@@ -16,9 +16,9 @@
     "tailwindcss": "^3.4.4"
   },
   "dependencies": {
-    "@ayu-sh-kr/dota-core": "^1.7.1",
-    "@ayu-sh-kr/dota-rest": "1.1.3",
-    "@ayu-sh-kr/dota-router": "0.0.11",
+    "@ayu-sh-kr/dota-core": "workspace:*",
+    "@ayu-sh-kr/dota-rest": "workspace:*",
+    "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-ui": "0.0.7",
     "highlight.js": "^11.11.1",
     "markdown-it": "^14.1.0",
