@@ -1,5 +1,6 @@
 import {RestClient} from "@ayu-sh-kr/dota-rest";
-import {routerService} from "@dota/configs/routes.config.ts";
+
+import {routerService} from "@dota/main.ts";
 
 
 export class DocLoaderService {
