@@ -24,9 +24,8 @@
     "url": "https://github.com/ayu-sh-kr/dota-core"
   },
   "scripts": {
-    "build": "tsup src/**/*.ts --format esm, cjs --dts",
-    "chunkless-build": "tsup src/index.ts --format esm, cjs --dts",
-    "build-pack": "pnpm chunkless-build && pnpm pack",
+    "build": "tsup src/index.ts --format esm, cjs --dts",
+    "build-pack": "pnpm build && pnpm pack",
     "lint": "tsc",
     "test": "jest",
     "release": "pnpm run chunkless-build && changeset publish"
