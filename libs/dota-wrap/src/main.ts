@@ -79,8 +79,7 @@ export async function registerRoutes(
   errorRoute: RouteConfig<HTMLElement>,
   defaultRoute: RouteConfig<HTMLElement>,
 ): Promise<RouterService<Router<HTMLElement>>> {
-  const components: CustomElementConstructor[] =
-    await extractComponent(modules);
+  const components: CustomElementConstructor[] = await extractComponent(modules);
   return DotaRouterService.fromComponents({
     router: DomHistoryRouter,
     components: [...components, ...externalComponents],
