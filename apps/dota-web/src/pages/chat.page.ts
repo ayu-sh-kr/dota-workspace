@@ -1,8 +1,10 @@
 import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-core";
+import { Route } from "@ayu-sh-kr/dota-router";
 import {OpenAIService} from "@dota/service/OpenAIService.ts";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
+@Route({path: '/chat'})
 @Component({
   selector: "chat-page",
   shadow: false,

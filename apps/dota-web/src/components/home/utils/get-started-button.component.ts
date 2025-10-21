@@ -1,5 +1,6 @@
 import {BaseElement, Component, HostListener} from "@ayu-sh-kr/dota-core";
-import {routerService} from "@dota/configs/routes.config.ts";
+
+import {routerService} from "@dota/main.ts";
 
 
 @Component({
@@ -14,7 +15,7 @@ export class GetStartedButtonComponent extends BaseElement {
 
   @HostListener({event: 'click'})
   onClickListener() {
-    routerService.route("/docs/Getting-Started.md");
+    routerService.route("/docs?content=Getting-Started.md");
   }
 
   render(): string {

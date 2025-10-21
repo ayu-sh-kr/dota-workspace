@@ -1,6 +1,8 @@
 import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-core";
+import { Route } from "@ayu-sh-kr/dota-router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
+@Route({path: '/resources'})
 @Component({
   selector: "resource-page",
   shadow: false

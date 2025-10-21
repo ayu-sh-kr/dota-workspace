@@ -1,6 +1,6 @@
 import { BaseElement, Component, HostListener, Property, String } from "@ayu-sh-kr/dota-core";
-import {routerService} from "@dota/configs/routes.config.ts";
 import {RouterUtils} from "@ayu-sh-kr/dota-router";
+import {routerService} from "@dota/main.ts";
 
 @Component({
   selector: "doc-path",
@@ -19,7 +19,7 @@ export class DocPathComponent extends BaseElement {
 
   @HostListener({ event: "click" })
   clickListener() {
-    routerService.route(`/docs/${this.filePath}`);
+    routerService.route(`/docs?content=${this.filePath}`);
   }
 
   render(): string {

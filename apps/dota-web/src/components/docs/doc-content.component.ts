@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, Param, Property, State, String} from "@ayu-sh-kr/dota-core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {WithLoading} from "@dota/utils/DecoratorUtils.ts";
 import {MarkdownService} from "@dota/service/markdown.service.ts";
@@ -9,11 +9,8 @@ import {MarkdownService} from "@dota/service/markdown.service.ts";
 })
 export class DocContentComponent extends BaseElement {
 
-  @Property({
-    name: 'file-path',
-    type: String,
-  })
-  filePath!: string;
+  @Param('content')
+  filePath: string = 'Getting-Started.md';
 
   docLoaderService: DocLoaderService;
   content!: string;
@@ -31,6 +28,8 @@ export class DocContentComponent extends BaseElement {
     this.updateHTML();
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
+
+
 
   render(): string {
     // language=html
