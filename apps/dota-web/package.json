@@ -19,6 +19,7 @@
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-rest": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
+    "@ayu-sh-kr/dota-wrap": "workspace:*",
     "@ayu-sh-kr/dota-ui": "0.0.7",
     "highlight.js": "^11.11.1",
     "markdown-it": "^14.1.0",
