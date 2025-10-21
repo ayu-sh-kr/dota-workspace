@@ -193,6 +193,7 @@ export class RouterUtils {
     }
 
     if (route.render) {
+      console.info(`Using custom render for path: ${path}`);
       route.render(path);
       return;
     }
