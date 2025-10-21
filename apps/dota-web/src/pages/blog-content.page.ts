@@ -1,5 +1,7 @@
 import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-core";
+import { Route } from "@ayu-sh-kr/dota-router";
 
+@Route({path: '/blogs/content'})
 @Component({
   selector: "blog-content",
   shadow: false

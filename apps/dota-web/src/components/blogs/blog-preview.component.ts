@@ -1,7 +1,8 @@
 // blog-preview.component.ts
 import {BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-core";
 import {type BlogCategory} from "@dota/configs/blogs.config.ts";
-import {routerService} from "@dota/configs/routes.config.ts";
+
+import {routerService} from "@dota/main.ts";
 
 @Component({
     selector: 'blog-preview',

@@ -1,29 +1,14 @@
-import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-core";
+import { BaseElement, Component } from "@ayu-sh-kr/dota-core";
 import { docConfigs } from "@dota/configs/doc.config.ts";
-import { RouterUtils } from "@ayu-sh-kr/dota-router";
-import {routerService} from "@dota/configs/routes.config.ts";
 
 @Component({
   selector: "doc-section",
   shadow: false,
 })
 export class DocSectionComponent extends BaseElement {
-  @Property({
-    name: "content-path",
-    type: String,
-  })
-  contentPath!: string;
 
   constructor() {
     super();
-    const currentEntry = RouterUtils.getCurrentPath();
-    if (currentEntry.includes("/docs")) {
-      const path = currentEntry.replace("/docs", "");
-      if (path === "") {
-        routerService.route("/docs/Getting-Started.md");
-      }
-      this.contentPath = path;
-    }
   }
 
   render(): string {
