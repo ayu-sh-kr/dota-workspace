@@ -83,6 +83,9 @@ importers:
       '@ayu-sh-kr/dota-ui':
         specifier: 0.0.7
         version: 0.0.7
+      '@ayu-sh-kr/dota-wrap':
+        specifier: workspace:*
+        version: link:../../libs/dota-wrap
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
