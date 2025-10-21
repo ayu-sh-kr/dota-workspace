@@ -1,0 +1,1 @@
+export {NavigationSidebarComponent} from "@dota/components/sidebar/navigation-sidebar.component.ts";

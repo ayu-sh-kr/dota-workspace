@@ -1,0 +1,100 @@
+@import "@ayu-sh-kr/dota-ui/dota-ui.css";
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Satisfy&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --animation-duration: 5000ms;
+}
+
+.toast-animate {
+    animation: toast-decrease ease-in-out var(--animation-duration);
+}
+
+.paused-animation {
+    animation-play-state: paused;
+}
+
+@layer base {
+    ::selection {
+        @apply bg-purple-500 dark:bg-purple-600 text-white;
+    }
+
+    ::-moz-selection {
+        @apply bg-purple-500 dark:bg-purple-600 text-white;
+    }
+
+}
+
+@layer utilities {
+    .card-wrapper {
+        @apply relative overflow-hidden rounded-2xl  bg-white dark:bg-gradient-to-b dark:from-gray-700 dark:to-gray-900;
+    }
+
+    .framework-logo{
+        @apply size-24 lg:size-36 transform transition-all duration-300 ease-in-out hover:translate-y-[-10px] hover:scale-110 drop-shadow-[0px_15px_25px_rgba(68,68,68,0.15)] dark:drop-shadow-[0px_15px_25px_rgba(68,68,68,.4)] ;
+    }
+
+
+    /* Gradient */
+    .card-wrapper::before {
+        background: conic-gradient(rgba(244, 114, 182, 0.4) 0deg, rgba(192, 132, 252, 0.8) 0deg, transparent 80deg);
+
+        @apply absolute left-[-25%] top-[-25%] h-[150%] w-[150%]  animate-border-spin content-[''];
+    }
+
+    /* Body */
+    .card-content {
+        @apply absolute left-[1.5px] top-[1.5px] h-[calc(100%-3px)] bg-white w-[calc(100%-3px)] rounded-2xl dark:bg-gradient-to-b dark:from-slate-800 dark:to-slate-900;
+    }
+
+    .font-adaptive {
+        @apply text-gray-900 dark:text-gray-50;
+    }
+
+    @keyframes toast-decrease {
+        0% {
+            @apply w-full;
+        }
+
+        100% {
+            @apply w-0;
+        }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+        border-radius: 20px;
+    }
+    /* .custom-scrollbar::-webkit-scrollbar-track {
+    background: #ffffff;
+  } */
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #dadada;
+        border-radius: 50px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #b1b1b1;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    code {
+        @apply custom-scrollbar
+    }
+    .community-card{
+        @apply bg-white dark:bg-slate-800 dark:text-white shadow-lg dark:shadow-purple-600
+        rounded-2xl hover:scale-110 ease-in duration-300 transition-all p-4 h-full
+    }
+
+}
+
+
+
+

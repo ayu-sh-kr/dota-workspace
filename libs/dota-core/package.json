@@ -1,0 +1,42 @@
+{
+  "name": "@ayu-sh-kr/dota-core",
+  "version": "1.7.2",
+  "author": "ayu-sh-kr",
+  "license": "MIT",
+  "description": "@ayu-sh-kr/dota-core is a comprehensive web component support module designed to facilitate the development of web components using TypeScript. This library provides decorators and utilities that simplify the creation, management, and usage of web components, ensuring a streamlined and efficient development process.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ayu-sh-kr/dota-core"
+  },
+  "scripts": {
+    "build": "tsup src/**/*.ts --format esm, cjs --dts",
+    "chunkless-build": "tsup src/index.ts --format esm, cjs --dts",
+    "build-pack": "pnpm chunkless-build && pnpm pack",
+    "lint": "tsc",
+    "test": "jest",
+    "release": "pnpm run chunkless-build && changeset publish"
+  },
+  "keywords": [
+    "Typescript",
+    "Web Component",
+    "Decorated Components"
+  ],
+  "dependencies": {
+    "reflect-metadata": "^0.2.2"
+  }
+}
