@@ -3,6 +3,7 @@ import {ComponentConfig} from "@ayu-sh-kr/dota-core";
 import 'reflect-metadata';
 import {DomNavigationRouter} from "@dota/dom-navigation.router";
 import {DomHistoryRouter} from "@dota/dom-history.router";
+import {BaseElement} from "@ayu-sh-kr/dota-core";
 
 export class RouterUtils {
 
@@ -44,6 +45,15 @@ export class RouterUtils {
    */
   static getChildPath<T extends HTMLElement>(path: string, route: RouteConfig<T>) {
     return path.substring(route.path.length) || '/';
+  }
+
+  /**
+   *
+   * @param previousPath
+   * @param completePath
+   */
+  static getNextPath(previousPath: string, completePath: string): string {
+    return completePath.substring(previousPath.length);
   }
 
   /**
@@ -183,6 +193,7 @@ export class RouterUtils {
     }
 
     if (route.render) {
+      console.info(`Using custom render for path: ${path}`);
       route.render(path);
       return;
     }
@@ -231,7 +242,7 @@ export class RouterUtils {
    * @param elements - An array of component classes to extract route configurations from.
    * @returns An array of top-level route configurations with nested children.
    */
-  static prepareConfig(elements: ComponentClass<HTMLElement>[]): RouteConfig<HTMLElement>[] {
+  static prepareConfig(elements: ComponentClass[]): RouteConfig<HTMLElement>[] {
     const routes: RouteConfig<HTMLElement>[] = [];
     const routeMap: Map<string, RouteConfig<HTMLElement>> = new Map();
 
@@ -239,20 +250,20 @@ export class RouterUtils {
     for (const element of elements) {
       if (element && Reflect.hasOwnMetadata('Route', element)) {
         const config: RouteConfig<HTMLElement> = Reflect.getOwnMetadata('Route', element);
-        routeMap.set(config.path, {...config, children: []});
+        routeMap.set(config.path, config);
       }
+    }
+
+    // find the root path and add it to the routes and remove it from the map
+    const rootComponent = routeMap.get('/');
+    if (rootComponent) {
+      routes.push(rootComponent)
+      routeMap.delete('/')
     }
 
     // Step 2 - Build the hierarchy
     for (const route of routeMap.values()) {
-      const parentPath = RouterUtils.getParentPath(route.path);
-      if (parentPath !== '/' && routeMap.has(parentPath)) {
-        const parentRoute = routeMap.get(parentPath)!;
-        parentRoute.children = parentRoute.children || [];
-        parentRoute.children.push(route);
-      } else {
-        routes.push(route);
-      }
+      RouterUtils.addRoute(route.path, routes, route)
     }
 
     // Step 3 - Return the top-level routes
@@ -261,5 +272,79 @@ export class RouterUtils {
     }
 
     return [];
+  }
+
+  /**
+   * Recursively builds a nested route hierarchy from a flat route configuration.
+   *
+   * This method takes a full route path, the current array of routes (which may be top-level or nested),
+   * and a route configuration. It splits the path into segments and determines whether the route should be
+   * added as a top-level route or nested under a parent. If the route is nested, it finds or creates the parent,
+   * then recurses to add the route to the parent's children.
+   *
+   * - If the path has only one segment, the route is added directly to the current routes array.
+   * - If the path has multiple segments, the method finds or creates the parent route for the first segment,
+   *   then recurses with the remaining segments to nest the route appropriately.
+   *
+   * @template T - Type parameter extending HTMLElement for route component type safety
+   * @param completePath - The full path of the route to add (e.g., "/resource/about")
+   * @param routes - The current array of route configurations (top-level or nested)
+   * @param route - The route configuration to add to the hierarchy
+   */
+  private static addRoute<T extends HTMLElement>(
+    completePath: string, routes: RouteConfig<T>[], route: RouteConfig<T>
+  ) {
+    // break the complete path into segments
+    const segments = completePath.replace(/^\//, '')
+      .split('/')
+      .filter(Boolean);
+
+    // one segment means top level route, add directly to routes
+    // fix the path as the route might have full path but should be only segment
+    if (segments.length === 1) {
+      route.path = '/' + segments[0];
+      // check if the path already exists, then update it
+      const existingRoute = routes.find(r => r.path === route.path);
+      if (existingRoute) {
+        existingRoute.component = route.component;
+        existingRoute.default = route.default;
+        existingRoute.render = route.render;
+        return;
+      }
+      // else add the route directly
+      routes.push(route);
+      return;
+    }
+
+    // more than one segment means nested route
+    // find the parent route and add the route to its children
+    const parentRoute = routes.find(r => r.path === '/' + segments[0]);
+    const remainingPath = segments.slice(1)
+      .join('/');
+
+    if (!parentRoute) {
+      const items = {
+        path: '/' + segments[0],
+        component: UnknownComponent,
+        children: []
+      };
+      routes.push(items)
+      RouterUtils.addRoute(`/${remainingPath}`, items.children!, route);
+      return;
+    }
+
+    if (!parentRoute.children) parentRoute.children = []
+    RouterUtils.addRoute(`/${remainingPath}`, parentRoute.children, route)
+  }
+}
+
+class UnknownComponent extends BaseElement {
+
+  constructor() {
+    super();
+  }
+
+  render(): string {
+    throw new Error("Method not implemented.");
   }
 }

@@ -21,9 +21,15 @@ export interface Router<T extends HTMLElement> {
   init(): void;
 }
 
+export type RouteMeta = {
+  path: string;
+  default?: boolean;
+  render?: (path: string) => void;
+}
+
 export type RouteConfig<T extends HTMLElement> = {
   path: string;
-  component: ComponentClass<T>;
+  component: ComponentClass;
   default?: boolean;
   children?: RouteConfig<T>[];
   render?: (path: string) => void;
@@ -46,7 +52,7 @@ export interface DefaultRouterConfig<T extends Router<HTMLElement>> {
   errorRoute: RouteConfig<HTMLElement>;
   defaultRoute: RouteConfig<HTMLElement>;
   router: new (...args: any[]) => T;
-  components?: ComponentClass<HTMLElement>[];
+  components?: ComponentClass[];
 }
 
 
@@ -61,4 +67,4 @@ export interface RouterService<T extends Router<HTMLElement>> {
   route(path: string): void;
 }
 
-export type ComponentClass<T> = new (...args: any[]) => T;
+export type ComponentClass<T extends HTMLElement = HTMLElement> = new (...args: any[]) => T;
