@@ -1,6 +1,10 @@
 {
   "name": "@ayu-sh-kr/dota-router",
-  "author": "ayu-sh-kr",
+  "author": {
+    "name": "ayu-sh-kr",
+    "email": "akjaiswal2003@gmail.com",
+    "url": "https://linkedin.com/in/ayu-sh-kr"
+  },
   "license": "MIT",
   "version": "0.0.13",
   "description": "Dota Router is a simple and lightweight router for `dota-core` web component api.",
