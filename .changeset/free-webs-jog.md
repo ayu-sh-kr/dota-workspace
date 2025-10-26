@@ -1,8 +1,8 @@
 ---
-"@ayu-sh-kr/dota-router": minor
-"@ayu-sh-kr/dota-core": minor
-"@ayu-sh-kr/dota-rest": minor
-"@ayu-sh-kr/dota-wrap": minor
+"@ayu-sh-kr/dota-router": patch
+"@ayu-sh-kr/dota-core": patch
+"@ayu-sh-kr/dota-rest": patch
+"@ayu-sh-kr/dota-wrap": patch
 ---
 
 Reconfigured the project structure and bring all the projects under the common umbrella.
