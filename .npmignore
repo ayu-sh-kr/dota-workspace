@@ -1,3 +1,9 @@
 .github/
 .changeset/
 .test/
+node_modules
+pnpm-lock.yaml
+pnpm-workspace.yaml
+tsconfig.json
+.editorconfig
+.gitignore
