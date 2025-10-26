@@ -1,5 +1,15 @@
 {
   "name": "@ayu-sh-kr/dota-router",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "router",
+    "dota",
+    "dota-core",
+    "dota-router"
+  ],
   "author": {
     "name": "ayu-sh-kr",
     "email": "akjaiswal2003@gmail.com",
@@ -29,12 +39,5 @@
     "dist/",
     "README.md",
     "package.json"
-  ],
-  "private": false,
-  "keywords": [
-    "router",
-    "dota",
-    "dota-core",
-    "dota-router"
   ]
 }
