@@ -35,5 +35,10 @@
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*"
-  }
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ]
 }

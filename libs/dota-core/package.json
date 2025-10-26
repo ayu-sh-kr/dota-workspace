@@ -21,7 +21,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist/",
+    "README.md",
+    "package.json"
   ],
   "repository": {
     "type": "git",

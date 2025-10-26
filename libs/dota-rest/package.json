@@ -21,6 +21,11 @@
     "build": "tsup src/index.ts --format esm, cjs --dts",
     "release": "pnpm run build && changeset publish"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ],
   "private": false,
   "keywords": [
     "fetch",

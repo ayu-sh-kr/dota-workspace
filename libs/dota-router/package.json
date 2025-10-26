@@ -25,6 +25,11 @@
     "@ayu-sh-kr/dota-core": "workspace:*",
     "reflect-metadata": "^0.2.2"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ],
   "private": false,
   "keywords": [
     "router",
