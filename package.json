@@ -11,7 +11,11 @@
     "release": "pnpm -r run release"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "ayu-sh-kr",
+    "email": "akjaiswal2003@gmail.com",
+    "url": "https://linkedin.com/in/ayu-sh-kr"
+  },
   "license": "ISC",
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
