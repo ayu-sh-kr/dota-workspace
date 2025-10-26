@@ -1,7 +1,7 @@
 {
   "name": "@ayu-sh-kr/dota-wrap",
   "private": false,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "dota-wrap have bunch of plugins to ease the development of web apps using dota ecosystem.",
   "author": {
     "name": "ayu-sh-kr",
@@ -9,7 +9,10 @@
     "url": "https://linkedin.com/in/ayu-sh-kr"
   },
   "license": "MIT",
-  "keywords": ["Dota Core Plugins", "Web Components"],
+  "keywords": [
+    "Dota Core Plugins",
+    "Web Components"
+  ],
   "type": "module",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
