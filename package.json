@@ -1,7 +1,7 @@
 {
   "name": "dota-workspace",
-  "version": "1.0.0",
-  "private": true,
+  "version": "0.0.0",
+  "private": false,
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "email": "akjaiswal2003@gmail.com",
     "url": "https://linkedin.com/in/ayu-sh-kr"
   },
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
     "@rollup/plugin-node-resolve": "^16.0.3",
