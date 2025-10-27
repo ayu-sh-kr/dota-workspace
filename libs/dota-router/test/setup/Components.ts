@@ -102,3 +102,29 @@ export class DummyComponent extends BaseElement {
     return '<div>Dummy</div>';
   }
 }
+
+@Route({ path: '/error' })
+@Component({selector: 'dota-error'})
+export class ErrorComponent extends BaseElement {
+
+  constructor() {
+    super();
+  }
+
+  render(): string {
+    return '<div>Error: Page not found</div>';
+  }
+}
+
+@Component({selector: 'app-root'})
+export class AppComponent extends BaseElement {
+
+  constructor() {
+    super();
+  }
+
+  render() : string {
+    return '<router-outlet></router-outlet>';
+  }
+
+}
