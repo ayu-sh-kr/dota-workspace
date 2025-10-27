@@ -2,7 +2,7 @@ import {describe, it, expect, beforeEach} from 'vitest';
 import {BaseElement} from '@ayu-sh-kr/dota-core';
 import { RouteConfig } from '@dota/Types';
 import { RouterUtils } from '@dota/RouterUtils';
-import { resetNavigationEntries } from './setup/MockNavigationUtility';
+import { resetNavigationEntries } from '../setup/MockNavigationUtility';
 
 // Mock classes for testing
 class TestComponent extends BaseElement {
