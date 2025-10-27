@@ -12,6 +12,7 @@ export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
     errorRoute: RouteConfig<T>,
     defaultRoute: RouteConfig<T>,
   ) {
+    if (!routes || routes.length === 0) throw new Error('Routes configuration cannot be empty.');
     this.routes = routes;
     this.errorRoute = errorRoute;
     this.defaultRoute = defaultRoute;
