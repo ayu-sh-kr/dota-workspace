@@ -54,7 +54,7 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
    * @returns A RouterService instance.
    */
   static fromComponents<T extends Router<HTMLElement>>(config: DefaultRouterConfig<T>): RouterService<T> {
-    if (!config.components) throw Error('Elements are required to create a RouterService instance');
+    if (!config.components || config.components.length === 0) throw Error('Elements are required to create a RouterService instance');
     const routes = RouterUtils.prepareConfig(config.components);
     return new DotaRouterService(
       config.router,
