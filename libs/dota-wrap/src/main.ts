@@ -1,5 +1,6 @@
 import { bootstrap } from '@ayu-sh-kr/dota-core';
 import {
+  ComponentClass,
   DomHistoryRouter,
   DotaRouterService,
   RouteConfig,
@@ -71,6 +72,7 @@ export async function registerComponents(
  * @param externalComponents - An optional array of CustomElementConstructor instances to include in routing.
  * @param errorRoute - The route configuration to use for error handling.
  * @param defaultRoute - The route configuration to use as the default route.
+ * @param root - The root component class for the application.
  * @returns A promise that resolves to an instance of DotaRouterService configured with the discovered components and routes.
  */
 export async function registerRoutes(
@@ -78,13 +80,15 @@ export async function registerRoutes(
   externalComponents: CustomElementConstructor[] = [],
   errorRoute: RouteConfig<HTMLElement>,
   defaultRoute: RouteConfig<HTMLElement>,
+  root: ComponentClass
 ): Promise<RouterService<Router<HTMLElement>>> {
   const components: CustomElementConstructor[] = await extractComponent(modules);
   return DotaRouterService.fromComponents({
     router: DomHistoryRouter,
     components: [...components, ...externalComponents],
-    errorRoute,
-    defaultRoute,
+    errorRoute: errorRoute,
+    defaultRoute: defaultRoute,
+    root: root
   });
 }
 
@@ -99,13 +103,15 @@ export async function registerRoutes(
  * @param externalComponents - An optional array of CustomElementConstructor instances to include in registration and routing.
  * @param errorRoute - The route configuration to use for error handling.
  * @param defaultRoute - The route configuration to use as the default route.
+ * @param root - The root component class for the application.
  * @returns A promise that resolves to an object containing the results of component registration and route registration.
  */
 export async function initializeApp(
   modules: Record<string, () => Promise<unknown>>,
   externalComponents: CustomElementConstructor[] = [],
   errorRoute: RouteConfig<HTMLElement>,
-  defaultRoute: RouteConfig<HTMLElement>
+  defaultRoute: RouteConfig<HTMLElement>,
+  root: ComponentClass
 ): Promise<{
   components: void,
   routerService: RouterService<Router<HTMLElement>>
@@ -114,7 +120,7 @@ export async function initializeApp(
   const components = await registerComponents(modules, externalComponents);
   console.info('Components registered.');
   console.info('Registering routes...');
-  const routerService = await registerRoutes(modules, externalComponents, errorRoute, defaultRoute);
+  const routerService = await registerRoutes(modules, externalComponents, errorRoute, defaultRoute, root);
   console.info(`Routes registered with available routes size: ${routerService._routes.length}`);
   routerService.init();
   console.info('Application initialized.');
