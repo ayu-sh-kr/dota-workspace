@@ -1,4 +1,4 @@
-import {DefaultRouterConfig, RouteConfig, Router, RouterService} from "@dota/Types";
+import {ComponentClass, DefaultRouterConfig, RouteConfig, Router, RouterConstructor, RouterService} from "@dota/Types";
 import {RouterUtils} from "@dota/RouterUtils";
 
 
@@ -10,38 +10,25 @@ import {RouterUtils} from "@dota/RouterUtils";
  */
 export class DotaRouterService<T extends Router<HTMLElement>> implements RouterService<T> {
 
-  _router: new (...args: any[]) => T;
+  _router: RouterConstructor<T>;
   _routes: RouteConfig<HTMLElement>[];
   _errorRoute: RouteConfig<HTMLElement>;
   _defaultRoute: RouteConfig<HTMLElement>;
+  _root: ComponentClass
   private instance!: T;
 
 
   constructor(
-    router: new (...args: any[]) => T,
+    router: RouterConstructor<T>,
     routes: RouteConfig<HTMLElement>[],
-    errorRoute: RouteConfig<HTMLElement>, defaultRoute: RouteConfig<HTMLElement>
+    errorRoute: RouteConfig<HTMLElement>, defaultRoute: RouteConfig<HTMLElement>,
+    root: ComponentClass
   ) {
     this._router = router;
     this._routes = routes;
     this._errorRoute = errorRoute;
     this._defaultRoute = defaultRoute;
-  }
-
-  /**
-   * Requires a router instance and returns a RouterService instance.
-   *
-   * This method is a factory method that helps create a RouterService instance.
-   * @param config - The configuration object containing the router instance and its routes.
-   */
-  static of<T extends Router<HTMLElement>>(config: DefaultRouterConfig<T>): RouterService<T> {
-    if (!config.routes) throw Error('Routes are required to create a RouterService instance');
-    return new DotaRouterService(
-      config.router,
-      config.routes,
-      config.errorRoute,
-      config.defaultRoute
-    )
+    this._root = root;
   }
 
   /**
@@ -60,7 +47,8 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
       config.router,
       routes,
       config.errorRoute,
-      config.defaultRoute
+      config.defaultRoute,
+      config.root
     )
   }
 
@@ -68,7 +56,8 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
     this.instance = new this._router(
       this._routes,
       this._errorRoute,
-      this._defaultRoute
+      this._defaultRoute,
+      this._root
     );
     return this;
   }
