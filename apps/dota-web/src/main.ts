@@ -41,7 +41,12 @@ const modules: Record<string, () => Promise<unknown>> = {
 };
 
 let routerService!: RouterService<Router<HTMLElement>>;
-initializeApp(modules, [IconsComponent as unknown as CustomElementConstructor], {path: '/error', component: ErrorPage}, {path: '/', component: HomePage})
+initializeApp(
+  modules, [IconsComponent as unknown as CustomElementConstructor],
+  {path: '/error', component: ErrorPage},
+  {path: '/', component: HomePage},
+  AppComponent
+)
   .then((value) => {
     routerService = value.routerService
   })
@@ -50,7 +55,7 @@ initializeApp(modules, [IconsComponent as unknown as CustomElementConstructor], 
 export {routerService}
 
 declare global {
-  interface HTMLTagNameMap {
+  interface HTMLElementTagNameMap {
     'app-offer': OfferComponent,
     'app-header': HeaderComponent,
     'app-hero': HeroSectionComponent,
