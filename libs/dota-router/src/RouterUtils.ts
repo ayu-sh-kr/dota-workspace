@@ -1,9 +1,8 @@
 import {ComponentClass, NavigationOption, RenderConfig, RouteConfig, Router} from "@dota/Types";
-import {ComponentConfig} from "@ayu-sh-kr/dota-core";
 import 'reflect-metadata';
 import {DomNavigationRouter} from "@dota/dom-navigation.router";
 import {DomHistoryRouter} from "@dota/dom-history.router";
-import {BaseElement} from "@ayu-sh-kr/dota-core";
+import {BaseElement, HelperUtils, ComponentConfig} from "@ayu-sh-kr/dota-core";
 
 export class RouterUtils {
 
@@ -174,10 +173,17 @@ export class RouterUtils {
   static render<T extends HTMLElement>(config: RenderConfig<T>): void {
     const {path, routes, options} = config;
     const router = config.router as Router<T>;
+    const componentConfig: ComponentConfig = HelperUtils.getComponentMetadata(router.root, 'Component');
+    const rootElement = document.querySelector(`#${componentConfig.selector}`)
+    if (!rootElement) {
+      console.error(`Root element not found for selector: ${componentConfig.selector}`);
+      return;
+    }
+
     if (path === '/error') {
       if (Reflect.hasOwnMetadata('Component', router.errorRoute.component)) {
         const config: ComponentConfig = Reflect.getOwnMetadata('Component', router.errorRoute.component);
-        document.querySelector('#app-root')!.innerHTML = `
+        rootElement.innerHTML = `
             <${config.selector} message="${options?.message || 'Path not found'}"></${config.selector}>
         `;
         return;
@@ -200,7 +206,7 @@ export class RouterUtils {
 
     if (Reflect.hasOwnMetadata('Component', route.component)) {
       const config: ComponentConfig = Reflect.getOwnMetadata('Component', route.component);
-      document.querySelector('#app-root')!.innerHTML = `<${config.selector} path="${path}"></${config.selector}>`;
+      rootElement.innerHTML = `<${config.selector} path="${path}"></${config.selector}>`;
       return;
     }
 
