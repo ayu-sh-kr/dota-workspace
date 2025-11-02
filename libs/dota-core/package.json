@@ -38,6 +38,7 @@
     "build-pack": "pnpm build && pnpm pack",
     "lint": "tsc",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "release": "pnpm run build && changeset publish"
   },
   "keywords": [

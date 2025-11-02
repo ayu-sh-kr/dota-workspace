@@ -28,9 +28,10 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "lint": "tsc",
-    "test": "jest --detectOpenHandles",
     "build": "tsup src/index.ts --format esm, cjs --dts",
-    "release": "pnpm run build && changeset publish"
+    "release": "pnpm run build && changeset publish",
+    "test": "jest --detectOpenHandles",
+    "test:coverage": "jest --coverage"
   },
   "files": [
     "dist/",
