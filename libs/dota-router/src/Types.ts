@@ -87,6 +87,7 @@ export interface RouterService<T extends Router<HTMLElement>> {
   _errorRoute: RouteConfig<HTMLElement>;
   _defaultRoute: RouteConfig<HTMLElement>;
   _root: ComponentClass
+  instance: T;
 
   init(): RouterService<T>;
 
