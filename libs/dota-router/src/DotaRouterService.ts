@@ -15,7 +15,7 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
   _errorRoute: RouteConfig<HTMLElement>;
   _defaultRoute: RouteConfig<HTMLElement>;
   _root: ComponentClass
-  private instance!: T;
+  instance!: T;
 
 
   constructor(
