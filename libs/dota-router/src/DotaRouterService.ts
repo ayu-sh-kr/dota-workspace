@@ -70,7 +70,7 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
    * @returns void
    */
   route(path: string): void {
-    RouterUtils.route(this.instance, path);
+    this.instance.route(path)
   }
 
 }
