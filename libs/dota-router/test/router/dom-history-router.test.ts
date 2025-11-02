@@ -3,6 +3,7 @@ import {components, defaultRoute, errorRoute} from "@test/setup/RouteConfig";
 import {DomHistoryRouter} from "@dota/dom-history.router";
 import {afterAll, beforeEach, vi} from "vitest";
 import { BaseElement } from "@ayu-sh-kr/dota-core";
+import {AppComponent} from "@test/setup/Components";
 
 describe('DomHistoryRouter', () => {
 
@@ -40,7 +41,8 @@ describe('DomHistoryRouter', () => {
     const router = new DomHistoryRouter<BaseElement>(
       routes,
       errorRoute,
-      defaultRoute
+      defaultRoute,
+      AppComponent
     );
 
     // Verify the instance was created successfully
@@ -62,7 +64,7 @@ describe('DomHistoryRouter', () => {
   });
 
   it('should throw error when initialized with null or empty route configs', () => {
-    const routerInit = () => new DomHistoryRouter([], errorRoute, defaultRoute);
+    const routerInit = () => new DomHistoryRouter([], errorRoute, defaultRoute, AppComponent);
     expect(routerInit).toThrow('Routes configuration cannot be empty.');
   });
 
