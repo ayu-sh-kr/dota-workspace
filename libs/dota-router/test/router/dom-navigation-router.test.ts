@@ -3,6 +3,7 @@ import { components, defaultRoute, errorRoute } from "@test/setup/RouteConfig";
 import { DomNavigationRouter } from "@dota/dom-navigation.router";
 import {afterAll, expect, vi} from "vitest";
 import { BaseElement } from "@ayu-sh-kr/dota-core";
+import {AppComponent} from "@test/setup/Components";
 
 describe('DomNavigationRouter', () => {
 
@@ -54,7 +55,8 @@ describe('DomNavigationRouter', () => {
     const router = new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
-      defaultRoute
+      defaultRoute,
+      AppComponent
     );
 
     // Verify the instance was created successfully
@@ -76,7 +78,8 @@ describe('DomNavigationRouter', () => {
   });
 
   it('should throw error when initialized with null or empty route configs', () => {
-    const routerInit = () => new DomNavigationRouter([], errorRoute, defaultRoute);
+    const routerInit
+      = () => new DomNavigationRouter([], errorRoute, defaultRoute, AppComponent);
     expect(routerInit).toThrow('Routes configuration cannot be empty.');
   });
 
@@ -142,7 +145,8 @@ describe('DomNavigationRouter', () => {
     const router = new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
-      defaultRoute
+      defaultRoute,
+      AppComponent
     );
 
     expect(router).toBeInstanceOf(DomNavigationRouter);
@@ -170,7 +174,8 @@ describe('DomNavigationRouter', () => {
     new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
-      defaultRoute
+      defaultRoute,
+      AppComponent
     );
 
     const navigateHandler = mockNavigation.addEventListener.mock.calls
@@ -188,7 +193,8 @@ describe('DomNavigationRouter', () => {
     new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
-      defaultRoute
+      defaultRoute,
+      AppComponent
     );
 
     const navigateHandler = mockNavigation.addEventListener.mock.calls
@@ -206,7 +212,8 @@ describe('DomNavigationRouter', () => {
     new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
-      defaultRoute
+      defaultRoute,
+      AppComponent
     );
 
     const navigateHandler = mockNavigation.addEventListener.mock.calls
@@ -230,7 +237,8 @@ describe('DomNavigationRouter', () => {
     const router = new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
-      defaultRoute
+      defaultRoute,
+      AppComponent
     );
 
     const navigateHandler = mockNavigation.addEventListener.mock.calls

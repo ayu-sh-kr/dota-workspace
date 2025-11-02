@@ -116,6 +116,27 @@ export class ErrorComponent extends BaseElement {
   }
 }
 
+@Route({
+  path: '/custom-render',
+  render: path => {
+    // language=html
+    document.querySelector('app-root')!.innerHTML = `
+        <div>Custom Render Function ${path}</div>
+    `
+  }
+})
+@Component({selector: 'dota-custom-render'})
+export class CustomRenderComponent extends BaseElement {
+
+  constructor() {
+    super();
+  }
+
+  render(): string {
+    return '<div>Custom Render</div>';
+  }
+}
+
 @Component({selector: 'app-root'})
 export class AppComponent extends BaseElement {
 

@@ -23,7 +23,7 @@ export class AppComponent extends BaseElement {
     }
 
     render(): string {
-        return HTML`<home-page></home-page>`
+        return ''
     }
 
 }

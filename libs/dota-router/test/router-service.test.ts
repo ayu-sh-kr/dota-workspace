@@ -3,6 +3,8 @@ import {DomHistoryRouter} from "@dota/dom-history.router";
 import {expect, vi} from "vitest";
 import {RouterUtils} from "@dota/RouterUtils";
 import {components, defaultRoute, errorRoute} from "@test/setup/RouteConfig";
+import {AppComponent} from "@test/setup/Components";
+import {Router} from "@dota/Types";
 
 describe('RouterService', () => {
 
@@ -11,6 +13,7 @@ describe('RouterService', () => {
       router: DomHistoryRouter,
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
+      root: AppComponent
     })
 
     expect(routerConfig)
@@ -23,6 +26,7 @@ describe('RouterService', () => {
       components: [],
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
+      root: AppComponent
     })
 
     expect(routerConfig)
@@ -35,6 +39,7 @@ describe('RouterService', () => {
       components: components,
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
+      root: AppComponent
     });
 
     expect(routerService).toBeInstanceOf(DotaRouterService);
@@ -46,6 +51,7 @@ describe('RouterService', () => {
       components: components,
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
+      root: AppComponent
     });
 
     const routes = RouterUtils.prepareConfig(components);
@@ -59,6 +65,7 @@ describe('RouterService', () => {
       components: components,
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
+      root: AppComponent
     });
 
     expect(routerService['_defaultRoute']).toBe(defaultRoute);
@@ -71,6 +78,7 @@ describe('RouterService', () => {
       components: components,
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
+      root: AppComponent
     });
 
     expect(routerService['_router']).toBe(DomHistoryRouter);
@@ -79,25 +87,30 @@ describe('RouterService', () => {
   it('should initialize the router with given config', () => {
     // Mock the entire DomHistoryRouter class
     const mockInit = vi.fn();
-    const MockDomHistoryRouter = vi.fn().mockImplementation((routes: any, errorRoute: any, defaultRoute: any) => ({
-      routes,
-      errorRoute,
-      defaultRoute,
-      init: mockInit
-    }));
+    const MockDomHistoryRouter = vi.fn()
+      .mockImplementation((routes: any, errorRoute: any, defaultRoute: any, root: any) => ({
+        routes,
+        errorRoute,
+        defaultRoute,
+        root,
+        init: mockInit
+      }));
+
 
     const routerService = DotaRouterService.fromComponents({
       router: MockDomHistoryRouter,
       components: components,
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
+      root: AppComponent
     });
     routerService.init();
 
     expect(MockDomHistoryRouter).toHaveBeenCalledWith(
       routerService['_routes'],
       routerService['_errorRoute'],
-      routerService['_defaultRoute']
+      routerService['_defaultRoute'],
+      routerService['_root']
     );
 
     mockInit.mockRestore();
@@ -106,17 +119,17 @@ describe('RouterService', () => {
 
   it('should call RouterUtils.route with the exact router instance and path', () => {
     // Mock RouterUtils.render to prevent DOM manipulation during router construction
-    const renderSpy = vi.spyOn(RouterUtils, 'render').mockImplementation(() => {});
-
-    // Mock RouterUtils.route to capture the call
-    const routeSpy = vi.spyOn(RouterUtils, 'route').mockImplementation(() => {});
+    const renderSpy = vi.spyOn(RouterUtils, 'render')
+      .mockImplementation(() => {});
 
     // Mock the DomHistoryRouter to prevent actual initialization
-    const mockRouter = {
+    const mockRouter: Router<HTMLElement> = {
       routes: [],
+      root: AppComponent,
       errorRoute: errorRoute,
       defaultRoute: defaultRoute,
-      init: vi.fn()
+      init: vi.fn(),
+      route: vi.fn()
     };
 
     const MockDomHistoryRouter = vi.fn().mockImplementation(() => mockRouter);
@@ -126,6 +139,7 @@ describe('RouterService', () => {
       components: components,
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
+      root: AppComponent
     });
 
     // Initialize the service (this creates the router instance)
@@ -135,12 +149,11 @@ describe('RouterService', () => {
     routerService.route(testPath);
 
     // Verify RouterUtils.route was called with the mock router instance and correct path
-    expect(routeSpy).toHaveBeenCalledTimes(1);
-    expect(routeSpy).toHaveBeenCalledWith(mockRouter, testPath);
+    expect(mockRouter.route).toHaveBeenCalledTimes(1);
+    expect(mockRouter.route).toHaveBeenCalledWith(testPath);
 
     // Clean up
     renderSpy.mockRestore();
-    routeSpy.mockRestore();
   });
 
 });

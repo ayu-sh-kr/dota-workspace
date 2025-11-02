@@ -1,4 +1,4 @@
-import {NavigationOption, RouteConfig, Router} from "@dota/Types";
+import {ComponentClass, NavigationOption, RouteConfig, Router} from "@dota/Types";
 import {RouterUtils} from "@dota/RouterUtils";
 
 export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
@@ -6,16 +6,19 @@ export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
   public readonly routes: RouteConfig<T>[]
   public readonly errorRoute: RouteConfig<T>;
   public readonly defaultRoute: RouteConfig<T>;
+  public readonly root: ComponentClass;
 
   constructor(
     routes: RouteConfig<T>[],
     errorRoute: RouteConfig<T>,
     defaultRoute: RouteConfig<T>,
+    root: ComponentClass
   ) {
     if (!routes || routes.length === 0) throw new Error('Routes configuration cannot be empty.');
     this.routes = routes;
     this.errorRoute = errorRoute;
     this.defaultRoute = defaultRoute;
+    this.root = root;
     this.init();
 
     // handle initial navigation
@@ -49,6 +52,10 @@ export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
         }
       })
     })
+  }
+
+  route(path: string) {
+    DomNavigationRouter.route(path);
   }
 
   /**

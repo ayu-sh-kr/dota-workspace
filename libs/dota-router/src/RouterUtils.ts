@@ -1,9 +1,6 @@
-import {ComponentClass, NavigationOption, RenderConfig, RouteConfig, Router} from "@dota/Types";
-import {ComponentConfig} from "@ayu-sh-kr/dota-core";
+import {ComponentClass, RenderConfig, RouteConfig, Router} from "@dota/Types";
 import 'reflect-metadata';
-import {DomNavigationRouter} from "@dota/dom-navigation.router";
-import {DomHistoryRouter} from "@dota/dom-history.router";
-import {BaseElement} from "@ayu-sh-kr/dota-core";
+import {BaseElement, HelperUtils, ComponentConfig} from "@ayu-sh-kr/dota-core";
 
 export class RouterUtils {
 
@@ -174,10 +171,17 @@ export class RouterUtils {
   static render<T extends HTMLElement>(config: RenderConfig<T>): void {
     const {path, routes, options} = config;
     const router = config.router as Router<T>;
+    const rootConfig: ComponentConfig = HelperUtils.getComponentMetadata(router.root, 'Component');
+    const rootElement = document.querySelector(`#${rootConfig.selector}`)
+    if (!rootElement) {
+      console.error(`Root element not found for selector: ${rootConfig.selector}`);
+      return;
+    }
+
     if (path === '/error') {
       if (Reflect.hasOwnMetadata('Component', router.errorRoute.component)) {
         const config: ComponentConfig = Reflect.getOwnMetadata('Component', router.errorRoute.component);
-        document.querySelector('#app-root')!.innerHTML = `
+        rootElement.innerHTML = `
             <${config.selector} message="${options?.message || 'Path not found'}"></${config.selector}>
         `;
         return;
@@ -188,7 +192,7 @@ export class RouterUtils {
     const route = RouterUtils.findRoute(path, routes);
     if (!route) {
       console.warn(`Route not found for path: ${path}`);
-      RouterUtils.route(router, '/error', {message: 'Path not found'});
+      RouterUtils.route(router, '/error');
       return;
     }
 
@@ -200,7 +204,7 @@ export class RouterUtils {
 
     if (Reflect.hasOwnMetadata('Component', route.component)) {
       const config: ComponentConfig = Reflect.getOwnMetadata('Component', route.component);
-      document.querySelector('#app-root')!.innerHTML = `<${config.selector} path="${path}"></${config.selector}>`;
+      rootElement.innerHTML = `<${config.selector} path="${path}"></${config.selector}>`;
       return;
     }
 
@@ -214,21 +218,12 @@ export class RouterUtils {
    *
    * @param router - The router instance to use for navigation.
    * @param path - The path to navigate to.
-   * @param options - Optional navigation options.
    * @returns void
    */
-  static route(router: Router<HTMLElement>, path: string, options?: NavigationOption) {
+  static route(router: Router<HTMLElement>, path: string) {
     // Normalize the path to ensure it starts with a slash
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-
-    // Use instanceof operator to determine the router type
-    if (router instanceof DomNavigationRouter) {
-      DomNavigationRouter.route(normalizedPath, options);
-    } else if (router instanceof DomHistoryRouter) {
-      DomHistoryRouter.route(normalizedPath, options);
-    } else {
-      console.error(`Unsupported router type`);
-    }
+    router.route(normalizedPath);
   }
 
   /**
