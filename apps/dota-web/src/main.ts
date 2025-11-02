@@ -32,7 +32,7 @@ import {
 import {DocContentComponent, DocPathComponent, DocSectionComponent} from "@dota/components/docs";
 import {CounterComponent} from "@dota/components/example/CounterComponent.ts";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
-import {Router, RouterService } from "@ayu-sh-kr/dota-router";
+import {Router, RouterService, ComponentClass } from "@ayu-sh-kr/dota-router";
 
 const modules: Record<string, () => Promise<unknown>> = {
   ...import.meta.glob('/src/**/*.component.ts'),
@@ -41,12 +41,13 @@ const modules: Record<string, () => Promise<unknown>> = {
 };
 
 let routerService!: RouterService<Router<HTMLElement>>;
-initializeApp(
-  modules, [IconsComponent as unknown as CustomElementConstructor],
-  {path: '/error', component: ErrorPage},
-  {path: '/', component: HomePage},
-  AppComponent
-)
+initializeApp({
+  modules: modules,
+  externalComponents: [IconsComponent] as unknown as ComponentClass[],
+  errorRoute: {path: '/error', component: ErrorPage},
+  defaultRoute: {path: '/', component: HomePage},
+  root: AppComponent,
+})
   .then((value) => {
     routerService = value.routerService
   })
