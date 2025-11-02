@@ -20,6 +20,15 @@ export interface Router<T extends HTMLElement> {
    * @returns void
    */
   init(): void;
+
+  /**
+   * Navigate to a specified path.
+   *
+   * This method uses path to navigate to the corresponding route.
+   * It should update the browser's history and render the appropriate component for the given path.
+   * @param path
+   */
+  route(path: string): void;
 }
 
 /**
@@ -77,6 +86,7 @@ export interface RouterService<T extends Router<HTMLElement>> {
   _routes: RouteConfig<HTMLElement>[];
   _errorRoute: RouteConfig<HTMLElement>;
   _defaultRoute: RouteConfig<HTMLElement>;
+  _root: ComponentClass
 
   init(): RouterService<T>;
 
