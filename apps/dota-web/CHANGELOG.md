@@ -1,5 +1,13 @@
 # doto-web
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [4d98eb5]
+  - @ayu-sh-kr/dota-router@0.0.15
+  - @ayu-sh-kr/dota-wrap@0.0.2
+
 ## 0.0.1
 
 ### Patch Changes
