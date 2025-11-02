@@ -54,6 +54,10 @@ export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
     })
   }
 
+  route(path: string) {
+    DomNavigationRouter.route(path);
+  }
+
   /**
    * Navigate to a specified path using the Navigation API.
    * This method is responsible for navigating to a new path using the Navigation API.
