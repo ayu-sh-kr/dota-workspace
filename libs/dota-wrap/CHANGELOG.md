@@ -1,5 +1,19 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.2
+
+### Patch Changes
+
+- 4d98eb5: Modify the dota-router to let user provide their root component instead of guessing it to be app-root
+
+  ### Patch Changes
+
+  - Modifies dota-router to accept a root component field in its configuration.
+  - Updates dota-wrap to ensure compatibility with the new root component configuration in dota-router.
+
+- Updated dependencies [4d98eb5]
+  - @ayu-sh-kr/dota-router@0.0.15
+
 ## 0.0.1
 
 ### Patch Changes
