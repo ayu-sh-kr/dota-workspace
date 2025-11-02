@@ -1,7 +1,5 @@
-import {ComponentClass, NavigationOption, RenderConfig, RouteConfig, Router} from "@dota/Types";
+import {ComponentClass, RenderConfig, RouteConfig, Router} from "@dota/Types";
 import 'reflect-metadata';
-import {DomNavigationRouter} from "@dota/dom-navigation.router";
-import {DomHistoryRouter} from "@dota/dom-history.router";
 import {BaseElement, HelperUtils, ComponentConfig} from "@ayu-sh-kr/dota-core";
 
 export class RouterUtils {
@@ -173,10 +171,10 @@ export class RouterUtils {
   static render<T extends HTMLElement>(config: RenderConfig<T>): void {
     const {path, routes, options} = config;
     const router = config.router as Router<T>;
-    const componentConfig: ComponentConfig = HelperUtils.getComponentMetadata(router.root, 'Component');
-    const rootElement = document.querySelector(`#${componentConfig.selector}`)
+    const rootConfig: ComponentConfig = HelperUtils.getComponentMetadata(router.root, 'Component');
+    const rootElement = document.querySelector(`#${rootConfig.selector}`)
     if (!rootElement) {
-      console.error(`Root element not found for selector: ${componentConfig.selector}`);
+      console.error(`Root element not found for selector: ${rootConfig.selector}`);
       return;
     }
 
@@ -194,7 +192,7 @@ export class RouterUtils {
     const route = RouterUtils.findRoute(path, routes);
     if (!route) {
       console.warn(`Route not found for path: ${path}`);
-      RouterUtils.route(router, '/error', {message: 'Path not found'});
+      RouterUtils.route(router, '/error');
       return;
     }
 
@@ -220,21 +218,12 @@ export class RouterUtils {
    *
    * @param router - The router instance to use for navigation.
    * @param path - The path to navigate to.
-   * @param options - Optional navigation options.
    * @returns void
    */
-  static route(router: Router<HTMLElement>, path: string, options?: NavigationOption) {
+  static route(router: Router<HTMLElement>, path: string) {
     // Normalize the path to ensure it starts with a slash
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-
-    // Use instanceof operator to determine the router type
-    if (router instanceof DomNavigationRouter) {
-      DomNavigationRouter.route(normalizedPath, options);
-    } else if (router instanceof DomHistoryRouter) {
-      DomHistoryRouter.route(normalizedPath, options);
-    } else {
-      console.error(`Unsupported router type`);
-    }
+    router.route(normalizedPath);
   }
 
   /**
