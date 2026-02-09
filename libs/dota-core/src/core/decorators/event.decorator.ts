@@ -1,4 +1,4 @@
-import {HelperUtils} from "@dota/core/helper";
+import {HelperUtils} from "@dota/core";
 import {EventDetails} from "@dota/core/types";
 
 
