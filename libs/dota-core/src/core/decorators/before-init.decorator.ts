@@ -1,4 +1,4 @@
-import {HelperUtils} from "@dota/core/helper";
+import {HelperUtils} from "@dota/core";
 
 /**
  * A method decorator that registers a method to be called before the initialization of a custom element.
