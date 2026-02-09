@@ -322,7 +322,9 @@ export type EventBindType = 'Bind' | 'Window' | 'Host' | 'Document';
 export type EventBindRecord = {
   option: EventOptionMeta,
   element: HTMLElement | Window | Document | ShadowRoot,
-  type: EventBindType
+  type: EventBindType,
+  event: string,
+  handler: EventListener
 }
 
 /**
