@@ -1,22 +1,21 @@
-import {HelperUtils} from "@dota/core/helper";
 import {
   BindConfig, ElementConfigInternal, EventDetails,
   EventOptionMeta,
   MethodDetails, ParameterConfig,
   PropertyDetails, StateConfig
 } from "@dota/core/types";
-import {EventEmitter, Sanitizer} from "@dota/core/utils";
+import {HelperUtils, PropertyUtils, Sanitizer} from "@dota/core/utils";
 import {EventManagerService} from "@dota/core/services";
+import {EventEmitter} from "@dota/core";
 
 
 export abstract class BaseElement extends HTMLElement {
   [key: string]: any
 
   isShadow!: boolean;
-
   shadowRoot!: ShadowRoot;
-
   reactive = false;
+  private __initialized = false;
 
   private eventManagerService: EventManagerService<BaseElement>;
 
@@ -34,28 +33,35 @@ export abstract class BaseElement extends HTMLElement {
    * @method connectedCallback
    */
   connectedCallback() {
-    // Critical operations that should execute immediately
     this.handleBeforeInit();
+
+    // Needs html to be rendered before binding methods and events,
+    // so we defer those tasks to the next microtask.
     this.bindHTML();
 
+    // Defer non-critical tasks to the next microtask to avoid blocking the main thread.
+    const bindProperties = this.bindProperties();
+    const bindParameters = this.bindParameters();
+    const bindState = this.bindState(this);
+    const bindElements = this.bindElements();
     const exposedMethods = this.exposeMethods();
     const bindMethods = this.bindMethods();
     const bindEmitter = this.bindEmitter();
     const bindHostEvents = this.bindHostEvents();
     const bindWindowEvents = this.bindWindowEvents();
     const bindDocumentEvents = this.bindDocumentEvents();
-    const bindParameters = this.bindParameters();
-    const bindState = this.bindState(this);
-    const bindElements = this.bindElements();
 
     Promise.all([
       exposedMethods, bindMethods, bindEmitter, bindHostEvents,
-      bindWindowEvents, bindDocumentEvents, bindParameters, bindState,
-      bindElements
+      bindWindowEvents, bindDocumentEvents, bindProperties, bindParameters,
+      bindState, bindElements
     ])
+      .then(() => {
+        this.__initialized = true;
+        this.updateHTML();
+        this.handleAfterInit();
+      })
       .catch((reason) => console.error(reason));
-
-    this.handleAfterInit();
   }
 
   disconnectedCallback() {
@@ -65,6 +71,7 @@ export abstract class BaseElement extends HTMLElement {
     const documentEvents = this.unbindDocumentEvents();
 
     Promise.all([unbindMethods, unbindHostEvents, unbindWindowEvents, documentEvents])
+      .then(() => this.__initialized = false)
       .catch((reason) => console.error(reason));
   }
 
@@ -81,6 +88,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method updateHTML
    */
   updateHTML() {
+    if (!this.__initialized) return;
     if (this.isShadow && this.shadowRoot) {
       this.shadowRoot.innerHTML = this.render();
     } else {
@@ -108,7 +116,7 @@ export abstract class BaseElement extends HTMLElement {
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
 
     if (!this.reactive) {
-      HelperUtils.bindReactive(this);
+      PropertyUtils.bindReactive(this);
     }
 
     if (!newValue) {
@@ -147,15 +155,12 @@ export abstract class BaseElement extends HTMLElement {
    * @method handleBeforeInit
    */
   handleBeforeInit() {
-
     let data: Map<string, Function> = HelperUtils.fetchOrCreate<Function>(this, 'Before')
-
     const fun = data.get('beforeViewInit')
 
     if (fun) {
       fun.apply(this);
     }
-
   }
 
   /**
@@ -169,16 +174,13 @@ export abstract class BaseElement extends HTMLElement {
    * @method handleAfterInit
    */
   private handleAfterInit() {
-
     const data: Map<string, Function> = HelperUtils.fetchOrCreate<Function>(this, 'After');
-
     const fun = data.get('afterViewInit')
 
     if (fun) {
       fun.apply(this);
       this.updateHTML();
     }
-
   }
 
   /**
@@ -193,20 +195,45 @@ export abstract class BaseElement extends HTMLElement {
    * @method bindHTML
    */
   private bindHTML() {
-
     this.isShadow = Reflect.getMetadata(this.constructor.name + ':' + 'shadow', this.constructor)
-
     if (this.isShadow) {
       this.shadowRoot = this.attachShadow({mode: "open"})
-    }
-
-    if (this.isShadow) {
       if (this.shadowRoot) {
         this.shadowRoot.innerHTML = this.render();
       }
     } else {
       this.innerHTML = this.render();
     }
+  }
+
+  /**
+   * Binds reactive properties to the component based on metadata.
+   *
+   * This method retrieves metadata associated with the component's constructor
+   * to find property configurations marked with the `@Property` decorator. It then
+   * sets up reactive getters and setters for each property, enabling automatic
+   * re-rendering when property values change. This allows for two-way data binding
+   * between component properties and their corresponding HTML attributes.
+   *
+   * @method bindProperties
+   */
+  private async bindProperties() {
+    PropertyUtils.bindReactive(this)
+  }
+
+
+  /**
+   * Unbinds reactive properties from the component.
+   *
+   * This method removes reactive getters and setters that were previously
+   * set up for component properties, effectively disabling automatic re-rendering
+   * when property values change.
+   *
+   * @method unbindProperties
+   */
+  private async unbindProperties() {
+    
+    PropertyUtils.unbindReactive(this)
   }
 
 
@@ -541,7 +568,7 @@ export abstract class BaseElement extends HTMLElement {
             element[propertyKey] = v;
             element.updateHTML();
 
-            HelperUtils.bindWatchers(element, value.prototype);
+            PropertyUtils.bindWatchers(element, value.prototype);
           }
         },
 
