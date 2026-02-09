@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-core
 
+## 1.8.0
+
+### Minor Changes
+
+- a69c83b: Updated the core rendering logic of the component itself, inorder to improve UI updates
+
 ## 1.7.3
 
 ### Patch Changes
