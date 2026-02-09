@@ -21,22 +21,29 @@ export class EventEmitter<T> {
   /**
    * Emits an event with the specified data.
    *
-   * This method creates a `CustomEvent` with the provided data and dispatches it.
-   * If a root element is specified, the event is dispatched from that element.
-   * Otherwise, the event is dispatched from the global window object.
+   * Backward compatible signature:
+   *   emit(data, root?, bubbles?)
    *
-   * @param {T} data - The data to be included in the event's detail.
-   * @param {HTMLElement} [root] - The root element from which to dispatch the event. If not provided, the event is dispatched from the window.
-   * @param {boolean} [bubbles=false] - Indicates whether the event should bubble up through the DOM. Defaults to `false`.
+   * New options signature:
+   *   emit(data, root?, { bubbles?, composed? })
    */
-  emit(data: T, root?: HTMLElement, bubbles: boolean = false): void {
-    const event = new CustomEvent<T>(this.name, {
-      bubbles: bubbles,
-      detail: data
-    })
+  emit(
+    data: T,
+    root?: HTMLElement | Window | Document | ShadowRoot,
+    bubblesOrOptions: boolean | { bubbles?: boolean; composed?: boolean } = false
+  ): void {
+    const opts =
+      typeof bubblesOrOptions === "boolean"
+        ? { bubbles: bubblesOrOptions, composed: true }
+        : { bubbles: bubblesOrOptions.bubbles ?? false, composed: bubblesOrOptions.composed ?? true };
 
-    if (root) {
-      root.dispatchEvent(event);
-    } else window.dispatchEvent(event);
+    const event = new CustomEvent<T>(this.name, {
+      bubbles: opts.bubbles,
+      composed: opts.composed,
+      detail: data,
+    });
+
+    const target: EventTarget = root ?? window;
+    target.dispatchEvent(event);
   }
 }
