@@ -2,26 +2,26 @@ import {BaseElement, BindEvent, Component, HTML} from "@ayu-sh-kr/dota-core";
 import {notificationService} from "@dota/components/utils/notification/notification.service.ts";
 
 @Component({
-    selector: 'app-hero',
-    shadow: false
+  selector: 'app-hero',
+  shadow: false
 })
 export class HeroSectionComponent extends BaseElement {
 
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
-    @BindEvent({event: 'click', id: '#copy'})
-    copyText() {
-        const text = 'npm install @ayu-sh-kr/dota-core'
-        navigator.clipboard.writeText(text)
-            .then(() => {
-                notificationService.info({duration: 5000, message: 'Text Copied to Clipboard', title: 'Notification' })
-            })
-    }
+  @BindEvent({event: 'click', id: '#copy'})
+  copyText() {
+    const text = 'npm install @ayu-sh-kr/dota-core'
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        notificationService.info({duration: 5000, message: 'Text Copied to Clipboard', title: 'Notification'})
+      })
+  }
 
-    render(): string {
-        return HTML`
+  render(): string {
+    return HTML`
             <div class="flex flex-col items-center justify-center py-20 font-dm px-2">
                 <h1 
                     class="text-5xl sm:text-7xl font-extrabold text-gray-900 dark:text-gray-100 max-w-5xl text-wrap py-10 leading-[3.25rem] tracking-wide text-center">
@@ -50,6 +50,6 @@ export class HeroSectionComponent extends BaseElement {
                 </div>
             </div>
         `
-    }
+  }
 
 }
