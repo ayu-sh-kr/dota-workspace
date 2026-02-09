@@ -19,6 +19,9 @@ export abstract class BaseElement extends HTMLElement {
 
   private eventManagerService: EventManagerService<BaseElement>;
 
+  // NEW: keep delegated listeners so updateHTML()/rebind doesn't stack duplicates
+  private __delegatedBindListeners = new Map<string, EventListener>();
+
   protected constructor() {
     super();
     this.eventManagerService = new EventManagerService(this);
@@ -119,7 +122,7 @@ export abstract class BaseElement extends HTMLElement {
       PropertyUtils.bindReactive(this);
     }
 
-    if (!newValue) {
+    if (newValue === null) {
       return;
     }
 
@@ -240,51 +243,75 @@ export abstract class BaseElement extends HTMLElement {
   /**
    * Binds the component's internal events to its methods based on metadata.
    *
-   * This method retrieves metadata associated with the component's constructor
-   * to find event binding configurations. It then binds the specified methods
-   * to the corresponding events on the elements identified by the metadata.
-   *
-   * @method bindMethods
+   * Framework-level improvement:
+   * Use event delegation so bindings survive:
+   * - wrapper components re-rendering
+   * - DOM replacement
+   * - slot/shadow boundaries (for composed events like click)
    */
   private async bindMethods() {
-    let data = HelperUtils.fetchOrCreate<BindConfig>(this, 'Bind');
-    if (data) {
-      data.forEach((config, methodName) => {
-        const element: HTMLElement | null = this.isShadow ? this.shadowRoot.querySelector(config.id) : this.querySelector(config.id);
-        if (element) {
-          this.eventManagerService.bindEvent(element, {
-            event: config.event,
-            name: methodName,
-            method: this[methodName].bind(this)
-          }, 'Bind')
-        }
-      });
-    }
+    const data = HelperUtils.fetchOrCreate<BindConfig>(this, 'Bind');
+    if (!data) return;
+
+    // Bind on a stable root
+    const root: HTMLElement | ShadowRoot = this.isShadow ? this.shadowRoot : this;
+
+    data.forEach((config, methodName) => {
+      const events = Array.isArray(config.event) ? config.event : [config.event];
+
+      for (const eventName of events) {
+        const key = `${eventName}@@${config.id}@@${methodName}`;
+
+        // prevent duplicate bindings across updateHTML()
+        if (this.__delegatedBindListeners.has(key)) continue;
+
+        const listener: EventListener = (e: Event) => {
+          // composedPath handles shadow/slot; fallback to target
+          const path = (typeof (e as any).composedPath === 'function'
+              ? (e as any).composedPath()
+              : [e.target]
+          ) as Array<EventTarget | null>;
+
+          for (const node of path) {
+            if (!(node instanceof Element)) continue;
+            if (node.matches(config.id)) {
+              const fn = this[methodName];
+              if (typeof fn === 'function') {
+                fn.call(this, e);
+              }
+              break;
+            }
+          }
+        };
+
+        root.addEventListener(eventName, listener);
+        this.__delegatedBindListeners.set(key, listener);
+      }
+    });
   }
 
   /**
    * Unbinds component's methods from their associated events.
    *
-   * This method retrieves metadata associated with the component's constructor
-   * to find methods that were previously bound to events. It then removes the
-   * event listeners for these methods, effectively unbinding them.
-   *
-   * @method unbindMethods
+   * Updated to unbind delegated listeners correctly.
    */
   private async unbindMethods() {
-
-    const data = HelperUtils.fetchOrCreate<BindConfig>(this, 'Bind')
-
+    const data = HelperUtils.fetchOrCreate<BindConfig>(this, 'Bind');
     if (!data) return;
 
-    data.forEach((config: BindConfig, method: string) => {
-      const element: HTMLElement | null = this.querySelector(config.id);
-      if (!element) return;
-      this.eventManagerService.unbindEvent(element, {
-        event: config.event,
-        name: method,
-        method: this[method].bind(this)
-      }, 'Bind');
+    const root: HTMLElement | ShadowRoot = this.isShadow ? this.shadowRoot : this;
+
+    data.forEach((config, methodName) => {
+      const events = Array.isArray(config.event) ? config.event : [config.event];
+
+      for (const eventName of events) {
+        const key = `${eventName}@@${config.id}@@${methodName}`;
+        const listener = this.__delegatedBindListeners.get(key);
+        if (!listener) continue;
+
+        root.removeEventListener(eventName, listener);
+        this.__delegatedBindListeners.delete(key);
+      }
     });
   }
 
@@ -466,17 +493,10 @@ export abstract class BaseElement extends HTMLElement {
    */
   private async unbindWindowEvents() {
     const data = HelperUtils.fetchOrCreate<EventOptionMeta>(this, 'Window');
-
     if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
-      if (typeof value.event === 'string') {
-        window.removeEventListener(value.event, (event: Event) => value.method.call(this, event));
-      } else if (Array.isArray(value.event)) {
-        value.event.forEach((eventName) => {
-          window.removeEventListener(eventName, (event: Event) => value.method.call(this, event));
-        });
-      }
+      this.eventManagerService.unbindEvent(window, value, 'Window');
     });
   }
 
