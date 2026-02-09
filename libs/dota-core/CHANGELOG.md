@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-core
 
+## 1.8.1
+
+### Patch Changes
+
+- e044ad8: Fix the event binding to be more mature and able to handle events across dom changes
+
 ## 1.8.0
 
 ### Minor Changes
