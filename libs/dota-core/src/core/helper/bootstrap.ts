@@ -1,5 +1,5 @@
 import {ComponentConfig} from "@dota/core/types";
-import {HelperUtils} from "@dota/core/helper";
+import {HelperUtils} from "@dota/core/utils";
 
 
 /**
