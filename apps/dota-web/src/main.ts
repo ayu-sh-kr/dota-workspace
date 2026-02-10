@@ -34,10 +34,10 @@ import {CounterComponent} from "@dota/components/example/CounterComponent.ts";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
 import {Router, RouterService, ComponentClass } from "@ayu-sh-kr/dota-router";
 
-const modules: Record<string, () => Promise<unknown>> = {
-  ...import.meta.glob('/src/**/*.component.ts'),
-  ...import.meta.glob('/src/components/*.component.ts'),
-  ...import.meta.glob('/src/pages/*.page.ts'),
+const modules: Record<string, unknown> = {
+  ...import.meta.glob('/src/**/*.component.ts', {eager: true}),
+  ...import.meta.glob('/src/components/*.component.ts', {eager: true}),
+  ...import.meta.glob('/src/pages/*.page.ts', {eager: true}),
 };
 
 let routerService!: RouterService<Router<HTMLElement>>;
