@@ -1,3 +1,5 @@
+import {BubbleOrOptions} from "@dota/core";
+
 /**
  * A class that provides a simple event emitting mechanism.
  *
@@ -30,16 +32,25 @@ export class EventEmitter<T> {
   emit(
     data: T,
     root?: HTMLElement | Window | Document | ShadowRoot,
-    bubblesOrOptions: boolean | { bubbles?: boolean; composed?: boolean } = false
+    bubblesOrOptions: BubbleOrOptions = false
   ): void {
     const opts =
       typeof bubblesOrOptions === "boolean"
-        ? { bubbles: bubblesOrOptions, composed: true }
-        : { bubbles: bubblesOrOptions.bubbles ?? false, composed: bubblesOrOptions.composed ?? true };
+        ? {
+            bubbles: bubblesOrOptions,
+            composed: true ,
+            cancelable: false
+          }
+        : {
+            bubbles: bubblesOrOptions.bubbles ?? false,
+            composed: bubblesOrOptions.composed ?? true,
+            cancelable: bubblesOrOptions.cancelable ?? false
+          };
 
     const event = new CustomEvent<T>(this.name, {
       bubbles: opts.bubbles,
       composed: opts.composed,
+      cancelable: opts.cancelable,
       detail: data,
     });
 
