@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-core
 
+## 1.8.2
+
+### Patch Changes
+
+- 439baa7: Improved app FCP time
+
 ## 1.8.1
 
 ### Patch Changes
