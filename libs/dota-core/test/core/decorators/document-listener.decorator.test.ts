@@ -1,7 +1,7 @@
 import {BaseElement, Component, DotaElementConstructor} from "@dota/core";
-import {HostListener} from "@dota/core/decorators/host-listener.decorator.ts";
+import {DocumentListener} from "@dota/core/decorators/document-listener.decorator.ts";
 
-describe('HostListenerDecorator', () => {
+describe('DocumentListenerDecorator', () => {
   function microtask() {
     return Promise.resolve();
   }
@@ -23,7 +23,7 @@ describe('HostListenerDecorator', () => {
     jest.clearAllMocks();
   });
 
-  it('binds the method to the host event on connect and unbinds on disconnect', async () => {
+  it('binds the method to the document event on connect and unbinds on disconnect', async () => {
     const mockMethod = jest.fn();
     const mockThis = jest.fn();
 
@@ -32,13 +32,12 @@ describe('HostListenerDecorator', () => {
       shadow: false
     })
     class TestComponent extends BaseElement {
-
       constructor() {
         super();
       }
 
-      @HostListener({ event: 'click' })
-      handleClick(event: Event) {
+      @DocumentListener({ event: 'click' })
+      handleDocumentClick(event: Event) {
         mockThis(this);
         mockMethod(event);
       }
@@ -50,16 +49,17 @@ describe('HostListenerDecorator', () => {
 
     const { el } = defineAndCreate(TestComponent);
 
-    // Before connecting: host listeners should not fire.
-    el.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
+    // Before connecting: document listeners should not fire
+    const event0 = new Event('click', { bubbles: true, composed: true });
+    document.dispatchEvent(event0);
     expect(mockMethod).not.toHaveBeenCalled();
 
-    // Connect to DOM => connectedCallback runs => host listener bound
+    // Connect to DOM => connectedCallback runs => document listener bound
     document.body.appendChild(el);
     await microtask();
 
     const event1 = new Event('click', { bubbles: true, composed: true });
-    el.dispatchEvent(event1);
+    document.dispatchEvent(event1);
 
     expect(mockMethod).toHaveBeenCalledTimes(1);
     expect(mockMethod).toHaveBeenCalledWith(event1);
@@ -72,26 +72,27 @@ describe('HostListenerDecorator', () => {
     el.remove();
     await microtask();
 
-    el.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
+    const event2 = new Event('click', { bubbles: true, composed: true });
+    document.dispatchEvent(event2);
+
     expect(mockMethod).toHaveBeenCalledTimes(1); // unchanged after disconnect
   });
 
-  it('supports multiple events when HostListener is used with an array', async () => {
-    const mockMethod = jest.fn();
+  it('supports multiple events when DocumentListener is used with an array', async () => {
+    const calls: string[] = [];
 
     @Component({
       selector: 'test-component-decorator-selector-only-2',
       shadow: false
     })
     class TestComponent extends BaseElement {
-
       constructor() {
         super();
       }
 
-      @HostListener({ event: ['click', 'mouseenter'] })
-      handleAny(event: Event) {
-        mockMethod(event.type);
+      @DocumentListener({ event: ['click', 'keydown'] })
+      handleDocumentEvent(event: Event) {
+        calls.push(event.type);
       }
 
       render(): string {
@@ -103,11 +104,18 @@ describe('HostListenerDecorator', () => {
     document.body.appendChild(el);
     await microtask();
 
-    el.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
-    el.dispatchEvent(new Event('mouseenter', { bubbles: true, composed: true }));
+    document.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
+    document.dispatchEvent(new Event('keydown', { bubbles: true, composed: true }));
 
-    expect(mockMethod).toHaveBeenCalledTimes(2);
-    expect(mockMethod).toHaveBeenNthCalledWith(1, 'click');
-    expect(mockMethod).toHaveBeenNthCalledWith(2, 'mouseenter');
+    expect(calls).toEqual(['click', 'keydown']);
+
+    el.remove();
+    await microtask();
+
+    document.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
+    document.dispatchEvent(new Event('keydown', { bubbles: true, composed: true }));
+
+    // still only the initial two calls
+    expect(calls).toEqual(['click', 'keydown']);
   });
 });

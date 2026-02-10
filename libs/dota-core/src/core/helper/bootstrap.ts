@@ -1,6 +1,4 @@
-import {ComponentConfig} from "@dota/core/types";
-import {HelperUtils} from "@dota/core/utils";
-
+import {DotaElementConstructor} from "@dota/core";
 
 /**
  * Bootstraps custom elements by defining them with the custom elements' registry.
@@ -22,18 +20,15 @@ import {HelperUtils} from "@dota/core/utils";
  * const myElement = document.createElement('my-element');
  * document.body.appendChild(myElement);
  */
-export const bootstrap = (elements: CustomElementConstructor[]) => {
+export const bootstrap = (elements: DotaElementConstructor[]) => {
   elements.forEach(element => {
-    const meta: ComponentConfig = HelperUtils.getComponentMetadata(element, 'Component');
-
-    if (!meta) {
-      console.warn(`No metadata found for ${element.name}`);
-      return;
+    if (element.__dotaSelector) {
+      const selector = element.__dotaSelector as string;
+      if (!customElements.get(selector)) {
+        customElements.define(selector, element);
+      } else {
+        console.warn(`Custom element with selector '${selector}' is already defined.`);
+      }
     }
-
-    if (!customElements.get(meta.selector)) {
-      customElements.define(meta.selector, element);
-    }
-
   })
 }

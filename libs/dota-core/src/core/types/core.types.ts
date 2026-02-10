@@ -442,3 +442,63 @@ export interface ElementConfigInternal {
   by: 'id' | 'tag' | 'class';
   property: string;
 }
+
+
+/**
+ * Configuration options for creating custom events.
+ *
+ * This type defines the structure for configuring custom event behavior,
+ * allowing control over event propagation and composition.
+ *
+ * @type CustomEventOptions
+ *
+ * @property {boolean} [bubbles] - Whether the event should bubble up through the DOM tree (optional).
+ * This property determines if the event will propagate through ancestor elements.
+ *
+ * @property {boolean} [composed] - Whether the event can cross shadow DOM boundaries (optional).
+ * This property determines if the event will propagate across shadow root boundaries.
+ *
+ * @property {boolean} [cancelable] - Whether the event can be canceled (optional).
+ * This property determines if the event's default action can be prevented.
+ *
+ * @example
+ * // Example of using CustomEventOptions to configure event behavior
+ * const eventOptions: CustomEventOptions = {
+ *     bubbles: true,
+ *     composed: true,
+ *     cancelable: false
+ * };
+ */
+export type CustomEventOptions = {
+  bubbles?: boolean;
+  composed?: boolean;
+  cancelable?: boolean;
+}
+
+/**
+ * Type representing event emission options.
+ *
+ * This type allows specifying event emission behavior either as a simple boolean
+ * to control bubbling, or as a detailed configuration object for more fine-grained control.
+ *
+ * @type BubbleOrOptions
+ *
+ * @example
+ * // Example using boolean to enable bubbling
+ * const bubbleOption: BubbleOrOptions = true;
+ *
+ * @example
+ * // Example using CustomEventOptions for detailed configuration
+ * const optionsConfig: BubbleOrOptions = {
+ *     bubbles: true,
+ *     composed: false,
+ *     cancelable: true
+ * };
+ */
+export type BubbleOrOptions = boolean | CustomEventOptions
+
+
+export type DotaElementConstructor = CustomElementConstructor & {
+  __dotaSelector?: string;
+  __dotaShadow?: boolean;
+}

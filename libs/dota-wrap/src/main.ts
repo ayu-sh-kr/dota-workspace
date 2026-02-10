@@ -1,4 +1,4 @@
-import { bootstrap } from '@ayu-sh-kr/dota-core';
+import { bootstrap, DotaElementConstructor } from '@ayu-sh-kr/dota-core';
 import {
   ComponentClass,
   DomHistoryRouter,
@@ -9,8 +9,10 @@ import {
 } from '@ayu-sh-kr/dota-router';
 
 
+export type AnyModule = Record<string, unknown>;
+
 export type AppConfig = {
-  modules: Record<string, () => Promise<unknown>>;
+  modules: AnyModule;
   externalComponents?: ComponentClass[];
   errorRoute: RouteConfig<HTMLElement>;
   defaultRoute: RouteConfig<HTMLElement>;
@@ -18,30 +20,34 @@ export type AppConfig = {
 }
 
 /**
- * Extracts all custom element constructors from the provided dynamic import modules.
+ * Extract component constructors from either:
+ * - eager modules: Record<string, moduleObject>
+ * - lazy modules:  Record<string, () => Promise<moduleObject>>
  *
- * This function iterates over each module, dynamically imports it, and inspects its exports.
- * If an export is a constructor function whose prototype extends HTMLElement, it is considered
- * a custom element and added to the result array. The intention is to automate the discovery
- * of custom elements for registration or bootstrapping in the application.
- *
- * @param modules - An object mapping module paths to functions that dynamically import the module.
- * @returns A promise that resolves to an array of CustomElementConstructor instances found in the modules.
+ * Optimizations:
+ * - Parallelize lazy imports with Promise.all
+ * - Avoid sequential awaits
  */
-async function extractComponent(modules: Record<string, () => Promise<unknown>>): Promise<CustomElementConstructor[]> {
-  const components: CustomElementConstructor[] = [];
+async function extractComponent(modules: Record<string, unknown>): Promise<DotaElementConstructor[]> {
+  const entries = Object.values(modules);
 
-  for (const path in modules) {
-    const mod = await modules[path]();
-    if (mod && typeof mod === 'object') {
-      for (const key in mod as Record<string, unknown>) {
-        const exported = (mod as Record<string, unknown>)[key];
-        if (
-          typeof exported === 'function' &&
-          exported.prototype instanceof HTMLElement
-        ) {
-          components.push(exported as CustomElementConstructor);
-        }
+  const loadedModules: AnyModule[] = await Promise.all(
+    entries.map(async (entry) => {
+      if (typeof entry === 'function') {
+        // lazy module loader
+        const mod = await (entry as () => Promise<unknown>)();
+        return (mod ?? {}) as AnyModule;
+      }
+      // eager module object
+      return (entry ?? {}) as AnyModule;
+    })
+  );
+
+  const components: CustomElementConstructor[] = [];
+  for (const mod of loadedModules) {
+    for (const exported of Object.values(mod)) {
+      if (typeof exported === 'function' && (exported as any).prototype instanceof HTMLElement) {
+        components.push(exported as CustomElementConstructor);
       }
     }
   }
@@ -62,14 +68,19 @@ async function extractComponent(modules: Record<string, () => Promise<unknown>>)
  *
  */
 export async function registerComponents(
-  modules: Record<string, () => Promise<unknown>>, externalComponents: CustomElementConstructor[] = []
+  modules: Record<string, unknown>,
+  externalComponents: DotaElementConstructor[] = []
 ) {
-  const components: CustomElementConstructor[] = await extractComponent(modules);
-  console.log(`Scanned ${components.length} for bootstrapping...`);
-  bootstrap([...components, ...externalComponents]);
-  return [...components, ...externalComponents];
-}
+  const components = await extractComponent(modules);
 
+  // Avoid extra spreads; keep it tight
+  if (externalComponents.length > 0) {
+    components.push(...externalComponents);
+  }
+
+  bootstrap(components);
+  return components;
+}
 /**
  * Registers routes for the application using discovered custom elements and returns a router service.
  *
@@ -113,15 +124,15 @@ export async function initializeApp(config: AppConfig): Promise<{
   components: ComponentClass[],
   routerService: RouterService<Router<HTMLElement>>
 }> {
-  console.info('Initializing application...');
   const components = await registerComponents(config.modules, config.externalComponents);
-  console.info('Components registered.');
-  console.info('Registering routes...');
+  console.info(`${components.length} Components registered.`);
+
   const routerService = await registerRoutes(
-    [...components], config.errorRoute, config.defaultRoute, config.root
+    components, config.errorRoute, config.defaultRoute, config.root
   );
-  console.info(`Routes registered with available routes size: ${routerService._routes.length}`);
   routerService.init();
+  console.info(`${routerService._routes.length} Routes registered.`);
+
   console.info('Application initialized.');
   return { components, routerService };
 }
