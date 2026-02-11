@@ -77,6 +77,9 @@ importers:
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../../libs/dota-core
+      '@ayu-sh-kr/dota-preloader-plugin':
+        specifier: workspace:*
+        version: link:../../plugins/dota-vite-preloader
       '@ayu-sh-kr/dota-rest':
         specifier: workspace:*
         version: link:../../libs/dota-rest
@@ -86,9 +89,6 @@ importers:
       '@ayu-sh-kr/dota-ui':
         specifier: 0.0.7
         version: 0.0.7
-      '@ayu-sh-kr/dota-vite-preloader':
-        specifier: workspace:*
-        version: link:../../plugins/dota-vite-preloader
       '@ayu-sh-kr/dota-wrap':
         specifier: workspace:*
         version: link:../../libs/dota-wrap
@@ -152,6 +152,9 @@ importers:
       '@swc/core':
         specifier: ^1.13.5
         version: 1.13.5
+      consola:
+        specifier: 3.4.2
+        version: 3.4.2
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3

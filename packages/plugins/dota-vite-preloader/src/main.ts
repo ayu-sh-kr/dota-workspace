@@ -4,13 +4,34 @@ import {readFile} from "node:fs/promises";
 import {ClassDeclaration, type Module, parse} from "@swc/core";
 import {Plugin} from "vite";
 import {ASTHelperUtils} from "@dota/ASTHelperUtils.ts";
+import {consola, createConsola, LogLevels, LogType} from 'consola';
 
+
+/**
+ * Represents a candidate Dota component discovered during the scanning process.
+ * Contains metadata about the component including its class name, file location,
+ * and the custom element tag name used for registration.
+ *
+ * @property name - The class name of the component
+ * @property filePath - The relative file path where the component is defined
+ * @property tagName - The HTML custom element tag name (selector) for the component
+ */
 export type DotaComponentCandidate = {
   name: string;
   filePath: string;
   tagName: string;
 }
 
+let logger = consola;
+
+/**
+ * Extracts component metadata from a class declaration by analyzing its @Component decorator.
+ * Searches for the Component decorator and extracts the selector (tag name) from its configuration.
+ * Returns null if the class is not decorated with @Component or lacks required metadata.
+ *
+ * @param classDecl - The AST class declaration node to analyze
+ * @returns A DotaComponentCandidate object if valid component found, null otherwise
+ */
 function extractComponentCandidateFromClassDeclaration(classDecl: ClassDeclaration): DotaComponentCandidate | null {
   const decorators = ASTHelperUtils.getDecorators(classDecl);
   for (const decorator of decorators) {
@@ -37,6 +58,14 @@ function extractComponentCandidateFromClassDeclaration(classDecl: ClassDeclarati
   return null;
 }
 
+/**
+ * Extracts all component candidates from a parsed TypeScript module AST.
+ * Filters exported class declarations and attempts to extract component metadata from each.
+ * Returns an array of component candidates, which may include null entries for non-components.
+ *
+ * @param ast - The parsed SWC module AST to analyze
+ * @returns Array of DotaComponentCandidate objects (may contain nulls)
+ */
 function extractComponentCandidateFromAst(ast: Module): DotaComponentCandidate[] {
   const body = ast.body;
   const exportDeclarations = ASTHelperUtils.getExportDeclarations(body);
@@ -45,6 +74,15 @@ function extractComponentCandidateFromAst(ast: Module): DotaComponentCandidate[]
     .map(classDecl => extractComponentCandidateFromClassDeclaration(classDecl));
 }
 
+/**
+ * Scans the project directory for Dota component files and extracts component metadata.
+ * Uses fast-glob to find TypeScript files in configured paths, then parses each file's AST
+ * to identify classes decorated with @Component. Handles parsing errors gracefully and logs
+ * discovered components.
+ *
+ * @param root - The root directory path to scan from
+ * @returns Promise resolving to array of all discovered component candidates
+ */
 async function scanDotaComponents(root: string): Promise<DotaComponentCandidate[]> {
   const files = await fg([
     ComponentScanPath.SOURCE_ROOT_DIRECTORY_SCAN_PATH,
@@ -60,18 +98,30 @@ async function scanDotaComponents(root: string): Promise<DotaComponentCandidate[
     try {
       ast = await parse(code, {syntax: 'typescript', decorators: true});
     } catch (e) {
-      console.log(`Failed to parse ${file}: ${e}`);
+      logger.error(`Failed to parse ${file}: ${e}`);
       continue;
     }
 
     const candidates = extractComponentCandidateFromAst(ast)
-      .map(candidate => ({ ...candidate, filePath: file }));
+      .map(candidate => {
+        candidate.filePath = file;
+        logger.debug(`Found component candidate ${candidate.name} in file ${file} with tag ${candidate.tagName}`);
+        return candidate;
+      });
     candidated.push(...candidates);
   }
 
   return candidated;
 }
 
+/**
+ * Generates ES module import statements for all discovered component candidates.
+ * Creates a single import statement per component using relative file paths.
+ * The generated imports are used in the virtual module to make components available.
+ *
+ * @param candidates - Array of component candidates to generate imports for
+ * @returns Promise resolving to newline-separated import statements
+ */
 async function prepareComponentImports(candidates: DotaComponentCandidate[]): Promise<string> {
   const importStatementTemplate = "import { %s } from '%s';";
   return candidates.map(candidate => {
@@ -84,13 +134,30 @@ async function prepareComponentImports(candidates: DotaComponentCandidate[]): Pr
   }).join('\n');
 }
 
+/**
+ * Generates a default export statement containing all component class names.
+ * Creates an array export with all component classes for registration with the Dota framework.
+ * The exported array is used by the application to register all discovered components.
+ *
+ * @param candidates - Array of component candidates to include in the export
+ * @returns Promise resolving to a default export statement with component array
+ */
 async function prepareComponentExports(candidates: DotaComponentCandidate[]): Promise<string> {
   const exportStatementTemplate = "export default [%s]"
-  const componentNames = candidates.map(candidate => candidate.name)
+  const componentNames = candidates
+    .map(candidate => candidate.name)
     .join(', ');
   return exportStatementTemplate.replace('%s', componentNames);
 }
 
+/**
+ * Combines component imports and exports into a complete virtual module source.
+ * Generates the full module code that imports all discovered components and exports
+ * them as a default array. This module is served by the virtual module system.
+ *
+ * @param candidates - Array of component candidates to process
+ * @returns Promise resolving to complete module source code with imports and exports
+ */
 async function resolveComponentExport(candidates: DotaComponentCandidate[]): Promise<string> {
   const imports = await prepareComponentImports(candidates);
   const exports = await prepareComponentExports(candidates);
@@ -98,13 +165,37 @@ async function resolveComponentExport(candidates: DotaComponentCandidate[]): Pro
 }
 
 
+/**
+ * Configuration options for the Dota Vite Preloader plugin.
+ * Allows customization of the component scanning root directory and logging verbosity.
+ *
+ * @property root - Root directory path for component scanning (defaults to process.cwd())
+ * @property logType - Logging level for plugin output (defaults to 'info')
+ */
 export type PluginConfig = {
   root?: string;
+  logType?: LogType
 }
 
-export default function dotaVitePreloader({ root = process.cwd() }: PluginConfig): Plugin {
+/**
+ * Vite plugin that automatically discovers and preloads Dota web components.
+ * Scans the project for @Component decorated classes, generates a virtual module
+ * that imports and exports them, enabling automatic component registration.
+ * The plugin caches component candidates for performance and provides detailed logging.
+ *
+ * @param config - Plugin configuration with optional root path and log level
+ * @returns Vite plugin instance with resolveId, load, and buildStart hooks
+ */
+export default function dotaVitePreloader({ root = process.cwd(), logType = 'info' }: PluginConfig): Plugin {
   // Plugin-scope cache: accessible from buildStart/resolveId/load/etc.
   let cachedCandidates: DotaComponentCandidate[] | null = null;
+  logger = createConsola({
+    level: LogLevels[logType],
+    formatOptions: {
+      date: true,
+      colors: true
+    }
+  });
 
   async function ensureCandidatesLoaded() {
     if (!cachedCandidates) {
@@ -128,7 +219,7 @@ export default function dotaVitePreloader({ root = process.cwd() }: PluginConfig
 
     async buildStart() {
       cachedCandidates = await scanDotaComponents(root); // Cache the candidates for potential later use
-      console.log(`Loaded Dota Component Candidates: ${cachedCandidates.length} components found.`);
+      logger.info(`Loaded Dota Component Candidates: ${cachedCandidates.length} components found.`);
     },
   }
 }

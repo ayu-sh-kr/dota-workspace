@@ -1,9 +1,14 @@
 import {defineConfig} from "vite";
 import {resolve} from "path";
-import dotaVitePreloader from "@ayu-sh-kr/dota-vite-preloader";
+import dotaVitePreloader from "@ayu-sh-kr/dota-preloader-plugin";
 
 export default defineConfig({
-  plugins: [dotaVitePreloader({root: resolve(__dirname)})],
+  plugins: [
+    dotaVitePreloader({
+      root: resolve(__dirname),
+      logType: 'info'
+    })
+  ],
   css: {
     postcss: 'postcss.config.js'
   },

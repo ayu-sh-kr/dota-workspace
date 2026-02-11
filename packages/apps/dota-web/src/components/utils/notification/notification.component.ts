@@ -15,7 +15,7 @@ import {
   selector: 'app-notification',
   shadow: false
 })
-class NotificationComponent extends BaseElement {
+export class NotificationComponent extends BaseElement {
 
   @Property({name: 'type', type: String})
   type!: string;
@@ -137,4 +137,4 @@ const NotificationConfig = {
 
 type NotificationColor = keyof typeof NotificationConfig.color;
 
-export {NotificationConfig, NotificationComponent, type NotificationColor}
+export {NotificationConfig, type NotificationColor}

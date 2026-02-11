@@ -13,7 +13,7 @@ const PositionConfig = {
   selector: 'notification-holder',
   shadow: false
 })
-class NotificationHolderComponent extends BaseElement {
+export class NotificationHolderComponent extends BaseElement {
 
   @Property({name: 'position', type: String})
   position!: NotificationPosition
@@ -40,4 +40,4 @@ class NotificationHolderComponent extends BaseElement {
 
 type NotificationPosition = keyof typeof PositionConfig;
 
-export {type NotificationPosition, NotificationHolderComponent, PositionConfig}
+export {type NotificationPosition, PositionConfig}

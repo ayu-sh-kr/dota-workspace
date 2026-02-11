@@ -20,7 +20,7 @@
     "@ayu-sh-kr/dota-rest": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-wrap": "workspace:*",
-    "@ayu-sh-kr/dota-vite-preloader": "workspace:*",
+    "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
     "@ayu-sh-kr/dota-ui": "0.0.7",
     "highlight.js": "^11.11.1",
     "markdown-it": "latest",
