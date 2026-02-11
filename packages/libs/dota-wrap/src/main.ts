@@ -12,7 +12,7 @@ import {
 export type AnyModule = Record<string, unknown>;
 
 export type AppConfig = {
-  modules: AnyModule;
+  modules: Record<string, unknown> | DotaElementConstructor[];
   externalComponents?: ComponentClass[];
   errorRoute: RouteConfig<HTMLElement>;
   defaultRoute: RouteConfig<HTMLElement>;
@@ -55,6 +55,7 @@ async function extractComponent(modules: Record<string, unknown>): Promise<DotaE
   return components;
 }
 
+
 /**
  * Registers custom elements for use in the application by bootstrapping them.
  *
@@ -68,10 +69,18 @@ async function extractComponent(modules: Record<string, unknown>): Promise<DotaE
  *
  */
 export async function registerComponents(
-  modules: Record<string, unknown>,
+  modules: Record<string, unknown> | DotaElementConstructor[],
   externalComponents: DotaElementConstructor[] = []
 ) {
-  const components = await extractComponent(modules);
+  let components: DotaElementConstructor[];
+
+  if (Array.isArray(modules)) {
+    // modules is already an array of element constructors
+    components = modules;
+  } else {
+    // modules is a Record, extract components from it
+    components = await extractComponent(modules);
+  }
 
   // Avoid extra spreads; keep it tight
   if (externalComponents.length > 0) {
