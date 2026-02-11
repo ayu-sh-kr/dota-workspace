@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-preloader-plugin
 
+## 0.0.2
+
+### Patch Changes
+
+- 85a2de8: Added logging framework for better insight
+
 ## 0.0.1
 
 ### Patch Changes
