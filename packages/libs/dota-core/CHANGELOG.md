@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-core
 
+## 1.8.3
+
+### Patch Changes
+
+- be58089: Added Plugin dota-vite-preloader to load components before hand, and restructure the project
+
 ## 1.8.2
 
 ### Patch Changes
