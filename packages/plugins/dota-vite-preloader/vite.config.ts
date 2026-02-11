@@ -12,7 +12,15 @@ export default defineConfig({
     },
     minify: false,
     rollupOptions: {
-      external: dependencies ? Object.keys(dependencies) : []
+      external: [
+        /^node:.*/,
+        "fs",
+        "path",
+        "url",
+        "fast-glob",
+        "@swc/core",
+        "vite",
+      ],
     }
   },
 
