@@ -4,12 +4,15 @@ import {readFile} from "node:fs/promises";
 import {ClassDeclaration, type Module, parse} from "@swc/core";
 import {Plugin} from "vite";
 import {ASTHelperUtils} from "@dota/ASTHelperUtils.ts";
+import {consola, createConsola, LogLevels, LogType} from 'consola';
 
 export type DotaComponentCandidate = {
   name: string;
   filePath: string;
   tagName: string;
 }
+
+let logger = consola;
 
 function extractComponentCandidateFromClassDeclaration(classDecl: ClassDeclaration): DotaComponentCandidate | null {
   const decorators = ASTHelperUtils.getDecorators(classDecl);
@@ -60,12 +63,16 @@ async function scanDotaComponents(root: string): Promise<DotaComponentCandidate[
     try {
       ast = await parse(code, {syntax: 'typescript', decorators: true});
     } catch (e) {
-      console.log(`Failed to parse ${file}: ${e}`);
+      logger.error(`Failed to parse ${file}: ${e}`);
       continue;
     }
 
     const candidates = extractComponentCandidateFromAst(ast)
-      .map(candidate => ({ ...candidate, filePath: file }));
+      .map(candidate => {
+        candidate.filePath = file;
+        logger.debug(`Found component candidate ${candidate.name} in file ${file} with tag ${candidate.tagName}`);
+        return candidate;
+      });
     candidated.push(...candidates);
   }
 
@@ -86,7 +93,8 @@ async function prepareComponentImports(candidates: DotaComponentCandidate[]): Pr
 
 async function prepareComponentExports(candidates: DotaComponentCandidate[]): Promise<string> {
   const exportStatementTemplate = "export default [%s]"
-  const componentNames = candidates.map(candidate => candidate.name)
+  const componentNames = candidates
+    .map(candidate => candidate.name)
     .join(', ');
   return exportStatementTemplate.replace('%s', componentNames);
 }
@@ -100,11 +108,19 @@ async function resolveComponentExport(candidates: DotaComponentCandidate[]): Pro
 
 export type PluginConfig = {
   root?: string;
+  logType?: LogType
 }
 
-export default function dotaVitePreloader({ root = process.cwd() }: PluginConfig): Plugin {
+export default function dotaVitePreloader({ root = process.cwd(), logType = 'info' }: PluginConfig): Plugin {
   // Plugin-scope cache: accessible from buildStart/resolveId/load/etc.
   let cachedCandidates: DotaComponentCandidate[] | null = null;
+  logger = createConsola({
+    level: LogLevels[logType],
+    formatOptions: {
+      date: true,
+      colors: true
+    }
+  });
 
   async function ensureCandidatesLoaded() {
     if (!cachedCandidates) {
@@ -128,7 +144,7 @@ export default function dotaVitePreloader({ root = process.cwd() }: PluginConfig
 
     async buildStart() {
       cachedCandidates = await scanDotaComponents(root); // Cache the candidates for potential later use
-      console.log(`Loaded Dota Component Candidates: ${cachedCandidates.length} components found.`);
+      logger.info(`Loaded Dota Component Candidates: ${cachedCandidates.length} components found.`);
     },
   }
 }
