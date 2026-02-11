@@ -1,5 +1,12 @@
 # doto-web
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [85a2de8]
+  - @ayu-sh-kr/dota-preloader-plugin@0.0.2
+
 ## 0.0.6
 
 ### Patch Changes
