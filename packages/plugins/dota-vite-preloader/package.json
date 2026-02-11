@@ -37,7 +37,7 @@
   "dependencies": {
     "@swc/core": "^1.13.5",
     "fast-glob": "^3.3.3",
-    "magic-string": "^0.30.21"
+    "consola": "3.4.2"
   },
   "files": [
     "dist/",
