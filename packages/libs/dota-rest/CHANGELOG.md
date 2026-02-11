@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-rest
 
+## 1.1.5
+
+### Patch Changes
+
+- be58089: Added Plugin dota-vite-preloader to load components before hand, and restructure the project
+
 ## 1.1.4
 
 ### Patch Changes

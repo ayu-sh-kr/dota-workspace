@@ -1,5 +1,14 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.6
+
+### Patch Changes
+
+- be58089: Added Plugin dota-vite-preloader to load components before hand, and restructure the project
+- Updated dependencies [be58089]
+  - @ayu-sh-kr/dota-router@0.0.19
+  - @ayu-sh-kr/dota-core@1.8.3
+
 ## 0.0.5
 
 ### Patch Changes
