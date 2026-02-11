@@ -1,15 +1,9 @@
 import {ASTFilterConstants, ComponentScanPath, VirtualImportID} from "@dota/Constants.ts";
-import {join} from "node:path";
 import fg from "fast-glob";
-import {readFile, writeFile} from "node:fs/promises";
+import {readFile} from "node:fs/promises";
 import {ClassDeclaration, type Module, parse} from "@swc/core";
 import {Plugin} from "vite";
 import {ASTHelperUtils} from "@dota/ASTHelperUtils.ts";
-
-
-
-const COMPONENT_REGISTER_FILE = "register-component.json";
-const COMPONENT_TYPESCRIPT_FILE = "Component.ts";
 
 export type DotaComponentCandidate = {
   name: string;
@@ -133,26 +127,8 @@ export default function dotaVitePreloader({ root = process.cwd() }: PluginConfig
     },
 
     async buildStart() {
-      const candidates = await scanDotaComponents(root);
-      cachedCandidates = candidates; // Cache the candidates for potential later use
-      console.log('Loaded Dota Component Candidates:');
-
-      const jsonOutputPath = join(root, COMPONENT_REGISTER_FILE);
-      try {
-        await writeFile(jsonOutputPath, JSON.stringify(candidates, null, 2), 'utf-8');
-        console.log(`Component registry written to: ${jsonOutputPath}`);
-      } catch (error) {
-        console.error(`Failed to write component registry: ${error}`);
-      }
-
-      const tsOutputPath = join(root, COMPONENT_TYPESCRIPT_FILE);
-      try {
-        const componentExport = await resolveComponentExport(candidates);
-        await writeFile(tsOutputPath, componentExport, 'utf-8');
-        console.log(`Component TypeScript file written to: ${tsOutputPath}`);
-      } catch (error) {
-        console.error(`Failed to write component TypeScript file: ${error}`);
-      }
+      cachedCandidates = await scanDotaComponents(root); // Cache the candidates for potential later use
+      console.log(`Loaded Dota Component Candidates: ${cachedCandidates.length} components found.`);
     },
   }
 }
