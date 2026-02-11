@@ -33,7 +33,9 @@ import {DocContentComponent, DocPathComponent, DocSectionComponent} from "@dota/
 import {CounterComponent} from "@dota/components/example/CounterComponent.ts";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
 import {Router, RouterService, ComponentClass } from "@ayu-sh-kr/dota-router";
+import Components from 'virtual:dota-components'
 
+console.log('Components from virtual module:', Components);
 const modules: Record<string, unknown> = {
   ...import.meta.glob('/src/**/*.component.ts', {eager: true}),
   ...import.meta.glob('/src/components/*.component.ts', {eager: true}),
