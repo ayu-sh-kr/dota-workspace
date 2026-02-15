@@ -47,6 +47,10 @@
     "Decorated Components"
   ],
   "dependencies": {
+    "morphdom": "^2.7.8",
     "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/morphdom": "^2.4.2"
   }
 }
