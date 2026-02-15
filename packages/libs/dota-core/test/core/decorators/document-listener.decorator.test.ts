@@ -1,22 +1,8 @@
 import {BaseElement, Component, DotaElementConstructor} from "@dota/core";
 import {DocumentListener} from "@dota/core/decorators/document-listener.decorator.ts";
+import {defineAndCreate, microtask} from "../../Utils.ts";
 
 describe('DocumentListenerDecorator', () => {
-  function microtask() {
-    return Promise.resolve();
-  }
-
-  function defineAndCreate<T extends DotaElementConstructor>(Ctor: T) {
-    // Custom elements cannot be "undefined", so always use a unique tag per test.
-    const tag = `test-component-${Math.random().toString(36).slice(2)}`;
-
-    if (!customElements.get(tag)) {
-      customElements.define(tag, Ctor);
-    }
-
-    const el = document.createElement(tag) as InstanceType<T>;
-    return { tag, el };
-  }
 
   afterEach(() => {
     document.body.innerHTML = '';
