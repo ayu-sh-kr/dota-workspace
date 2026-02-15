@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import {PropertyDetails, WatcherOptionMeta} from "@dota/core/types";
+import {DotaElementConstructor, PropertyDetails, WatcherOptionMeta} from "@dota/core/types";
 import {BaseElement} from "@dota/core";
 
 
@@ -18,11 +18,9 @@ export class HelperUtils {
    * @returns {Map<string, T>} - The metadata Map associated with the target and appender.
    */
   static fetchOrCreate<T>(target: any, appender: string): Map<string, T> {
-
     const key = `${target.constructor.name}:${appender}`
 
     let data: Map<string, T>;
-
     if (!Reflect.hasMetadata(key, target)) {
       data = new Map<string, T>();
       Reflect.defineMetadata(key, data, target);
@@ -36,14 +34,28 @@ export class HelperUtils {
   /**
    * Extracts metadata for a given decorator from a class.
    *
-   * @param {Function} targetClass - The class from which to extract metadata.
+   * @param {Function} targetConstructor - The class from which to extract metadata.
    * @param {string} decoratorName - The name of the decorator.
    * @returns {any} - The metadata associated with the specified decorator.
    */
-  static getComponentMetadata(targetClass: Object, decoratorName: string): any {
-    if (Reflect.hasOwnMetadata(decoratorName, targetClass)) {
-      return Reflect.getOwnMetadata(decoratorName, targetClass);
+  static getComponentMetadata(targetConstructor: Object, decoratorName: string): any {
+    if (Reflect.hasOwnMetadata(decoratorName, targetConstructor)) {
+      return Reflect.getOwnMetadata(decoratorName, targetConstructor);
     }
+  }
+
+  static toDotaElementConstructor(target: any): DotaElementConstructor {
+    // Check if target is a function (constructor)
+    if (typeof target !== 'function') {
+      throw new TypeError('Target must be a constructor function');
+    }
+
+    // Check if target extends BaseElement
+    if (!(target.prototype instanceof BaseElement) && target !== BaseElement) {
+      throw new TypeError('Target must extend BaseElement');
+    }
+
+    return target as DotaElementConstructor;
   }
 
 }
