@@ -502,3 +502,15 @@ export type DotaElementConstructor = CustomElementConstructor & {
   __dotaSelector?: string;
   __dotaShadow?: boolean;
 }
+
+export type SEO = {
+  title: string;
+  description: string;
+  image?: string;
+  keywords?: string[];
+  og?: {
+    title: string;
+    description: string;
+    image?: string;
+  }
+}
