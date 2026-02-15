@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-core
 
+## 1.8.4
+
+### Patch Changes
+
+- 0d00dc3: Added a new DotaPageElement to help with page seo
+
 ## 1.8.3
 
 ### Patch Changes

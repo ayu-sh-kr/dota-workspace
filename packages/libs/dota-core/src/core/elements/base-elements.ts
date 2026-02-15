@@ -18,14 +18,13 @@ export abstract class BaseElement extends HTMLElement {
   reactive = false;
   private __initialized = false;
 
-  private eventManagerService: EventManagerService<BaseElement>;
+  private __eventManagerService: EventManagerService<BaseElement>;
 
-  // NEW: keep delegated listeners so updateHTML()/rebind doesn't stack duplicates
   private __delegatedBindListeners = new Map<string, EventListener>();
 
   protected constructor() {
     super();
-    this.eventManagerService = new EventManagerService(this);
+    this.__eventManagerService = new EventManagerService(this);
   }
 
   /**
@@ -196,7 +195,7 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method handleAfterInit
    */
-  private handleAfterInit() {
+   handleAfterInit() {
     const data: Map<string, Function> = HelperUtils.fetchOrCreate<Function>(this, 'After');
     const fun = data.get('afterViewInit')
 
@@ -435,7 +434,7 @@ export abstract class BaseElement extends HTMLElement {
     data.forEach((value: EventOptionMeta) => {
       const element = this.isShadow ? this.shadowRoot : this;
       if (element) {
-        this.eventManagerService.bindEvent(element, value, 'Host');
+        this.__eventManagerService.bindEvent(element, value, 'Host');
       }
     });
   }
@@ -458,7 +457,7 @@ export abstract class BaseElement extends HTMLElement {
       const element = this.isShadow ? this.shadowRoot : this;
 
       if (element) {
-        this.eventManagerService.unbindEvent(element, option, 'Host');
+        this.__eventManagerService.unbindEvent(element, option, 'Host');
       }
     });
   }
@@ -494,7 +493,7 @@ export abstract class BaseElement extends HTMLElement {
     if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
-      this.eventManagerService.bindEvent(window, value, 'Window');
+      this.__eventManagerService.bindEvent(window, value, 'Window');
     })
   }
 
@@ -512,7 +511,7 @@ export abstract class BaseElement extends HTMLElement {
     if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
-      this.eventManagerService.unbindEvent(window, value, 'Window');
+      this.__eventManagerService.unbindEvent(window, value, 'Window');
     });
   }
 
@@ -534,7 +533,7 @@ export abstract class BaseElement extends HTMLElement {
     if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
-      this.eventManagerService.bindEvent(document, value, 'Document');
+      this.__eventManagerService.bindEvent(document, value, 'Document');
     })
   }
 
@@ -553,7 +552,7 @@ export abstract class BaseElement extends HTMLElement {
     if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
-      this.eventManagerService.unbindEvent(document, value, 'Document');
+      this.__eventManagerService.unbindEvent(document, value, 'Document');
     });
   }
 
