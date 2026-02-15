@@ -7,6 +7,7 @@ import {
 import {HelperUtils, PropertyUtils, Sanitizer} from "@dota/core/utils";
 import {EventManagerService} from "@dota/core/services";
 import {EventEmitter} from "@dota/core";
+import morphdom from "morphdom";
 
 
 export abstract class BaseElement extends HTMLElement {
@@ -93,11 +94,29 @@ export abstract class BaseElement extends HTMLElement {
    */
   updateHTML() {
     if (!this.__initialized) return;
-    if (this.isShadow && this.shadowRoot) {
-      this.shadowRoot.innerHTML = this.render();
-    } else {
-      this.innerHTML = this.render();
-    }
+
+    const newHTML = this.render();
+    const root = this.isShadow ? this.shadowRoot : this;
+
+    if (!root) return;
+
+    // Create wrapper to morph innerHTML
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = root.innerHTML;
+
+    const newWrapper = document.createElement('div');
+    newWrapper.innerHTML = newHTML;
+
+    morphdom(wrapper, newWrapper, {
+      childrenOnly: true,
+      onBeforeElUpdated: (fromEl, toEl) => {
+        // Skip if elements are the same
+        return !fromEl.isEqualNode(toEl);
+      }
+    });
+
+    root.innerHTML = wrapper.innerHTML;
+
     const bindMethods = this.bindMethods();
     const bindElements = this.bindElements();
 
