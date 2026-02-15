@@ -1,5 +1,4 @@
-import {BaseElement, Component, DotaElementConstructor} from "@dota/core";
-import {HostListener} from "@dota/core/decorators/host-listener.decorator.ts";
+import {BaseElement, Component, DotaElementConstructor, HostListener} from "@dota/core";
 
 describe('HostListenerDecorator', () => {
   function microtask() {
