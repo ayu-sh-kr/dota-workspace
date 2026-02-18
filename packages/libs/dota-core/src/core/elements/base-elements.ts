@@ -93,29 +93,11 @@ export abstract class BaseElement extends HTMLElement {
    */
   updateHTML() {
     if (!this.__initialized) return;
-
-    const newHTML = this.render();
-    const root = this.isShadow ? this.shadowRoot : this;
-
-    if (!root) return;
-
-    // Create wrapper to morph innerHTML
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = root.innerHTML;
-
-    const newWrapper = document.createElement('div');
-    newWrapper.innerHTML = newHTML;
-
-    morphdom(wrapper, newWrapper, {
-      childrenOnly: true,
-      onBeforeElUpdated: (fromEl, toEl) => {
-        // Skip if elements are the same
-        return !fromEl.isEqualNode(toEl);
-      }
-    });
-
-    root.innerHTML = wrapper.innerHTML;
-
+    if (this.isShadow && this.shadowRoot) {
+      this.shadowRoot.innerHTML = this.render();
+    } else {
+      this.innerHTML = this.render();
+    }
     const bindMethods = this.bindMethods();
     const bindElements = this.bindElements();
 
