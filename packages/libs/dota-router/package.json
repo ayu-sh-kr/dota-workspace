@@ -16,7 +16,7 @@
     "url": "https://linkedin.com/in/ayu-sh-kr"
   },
   "license": "MIT",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Dota Router is a simple and lightweight router for `dota-core` web component api.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

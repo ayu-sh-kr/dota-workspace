@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-core
 
+## 1.9.1
+
+### Patch Changes
+
+- 9b95d48: Added new binding manager for application which prevents binding of same method to same listener multiple time when a class is redered or called bind multiple times
+- Updated dependencies [9b95d48]
+  - @ayu-sh-kr/dota-event@0.0.2
+
 ## 1.9.0
 
 ### Minor Changes
