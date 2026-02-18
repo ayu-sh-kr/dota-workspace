@@ -7,7 +7,6 @@ import {
 import {HelperUtils, PropertyUtils, Sanitizer} from "@dota/core/utils";
 import {EventManagerService} from "@dota/core/services";
 import {EventEmitter} from "@dota/core";
-import morphdom from "morphdom";
 
 
 export abstract class BaseElement extends HTMLElement {
