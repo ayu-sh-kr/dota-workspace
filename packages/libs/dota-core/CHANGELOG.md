@@ -1,5 +1,16 @@
 # @ayu-sh-kr/dota-core
 
+## 1.9.0
+
+### Minor Changes
+
+- 4272d8d: Added new module/lib dota-event to handle in-app events
+
+### Patch Changes
+
+- Updated dependencies [4272d8d]
+  - @ayu-sh-kr/dota-event@0.0.1
+
 ## 1.8.4
 
 ### Patch Changes
