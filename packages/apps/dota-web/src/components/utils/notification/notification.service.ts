@@ -3,10 +3,6 @@ import {NotificationColor, NotificationComponent} from "@dota/components/utils/n
 
 
 class NotificationService {
-
-  readonly notificationHolderId = '#dota-notification'
-
-
   push({duration, icon, color, message, title}: NotificationDetails) {
 
     const notification = document.createElement('app-notification') as NotificationComponent;

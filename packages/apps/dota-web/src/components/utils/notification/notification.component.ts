@@ -7,7 +7,7 @@ import {
   HTML,
   Number as DNumber,
   Property,
-  String
+  String, ApplicationEventService
 } from "@ayu-sh-kr/dota-core";
 
 
@@ -62,6 +62,18 @@ export class NotificationComponent extends BaseElement {
 
   @BindEvent({event: 'click', id: '#close'})
   removeNode() {
+    ApplicationEventService.getInstance()
+      .getPublisher()
+      .publishAsync({
+        name: 'notification:removed',
+        data: {
+          type: this.type,
+          message: this.message,
+          color: this.color,
+          icon: this.icon,
+          title: this.title
+        }
+      })
     this.remove();
   }
 

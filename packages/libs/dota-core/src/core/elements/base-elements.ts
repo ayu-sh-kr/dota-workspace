@@ -7,6 +7,8 @@ import {
 import {HelperUtils, PropertyUtils, Sanitizer} from "@dota/core/utils";
 import {EventManagerService} from "@dota/core/services";
 import {EventEmitter} from "@dota/core";
+import {bindInstanceEventHandlers, unbindInstanceEventHandlers} from "@ayu-sh-kr/dota-event";
+import {ApplicationEventService} from "@dota/core/services/application-event.service.ts";
 
 
 export abstract class BaseElement extends HTMLElement {
@@ -18,7 +20,7 @@ export abstract class BaseElement extends HTMLElement {
   private __initialized = false;
 
   private __eventManagerService: EventManagerService<BaseElement>;
-
+  private __applicationEventService = ApplicationEventService.getInstance();
   private __delegatedBindListeners = new Map<string, EventListener>();
 
   protected constructor() {
@@ -56,7 +58,7 @@ export abstract class BaseElement extends HTMLElement {
     Promise.all([
       exposedMethods, bindMethods, bindEmitter, bindHostEvents,
       bindWindowEvents, bindDocumentEvents, bindProperties, bindParameters,
-      bindState, bindElements
+      bindState, bindElements, bindInstanceEventHandlers(this, this.__applicationEventService.getListener())
     ])
       .then(() => {
         this.__initialized = true;
@@ -73,7 +75,10 @@ export abstract class BaseElement extends HTMLElement {
     const documentEvents = this.unbindDocumentEvents();
     const unbindProperties = this.unbindProperties();
 
-    Promise.all([unbindMethods, unbindHostEvents, unbindWindowEvents, documentEvents, unbindProperties])
+    Promise.all([
+      unbindMethods, unbindHostEvents, unbindWindowEvents,
+      documentEvents, unbindProperties, unbindInstanceEventHandlers(this, this.__applicationEventService.getListener())
+    ])
       .then(() => this.__initialized = false)
       .catch((reason) => console.error(reason));
   }
