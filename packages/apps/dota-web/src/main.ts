@@ -34,6 +34,7 @@ import {CounterComponent} from "@dota/components/example/counter.component.ts";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
 import {Router, RouterService, ComponentClass } from "@ayu-sh-kr/dota-router";
 import components from "virtual:dota-components";
+import { ApplicationEventService } from "@ayu-sh-kr/dota-core";
 
 let routerService!: RouterService<Router<HTMLElement>>;
 initializeApp({
@@ -45,9 +46,14 @@ initializeApp({
 })
   .then((value) => {
     routerService = value.routerService
+    ApplicationEventService.getInstance()
+      .getPublisher()
+      .publishAsync({
+        name: 'app:initialized',
+        data: null
+      })
   })
   .catch(error => console.error(error))
-
 export {routerService}
 
 declare global {
