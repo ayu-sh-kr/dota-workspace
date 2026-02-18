@@ -3,5 +3,6 @@ export {DefaultApplicationEventManager} from '@dota/DefaultApplicationEventManag
 export {DefaultApplicationEventBus} from '@dota/DefaultApplicationEventBus.ts';
 export {DefaultApplicationEventPublisher} from '@dota/DefaultApplicationEventPublisher.ts';
 export {DefaultApplicationEventListener} from '@dota/DefaultApplicationEventListener.ts';
+export {DefaultClassApplicationEventBindManager} from "@dota/DefaultClassApplicationEventBindManager.ts"
 export * from "@dota/on-event.decorator.ts"
 
