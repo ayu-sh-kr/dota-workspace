@@ -123,6 +123,15 @@ importers:
 
   packages/libs/dota-core:
     dependencies:
+      '@ayu-sh-kr/dota-event':
+        specifier: workspace:*
+        version: link:../dota-event
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+
+  packages/libs/dota-event:
+    dependencies:
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
