@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-router
 
+## 0.0.21
+
+### Patch Changes
+
+- Updated dependencies [4272d8d]
+  - @ayu-sh-kr/dota-core@1.9.0
+
 ## 0.0.20
 
 ### Patch Changes
