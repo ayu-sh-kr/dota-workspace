@@ -138,3 +138,31 @@ export interface ApplicationEventPublisher {
    */
   publishAsync(event: ApplicationEvent): Promise<void>;
 }
+
+
+/**
+ * Manages binding and unbinding of decorated event handlers for class instances.
+ * Provides lifecycle management for event subscriptions using OnEvent decorator metadata.
+ * Maintains internal state to track bound callbacks and prevent duplicate registrations.
+ * Ensures proper cleanup of event listeners when handlers are no longer needed.
+ * Works in conjunction with ApplicationEventListener to register/unregister handlers.
+ */
+export interface ClassApplicationEventBindManager {
+  /**
+   * Registers all decorated event handler methods from the target instance.
+   * Retrieves OnEvent metadata and binds each method to the event listener.
+   * Stores bound callback references to enable proper unbinding later.
+   * Prevents duplicate bindings by checking if methods are already registered.
+   * Methods are bound to the instance context to preserve 'this' references.
+   */
+  bind(): void;
+
+  /**
+   * Unregisters all previously bound event handler methods from the listener.
+   * Uses stored callback references to ensure exact matches during removal.
+   * Cleans up internal state by removing binding records after unsubscription.
+   * Only removes handlers that were previously registered via bind().
+   * Safely handles cases where handlers were never bound or already removed.
+   */
+  unbind(): void;
+}
