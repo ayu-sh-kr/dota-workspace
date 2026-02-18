@@ -1,21 +1,8 @@
 import {BaseElement, Component, DotaElementConstructor, HostListener} from "@dota/core";
+import {defineAndCreate, microtask} from "../../Utils.ts";
+
 
 describe('HostListenerDecorator', () => {
-  function microtask() {
-    return Promise.resolve();
-  }
-
-  function defineAndCreate<T extends DotaElementConstructor>(Ctor: T) {
-    // Custom elements cannot be "undefined", so always use a unique tag per test.
-    const tag = `test-component-${Math.random().toString(36).slice(2)}`;
-
-    if (!customElements.get(tag)) {
-      customElements.define(tag, Ctor);
-    }
-
-    const el = document.createElement(tag) as InstanceType<T>;
-    return { tag, el };
-  }
 
   afterEach(() => {
     document.body.innerHTML = '';
@@ -48,7 +35,6 @@ describe('HostListenerDecorator', () => {
     }
 
     const { el } = defineAndCreate(TestComponent);
-
     // Before connecting: host listeners should not fire.
     el.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
     expect(mockMethod).not.toHaveBeenCalled();

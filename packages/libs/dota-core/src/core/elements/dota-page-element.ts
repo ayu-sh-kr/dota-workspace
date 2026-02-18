@@ -2,7 +2,6 @@ import { BaseElement } from "@dota/core/elements";
 import {type SEO} from "@dota/core/types";
 
 
-
 export abstract class DotaPageElement extends BaseElement {
 
   /**

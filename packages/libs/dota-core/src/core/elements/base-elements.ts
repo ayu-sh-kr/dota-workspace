@@ -71,8 +71,9 @@ export abstract class BaseElement extends HTMLElement {
     const unbindHostEvents = this.unbindHostEvents();
     const unbindWindowEvents = this.unbindWindowEvents();
     const documentEvents = this.unbindDocumentEvents();
+    const unbindProperties = this.unbindProperties();
 
-    Promise.all([unbindMethods, unbindHostEvents, unbindWindowEvents, documentEvents])
+    Promise.all([unbindMethods, unbindHostEvents, unbindWindowEvents, documentEvents, unbindProperties])
       .then(() => this.__initialized = false)
       .catch((reason) => console.error(reason));
   }
@@ -234,7 +235,6 @@ export abstract class BaseElement extends HTMLElement {
    * @method unbindProperties
    */
   private async unbindProperties() {
-    
     PropertyUtils.unbindReactive(this)
   }
 
@@ -324,7 +324,6 @@ export abstract class BaseElement extends HTMLElement {
    * @method exposeMethods
    */
   private async exposeMethods() {
-
     let data = HelperUtils.fetchOrCreate<MethodDetails>(this, 'Exposed')
 
     if (data) {
@@ -352,7 +351,6 @@ export abstract class BaseElement extends HTMLElement {
    * @param {string} value - The new value of the attribute.
    */
   private bindProperty(name: string, value: any) {
-
     let data: Map<string, PropertyDetails> = HelperUtils.fetchOrCreate<PropertyDetails>(this, 'Property')
 
     if (data) {
@@ -375,7 +373,6 @@ export abstract class BaseElement extends HTMLElement {
    * @method bindEmitter
    */
   private async bindEmitter() {
-
     let data = HelperUtils.fetchOrCreate<EventDetails>(this, 'Output')
 
     if (!data) return;

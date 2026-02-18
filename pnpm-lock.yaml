@@ -158,9 +158,6 @@ importers:
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
-      magic-string:
-        specifier: ^0.30.21
-        version: 0.30.21
 
 packages:
 

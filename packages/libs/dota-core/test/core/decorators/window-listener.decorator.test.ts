@@ -1,15 +1,15 @@
-import {BaseElement, Component, DotaElementConstructor} from "@dota/core";
-import {DocumentListener} from "@dota/core/decorators/document-listener.decorator.ts";
 import {defineAndCreate, microtask} from "../../Utils.ts";
+import {BaseElement, Component, DocumentListener, WindowListener} from "@dota/core";
 
-describe('DocumentListenerDecorator', () => {
+
+describe('WindowListenerDecorator', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
     jest.clearAllMocks();
   });
 
-  it('binds the method to the document event on connect and unbinds on disconnect', async () => {
+  it('binds the method to the window event on connect and unbinds on disconnect', async () => {
     const mockMethod = jest.fn();
     const mockThis = jest.fn();
 
@@ -22,8 +22,8 @@ describe('DocumentListenerDecorator', () => {
         super();
       }
 
-      @DocumentListener({ event: 'click' })
-      handleDocumentClick(event: Event) {
+      @WindowListener({event: 'resize'})
+      handleWindowResize(event: Event) {
         mockThis(this);
         mockMethod(event);
       }
@@ -33,19 +33,19 @@ describe('DocumentListenerDecorator', () => {
       }
     }
 
-    const { el } = defineAndCreate(TestComponent);
+    const {el} = defineAndCreate(TestComponent);
 
-    // Before connecting: document listeners should not fire
-    const event0 = new Event('click', { bubbles: true, composed: true });
-    document.dispatchEvent(event0);
+    // Before connecting: window listeners should not fire
+    const event0 = new Event('resize');
+    window.dispatchEvent(event0);
     expect(mockMethod).not.toHaveBeenCalled();
 
-    // Connect to DOM => connectedCallback runs => document listener bound
+    // Connect to DOM => connectedCallback runs => window listener bound
     document.body.appendChild(el);
     await microtask();
 
-    const event1 = new Event('click', { bubbles: true, composed: true });
-    document.dispatchEvent(event1);
+    const event1 = new Event('resize');
+    window.dispatchEvent(event1);
 
     expect(mockMethod).toHaveBeenCalledTimes(1);
     expect(mockMethod).toHaveBeenCalledWith(event1);
@@ -58,13 +58,14 @@ describe('DocumentListenerDecorator', () => {
     el.remove();
     await microtask();
 
-    const event2 = new Event('click', { bubbles: true, composed: true });
-    document.dispatchEvent(event2);
-
+    const event2 = new Event('resize');
+    window.dispatchEvent(event2);
     expect(mockMethod).toHaveBeenCalledTimes(1); // unchanged after disconnect
+
+    expect(mockThis).toHaveBeenCalledTimes(1); // unchanged after disconnect
   });
 
-  it('supports multiple events when DocumentListener is used with an array', async () => {
+  it('supports multiple events when WindowListener is used with an array', async () => {
     const calls: string[] = [];
 
     @Component({
@@ -76,7 +77,7 @@ describe('DocumentListenerDecorator', () => {
         super();
       }
 
-      @DocumentListener({ event: ['click', 'keydown'] })
+      @WindowListener({ event: ['click', 'keydown'] })
       handleDocumentEvent(event: Event) {
         calls.push(event.type);
       }
@@ -90,18 +91,19 @@ describe('DocumentListenerDecorator', () => {
     document.body.appendChild(el);
     await microtask();
 
-    document.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
-    document.dispatchEvent(new Event('keydown', { bubbles: true, composed: true }));
+    window.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
+    window.dispatchEvent(new Event('keydown', { bubbles: true, composed: true }));
 
     expect(calls).toEqual(['click', 'keydown']);
 
     el.remove();
     await microtask();
 
-    document.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
-    document.dispatchEvent(new Event('keydown', { bubbles: true, composed: true }));
+    window.dispatchEvent(new Event('click', { bubbles: true, composed: true }));
+    window.dispatchEvent(new Event('keydown', { bubbles: true, composed: true }));
 
     // still only the initial two calls
     expect(calls).toEqual(['click', 'keydown']);
   });
-});
+
+})
