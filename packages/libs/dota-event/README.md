@@ -63,6 +63,17 @@ Exports you will typically use:
   - `bindInstanceEventHandlers(instance, listener)` — register decorated methods on a listener
   - `unbindInstanceEventHandlers(instance, listener)` — unregister decorated methods from a listener
 
+## DefaultClassApplicationEventBindManager
+
+`DefaultClassApplicationEventBindManager` is the package's class-level helper for managing decorated instance method bindings on a provided `ApplicationEventListener`. It:
+
+- Scans a target instance's `@OnEvent` metadata and binds each method to the listener.
+- Keeps an internal store of bound callbacks organized by event name and method key.
+- Prevents duplicate registrations: calling `bind()` multiple times will not re-register the same method for the same event because the manager checks the internal store before adding a listener.
+- Ensures precise unbinding: `unbind()` uses the stored bound callback references to remove the exact functions from the listener and cleans up empty entries.
+
+This makes it safe for services or components that might initialize or call `bind()` repeatedly (for example during hot-reload or multiple init attempts) without producing duplicate listener invocations.
+
 ## Quickstart examples
 
 All snippets are TypeScript and assume the following import path — replace with your project-specific path if needed:
@@ -151,20 +162,3 @@ await bus.emit({ name: 'metrics:tick' });
 // Remove all handlers for the event
 await bus.off('metrics:tick', null);
 ```
-
-## Notes & assumptions
-
-- The README examples use `await` for `DefaultApplicationEventBus` methods because the concrete class implements `on`, `off`, and `emit` as `async` returning `Promise<void>`.
-- The decorator utilities depend on `reflect-metadata`. Make sure your runtime imports it and your tsconfig enables decorators.
-- Import paths in examples use `@ayu-sh-kr/dota-event` as a reasonable published package name. In a monorepo you may import directly from the local package path.
-
-## Suggestions / next steps
-
-- Add an API reference documenting each exported symbol with full TypeScript signatures.
-- Add a test/example that wires event handlers across multiple packages (app -> lib -> app) to demonstrate the singleton bus usage in the monorepo.
-- Consider making bus `on/off/emit` signatures consistent with the `Types.ts` interface (either sync or async) to avoid confusion.
-
----
-
-If you'd like, I can also add a tiny example test file in `test/` that runs the snippets and asserts handler calls — tell me if you want a runnable example and I'll add it.
-

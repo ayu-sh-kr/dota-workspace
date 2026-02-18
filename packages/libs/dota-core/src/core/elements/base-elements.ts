@@ -7,7 +7,7 @@ import {
 import {HelperUtils, PropertyUtils, Sanitizer} from "@dota/core/utils";
 import {EventManagerService} from "@dota/core/services";
 import {EventEmitter} from "@dota/core";
-import {bindInstanceEventHandlers, unbindInstanceEventHandlers} from "@ayu-sh-kr/dota-event";
+import {type ClassApplicationEventBindManager, DefaultClassApplicationEventBindManager} from "@ayu-sh-kr/dota-event";
 import {ApplicationEventService} from "@dota/core/services/application-event.service.ts";
 
 
@@ -22,10 +22,12 @@ export abstract class BaseElement extends HTMLElement {
   private __eventManagerService: EventManagerService<BaseElement>;
   private __applicationEventService = ApplicationEventService.getInstance();
   private __delegatedBindListeners = new Map<string, EventListener>();
+  private __classApplicationEventManager!: ClassApplicationEventBindManager
 
   protected constructor() {
     super();
     this.__eventManagerService = new EventManagerService(this);
+    this.__classApplicationEventManager = new DefaultClassApplicationEventBindManager(this, this.__applicationEventService.getListener());
   }
 
   /**
@@ -58,7 +60,7 @@ export abstract class BaseElement extends HTMLElement {
     Promise.all([
       exposedMethods, bindMethods, bindEmitter, bindHostEvents,
       bindWindowEvents, bindDocumentEvents, bindProperties, bindParameters,
-      bindState, bindElements, bindInstanceEventHandlers(this, this.__applicationEventService.getListener())
+      bindState, bindElements, this.__classApplicationEventManager.bind()
     ])
       .then(() => {
         this.__initialized = true;
@@ -77,7 +79,7 @@ export abstract class BaseElement extends HTMLElement {
 
     Promise.all([
       unbindMethods, unbindHostEvents, unbindWindowEvents,
-      documentEvents, unbindProperties, unbindInstanceEventHandlers(this, this.__applicationEventService.getListener())
+      documentEvents, unbindProperties, this.__classApplicationEventManager.unbind()
     ])
       .then(() => this.__initialized = false)
       .catch((reason) => console.error(reason));
