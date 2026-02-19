@@ -18,14 +18,23 @@
   "license": "MIT",
   "version": "0.0.22",
   "description": "Dota Router is a simple and lightweight router for `dota-core` web component api.",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "lint": "tsc --noEmit",
-    "build-pack": "pnpm build && pnpm pack",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
     "test": "vitest run",
     "test:watch": "vitest",
