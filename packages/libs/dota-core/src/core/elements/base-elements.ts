@@ -28,6 +28,11 @@ export abstract class BaseElement extends HTMLElement {
     super();
     this.__eventManagerService = new EventManagerService(this);
     this.__classApplicationEventManager = new DefaultClassApplicationEventBindManager(this, this.__applicationEventService.getListener());
+    this.__applicationEventService
+      .getPublisher()
+      .publishAsync({
+        name: `${HelperUtils.toDotaElementConstructor(this).__dotaSelector}:constructed`
+      })
   }
 
   /**
@@ -65,6 +70,11 @@ export abstract class BaseElement extends HTMLElement {
       .then(() => {
         this.__initialized = true;
         this.updateHTML();
+        this.__applicationEventService
+          .getPublisher()
+          .publishAsync({
+            name: `${HelperUtils.toDotaElementConstructor(this).__dotaSelector}:connected`
+          })
         this.handleAfterInit();
       })
       .catch((reason) => console.error(reason));
@@ -81,7 +91,14 @@ export abstract class BaseElement extends HTMLElement {
       unbindMethods, unbindHostEvents, unbindWindowEvents,
       documentEvents, unbindProperties, this.__classApplicationEventManager.unbind()
     ])
-      .then(() => this.__initialized = false)
+      .then(() => {
+        this.__initialized = false;
+        this.__applicationEventService
+          .getPublisher()
+          .publishAsync({
+            name: `${HelperUtils.toDotaElementConstructor(this).__dotaSelector}:disconnected`
+          })
+      })
       .catch((reason) => console.error(reason));
   }
 
@@ -124,7 +141,6 @@ export abstract class BaseElement extends HTMLElement {
    * @param {string} newValue - The new value of the attribute.
    */
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-
     if (!this.reactive) {
       PropertyUtils.bindReactive(this);
     }
@@ -137,6 +153,13 @@ export abstract class BaseElement extends HTMLElement {
       this.bindProperty(name, newValue);
       this.updateHTML();
     }
+
+    this.__applicationEventService
+      .getPublisher()
+      .publishAsync({
+        name: `${HelperUtils.toDotaElementConstructor(this).__dotaSelector}:attributeChanged`,
+        data: { name, oldValue, newValue }
+      })
   }
 
   /**
