@@ -6,6 +6,7 @@
 export type ApplicationEventMetadata = {
   name: string
   method: string | symbol
+  scoped?: boolean
 }
 
 /**
