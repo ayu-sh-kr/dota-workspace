@@ -32,6 +32,7 @@ export class HomePage extends DotaPageElement {
   }
 
   render(): string {
+    //language=html
     return HTML`
            <app-offer visible="true"></app-offer>
            <app-header></app-header>
