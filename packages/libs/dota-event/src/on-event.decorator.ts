@@ -10,12 +10,14 @@ export const EVENTS_METADATA_KEY = 'key:on-event';
  * Multiple methods in a class can be decorated to handle different events.
  * The metadata is later used by bindInstanceEventHandlers to register listeners.
  * @param name - The event name this method should handle
+ * @param scoped - Optional flag for future use to indicate if the handler should be scoped (not currently implemented)
+ * @returns A method decorator function that adds metadata to the class constructor
  */
-function OnEventDecorator(name: string): MethodDecorator {
+function OnEventDecorator(name: string, scoped: boolean = false): MethodDecorator {
   return (target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor) => {
     const ctor = target.constructor;
     const existing: Array<ApplicationEventMetadata> = Reflect.getOwnMetadata(EVENTS_METADATA_KEY, ctor) || [];
-    existing.push({ name: name, method: propertyKey });
+    existing.push({ name: name, method: propertyKey, scoped: scoped });
     Reflect.defineMetadata(EVENTS_METADATA_KEY, existing, ctor);
   };
 }
