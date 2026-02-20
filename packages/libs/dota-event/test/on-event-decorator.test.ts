@@ -140,10 +140,11 @@ describe('OnEvent Decorator Tests', () => {
       const metadata = getOnEventMetadata(UserEventSubscriber);
 
       expect(metadata).toHaveLength(4);
-      expect(metadata).toContainEqual({ name: 'user:created', method: 'handleUserCreated' });
-      expect(metadata).toContainEqual({ name: 'user:updated', method: 'handleUserUpdated' });
-      expect(metadata).toContainEqual({ name: 'user:deleted', method: 'handleUserDeleted' });
-      expect(metadata).toContainEqual({ name: 'user:created', method: 'sendWelcomeEmail' });
+
+      expect(metadata).toContainEqual({name: 'user:created', method: 'handleUserCreated', scoped: false});
+      expect(metadata).toContainEqual({name: 'user:updated', method: 'handleUserUpdated', scoped: false});
+      expect(metadata).toContainEqual({name: 'user:deleted', method: 'handleUserDeleted', scoped: false});
+      expect(metadata).toContainEqual({name: 'user:created', method: 'sendWelcomeEmail', scoped: false});
     });
 
     it('should support multiple handlers for same event', () => {
@@ -152,16 +153,18 @@ describe('OnEvent Decorator Tests', () => {
 
       expect(userCreatedHandlers).toHaveLength(2);
       expect(userCreatedHandlers[0].method).toBe('handleUserCreated');
+      expect(userCreatedHandlers[0].scoped).toBe(false);
       expect(userCreatedHandlers[1].method).toBe('sendWelcomeEmail');
+      expect(userCreatedHandlers[1].scoped).toBe(false);
     });
 
     it('should store metadata for NotificationEventSubscriber', () => {
       const metadata = getOnEventMetadata(NotificationEventSubscriber);
 
       expect(metadata).toHaveLength(3);
-      expect(metadata).toContainEqual({ name: 'notification:send', method: 'handleNotification' });
-      expect(metadata).toContainEqual({ name: 'notification:broadcast', method: 'handleBroadcast' });
-      expect(metadata).toContainEqual({ name: 'notification:send', method: 'logNotification' });
+      expect(metadata).toContainEqual({name: 'notification:send', method: 'handleNotification', scoped: false});
+      expect(metadata).toContainEqual({name: 'notification:broadcast', method: 'handleBroadcast', scoped: false});
+      expect(metadata).toContainEqual({name: 'notification:send', method: 'logNotification', scoped: false});
     });
 
     it('should store metadata for OrderEventSubscriber', () => {
