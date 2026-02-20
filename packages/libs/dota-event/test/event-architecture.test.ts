@@ -402,5 +402,26 @@ describe('Event Architecture Integration Tests', () => {
       expect(callback).toHaveBeenCalledWith({ name: 'shared:event', data: 'shared' });
     });
   });
+
+  describe('Event Bus New Instance', () => {
+    it('should create a new independent event bus instance', () => {
+      const newBus = DefaultApplicationEventBus.getNewInstance();
+      expect(newBus).not.toBe(eventBus);
+
+      const newListener = new DefaultApplicationEventListener(newBus);
+      const callback = vi.fn();
+
+      newListener.on('new:event', callback);
+      publisher.publish({ name: 'new:event', data: 'test' });
+
+      // Should not be called since it's a different bus
+      expect(callback).not.toHaveBeenCalled();
+
+      // Publish on the new bus
+      new DefaultApplicationEventPublisher(newBus)
+        .publishAsync({ name: 'new:event', data: 'test' });
+      expect(callback).toHaveBeenCalledWith({ name: 'new:event', data: 'test' });
+    });
+  })
 });
 
