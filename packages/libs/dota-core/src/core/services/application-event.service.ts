@@ -2,7 +2,8 @@ import {
   ApplicationEventBus,
   ApplicationEventListener, ApplicationEventPublisher,
   DefaultApplicationEventBus,
-  DefaultApplicationEventListener, DefaultApplicationEventPublisher
+  DefaultApplicationEventListener, DefaultApplicationEventPublisher,
+  EventChannel
 } from "@ayu-sh-kr/dota-event";
 
 
@@ -79,5 +80,9 @@ export class ApplicationEventService {
    */
   getEventBus(): ApplicationEventBus {
     return this.eventBus
+  }
+
+  createEventChannel(prefix: string): EventChannel {
+    return new EventChannel(prefix, this.listener, this.publisher);
   }
 }
