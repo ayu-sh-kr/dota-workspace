@@ -44,18 +44,30 @@ export class HelperUtils {
     }
   }
 
+  /**
+   * Converts a target (constructor function or object instance) to a DotaElementConstructor.
+   *
+   * This method validates that the target is either a constructor function or an object instance,
+   * and ensures that the resulting constructor extends BaseElement. It performs type checking
+   * and throws errors if the target does not meet the requirements.
+   *
+   * @param {any} target - The target to convert, which can be a constructor function or an object instance.
+   * @returns {DotaElementConstructor} - The validated constructor that extends BaseElement.
+   * @throws {TypeError} - If the target is not a constructor function or an object instance.
+   * @throws {TypeError} - If the target constructor does not extend BaseElement.
+   */
   static toDotaElementConstructor(target: any): DotaElementConstructor {
-    // Check if target is a function (constructor)
-    if (typeof target !== 'function') {
-      throw new TypeError('Target must be a constructor function');
+    const constructor = typeof target === 'function' ? target : target?.constructor;
+    
+    if (typeof constructor !== 'function') {
+      throw new TypeError('Target must be a constructor function or an object instance');
     }
-
-    // Check if target extends BaseElement
-    if (!(target.prototype instanceof BaseElement) && target !== BaseElement) {
+    
+    if (!(constructor.prototype instanceof BaseElement) && constructor !== BaseElement) {
       throw new TypeError('Target must extend BaseElement');
     }
 
-    return target as DotaElementConstructor;
+    return constructor as DotaElementConstructor;
   }
 
 }

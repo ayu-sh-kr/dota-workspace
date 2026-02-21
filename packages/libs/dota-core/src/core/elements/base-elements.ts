@@ -7,8 +7,15 @@ import {
 import {HelperUtils, PropertyUtils, Sanitizer} from "@dota/core/utils";
 import {EventManagerService} from "@dota/core/services";
 import {EventEmitter} from "@dota/core";
-import {type ClassApplicationEventBindManager, DefaultClassApplicationEventBindManager} from "@ayu-sh-kr/dota-event";
+import {
+  type ClassApplicationEventBindManager,
+  DefaultClassApplicationEventBindManager,
+  EventChannel,
+  DefaultClassScopedApplicationEventBindManager
+} from "@ayu-sh-kr/dota-event";
 import {ApplicationEventService} from "@dota/core/services/application-event.service.ts";
+import {KeyUtils} from "@dota/core/utils/KeyUtils.ts";
+import {LifecycleEventConstants} from "@dota/core/constants";
 
 
 export abstract class BaseElement extends HTMLElement {
@@ -17,17 +24,28 @@ export abstract class BaseElement extends HTMLElement {
   isShadow!: boolean;
   shadowRoot!: ShadowRoot;
   reactive = false;
+  private readonly __uid!: number;
   private __initialized = false;
 
   private __eventManagerService: EventManagerService<BaseElement>;
   private __applicationEventService = ApplicationEventService.getInstance();
   private __delegatedBindListeners = new Map<string, EventListener>();
   private __classApplicationEventManager!: ClassApplicationEventBindManager
+  protected __eventChannel!: EventChannel
+  private __classScopedApplicationEventManager!: ClassApplicationEventBindManager
 
   protected constructor() {
     super();
+    const dotaElementConstructor = HelperUtils.toDotaElementConstructor(this);
+    this.__uid = KeyUtils.getKey()
     this.__eventManagerService = new EventManagerService(this);
     this.__classApplicationEventManager = new DefaultClassApplicationEventBindManager(this, this.__applicationEventService.getListener());
+    this.__eventChannel = this.__applicationEventService
+      .createEventChannel(`${dotaElementConstructor.__dotaSelector}:${this.__uid}`);
+    this.__classScopedApplicationEventManager = new DefaultClassScopedApplicationEventBindManager(this, this.__eventChannel);
+    this.__eventChannel.emit({
+      name: LifecycleEventConstants.CONSTRUCTED
+    })
   }
 
   /**
@@ -35,7 +53,7 @@ export abstract class BaseElement extends HTMLElement {
    *
    * This method performs essential tasks synchronously and defers non-critical tasks
    * using microtasks (via Promise.resolve()) to avoid blocking the main thread.
-   * 
+   *
    * @method connectedCallback
    */
   connectedCallback() {
@@ -60,11 +78,14 @@ export abstract class BaseElement extends HTMLElement {
     Promise.all([
       exposedMethods, bindMethods, bindEmitter, bindHostEvents,
       bindWindowEvents, bindDocumentEvents, bindProperties, bindParameters,
-      bindState, bindElements, this.__classApplicationEventManager.bind()
+      bindState, bindElements, this.__classApplicationEventManager.bind(),
+      this.__classScopedApplicationEventManager.bind()
     ])
       .then(() => {
         this.__initialized = true;
-        this.updateHTML();
+        this.__eventChannel.emit({
+          name: LifecycleEventConstants.CONNECTED
+        })
         this.handleAfterInit();
       })
       .catch((reason) => console.error(reason));
@@ -79,9 +100,15 @@ export abstract class BaseElement extends HTMLElement {
 
     Promise.all([
       unbindMethods, unbindHostEvents, unbindWindowEvents,
-      documentEvents, unbindProperties, this.__classApplicationEventManager.unbind()
+      documentEvents, unbindProperties, this.__classApplicationEventManager.unbind(),
+      this.__classScopedApplicationEventManager.unbind()
     ])
-      .then(() => this.__initialized = false)
+      .then(() => {
+        this.__initialized = false;
+        this.__eventChannel.emit({
+          name: LifecycleEventConstants.DISCONNECTED
+        })
+      })
       .catch((reason) => console.error(reason));
   }
 
@@ -108,6 +135,11 @@ export abstract class BaseElement extends HTMLElement {
     const bindElements = this.bindElements();
 
     Promise.all([bindMethods, bindElements])
+      .then(() => {
+        this.__eventChannel.emit({
+          name: LifecycleEventConstants.DOM_UPDATED
+        })
+      })
       .catch((reason) => console.error(reason));
   }
 
@@ -125,10 +157,6 @@ export abstract class BaseElement extends HTMLElement {
    */
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
 
-    if (!this.reactive) {
-      PropertyUtils.bindReactive(this);
-    }
-
     if (newValue === null) {
       return;
     }
@@ -136,6 +164,9 @@ export abstract class BaseElement extends HTMLElement {
     if (newValue !== oldValue) {
       this.bindProperty(name, newValue);
       this.updateHTML();
+      this.__eventChannel.emit({
+        name: LifecycleEventConstants.ATTRIBUTE_CHANGED
+      });
     }
   }
 
@@ -183,13 +214,12 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method handleAfterInit
    */
-   handleAfterInit() {
+  handleAfterInit() {
     const data: Map<string, Function> = HelperUtils.fetchOrCreate<Function>(this, 'After');
     const fun = data.get('afterViewInit')
 
     if (fun) {
       fun.apply(this);
-      this.updateHTML();
     }
   }
 
@@ -205,7 +235,12 @@ export abstract class BaseElement extends HTMLElement {
    * @method bindHTML
    */
   private bindHTML() {
-    this.isShadow = Reflect.getMetadata(this.constructor.name + ':' + 'shadow', this.constructor)
+    const isShadow = HelperUtils.toDotaElementConstructor(this)
+      .__dotaShadow;
+    if (isShadow) {
+      this.isShadow = isShadow;
+    }
+
     if (this.isShadow) {
       this.shadowRoot = this.attachShadow({mode: "open"})
       if (this.shadowRoot) {

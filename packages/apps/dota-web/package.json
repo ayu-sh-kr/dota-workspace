@@ -1,5 +1,5 @@
 {
-  "name": "doto-web",
+  "name": "dota-web",
   "private": true,
   "version": "0.0.10",
   "type": "module",
@@ -17,12 +17,13 @@
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
-    "@ayu-sh-kr/dota-rest": "workspace:*",
-    "@ayu-sh-kr/dota-router": "workspace:*",
-    "@ayu-sh-kr/dota-wrap": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
     "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
+    "@ayu-sh-kr/dota-rest": "workspace:*",
+    "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-ui": "0.0.7",
+    "@ayu-sh-kr/dota-wrap": "workspace:*",
+    "@floating-ui/dom": "^1.7.5",
     "highlight.js": "^11.11.1",
     "markdown-it": "latest",
     "markdown-it-highlightjs": "^4.2.0",

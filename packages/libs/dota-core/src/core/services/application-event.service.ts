@@ -2,7 +2,8 @@ import {
   ApplicationEventBus,
   ApplicationEventListener, ApplicationEventPublisher,
   DefaultApplicationEventBus,
-  DefaultApplicationEventListener, DefaultApplicationEventPublisher
+  DefaultApplicationEventListener, DefaultApplicationEventPublisher,
+  EventChannel
 } from "@ayu-sh-kr/dota-event";
 
 
@@ -32,9 +33,9 @@ export class ApplicationEventService {
    * @private
    */
   private constructor() {
-    const eventBusInstance = DefaultApplicationEventBus.getInstance();
-    this.listener = new DefaultApplicationEventListener(eventBusInstance);
-    this.publisher = new DefaultApplicationEventPublisher(eventBusInstance);
+    this.eventBus = DefaultApplicationEventBus.getInstance();
+    this.listener = new DefaultApplicationEventListener(this.eventBus);
+    this.publisher = new DefaultApplicationEventPublisher(this.eventBus);
   }
 
   /**
@@ -79,5 +80,17 @@ export class ApplicationEventService {
    */
   getEventBus(): ApplicationEventBus {
     return this.eventBus
+  }
+
+  /**
+   * Creates a new event channel with the specified prefix.
+   * An event channel is a scoped communication channel for events, allowing for organized event handling.
+   * The prefix is used to namespace events within the channel, helping to avoid naming collisions and improve event management.
+   *
+   * @param prefix A string prefix to namespace the events in the channel
+   * @returns {EventChannel} A new event channel instance with the specified prefix
+   */
+  createEventChannel(prefix: string): EventChannel {
+    return new EventChannel(prefix, this.listener, this.publisher);
   }
 }

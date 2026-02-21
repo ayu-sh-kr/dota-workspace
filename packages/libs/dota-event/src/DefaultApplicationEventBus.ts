@@ -29,6 +29,23 @@ export class DefaultApplicationEventBus implements ApplicationEventBus {
   }
 
   /**
+   * Creates and returns a new independent instance of DefaultApplicationEventBus.
+   * Unlike getInstance(), this method bypasses the singleton pattern and creates a fresh instance
+   * with its own event manager and listener registry. Use this when you need isolated event buses
+   * for specific contexts, such as testing, module isolation, or when multiple independent
+   * event handling systems are required within the same application.
+   *
+   * @returns A new DefaultApplicationEventBus instance with an empty event registry
+   * @example
+   * // Create isolated event bus for a specific module
+   * const moduleEventBus = DefaultApplicationEventBus.getNewInstance();
+   * await moduleEventBus.on('module:event', handler);
+   */
+  static getNewInstance(): DefaultApplicationEventBus {
+    return new DefaultApplicationEventBus();
+  }
+
+  /**
    * Registers an event listener callback for the specified event name.
    * Multiple callbacks can be registered for the same event name.
    * The callback will be invoked whenever the event is emitted.

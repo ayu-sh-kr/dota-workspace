@@ -8,6 +8,7 @@ import {getOnEventMetadata} from "@dota/on-event.decorator.ts";
  * Provides bind/unbind operations that work with OnEvent decorator metadata.
  * Ensures proper cleanup by maintaining references to bound function instances.
  * Used as the default implementation for managing class-level event subscriptions.
+ * Note: This manager does not bind methods decorated with scoped events - those are skipped during bind/unbind operations.
  */
 export class DefaultClassApplicationEventBindManager implements ClassApplicationEventBindManager {
   private _store: Map<string, Map<string, ApplicationEventCallback>> = new Map();
@@ -21,12 +22,14 @@ export class DefaultClassApplicationEventBindManager implements ClassApplication
    * Stores bound callbacks internally to enable proper unbinding and prevent duplicates.
    * Skips methods that are not functions or already bound for the same event.
    * Does nothing if no decorated event handlers exist on the target.
+   * Note: Methods decorated with scoped events are explicitly skipped and not bound.
    */
   async bind() {
     const metadata = getOnEventMetadata(this.target);
     if (metadata.length === 0) return;
 
-    metadata.forEach(({name, method}) => {
+    metadata.forEach(({name, method, scoped}) => {
+      if (scoped) return;
       const handler = (this.target as any)[method];
       if (typeof handler !== 'function') return;
 
@@ -56,12 +59,14 @@ export class DefaultClassApplicationEventBindManager implements ClassApplication
    * Cleans up internal store by removing method references and empty event maps.
    * Skips methods that were never bound or already unbound.
    * Does nothing if no decorated event handlers exist on the target.
+   * Note: Methods decorated with scoped events are explicitly skipped and not unbound.
    */
   async unbind() {
     const metadata = getOnEventMetadata(this.target);
     if (metadata.length === 0) return;
 
-    metadata.forEach(({name, method}) => {
+    metadata.forEach(({name, method, scoped}) => {
+      if (scoped) return;
       const eventBindings = this._store.get(name);
       if (!eventBindings) return;
 

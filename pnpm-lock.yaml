@@ -77,6 +77,9 @@ importers:
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../../libs/dota-core
+      '@ayu-sh-kr/dota-event':
+        specifier: workspace:*
+        version: link:../../libs/dota-event
       '@ayu-sh-kr/dota-preloader-plugin':
         specifier: workspace:*
         version: link:../../plugins/dota-vite-preloader
@@ -92,6 +95,9 @@ importers:
       '@ayu-sh-kr/dota-wrap':
         specifier: workspace:*
         version: link:../../libs/dota-wrap
+      '@floating-ui/dom':
+        specifier: ^1.7.5
+        version: 1.7.5
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
@@ -754,6 +760,15 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@floating-ui/core@1.7.4':
+    resolution: {integrity: sha512-C3HlIdsBxszvm5McXlB8PeOEWfBhcGBTZGkGlWc2U0KFY5IwG5OQEuQ8rq52DZmcHDlPLd+YFBK+cZcytwIFWg==}
+
+  '@floating-ui/dom@1.7.5':
+    resolution: {integrity: sha512-N0bD2kIPInNHUHehXhMke1rBGs1dwqvC9O9KYMyyjK7iXt7GAhnro7UlcuYcGdS/yYOlq0MAVgrow8IbWJwyqg==}
+
+  '@floating-ui/utils@0.2.10':
+    resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
 
   '@inquirer/external-editor@1.0.2':
     resolution: {integrity: sha512-yy9cOoBnx58TlsPrIxauKIFQTiyH+0MK4e97y4sV9ERbI+zDxw7i2hxHLCIEGIE/8PPvDxGhgzIOTSOWcs6/MQ==}
@@ -3927,6 +3942,17 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.3':
     optional: true
+
+  '@floating-ui/core@1.7.4':
+    dependencies:
+      '@floating-ui/utils': 0.2.10
+
+  '@floating-ui/dom@1.7.5':
+    dependencies:
+      '@floating-ui/core': 1.7.4
+      '@floating-ui/utils': 0.2.10
+
+  '@floating-ui/utils@0.2.10': {}
 
   '@inquirer/external-editor@1.0.2(@types/node@24.9.0)':
     dependencies:

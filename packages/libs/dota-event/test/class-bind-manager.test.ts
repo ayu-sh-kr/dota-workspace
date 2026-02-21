@@ -53,9 +53,9 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // Call bind multiple times
-      bindManager.bind();
-      bindManager.bind();
-      bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
 
       // Emit an event
       await eventBus.emit({ name: 'user:created', data: { id: 1, name: 'John' } });
@@ -71,8 +71,8 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // Call bind multiple times
-      bindManager.bind();
-      bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
 
       // Emit multiple different events
       await eventBus.emit({ name: 'user:created', data: { id: 1 } });
@@ -91,12 +91,12 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // First bind
-      bindManager.bind();
+      await bindManager.bind();
       await eventBus.emit({ name: 'user:created', data: { id: 1 } });
       expect(handler.eventCounts.get('user:created')).toBe(1);
 
       // Unbind
-      bindManager.unbind();
+      await bindManager.unbind();
       handler.reset();
 
       // Emit event - should not be received
@@ -105,7 +105,7 @@ describe('DefaultClassApplicationEventBindManager', () => {
       expect(handler.receivedEvents).toHaveLength(0);
 
       // Bind again
-      bindManager.bind();
+      await bindManager.bind();
       await eventBus.emit({ name: 'user:created', data: { id: 3 } });
       expect(handler.eventCounts.get('user:created')).toBe(1);
       expect(handler.receivedEvents).toHaveLength(1);
@@ -117,7 +117,7 @@ describe('DefaultClassApplicationEventBindManager', () => {
 
       // Call bind many times
       for (let i = 0; i < 10; i++) {
-        bindManager.bind();
+        await bindManager.bind();
       }
 
       // Emit event once
@@ -135,10 +135,10 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager2 = new DefaultClassApplicationEventBindManager(handler2, listener);
 
       // Bind both managers multiple times
-      bindManager1.bind();
-      bindManager1.bind();
-      bindManager2.bind();
-      bindManager2.bind();
+      await bindManager1.bind();
+      await bindManager1.bind();
+      await bindManager2.bind();
+      await bindManager2.bind();
 
       // Emit event
       await eventBus.emit({ name: 'user:created', data: { id: 1 } });
@@ -174,9 +174,9 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // Call bind multiple times
-      bindManager.bind();
-      bindManager.bind();
-      bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
 
       // Emit event
       await eventBus.emit({ name: 'order:placed', data: { orderId: 123 } });
@@ -202,16 +202,16 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(counter, listener);
 
       // Bind multiple times
-      bindManager.bind();
-      bindManager.bind();
-      bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
 
       // Emit event - should be received
       await eventBus.emit({ name: 'counter:increment', data: {} });
       expect(counter.count).toBe(1);
 
       // Unbind
-      bindManager.unbind();
+      await bindManager.unbind();
 
       // Emit event - should not be received
       await eventBus.emit({ name: 'counter:increment', data: {} });
@@ -222,14 +222,14 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const counter = new EventCounter();
       const bindManager = new DefaultClassApplicationEventBindManager(counter, listener);
 
-      bindManager.bind();
-      await eventBus.emit({ name: 'counter:increment', data: {} });
+      await bindManager.bind();
+      await eventBus.emit({name: 'counter:increment', data: {}});
       expect(counter.count).toBe(1);
 
       // Unbind multiple times
-      bindManager.unbind();
-      bindManager.unbind();
-      bindManager.unbind();
+      await bindManager.unbind();
+      await bindManager.unbind();
+      await bindManager.unbind();
 
       // Should not cause errors and handler should not receive events
       await eventBus.emit({ name: 'counter:increment', data: {} });
@@ -255,22 +255,22 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // First cycle
-      bindManager.bind();
-      bindManager.bind(); // Duplicate
+      await bindManager.bind();
+      await bindManager.bind(); // Duplicate
       await eventBus.emit({ name: 'event:a', data: {} });
       await eventBus.emit({ name: 'event:b', data: {} });
       expect(handler.events).toEqual(['a', 'b']);
 
       // Unbind
-      bindManager.unbind();
+      await bindManager.unbind();
       handler.events = [];
       await eventBus.emit({ name: 'event:a', data: {} });
       await eventBus.emit({ name: 'event:b', data: {} });
       expect(handler.events).toEqual([]);
 
       // Second cycle
-      bindManager.bind();
-      bindManager.bind(); // Duplicate
+      await bindManager.bind();
+      await bindManager.bind(); // Duplicate
       await eventBus.emit({ name: 'event:a', data: {} });
       await eventBus.emit({ name: 'event:b', data: {} });
       expect(handler.events).toEqual(['a', 'b']);
@@ -287,12 +287,12 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // Should not throw
-      expect(() => bindManager.bind()).not.toThrow();
-      expect(() => bindManager.bind()).not.toThrow();
-      expect(() => bindManager.unbind()).not.toThrow();
+      expect(async () => await bindManager.bind()).not.toThrow();
+      expect(async () => await bindManager.bind()).not.toThrow();
+      expect(async () => await bindManager.unbind()).not.toThrow();
     });
 
-    it('should handle non-function properties decorated with OnEvent', () => {
+    it('should handle non-function properties decorated with OnEvent', async () => {
       // This is an edge case where the decorator is misused
       class InvalidHandler {
         public calls: string[] = [];
@@ -307,8 +307,8 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // Should work fine for valid methods
-      bindManager.bind();
-      bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
 
       expect(() => eventBus.emit({ name: 'test:event', data: {} })).not.toThrow();
       expect(handler.calls).toContain('handled');
@@ -332,12 +332,12 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager2 = new DefaultClassApplicationEventBindManager(handler, listener2);
 
       // Bind with first manager multiple times
-      bindManager1.bind();
-      bindManager1.bind();
+      await bindManager1.bind();
+      await bindManager1.bind();
 
       // Bind with second manager multiple times
-      bindManager2.bind();
-      bindManager2.bind();
+      await bindManager2.bind();
+      await bindManager2.bind();
 
       // Emit event
       await eventBus.emit({ name: 'shared:event', data: {} });
@@ -363,9 +363,9 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // Bind multiple times
-      bindManager.bind();
-      bindManager.bind();
-      bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
 
       // Emit event
       await eventBus.emit({ name: 'context:test', data: {} });
@@ -388,8 +388,8 @@ describe('DefaultClassApplicationEventBindManager', () => {
       const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
 
       // Bind
-      bindManager.bind();
-      bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
 
       // Emit event
       await eventBus.emit({ name: 'dynamic:event', data: {} });
@@ -398,6 +398,158 @@ describe('DefaultClassApplicationEventBindManager', () => {
       // The bound method should continue to work
       await eventBus.emit({ name: 'dynamic:event', data: {} });
       expect(handler.calls).toBe(2);
+    });
+  });
+
+  describe('Scoped Event Skipping', () => {
+    it('should not bind a method decorated with a scoped event', async () => {
+      class ScopedHandler {
+        public calls: string[] = [];
+
+        @OnEvent('global:event')
+        handleGlobal(_event: ApplicationEvent): void {
+          this.calls.push('global');
+        }
+
+        @OnEvent('scoped:event', true)
+        handleScoped(_event: ApplicationEvent): void {
+          this.calls.push('scoped');
+        }
+      }
+
+      const handler = new ScopedHandler();
+      const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
+
+      await bindManager.bind();
+
+      await eventBus.emit({ name: 'global:event', data: {} });
+      await eventBus.emit({ name: 'scoped:event', data: {} });
+
+      // global handler fires, scoped handler must NOT fire
+      expect(handler.calls).toContain('global');
+      expect(handler.calls).not.toContain('scoped');
+    });
+
+    it('should not bind scoped methods even when bind() is called multiple times', async () => {
+      class ScopedOnlyHandler {
+        public count = 0;
+
+        @OnEvent('only:scoped', true)
+        handle(_event: ApplicationEvent): void {
+          this.count++;
+        }
+      }
+
+      const handler = new ScopedOnlyHandler();
+      const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
+
+      await bindManager.bind();
+      await bindManager.bind();
+      await bindManager.bind();
+
+      await eventBus.emit({ name: 'only:scoped', data: {} });
+
+      expect(handler.count).toBe(0);
+    });
+
+    it('should not unbind scoped methods (they were never bound)', async () => {
+      class MixedHandler {
+        public calls: string[] = [];
+
+        @OnEvent('mix:regular')
+        handleRegular(_event: ApplicationEvent): void {
+          this.calls.push('regular');
+        }
+
+        @OnEvent('mix:scoped', true)
+        handleScoped(_event: ApplicationEvent): void {
+          this.calls.push('scoped');
+        }
+      }
+
+      const handler = new MixedHandler();
+      const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
+
+      await bindManager.bind();
+
+      // unbind should not throw even though scoped was never bound
+      expect(async () => await bindManager.unbind()).not.toThrow();
+
+      // after unbind the regular handler must be gone too
+      await eventBus.emit({ name: 'mix:regular', data: {} });
+      await eventBus.emit({ name: 'mix:scoped', data: {} });
+
+      expect(handler.calls).toHaveLength(0);
+    });
+
+    it('should only bind non-scoped methods when class has a mix of scoped and non-scoped', async () => {
+      class MixedBindHandler {
+        public log: string[] = [];
+
+        @OnEvent('order:created')
+        onCreated(_event: ApplicationEvent): void {
+          this.log.push('created');
+        }
+
+        @OnEvent('order:scoped-internal', true)
+        onInternal(_event: ApplicationEvent): void {
+          this.log.push('internal');
+        }
+
+        @OnEvent('order:shipped')
+        onShipped(_event: ApplicationEvent): void {
+          this.log.push('shipped');
+        }
+
+        @OnEvent('order:scoped-payment', true)
+        onPayment(_event: ApplicationEvent): void {
+          this.log.push('payment');
+        }
+      }
+
+      const handler = new MixedBindHandler();
+      const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
+
+      await bindManager.bind();
+      await bindManager.bind(); // duplicate — must still only register once each
+
+      await eventBus.emit({ name: 'order:created', data: {} });
+      await eventBus.emit({ name: 'order:shipped', data: {} });
+      await eventBus.emit({ name: 'order:scoped-internal', data: {} });
+      await eventBus.emit({ name: 'order:scoped-payment', data: {} });
+
+      expect(handler.log).toContain('created');
+      expect(handler.log).toContain('shipped');
+      expect(handler.log).not.toContain('internal');
+      expect(handler.log).not.toContain('payment');
+
+      // non-scoped handlers each called exactly once
+      expect(handler.log.filter(e => e === 'created')).toHaveLength(1);
+      expect(handler.log.filter(e => e === 'shipped')).toHaveLength(1);
+    });
+
+    it('should bind a scoped method after explicit unbind without error', async () => {
+      class ScopedUnbindHandler {
+        public count = 0;
+
+        @OnEvent('sb:scoped', true)
+        handle(_event: ApplicationEvent): void {
+          this.count++;
+        }
+      }
+
+      const handler = new ScopedUnbindHandler();
+      const bindManager = new DefaultClassApplicationEventBindManager(handler, listener);
+
+      // bind → unbind → bind should not throw
+      expect(async () => await bindManager.bind()).not.toThrow();
+      expect(async () => await bindManager.unbind()).not.toThrow();
+      expect(async () => await bindManager.bind()).not.toThrow();
+
+      await eventBus.emit({ name: 'sb:scoped', data: {} });
+
+      // still never bound, so count stays 0
+      expect(handler.count).toBe(0);
     });
   });
 
@@ -464,7 +616,7 @@ describe('DefaultClassApplicationEventBindManager', () => {
 
       // Simulate hot-reload cycles
       for (let i = 0; i < 5; i++) {
-        bindManager.bind(); // Simulating repeated hot-reload bind calls
+        await bindManager.bind(); // Simulating repeated hot-reload bind calls
       }
 
       // Emit events
