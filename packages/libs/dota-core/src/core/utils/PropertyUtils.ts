@@ -3,44 +3,59 @@ import {BaseElement, HelperUtils, PropertyDetails, Sanitizer, WatcherOptionMeta}
 
 export class PropertyUtils {
   /**
-   * Binds reactive properties to an element based on metadata, creating reactive getters/setters
-   * that synchronize with DOM attributes and trigger watchers on changes.
+   * Establishes reactive property bindings on an element instance by installing getter/setter pairs
+   * that maintain bidirectional synchronization between JavaScript properties and DOM attributes.
    *
-   * This function performs the following steps for each property defined in metadata:
-   * 1. Retrieves property metadata using HelperUtils.fetchOrCreate
-   * 2. Captures any existing JavaScript-initialized values before defining accessors
-   * 3. Creates a backing field (prefixed with underscore) to store the actual value
-   * 4. Installs reactive getter/setter that:
-   *    - Returns value from backing field on get
-   *    - Updates backing field, syncs to DOM attribute, and triggers watchers on set
-   * 5. Reflects initial JavaScript values to DOM attributes if not already present
-   * 6. Sets the element's `reactive` flag to true
+   * This method implements a three-tier value precedence system during initialization:
+   * 1. DOM attribute value (highest priority) - reflects user-supplied HTML attributes
+   * 2. JavaScript-initialized value (medium priority) - captures constructor assignments or field initializers
+   * 3. Decorator default value (lowest priority) - fallback specified in @Property metadata
    *
-   * The function preserves any values set via JavaScript initialization (e.g., in constructor)
-   * and ensures clean property descriptor installation by removing conflicting own data properties.
+   * For each property registered via @Property decorator, the method:
+   * - Retrieves property metadata including name mappings, type information, and defaults
+   * - Resolves the initial value using the precedence hierarchy described above
+   * - Creates an underscore-prefixed backing field (e.g., `_duration`) to store the actual value
+   * - Installs a reactive accessor pair on the public property name that:
+   *   * Getter: Returns the current value from the backing field
+   *   * Setter: Updates the backing field, reflects the new value to the corresponding DOM attribute,
+   *     and invokes all registered watchers for the property
+   * - Handles cleanup of conflicting property descriptors to ensure clean installation
+   * - Reflects computed initial values back to DOM attributes when appropriate
    *
-   * @function bindReactive
+   * The reactive setter performs change detection and only triggers side effects (attribute updates
+   * and watcher invocations) when the new value differs from the current backing field value.
+   * Attribute synchronization uses HTMLElement.prototype.setAttribute to bypass observed attribute
+   * callbacks during internal initialization, preventing infinite loops.
+   *
+   * After all properties are bound, the element's `reactive` flag is set to true, indicating that
+   * the reactive system is active and property changes will propagate through the system.
+   *
+   * @static
    * @param {any} element - The element instance to bind reactive properties to. Typically extends BaseElement.
+   *                        Must have property metadata registered via @Property decorators.
    *
    * @example
-   * // Define a property with decorator
-   * class MyComponent extends BaseElement {
-   *   @Property({name: 'duration', type: Number})
-   *   duration!: number;
+   * ```typescript
+   * @Property({name: 'duration', type: Number, default: 1000})
+   * duration!: number;
    *
+   * @Property({name: 'enabled', type: Boolean})
+   * enabled!: boolean;
+   *
+   * class Timer extends BaseElement {
    *   constructor() {
    *     super();
-   *     this.duration = 5000; // JS initialization is preserved
+   *     this.duration = 5000; // JS initialization
    *   }
    * }
    *
-   * // After bindReactive is called (typically in element lifecycle):
-   * const element = new MyComponent();
-   * PropertyUtils.bindReactive(element);
+   * // In element lifecycle (e.g., connectedCallback):
+   * PropertyUtils.bindReactive(this);
    *
-   * // Property changes now sync to attribute and trigger watchers
-   * element.duration = 3000; // Sets attribute and calls watchers
-   * console.log(element.getAttribute('duration')); // "3000"
+   * // Now properties are reactive:
+   * this.duration = 3000; // Updates attribute and triggers watchers
+   * console.log(this.getAttribute('duration')); // "3000"
+   * ```
    */
   static bindReactive(element: any) {
     const data = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property');
@@ -114,9 +129,10 @@ export class PropertyUtils {
       });
 
       // Reflect initial value to attribute ONLY if attribute wasn't already the source of truth.
-      // This keeps DOM + property aligned without overriding explicit HTML attributes.
+      // Use HTMLElement.prototype.setAttribute directly so the observed-attribute callback is
+      // NOT triggered — this is an internal setup step, not a user-driven change.
       if (!hasAttr && initial !== undefined) {
-        element.setAttribute(attrName, initial);
+        HTMLElement.prototype.setAttribute.call(element, attrName, initial);
       }
     });
 
