@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-core
 
+## 1.9.2
+
+### Patch Changes
+
+- 35c9b8a: added support for event channel which creates and manages namespaced events on global bus, add rich test for dota-core
+- Updated dependencies [35c9b8a]
+  - @ayu-sh-kr/dota-event@0.0.3
+
 ## 1.9.1
 
 ### Patch Changes
