@@ -24,7 +24,7 @@ export abstract class BaseElement extends HTMLElement {
   isShadow!: boolean;
   shadowRoot!: ShadowRoot;
   reactive = false;
-  private __uid!: number;
+  private readonly __uid!: number;
   private __initialized = false;
 
   private __eventManagerService: EventManagerService<BaseElement>;
@@ -156,9 +156,6 @@ export abstract class BaseElement extends HTMLElement {
    * @param {string} newValue - The new value of the attribute.
    */
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-    if (!this.reactive) {
-      PropertyUtils.bindReactive(this);
-    }
 
     if (newValue === null) {
       return;
@@ -167,12 +164,10 @@ export abstract class BaseElement extends HTMLElement {
     if (newValue !== oldValue) {
       this.bindProperty(name, newValue);
       this.updateHTML();
-    }
-
-    this.__eventChannel
-      .emit({
+      this.__eventChannel.emit({
         name: LifecycleEventConstants.ATTRIBUTE_CHANGED
-      })
+      });
+    }
   }
 
   /**
