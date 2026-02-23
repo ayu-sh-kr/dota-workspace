@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { DefaultApplicationEventManager } from '../src/DefaultApplicationEventManager.ts';
+import { DefaultApplicationEventManager } from '@dota/manager/DefaultApplicationEventManager.ts';
 import { ApplicationEvent, ApplicationEventCallback } from '../src/Types.ts';
 
 describe('DefaultApplicationEventManager', () => {

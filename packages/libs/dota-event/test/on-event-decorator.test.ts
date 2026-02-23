@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {bindInstanceEventHandlers, getOnEventMetadata, OnEvent} from "../src/on-event.decorator.ts";
-import {DefaultApplicationEventBus} from "../src/DefaultApplicationEventBus.ts";
-import {DefaultApplicationEventPublisher} from "../src/DefaultApplicationEventPublisher.ts";
-import {DefaultApplicationEventListener} from "../src/DefaultApplicationEventListener.ts";
+import {bindInstanceEventHandlers, getOnEventMetadata, OnEvent} from "@dota/listener/on-event.decorator.ts";
+import {DefaultApplicationEventBus} from "@dota/bus/DefaultApplicationEventBus.ts";
+import {DefaultApplicationEventPublisher} from "@dota/publisher/DefaultApplicationEventPublisher.ts";
+import {DefaultApplicationEventListener} from "@dota/listener/DefaultApplicationEventListener.ts";
 import {type ApplicationEvent} from "../src/Types.ts";
 
 // Test subscriber classes using @OnEvent decorator

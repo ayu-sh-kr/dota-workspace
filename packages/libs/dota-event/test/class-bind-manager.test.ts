@@ -1,9 +1,9 @@
-import {DefaultApplicationEventBus } from "@dota/DefaultApplicationEventBus";
-import { OnEvent } from "@dota/on-event.decorator";
+import {DefaultApplicationEventBus } from "@dota/bus/DefaultApplicationEventBus.ts";
+import { OnEvent } from "@dota/listener/on-event.decorator.ts";
 import {type ApplicationEvent, ApplicationEventListener } from "@dota/Types";
 import { describe, it, expect, beforeEach } from 'vitest';
-import {DefaultApplicationEventListener} from "@dota/DefaultApplicationEventListener.ts";
-import {DefaultClassApplicationEventBindManager} from "@dota/DefaultClassApplicationEventBindManager.ts";
+import {DefaultApplicationEventListener} from "@dota/listener/DefaultApplicationEventListener.ts";
+import {DefaultClassApplicationEventBindManager} from "@dota/manager/DefaultClassApplicationEventBindManager.ts";
 
 
 describe('DefaultClassApplicationEventBindManager', () => {
