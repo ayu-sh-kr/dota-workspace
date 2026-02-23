@@ -1,5 +1,5 @@
 import {ApplicationEventCallback, ApplicationEventListener, ClassApplicationEventBindManager} from "@dota/Types.ts";
-import {getOnEventMetadata} from "@dota/on-event.decorator.ts";
+import {getOnEventMetadata} from "@dota/listener/on-event.decorator.ts";
 
 
 /**

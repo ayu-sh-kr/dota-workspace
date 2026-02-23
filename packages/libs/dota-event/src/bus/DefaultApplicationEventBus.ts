@@ -1,5 +1,5 @@
 import {ApplicationEvent, ApplicationEventBus, ApplicationEventCallback} from "@dota/Types.ts";
-import {DefaultApplicationEventManager} from "@dota/DefaultApplicationEventManager.ts";
+import {DefaultApplicationEventManager} from "@dota/manager/DefaultApplicationEventManager.ts";
 
 /**
  * Singleton implementation of ApplicationEventBus that manages application-wide event distribution.
