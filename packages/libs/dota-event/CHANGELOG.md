@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-event
 
+## 0.0.4
+
+### Patch Changes
+
+- 5ee8e6c: Added support for type intellisense on event and added auto-bind suppport @OnEvent decorator on standalone classes
+
 ## 0.0.3
 
 ### Patch Changes
