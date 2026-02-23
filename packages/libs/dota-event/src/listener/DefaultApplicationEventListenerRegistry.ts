@@ -7,7 +7,7 @@ import {ApplicationEventListener} from "@dota/Types.ts";
  * Used internally by event management components to access the shared listener instance.
  * Ensures a single source of truth for event listener configuration across the system.
  */
-export class DefaultApplicationEventRegistry {
+export class DefaultApplicationEventListenerRegistry {
   
   private static listener: ApplicationEventListener | null = null;
 
