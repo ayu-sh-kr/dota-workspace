@@ -6,6 +6,7 @@ export {DefaultApplicationEventListener} from '@dota/listener/DefaultApplication
 export {DefaultClassApplicationEventBindManager} from "@dota/manager/DefaultClassApplicationEventBindManager.ts"
 export {DefaultClassScopedApplicationEventBindManager} from "@dota/manager/DefaultClassScopedApplicationEventBindManager.ts";
 export {EventChannel} from "@dota/channel/EventChannel.ts";
+export {DefaultApplicationEventListenerRegistry} from "@dota/listener/DefaultApplicationEventListenerRegistry.ts";
 export * from "@dota/listener/on-event.decorator.ts"
 export * from "@dota/listener/auto-bind.decorator.ts";
 
