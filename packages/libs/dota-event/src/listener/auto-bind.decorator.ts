@@ -1,5 +1,5 @@
 import { DefaultClassApplicationEventBindManager } from '@dota/manager/DefaultClassApplicationEventBindManager.ts';
-import { DefaultApplicationEventRegistry } from '@dota/listener/DefaultApplicationEventRegistry.ts';
+import { DefaultApplicationEventListenerRegistry } from '@dota/listener/DefaultApplicationEventListenerRegistry.ts';
 
 /**
  * Class decorator that automatically binds all non-scoped `@OnEvent`-decorated
@@ -13,7 +13,7 @@ import { DefaultApplicationEventRegistry } from '@dota/listener/DefaultApplicati
  * instance and immediately calls `bind()` on it.  The manager reads the
  * `@OnEvent` metadata, binds each handler method to the instance context, and
  * registers it with the listener obtained from
- * {@link DefaultApplicationEventRegistry}.
+ * {@link DefaultApplicationEventListenerRegistry}.
  *
  * ### Scoped handlers
  * Methods decorated with `@OnEvent(name, true)` (scoped) are intentionally
@@ -22,7 +22,7 @@ import { DefaultApplicationEventRegistry } from '@dota/listener/DefaultApplicati
  * `DefaultClassScopedApplicationEventBindManager` and `EventChannel`.
  *
  * ### Prerequisites
- * {@link DefaultApplicationEventRegistry.setListener} **must** have been called
+ * {@link DefaultApplicationEventListenerRegistry.setListener} **must** have been called
  * during application bootstrap before any decorated class is instantiated,
  * otherwise the registry will throw at runtime.
  *
@@ -58,7 +58,7 @@ function AutoBindDecorator(): ClassDecorator {
      * 1. Delegates to the original constructor with all supplied arguments so
      *    the instance is built exactly as the author intended.
      * 2. Retrieves the globally registered {@link ApplicationEventListener}
-     *    from {@link DefaultApplicationEventRegistry}.
+     *    from {@link DefaultApplicationEventListenerRegistry}.
      * 3. Constructs a {@link DefaultClassApplicationEventBindManager} for the
      *    fresh instance and synchronously calls `bind()`, which walks the
      *    `@OnEvent` metadata and registers every non-scoped handler.
@@ -81,7 +81,7 @@ function AutoBindDecorator(): ClassDecorator {
       // 2. Resolve the shared listener from the global registry.
       //    Throws if setListener() was never called — intentional, as this is
       //    a programming error that must surface immediately.
-      const listener = DefaultApplicationEventRegistry.getListener();
+      const listener = DefaultApplicationEventListenerRegistry.getListener();
 
       // 3. Create the bind manager for the freshly constructed instance and
       //    call bind().  Non-scoped @OnEvent handlers are registered here;
