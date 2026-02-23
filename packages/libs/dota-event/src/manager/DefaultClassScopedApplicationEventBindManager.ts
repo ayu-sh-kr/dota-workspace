@@ -1,6 +1,6 @@
 import {ApplicationEventCallback, ClassApplicationEventBindManager} from "@dota/Types.ts";
-import {EventChannel} from "@dota/EventChannel.ts";
-import {getOnEventMetadata} from "@dota/on-event.decorator.ts";
+import {EventChannel} from "@dota/channel/EventChannel.ts";
+import {getOnEventMetadata} from "@dota/listener/on-event.decorator.ts";
 
 /**
  * Manages scoped event bindings for class methods decorated with @OnEvent(scoped: true).

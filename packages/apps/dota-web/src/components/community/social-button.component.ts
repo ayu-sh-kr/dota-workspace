@@ -1,5 +1,6 @@
 import {BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-core";
-import {notificationService} from "@dota/components/utils/notification/notification.service.ts";
+
+import {notificationService} from "@dota/main.ts";
 
 @Component({
   selector: "social-button",

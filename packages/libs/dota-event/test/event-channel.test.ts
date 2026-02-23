@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { EventChannel } from '../src/EventChannel.ts';
-import { DefaultApplicationEventListener } from '../src/DefaultApplicationEventListener.ts';
-import { DefaultApplicationEventPublisher } from '../src/DefaultApplicationEventPublisher.ts';
+import { EventChannel } from '@dota/channel/EventChannel.ts';
+import { DefaultApplicationEventListener } from '@dota/listener/DefaultApplicationEventListener.ts';
+import { DefaultApplicationEventPublisher } from '@dota/publisher/DefaultApplicationEventPublisher.ts';
 import { ApplicationEvent } from '../src/Types.ts';
-import { DefaultApplicationEventBus } from '../src/DefaultApplicationEventBus.ts';
+import { DefaultApplicationEventBus } from '@dota/bus/DefaultApplicationEventBus.ts';
 
 describe('EventChannel', () => {
   let listener: DefaultApplicationEventListener;

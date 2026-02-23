@@ -1,6 +1,6 @@
 import {RestClient} from "@ayu-sh-kr/dota-rest";
-import {notificationService} from "@dota/components/utils/notification/notification.service.ts";
 import {SYSTEM_PROMPT} from "@dota/constants/prompt.ts";
+import {notificationService} from "@dota/main.ts";
 
 
 export class OpenAIService {

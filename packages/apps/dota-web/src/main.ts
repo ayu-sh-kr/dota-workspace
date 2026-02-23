@@ -1,13 +1,7 @@
 import './style.css'
 
 import {AppComponent} from "@dota/app.component.ts";
-import {
-  BlogPage,
-  ChatPage,
-  DocPage,
-  ErrorPage,
-  HomePage
-} from "@dota/pages";
+import {BlogPage, ChatPage, DocPage, ErrorPage, HomePage} from "@dota/pages";
 import {
   ClientSectionComponent,
   CodeSectionComponent,
@@ -32,11 +26,16 @@ import {
 import {DocContentComponent, DocPathComponent, DocSectionComponent} from "@dota/components/docs";
 import {CounterComponent} from "@dota/components/example/counter.component.ts";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
-import {Router, RouterService, ComponentClass } from "@ayu-sh-kr/dota-router";
+import {ComponentClass, Router, RouterService} from "@ayu-sh-kr/dota-router";
 import components from "virtual:dota-components";
-import { ApplicationEventService } from "@ayu-sh-kr/dota-core";
+import {ApplicationEventService} from "@ayu-sh-kr/dota-core";
+import {NotificationService} from "@dota/components/utils/notification/notification.service.ts";
+import {DefaultApplicationEventListenerRegistry} from "@ayu-sh-kr/dota-event";
+
+const applicationEventService = ApplicationEventService.getInstance();
 
 let routerService!: RouterService<Router<HTMLElement>>;
+let notificationService!: NotificationService
 initializeApp({
   modules: components,
   externalComponents: [IconsComponent] as unknown as ComponentClass[],
@@ -45,16 +44,22 @@ initializeApp({
   root: AppComponent,
 })
   .then((value) => {
+    const listener = applicationEventService
+      .getListener();
+    DefaultApplicationEventListenerRegistry.setListener(listener)
     routerService = value.routerService
-    ApplicationEventService.getInstance()
+    notificationService = new NotificationService()
+    applicationEventService
       .getPublisher()
       .publishAsync({
-        name: 'app:initialized',
+        name: "app:initialized",
         data: null
       })
   })
   .catch(error => console.error(error))
-export {routerService}
+
+
+export {routerService, notificationService}
 
 declare global {
   interface HTMLElementTagNameMap {

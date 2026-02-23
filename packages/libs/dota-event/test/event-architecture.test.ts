@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {DefaultApplicationEventListener} from "../src/DefaultApplicationEventListener.ts";
+import {DefaultApplicationEventListener} from "@dota/listener/DefaultApplicationEventListener.ts";
 import {type ApplicationEvent} from "../src/Types.ts";
-import {DefaultApplicationEventBus} from "../src/DefaultApplicationEventBus.ts";
-import {DefaultApplicationEventPublisher} from "../src/DefaultApplicationEventPublisher.ts";
+import {DefaultApplicationEventBus} from "@dota/bus/DefaultApplicationEventBus.ts";
+import {DefaultApplicationEventPublisher} from "@dota/publisher/DefaultApplicationEventPublisher.ts";
 
 // Mock subscriber classes to test event architecture
 class UserService {

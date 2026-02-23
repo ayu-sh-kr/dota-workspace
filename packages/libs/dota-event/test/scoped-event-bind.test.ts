@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { DefaultClassScopedApplicationEventBindManager } from '../src/DefaultClassScopedApplicationEventBindManager.ts';
-import { DefaultApplicationEventBus } from '../src/DefaultApplicationEventBus.ts';
-import { DefaultApplicationEventListener } from '../src/DefaultApplicationEventListener.ts';
-import { DefaultApplicationEventPublisher } from '../src/DefaultApplicationEventPublisher.ts';
-import { EventChannel } from '../src/EventChannel.ts';
-import { OnEvent } from '../src/on-event.decorator.ts';
+import { DefaultClassScopedApplicationEventBindManager } from '@dota/manager/DefaultClassScopedApplicationEventBindManager.ts';
+import { DefaultApplicationEventBus } from '@dota/bus/DefaultApplicationEventBus.ts';
+import { DefaultApplicationEventListener } from '@dota/listener/DefaultApplicationEventListener.ts';
+import { DefaultApplicationEventPublisher } from '@dota/publisher/DefaultApplicationEventPublisher.ts';
+import { EventChannel } from '@dota/channel/EventChannel.ts';
+import { OnEvent } from '@dota/listener/on-event.decorator.ts';
 import { type ApplicationEvent } from '../src/Types.ts';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
