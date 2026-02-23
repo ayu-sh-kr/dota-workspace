@@ -4,7 +4,7 @@ import { OnEvent } from '@dota/listener/on-event.decorator.ts';
 import { AutoBind } from '@dota/listener/auto-bind.decorator.ts';
 import { DefaultApplicationEventBus } from '@dota/bus/DefaultApplicationEventBus.ts';
 import { DefaultApplicationEventListener } from '@dota/listener/DefaultApplicationEventListener.ts';
-import { DefaultApplicationEventRegistry } from '@dota/listener/DefaultApplicationEventRegistry.ts';
+import { DefaultApplicationEventListenerRegistry } from '@dota/listener/DefaultApplicationEventListenerRegistry.ts';
 import { DefaultApplicationEventPublisher } from '@dota/publisher/DefaultApplicationEventPublisher.ts';
 import { DefaultClassApplicationEventBindManager } from '@dota/manager/DefaultClassApplicationEventBindManager.ts';
 
@@ -18,7 +18,7 @@ function createInfrastructure() {
   const bus = DefaultApplicationEventBus.getNewInstance();
   const listener = new DefaultApplicationEventListener(bus);
   const publisher = new DefaultApplicationEventPublisher(bus);
-  DefaultApplicationEventRegistry.setListener(listener);
+  DefaultApplicationEventListenerRegistry.setListener(listener);
   return { bus, listener, publisher };
 }
 
@@ -293,7 +293,7 @@ describe('@AutoBind() decorator', () => {
     it('throws at instantiation time if the registry was never seeded', () => {
       // Reset the registry to a clean null state by setting a null-like value.
       // We rely on the registry throwing when listener is null.
-      (DefaultApplicationEventRegistry as any)['listener'] = null;
+      (DefaultApplicationEventListenerRegistry as any)['listener'] = null;
 
       expect(() => new UserService()).toThrow(
         'ApplicationEventListener has not been set in DefaultApplicationEventRegistry.'
