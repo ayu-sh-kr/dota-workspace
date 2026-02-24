@@ -1,5 +1,4 @@
 import {BaseElement, Component, BindEvent, Property, String, WindowListener} from "@ayu-sh-kr/dota-core";
-import {type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-event";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 
@@ -22,14 +21,6 @@ export class DarkModeButtonComponent extends BaseElement {
   @BindEvent({event: 'click', id: '#dark-button'})
   handleDark() {
     GeneralUtils.toggleDarkMode();
-  }
-
-  @OnEvent('docs:theme-change')
-  onThemeChange(event: ApplicationEvent<'docs:theme-change'>) {
-    const data = event.data;
-    if (data && data.theme) {
-      this.color = data.theme;
-    }
   }
 
   @WindowListener({event: 'themeChange'})
