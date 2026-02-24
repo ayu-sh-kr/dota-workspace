@@ -24,7 +24,7 @@ export abstract class BaseElement extends HTMLElement {
   isShadow!: boolean;
   shadowRoot!: ShadowRoot;
   reactive = false;
-  private readonly __uid!: number;
+  readonly __uid!: number;
   private __initialized = false;
 
   private __eventManagerService: EventManagerService<BaseElement>;
