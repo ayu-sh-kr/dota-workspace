@@ -1,0 +1,47 @@
+{
+  "name": "@ayu-sh-kr/dota-ui",
+  "private": false,
+  "version": "0.0.7",
+  "description": "Dota-UI is a web component library that provides various regular use components for development. It works out of the box with all the popular javascript frameworks that support web component",
+  "type": "module",
+  "author": "ayu-sh-kr",
+  "license": "MIT",
+  "keywords": [
+    "UI Library",
+    "Web Components",
+    "Sleek Design"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/dota-ui.cjs",
+  "module": "./dist/dota-ui.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/dota-ui.mjs",
+      "import": "./dist/dota-ui.mjs",
+      "require": "./dist/dota-ui.cjs",
+      "default": "./dist/dota-ui.cjs"
+    },
+    "./dota-ui.css": "./dist/dota-ui.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "lint": "tsc",
+    "build": "tsc && vite build",
+    "build-pack": "pnpm build && pnpm pack",
+    "preview": "vite preview",
+    "publish": "pnpm run build && changeset publish"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.4"
+  },
+  "dependencies": {
+    "@ayu-sh-kr/dota-core": "workspace:*",
+    "@ayu-sh-kr/dota-event": "workspace:*"
+  }
+}

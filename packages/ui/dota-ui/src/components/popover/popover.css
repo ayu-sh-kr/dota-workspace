@@ -1,0 +1,7 @@
+#tooltip {
+    @apply bg-white shadow-xl  font-medium text-xl w-fit top-0 left-0 absolute rounded-lg;
+}
+
+#tooltip[data-show] {
+    @apply block
+}

@@ -1,0 +1,171 @@
+
+
+export const UIConfig: Partial<UIConfig> = {
+    color: {
+        none: {
+            solid: 'text-white bg-gray-900 hover:bg-gray-800 disabled:bg-gray-900 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 dark:disabled:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900 dark:focus-visible:outline-white',
+            soft: 'text-gray-900 dark:text-white bg-gray-100 hover:bg-gray-200 disabled:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:disabled:bg-gray-800 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-900 dark:focus-visible:ring-white',
+            outline: 'ring-1 ring-inset ring-current text-gray-900 dark:text-white hover:bg-gray-100 disabled:bg-transparent dark:hover:bg-gray-800 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-white',
+            ghost: 'text-gray-900 dark:text-white hover:bg-gray-100 disabled:bg-transparent dark:hover:bg-gray-800 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-900 dark:focus-visible:ring-white',
+            link: 'text-gray-900 hover:text-gray-700 disabled:text-gray-900 dark:text-white dark:hover:text-gray-300 dark:disabled:text-white underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-900 dark:focus-visible:ring-white',
+        },
+        red: {
+            solid: 'dark:text-gray-800 text-gray-200 bg-red-500 hover:bg-red-600 disabled:bg-red-500 dark:bg-red-400 dark:hover:bg-red-500 dark:disabled:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 dark:focus-visible:outline-red-400',
+            soft: 'text-red-500 dark:text-red-400 bg-red-50 hover:bg-red-100 disabled:bg-red-50 dark:bg-red-950 dark:hover:bg-red-900 dark:disabled:bg-red-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-red-500 dark:focus-visible:ring-red-400',
+            outline: 'ring-1 ring-inset ring-current text-red-500 dark:text-red-400 hover:bg-red-50 disabled:bg-transparent dark:hover:bg-red-950 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-red-500 dark:focus-visible:ring-red-400',
+            ghost: 'text-red-500 dark:text-red-400 hover:bg-red-50 disabled:bg-transparent dark:hover:bg-red-950 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-red-500 dark:focus-visible:ring-red-400',
+            link: 'text-red-500 hover:text-red-600 disabled:text-red-500 dark:text-red-400 dark:hover:text-red-500 dark:disabled:text-red-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-red-500 dark:focus-visible:ring-red-400',
+        },
+        yellow: {
+            solid: 'text-white bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-500 dark:bg-yellow-400 dark:hover:bg-yellow-500 dark:disabled:bg-yellow-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-yellow-500 dark:focus-visible:ring-yellow-400',
+            soft: 'text-yellow-500 dark:text-yellow-400 bg-yellow-50 hover:bg-yellow-100 disabled:bg-yellow-50 dark:bg-yellow-950 dark:hover:bg-yellow-900 dark:disabled:bg-yellow-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-yellow-500 dark:focus-visible:ring-yellow-400',
+            outline: 'text-yellow-500 dark:text-yellow-400 border border-yellow-500 hover:bg-yellow-50 disabled:bg-yellow-50 dark:border-yellow-400 dark:hover:bg-yellow-900 dark:disabled:bg-yellow-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-yellow-500 dark:focus-visible:ring-yellow-400',
+            ghost: 'text-yellow-500 dark:text-yellow-400 bg-transparent hover:bg-yellow-50 disabled:bg-transparent dark:hover:bg-yellow-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-yellow-500 dark:focus-visible:ring-yellow-400',
+            link: 'text-yellow-500 hover:text-yellow-600 disabled:text-yellow-500 dark:text-yellow-400 dark:hover:text-yellow-500 dark:disabled:text-yellow-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-yellow-500 dark:focus-visible:ring-yellow-400',
+        },
+        rose: {
+            solid: 'text-white bg-rose-500 hover:bg-rose-600 disabled:bg-rose-500 dark:bg-rose-400 dark:hover:bg-rose-500 dark:disabled:bg-rose-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rose-500 dark:focus-visible:ring-rose-400',
+            soft: 'text-rose-500 dark:text-rose-400 bg-rose-50 hover:bg-rose-100 disabled:bg-rose-50 dark:bg-rose-950 dark:hover:bg-rose-900 dark:disabled:bg-rose-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rose-500 dark:focus-visible:ring-rose-400',
+            outline: 'text-rose-500 dark:text-rose-400 border border-rose-500 hover:bg-rose-50 disabled:bg-rose-50 dark:border-rose-400 dark:hover:bg-rose-900 dark:disabled:bg-rose-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rose-500 dark:focus-visible:ring-rose-400',
+            ghost: 'text-rose-500 dark:text-rose-400 bg-transparent hover:bg-rose-50 disabled:bg-transparent dark:hover:bg-rose-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rose-500 dark:focus-visible:ring-rose-400',
+            link: 'text-rose-500 hover:text-rose-600 disabled:text-rose-500 dark:text-rose-400 dark:hover:text-rose-500 dark:disabled:text-rose-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rose-500 dark:focus-visible:ring-rose-400',
+        },
+        emerald: {
+            solid: 'text-white bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-500 dark:bg-emerald-400 dark:hover:bg-emerald-500 dark:disabled:bg-emerald-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 dark:focus-visible:ring-emerald-400',
+            soft: 'text-emerald-500 dark:text-emerald-400 bg-emerald-50 hover:bg-emerald-100 disabled:bg-emerald-50 dark:bg-emerald-950 dark:hover:bg-emerald-900 dark:disabled:bg-emerald-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 dark:focus-visible:ring-emerald-400',
+            outline: 'text-emerald-500 dark:text-emerald-400 border border-emerald-500 hover:bg-emerald-50 disabled:bg-emerald-50 dark:border-emerald-400 dark:hover:bg-emerald-900 dark:disabled:bg-emerald-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 dark:focus-visible:ring-emerald-400',
+            ghost: 'text-emerald-500 dark:text-emerald-400 bg-transparent hover:bg-emerald-50 disabled:bg-transparent dark:hover:bg-emerald-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 dark:focus-visible:ring-emerald-400',
+            link: 'text-emerald-500 hover:text-emerald-600 disabled:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-500 dark:disabled:text-emerald-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500 dark:focus-visible:ring-emerald-400',
+        },
+        green: {
+            solid: 'text-white bg-green-500 hover:bg-green-600 disabled:bg-green-500 dark:bg-green-400 dark:hover:bg-green-500 dark:disabled:bg-green-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 dark:focus-visible:ring-green-400',
+            soft: 'text-green-500 dark:text-green-400 bg-green-50 hover:bg-green-100 disabled:bg-green-50 dark:bg-green-950 dark:hover:bg-green-900 dark:disabled:bg-green-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 dark:focus-visible:ring-green-400',
+            outline: 'text-green-500 dark:text-green-400 border border-green-500 hover:bg-green-50 disabled:bg-green-50 dark:border-green-400 dark:hover:bg-green-900 dark:disabled:bg-green-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 dark:focus-visible:ring-green-400',
+            ghost: 'text-green-500 dark:text-green-400 bg-transparent hover:bg-green-50 disabled:bg-transparent dark:hover:bg-green-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 dark:focus-visible:ring-green-400',
+            link: 'text-green-500 hover:text-green-600 disabled:text-green-500 dark:text-green-400 dark:hover:text-green-500 dark:disabled:text-green-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 dark:focus-visible:ring-green-400',
+        },
+        blue: {
+            solid: 'text-white bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500 dark:bg-blue-400 dark:hover:bg-blue-500 dark:disabled:bg-blue-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400',
+            soft: 'text-blue-500 dark:text-blue-400 bg-blue-50 hover:bg-blue-100 disabled:bg-blue-50 dark:bg-blue-950 dark:hover:bg-blue-900 dark:disabled:bg-blue-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400',
+            outline: 'text-blue-500 dark:text-blue-400 border border-blue-500 hover:bg-blue-50 disabled:bg-blue-50 dark:border-blue-400 dark:hover:bg-blue-900 dark:disabled:bg-blue-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400',
+            ghost: 'text-blue-500 dark:text-blue-400 bg-transparent hover:bg-blue-50 disabled:bg-transparent dark:hover:bg-blue-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400',
+            link: 'text-blue-500 hover:text-blue-600 disabled:text-blue-500 dark:text-blue-400 dark:hover:text-blue-500 dark:disabled:text-blue-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400',
+        },
+        cyan: {
+            solid: 'text-white bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-500 dark:bg-cyan-400 dark:hover:bg-cyan-500 dark:disabled:bg-cyan-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-500 dark:focus-visible:ring-cyan-400',
+            soft: 'text-cyan-500 dark:text-cyan-400 bg-cyan-50 hover:bg-cyan-100 disabled:bg-cyan-50 dark:bg-cyan-950 dark:hover:bg-cyan-900 dark:disabled:bg-cyan-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-500 dark:focus-visible:ring-cyan-400',
+            outline: 'text-cyan-500 dark:text-cyan-400 border border-cyan-500 hover:bg-cyan-50 disabled:bg-cyan-50 dark:border-cyan-400 dark:hover:bg-cyan-900 dark:disabled:bg-cyan-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-500 dark:focus-visible:ring-cyan-400',
+            ghost: 'text-cyan-500 dark:text-cyan-400 bg-transparent hover:bg-cyan-50 disabled:bg-transparent dark:hover:bg-cyan-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-500 dark:focus-visible:ring-cyan-400',
+            link: 'text-cyan-500 hover:text-cyan-600 disabled:text-cyan-500 dark:text-cyan-400 dark:hover:text-cyan-500 dark:disabled:text-cyan-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-500 dark:focus-visible:ring-cyan-400',
+        },
+        teal: {
+            solid: 'text-white bg-teal-500 hover:bg-teal-600 disabled:bg-teal-500 dark:bg-teal-400 dark:hover:bg-teal-500 dark:disabled:bg-teal-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:focus-visible:ring-teal-400',
+            soft: 'text-teal-500 dark:text-teal-400 bg-teal-50 hover:bg-teal-100 disabled:bg-teal-50 dark:bg-teal-950 dark:hover:bg-teal-900 dark:disabled:bg-teal-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:focus-visible:ring-teal-400',
+            outline: 'text-teal-500 dark:text-teal-400 border border-teal-500 hover:bg-teal-50 disabled:bg-teal-50 dark:border-teal-400 dark:hover:bg-teal-900 dark:disabled:bg-teal-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:focus-visible:ring-teal-400',
+            ghost: 'text-teal-500 dark:text-teal-400 bg-transparent hover:bg-teal-50 disabled:bg-transparent dark:hover:bg-teal-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:focus-visible:ring-teal-400',
+            link: 'text-teal-500 hover:text-teal-600 disabled:text-teal-500 dark:text-teal-400 dark:hover:text-teal-500 dark:disabled:text-teal-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-500 dark:focus-visible:ring-teal-400',
+        },
+        gray: {
+            solid: 'text-white bg-gray-500 hover:bg-gray-600 disabled:bg-gray-500 dark:bg-gray-400 dark:hover:bg-gray-500 dark:disabled:bg-gray-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400',
+            soft: 'text-gray-500 dark:text-gray-400 bg-gray-50 hover:bg-gray-100 disabled:bg-gray-50 dark:bg-gray-950 dark:hover:bg-gray-900 dark:disabled:bg-gray-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400',
+            outline: 'text-gray-500 dark:text-gray-400 border border-gray-500 hover:bg-gray-50 disabled:bg-gray-50 dark:border-gray-400 dark:hover:bg-gray-900 dark:disabled:bg-gray-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400',
+            ghost: 'text-gray-500 dark:text-gray-400 bg-transparent hover:bg-gray-50 disabled:bg-transparent dark:hover:bg-gray-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400',
+            link: 'text-gray-500 hover:text-gray-600 disabled:text-gray-500 dark:text-gray-400 dark:hover:text-gray-500 dark:disabled:text-gray-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400',
+        },
+        purple: {
+            solid: 'text-white bg-purple-500 hover:bg-purple-600 disabled:bg-purple-500 dark:bg-purple-400 dark:hover:bg-purple-500 dark:disabled:bg-purple-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-purple-500 dark:focus-visible:ring-purple-400',
+            soft: 'text-purple-500 dark:text-purple-400 bg-purple-50 hover:bg-purple-100 disabled:bg-purple-50 dark:bg-purple-950 dark:hover:bg-purple-900 dark:disabled:bg-purple-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-purple-500 dark:focus-visible:ring-purple-400',
+            outline: 'text-purple-500 dark:text-purple-400 border border-purple-500 hover:bg-purple-50 disabled:bg-purple-50 dark:border-purple-400 dark:hover:bg-purple-900 dark:disabled:bg-purple-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-purple-500 dark:focus-visible:ring-purple-400',
+            ghost: 'text-purple-500 dark:text-purple-400 bg-transparent hover:bg-purple-50 disabled:bg-transparent dark:hover:bg-purple-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-purple-500 dark:focus-visible:ring-purple-400',
+            link: 'text-purple-500 hover:text-purple-600 disabled:text-purple-500 dark:text-purple-400 dark:hover:text-purple-500 dark:disabled:text-purple-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-purple-500 dark:focus-visible:ring-purple-400',
+        },
+        violet: {
+            solid: 'text-white bg-violet-500 hover:bg-violet-600 disabled:bg-violet-500 dark:bg-violet-400 dark:hover:bg-violet-500 dark:disabled:bg-violet-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500 dark:focus-visible:ring-violet-400',
+            soft: 'text-violet-500 dark:text-violet-400 bg-violet-50 hover:bg-violet-100 disabled:bg-violet-50 dark:bg-violet-950 dark:hover:bg-violet-900 dark:disabled:bg-violet-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500 dark:focus-visible:ring-violet-400',
+            outline: 'text-violet-500 dark:text-violet-400 border border-violet-500 hover:bg-violet-50 disabled:bg-violet-50 dark:border-violet-400 dark:hover:bg-violet-900 dark:disabled:bg-violet-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500 dark:focus-visible:ring-violet-400',
+            ghost: 'text-violet-500 dark:text-violet-400 bg-transparent hover:bg-violet-50 disabled:bg-transparent dark:hover:bg-violet-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500 dark:focus-visible:ring-violet-400',
+            link: 'text-violet-500 hover:text-violet-600 disabled:text-violet-500 dark:text-violet-400 dark:hover:text-violet-500 dark:disabled:text-violet-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500 dark:focus-visible:ring-violet-400',
+        },
+        pink: {
+            solid: 'text-white bg-pink-500 hover:bg-pink-600 disabled:bg-pink-500 dark:bg-pink-400 dark:hover:bg-pink-500 dark:disabled:bg-pink-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pink-500 dark:focus-visible:ring-pink-400',
+            soft: 'text-pink-500 dark:text-pink-400 bg-pink-50 hover:bg-pink-100 disabled:bg-pink-50 dark:bg-pink-950 dark:hover:bg-pink-900 dark:disabled:bg-pink-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pink-500 dark:focus-visible:ring-pink-400',
+            outline: 'text-pink-500 dark:text-pink-400 border border-pink-500 hover:bg-pink-50 disabled:bg-pink-50 dark:border-pink-400 dark:hover:bg-pink-900 dark:disabled:bg-pink-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pink-500 dark:focus-visible:ring-pink-400',
+            ghost: 'text-pink-500 dark:text-pink-400 bg-transparent hover:bg-pink-50 disabled:bg-transparent dark:hover:bg-pink-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pink-500 dark:focus-visible:ring-pink-400',
+            link: 'text-pink-500 hover:text-pink-600 disabled:text-pink-500 dark:text-pink-400 dark:hover:text-pink-500 dark:disabled:text-pink-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pink-500 dark:focus-visible:ring-pink-400',
+        },
+        sky: {
+            solid: 'text-white bg-sky-500 hover:bg-sky-600 disabled:bg-sky-500 dark:bg-sky-400 dark:hover:bg-sky-500 dark:disabled:bg-sky-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 dark:focus-visible:ring-sky-400',
+            soft: 'text-sky-500 dark:text-sky-400 bg-sky-50 hover:bg-sky-100 disabled:bg-sky-50 dark:bg-sky-950 dark:hover:bg-sky-900 dark:disabled:bg-sky-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 dark:focus-visible:ring-sky-400',
+            outline: 'text-sky-500 dark:text-sky-400 border border-sky-500 hover:bg-sky-50 disabled:bg-sky-50 dark:border-sky-400 dark:hover:bg-sky-900 dark:disabled:bg-sky-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 dark:focus-visible:ring-sky-400',
+            ghost: 'text-sky-500 dark:text-sky-400 bg-transparent hover:bg-sky-50 disabled:bg-transparent dark:hover:bg-sky-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 dark:focus-visible:ring-sky-400',
+            link: 'text-sky-500 hover:text-sky-600 disabled:text-sky-500 dark:text-sky-400 dark:hover:text-sky-500 dark:disabled:text-sky-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-500 dark:focus-visible:ring-sky-400',
+        },
+        orange: {
+            solid: 'text-white bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500 dark:bg-orange-400 dark:hover:bg-orange-500 dark:disabled:bg-orange-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400',
+            soft: 'text-orange-500 dark:text-orange-400 bg-orange-50 hover:bg-orange-100 disabled:bg-orange-50 dark:bg-orange-950 dark:hover:bg-orange-900 dark:disabled:bg-orange-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400',
+            outline: 'text-orange-500 dark:text-orange-400 border border-orange-500 hover:bg-orange-50 disabled:bg-orange-50 dark:border-orange-400 dark:hover:bg-orange-900 dark:disabled:bg-orange-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400',
+            ghost: 'text-orange-500 dark:text-orange-400 bg-transparent hover:bg-orange-50 disabled:bg-transparent dark:hover:bg-orange-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400',
+            link: 'text-orange-500 hover:text-orange-600 disabled:text-orange-500 dark:text-orange-400 dark:hover:text-orange-500 dark:disabled:text-orange-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-orange-500 dark:focus-visible:ring-orange-400',
+        },
+        slate: {
+            solid: 'text-white bg-slate-500 hover:bg-slate-600 disabled:bg-slate-500 dark:bg-slate-400 dark:hover:bg-slate-500 dark:disabled:bg-slate-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400',
+            soft: 'text-slate-500 dark:text-slate-400 bg-slate-50 hover:bg-slate-100 disabled:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-900 dark:disabled:bg-slate-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400',
+            outline: 'text-slate-500 dark:text-slate-400 border border-slate-500 hover:bg-slate-50 disabled:bg-slate-50 dark:border-slate-400 dark:hover:bg-slate-900 dark:disabled:bg-slate-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400',
+            ghost: 'text-slate-500 dark:text-slate-400 bg-transparent hover:bg-slate-50 disabled:bg-transparent dark:hover:bg-slate-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400',
+            link: 'text-slate-500 hover:text-slate-600 disabled:text-slate-500 dark:text-slate-400 dark:hover:text-slate-500 dark:disabled:text-slate-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500 dark:focus-visible:ring-slate-400',
+        },
+        indigo: {
+            solid: 'text-white bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-500 dark:bg-indigo-400 dark:hover:bg-indigo-500 dark:disabled:bg-indigo-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:focus-visible:ring-indigo-400',
+            soft: 'text-indigo-500 dark:text-indigo-400 bg-indigo-50 hover:bg-indigo-100 disabled:bg-indigo-50 dark:bg-indigo-950 dark:hover:bg-indigo-900 dark:disabled:bg-indigo-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:focus-visible:ring-indigo-400',
+            outline: 'text-indigo-500 dark:text-indigo-400 border border-indigo-500 hover:bg-indigo-50 disabled:bg-indigo-50 dark:border-indigo-400 dark:hover:bg-indigo-900 dark:disabled:bg-indigo-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:focus-visible:ring-indigo-400',
+            ghost: 'text-indigo-500 dark:text-indigo-400 bg-transparent hover:bg-indigo-50 disabled:bg-transparent dark:hover:bg-indigo-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:focus-visible:ring-indigo-400',
+            link: 'text-indigo-500 hover:text-indigo-600 disabled:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-500 dark:disabled:text-indigo-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:focus-visible:ring-indigo-400',
+        },
+        fuchsia: {
+            solid: 'text-white bg-fuchsia-500 hover:bg-fuchsia-600 disabled:bg-fuchsia-500 dark:bg-fuchsia-400 dark:hover:bg-fuchsia-500 dark:disabled:bg-fuchsia-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fuchsia-500 dark:focus-visible:ring-fuchsia-400',
+            soft: 'text-fuchsia-500 dark:text-fuchsia-400 bg-fuchsia-50 hover:bg-fuchsia-100 disabled:bg-fuchsia-50 dark:bg-fuchsia-950 dark:hover:bg-fuchsia-900 dark:disabled:bg-fuchsia-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fuchsia-500 dark:focus-visible:ring-fuchsia-400',
+            outline: 'text-fuchsia-500 dark:text-fuchsia-400 border border-fuchsia-500 hover:bg-fuchsia-50 disabled:bg-fuchsia-50 dark:border-fuchsia-400 dark:hover:bg-fuchsia-900 dark:disabled:bg-fuchsia-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fuchsia-500 dark:focus-visible:ring-fuchsia-400',
+            ghost: 'text-fuchsia-500 dark:text-fuchsia-400 bg-transparent hover:bg-fuchsia-50 disabled:bg-transparent dark:hover:bg-fuchsia-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fuchsia-500 dark:focus-visible:ring-fuchsia-400',
+            link: 'text-fuchsia-500 hover:text-fuchsia-600 disabled:text-fuchsia-500 dark:text-fuchsia-400 dark:hover:text-fuchsia-500 dark:disabled:text-fuchsia-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fuchsia-500 dark:focus-visible:ring-fuchsia-400',
+        },
+        zinc: {
+            solid: 'text-white bg-zinc-500 hover:bg-zinc-600 disabled:bg-zinc-500 dark:bg-zinc-400 dark:hover:bg-zinc-500 dark:disabled:bg-zinc-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-500 dark:focus-visible:ring-zinc-400',
+            soft: 'text-zinc-500 dark:text-zinc-400 bg-zinc-50 hover:bg-zinc-100 disabled:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 dark:disabled:bg-zinc-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-500 dark:focus-visible:ring-zinc-400',
+            outline: 'text-zinc-500 dark:text-zinc-400 border border-zinc-500 hover:bg-zinc-50 disabled:bg-zinc-50 dark:border-zinc-400 dark:hover:bg-zinc-900 dark:disabled:bg-zinc-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-500 dark:focus-visible:ring-zinc-400',
+            ghost: 'text-zinc-500 dark:text-zinc-400 bg-transparent hover:bg-zinc-50 disabled:bg-transparent dark:hover:bg-zinc-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-500 dark:focus-visible:ring-zinc-400',
+            link: 'text-zinc-500 hover:text-zinc-600 disabled:text-zinc-500 dark:text-zinc-400 dark:hover:text-zinc-500 dark:disabled:text-zinc-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-500 dark:focus-visible:ring-zinc-400',
+        },
+        amber: {
+            solid: 'text-white bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500 dark:bg-amber-400 dark:hover:bg-amber-500 dark:disabled:bg-amber-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 dark:focus-visible:ring-amber-400',
+            soft: 'text-amber-500 dark:text-amber-400 bg-amber-50 hover:bg-amber-100 disabled:bg-amber-50 dark:bg-amber-950 dark:hover:bg-amber-900 dark:disabled:bg-amber-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 dark:focus-visible:ring-amber-400',
+            outline: 'text-amber-500 dark:text-amber-400 border border-amber-500 hover:bg-amber-50 disabled:bg-amber-50 dark:border-amber-400 dark:hover:bg-amber-900 dark:disabled:bg-amber-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 dark:focus-visible:ring-amber-400',
+            ghost: 'text-amber-500 dark:text-amber-400 bg-transparent hover:bg-amber-50 disabled:bg-transparent dark:hover:bg-amber-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 dark:focus-visible:ring-amber-400',
+            link: 'text-amber-500 hover:text-amber-600 disabled:text-amber-500 dark:text-amber-400 dark:hover:text-amber-500 dark:disabled:text-amber-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-500 dark:focus-visible:ring-amber-400',
+        },
+        lime: {
+            solid: 'text-white bg-lime-500 hover:bg-lime-600 disabled:bg-lime-500 dark:bg-lime-400 dark:hover:bg-lime-500 dark:disabled:bg-lime-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lime-500 dark:focus-visible:ring-lime-400',
+            soft: 'text-lime-500 dark:text-lime-400 bg-lime-50 hover:bg-lime-100 disabled:bg-lime-50 dark:bg-lime-950 dark:hover:bg-lime-900 dark:disabled:bg-lime-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lime-500 dark:focus-visible:ring-lime-400',
+            outline: 'text-lime-500 dark:text-lime-400 border border-lime-500 hover:bg-lime-50 disabled:bg-lime-50 dark:border-lime-400 dark:hover:bg-lime-900 dark:disabled:bg-lime-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lime-500 dark:focus-visible:ring-lime-400',
+            ghost: 'text-lime-500 dark:text-lime-400 bg-transparent hover:bg-lime-50 disabled:bg-transparent dark:hover:bg-lime-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lime-500 dark:focus-visible:ring-lime-400',
+            link: 'text-lime-500 hover:text-lime-600 disabled:text-lime-500 dark:text-lime-400 dark:hover:text-lime-500 dark:disabled:text-lime-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-lime-500 dark:focus-visible:ring-lime-400',
+        },
+        stone: {
+            solid: 'text-white bg-stone-500 hover:bg-stone-600 disabled:bg-stone-500 dark:bg-stone-400 dark:hover:bg-stone-500 dark:disabled:bg-stone-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-500 dark:focus-visible:ring-stone-400',
+            soft: 'text-stone-500 dark:text-stone-400 bg-stone-50 hover:bg-stone-100 disabled:bg-stone-50 dark:bg-stone-950 dark:hover:bg-stone-900 dark:disabled:bg-stone-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-500 dark:focus-visible:ring-stone-400',
+            outline: 'text-stone-500 dark:text-stone-400 border border-stone-500 hover:bg-stone-50 disabled:bg-stone-50 dark:border-stone-400 dark:hover:bg-stone-900 dark:disabled:bg-stone-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-500 dark:focus-visible:ring-stone-400',
+            ghost: 'text-stone-500 dark:text-stone-400 bg-transparent hover:bg-stone-50 disabled:bg-transparent dark:hover:bg-stone-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-500 dark:focus-visible:ring-stone-400',
+            link: 'text-stone-500 hover:text-stone-600 disabled:text-stone-500 dark:text-stone-400 dark:hover:text-stone-500 dark:disabled:text-stone-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-500 dark:focus-visible:ring-stone-400',
+        },
+        neutral: {
+            solid: 'text-white bg-neutral-500 hover:bg-neutral-600 disabled:bg-neutral-500 dark:bg-neutral-400 dark:hover:bg-neutral-500 dark:disabled:bg-neutral-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-400',
+            soft: 'text-neutral-500 dark:text-neutral-400 bg-neutral-50 hover:bg-neutral-100 disabled:bg-neutral-50 dark:bg-neutral-950 dark:hover:bg-neutral-900 dark:disabled:bg-neutral-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-400',
+            outline: 'text-neutral-500 dark:text-neutral-400 border border-neutral-500 hover:bg-neutral-50 disabled:bg-neutral-50 dark:border-neutral-400 dark:hover:bg-neutral-900 dark:disabled:bg-neutral-950 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-400',
+            ghost: 'text-neutral-500 dark:text-neutral-400 bg-transparent hover:bg-neutral-50 disabled:bg-transparent dark:hover:bg-neutral-900 dark:disabled:bg-transparent focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-400',
+            link: 'text-neutral-500 hover:text-neutral-600 disabled:text-neutral-500 dark:text-neutral-400 dark:hover:text-neutral-500 dark:disabled:text-neutral-400 underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neutral-500 dark:focus-visible:ring-neutral-400',
+        }
+
+    },
+}
+
+export type UIColor = keyof typeof UIConfig.color;
+

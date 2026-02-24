@@ -1,0 +1,19 @@
+.header {
+    @apply cursor-pointer flex items-center justify-between border px-4 py-2
+}
+
+.icon {
+    transition: transform 0.2s;
+}
+
+.icon.active {
+    transform: rotate(90deg);
+}
+
+.description {
+    @apply h-0 transform duration-300 ease-in overflow-hidden transition-[height]
+}
+
+.description-active {
+    @apply h-fit duration-300 transform ease-in text-lg transition-[height]
+}
