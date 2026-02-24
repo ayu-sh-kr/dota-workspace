@@ -32,7 +32,7 @@ export class DocSectionComponent extends BaseElement {
             .join(" ")}
         </aside>
         <main class="flex-1 p-4 w-full">
-          <doc-content file-path="${this.contentPath}"></doc-content>
+          <doc-content file-path="${this.contentPath}" max-width="max-w-6xl" theme="emerald"></doc-content>
         </main>
       </section>
     `;

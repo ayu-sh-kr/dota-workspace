@@ -1,7 +1,8 @@
-import {AfterInit, BaseElement, Component, Param, Property, State, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, Param, Property, String} from "@ayu-sh-kr/dota-core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {WithLoading} from "@dota/utils/DecoratorUtils.ts";
 import {MarkdownService} from "@dota/service/markdown.service.ts";
+import type {MarkdownTheme} from "@dota/configs/markdown.config.ts";
 
 @Component({
   selector: 'doc-content',
@@ -12,8 +13,16 @@ export class DocContentComponent extends BaseElement {
   @Param('content')
   filePath: string = 'Getting-Started.md';
 
+  /** Theme passed straight through to <markdown-view>. Default: 'purple'. */
+  @Property({name: 'theme', type: String})
+  theme: MarkdownTheme = 'purple';
+
+  /** max-width passed straight through to <markdown-view>. Default: 'max-w-4xl'. */
+  @Property({name: 'max-width', type: String})
+  maxWidth: string = 'max-w-4xl';
+
   docLoaderService: DocLoaderService;
-  content!: string;
+  content: string = '';
 
   constructor() {
     super();
@@ -23,20 +32,25 @@ export class DocContentComponent extends BaseElement {
   @AfterInit()
   @WithLoading()
   async afterViewInit() {
-    const content = await this.docLoaderService.loadDoc(this.filePath.replace("/", ""));
-    this.content = MarkdownService.renderMarkdown(content)
-    this.updateHTML();
+    const raw = await this.docLoaderService.loadDoc(this.filePath.replace("/", ""));
+    this.content = MarkdownService.renderMarkdown(raw);
+    this.setContent();
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
-
+  /** Push content into the child markdown-view and trigger its re-render. */
+  private setContent() {
+    const view = this.querySelector('markdown-view') as any;
+    if (view) {
+      view.content = this.content;
+      view.updateHTML();
+    }
+  }
 
   render(): string {
     // language=html
     return `
-      <article class="prose prose-purple dark:prose-invert max-w-7xl mx-auto">
-        ${this.content || ''}
-      </article>
+      <markdown-view theme="${this.theme}" max-width="${this.maxWidth}"></markdown-view>
     `;
   }
 
