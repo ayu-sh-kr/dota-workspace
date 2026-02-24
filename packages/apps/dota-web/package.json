@@ -21,7 +21,7 @@
     "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
     "@ayu-sh-kr/dota-rest": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
-    "@ayu-sh-kr/dota-ui": "0.0.7",
+    "@ayu-sh-kr/dota-ui": "workspace:*",
     "@ayu-sh-kr/dota-wrap": "workspace:*",
     "@floating-ui/dom": "^1.7.5",
     "highlight.js": "^11.11.1",

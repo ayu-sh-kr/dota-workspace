@@ -14,3 +14,4 @@ export {PageWrapperComponent} from "@dota/components/utils/wrapper/page-wrapper.
 export {SectionHeaderComponent} from "@dota/components/utils/header/section-header.component.ts";
 export {NoContentComponent} from "@dota/components/utils/section/no-content.component.ts";
 export {SectionWrapperComponent} from "@dota/components/utils/wrapper/section-wrapper.component.ts";
+export {MarkdownViewComponent} from "@dota/components/utils/markdown-view.component.ts";

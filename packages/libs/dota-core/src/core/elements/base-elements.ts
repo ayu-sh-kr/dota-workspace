@@ -24,7 +24,7 @@ export abstract class BaseElement extends HTMLElement {
   isShadow!: boolean;
   shadowRoot!: ShadowRoot;
   reactive = false;
-  private readonly __uid!: number;
+  readonly __uid!: number;
   private __initialized = false;
 
   private __eventManagerService: EventManagerService<BaseElement>;
@@ -165,7 +165,8 @@ export abstract class BaseElement extends HTMLElement {
       this.bindProperty(name, newValue);
       this.updateHTML();
       this.__eventChannel.emit({
-        name: LifecycleEventConstants.ATTRIBUTE_CHANGED
+        name: LifecycleEventConstants.ATTRIBUTE_CHANGED,
+        data: {name, oldValue, newValue}
       });
     }
   }

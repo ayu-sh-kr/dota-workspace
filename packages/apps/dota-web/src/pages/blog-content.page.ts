@@ -45,7 +45,7 @@ export class BlogContentPage extends DotaPageElement {
     return `
       <app-header></app-header>
       <page-wrapper>
-        <blog-view></blog-view>
+        <blog-view theme="purple" max-width="max-w-5xl"></blog-view>
       </page-wrapper>
       <app-footer></app-footer>
     `

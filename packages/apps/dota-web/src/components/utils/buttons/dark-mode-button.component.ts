@@ -1,4 +1,4 @@
-import {BaseElement, Component, BindEvent, WindowListener} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, BindEvent, Property, String, WindowListener} from "@ayu-sh-kr/dota-core";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 
@@ -7,6 +7,12 @@ import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
   shadow: false
 })
 export class DarkModeButtonComponent extends BaseElement {
+
+  @Property({
+   name: 'color',
+    type: String
+  })
+  color: string = 'purple';
 
   constructor() {
     super();
@@ -28,7 +34,7 @@ export class DarkModeButtonComponent extends BaseElement {
     // language=html
     return `
       <span id="dark-button" class="active:scale-95 cursor-pointer">
-        <dota-icon name="${icon}" color="purple" variant="ghost" size="md"/>
+        <dota-icon name="${icon}" color="${this.color}" variant="ghost" size="md"></dota-icon>
       </span>
     `;
   }
