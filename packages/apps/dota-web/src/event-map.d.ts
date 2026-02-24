@@ -7,6 +7,7 @@ declare module "@ayu-sh-kr/dota-event" {
     "notification:success": SoftNotification;
     "notification:danger": SoftNotification;
     "notification:warning": SoftNotification;
+    "docs:theme-change": { theme: string };
   }
 }
 
