@@ -1,5 +1,12 @@
 # doto-web
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [ee06014]
+  - @ayu-sh-kr/dota-ui@0.0.9
+
 ## 0.0.14
 
 ### Patch Changes

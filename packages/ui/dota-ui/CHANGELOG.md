@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.0.9
+
+### Patch Changes
+
+- ee06014: added improved popover component using floating-ui dom
+
 ## 0.0.8
 
 ### Patch Changes
