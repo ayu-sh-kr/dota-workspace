@@ -2,6 +2,9 @@
   "name": "@ayu-sh-kr/dota-ui",
   "private": false,
   "version": "0.0.8",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Dota-UI is a web component library that provides various regular use components for development. It works out of the box with all the popular javascript frameworks that support web component",
   "type": "module",
   "author": "ayu-sh-kr",
