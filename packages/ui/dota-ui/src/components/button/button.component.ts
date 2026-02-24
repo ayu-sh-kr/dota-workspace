@@ -1,8 +1,8 @@
 import {BaseElement, Component, Property, String, Boolean} from "@ayu-sh-kr/dota-core";
 import {
-    type ButtonAnimation, type ButtonAnimationColor,
-    type ButtonRound, type ButtonSize,
-    ButtonStyle, type ButtonVariants, type IconPosition
+  type ButtonAnimation, type ButtonAnimationColor,
+  type ButtonRound, type ButtonSize,
+  ButtonStyle, type ButtonVariants, type IconPosition
 } from "@dota/components/button/button.config.ts";
 import './button.css'
 import {type UIColor} from "@dota/configs/app.config.ts";
@@ -30,102 +30,102 @@ import {type UIColor} from "@dota/configs/app.config.ts";
  * ></dota-button>
  */
 @Component({
-    selector: 'dota-button',
-    shadow: false
+  selector: 'dota-button',
+  shadow: false
 })
 class ButtonComponent extends BaseElement {
-    /** Inner content of the button */
-    content!: string;
+  /** Inner content of the button */
+  content!: string;
 
-    /** Button animation type */
-    @Property({name: 'animation', type: String})
-    animation!: ButtonAnimation
+  /** Button animation type */
+  @Property({name: 'animation', type: String})
+  animation!: ButtonAnimation
 
-    /** Additional CSS classes */
-    @Property({name: 'className', type: String})
-    className!: string
+  /** Additional CSS classes */
+  @Property({name: 'className', type: String})
+  className!: string
 
-    /** Button label text */
-    @Property({name: "label", type: String})
-    label!: string;
+  /** Button label text */
+  @Property({name: "label", type: String})
+  label!: string;
 
-    /** Button color theme */
-    @Property({name: 'color', type: String})
-    color!: UIColor
+  /** Button color theme */
+  @Property({name: 'color', type: String})
+  color!: UIColor
 
-    /** Button style variant */
-    @Property({name: "variant", type: String})
-    variant!: ButtonVariants;
+  /** Button style variant */
+  @Property({name: "variant", type: String})
+  variant!: ButtonVariants;
 
-    /** Icon name to display */
-    @Property({name: "icon", type: String})
-    icon!: string;
+  /** Icon name to display */
+  @Property({name: "icon", type: String})
+  icon!: string;
 
-    /** Loading state of the button */
-    @Property({name: 'loading', type: Boolean})
-    loading!: boolean
+  /** Loading state of the button */
+  @Property({name: 'loading', type: Boolean})
+  loading!: boolean
 
-    /** Position of the icon relative to label */
-    @Property({name: 'icon-position', type: String})
-    iconPosition!: IconPosition
+  /** Position of the icon relative to label */
+  @Property({name: 'icon-position', type: String})
+  iconPosition!: IconPosition
 
-    /** Color of the button animation */
-    @Property({name: 'animation-color', type: String})
-    animationColor!: ButtonAnimationColor;
+  /** Color of the button animation */
+  @Property({name: 'animation-color', type: String})
+  animationColor!: ButtonAnimationColor;
 
-    /** HTML button type attribute */
-    @Property({name: 'type', type: String})
-    type!: string;
+  /** HTML button type attribute */
+  @Property({name: 'type', type: String})
+  type!: string;
 
-    /** Button size variant */
-    @Property({name: 'size', type: String})
-    size!: ButtonSize
+  /** Button size variant */
+  @Property({name: 'size', type: String})
+  size!: ButtonSize
 
-    /** Button border radius style */
-    @Property({name: 'round', type: String})
-    rounded!: ButtonRound
+  /** Button border radius style */
+  @Property({name: 'round', type: String})
+  rounded!: ButtonRound
 
-    constructor() {
-        super();
-        this.content = this.innerHTML;
+  constructor() {
+    super();
+    this.content = this.innerHTML;
 
-    }
+  }
 
 
-    template = (): string => {
+  template = (): string => {
 
-        const iconComponent = this.icon ? `<dota-icon class="relative block" name="${this.icon}" size="${this.size || 'md'}"></dota-icon>` : '';
-        const size = ButtonStyle.size?.[this.size ?? "md"] ?? '';
-        const round = ButtonStyle.rounded?.[this.rounded] ?? '';
+    const iconComponent = this.icon ? `<dota-icon class="relative block" name="${this.icon}" size="${this.size || 'md'}"></dota-icon>` : '';
+    const size = ButtonStyle.size?.[this.size ?? "md"] ?? '';
+    const round = ButtonStyle.rounded?.[this.rounded] ?? '';
 
-        let content: string;
-        switch (this.iconPosition) {
-            case "forward": {
-                content = `
+    let content: string;
+    switch (this.iconPosition) {
+      case "forward": {
+        content = `
                     <p>${this.label || this.content}</p>
                    ${iconComponent}
                 `
-                break
-            }
+        break
+      }
 
-            case "leading": {
-                content = `
+      case "leading": {
+        content = `
                     ${iconComponent}
                     <p>${this.label || this.content}</p>
                 `
-                break
-            }
+        break
+      }
 
-            default: {
-                content = `
+      default: {
+        content = `
                     ${iconComponent}
                     <p>${this.label || this.content}</p>
                 `
-            }
-        }
+      }
+    }
 
-        if(this.animation) {
-            return `
+    if (this.animation) {
+      return `
                 <button class="${ButtonStyle.base} ${ButtonStyle.animation[this.animation || 'fill'].base} ${size} ${round}
                                ${ButtonStyle.animation[this.animation ?? 'fill'].color[this.animationColor ?? 'indigo']}
                                
@@ -133,19 +133,19 @@ class ButtonComponent extends BaseElement {
                     ${this.label || this.content}
                 </button>
             `
-        }
+    }
 
-        const color = ButtonStyle.color?.[this.color ?? 'none']?.[this.variant ?? 'solid'] ?? '';
-        return `
+    const color = ButtonStyle.color?.[this.color ?? 'none']?.[this.variant ?? 'solid'] ?? '';
+    return `
             <button class="${ButtonStyle.base} ${color} ${size} ${round}">
                 ${content}
             </button>
         `
-    }
+  }
 
-    render(): string {
-        return this.template();
-    }
+  render(): string {
+    return this.template();
+  }
 
 }
 
