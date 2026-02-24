@@ -1,7 +1,7 @@
 {
   "name": "@ayu-sh-kr/dota-ui",
   "private": false,
-  "version": "0.0.8",
+  "version": "0.0.7",
   "publishConfig": {
     "access": "public"
   },
@@ -36,7 +36,7 @@
     "build": "tsc && vite build",
     "build-pack": "pnpm build && pnpm pack",
     "preview": "vite preview",
-    "publish": "pnpm run build && changeset publish"
+    "release": "pnpm run build && changeset publish"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
