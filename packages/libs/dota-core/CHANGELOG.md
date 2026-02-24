@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-core
 
+## 1.9.4
+
+### Patch Changes
+
+- 0873984: Integrated the dota-ui to the dota-ecosystem for better support and more components integration
+
 ## 1.9.3
 
 ### Patch Changes
