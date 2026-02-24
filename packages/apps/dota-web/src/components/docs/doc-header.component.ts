@@ -5,13 +5,12 @@ import {
   Component,
   HTML,
   Property,
-  String,
-  WindowListener
+  String
 } from "@ayu-sh-kr/dota-core";
 import type {MarkdownTheme} from "@dota/configs/markdown.config.ts";
-import {MarkdownThemeConfig} from "@dota/configs/markdown.config.ts";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
+
 @Component({
   selector: 'doc-header',
   shadow: false
@@ -67,20 +66,6 @@ export class DocHeaderComponent extends BaseElement {
     window.dispatchEvent(new CustomEvent('doc:sidebar-toggle'));
   }
 
-  // ── markdown theme picker ─────────────────────────────────────────────────
-
-  @BindEvent({event: 'change', id: '#theme-picker'})
-  handleThemePick(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const chosen = select.value as MarkdownTheme;
-    ApplicationEventService.getInstance()
-      .getPublisher()
-      .publishAsync({
-        name: 'docs:theme-change',
-        data: {theme: chosen}
-      });
-  }
-
   // ── helpers ───────────────────────────────────────────────────────────────
 
   private get breadcrumb(): string {
@@ -88,12 +73,6 @@ export class DocHeaderComponent extends BaseElement {
     return file.replace('.md', '').replace(/-/g, ' ');
   }
 
-  private buildThemeOptions(): string {
-    const active = this.theme ?? 'purple';
-    return Object.keys(MarkdownThemeConfig)
-      .map(key => `<option value="${key}" ${key === active ? 'selected' : ''}>${key}</option>`)
-      .join('');
-  }
 
   render(): string {
     return HTML`
@@ -148,26 +127,13 @@ export class DocHeaderComponent extends BaseElement {
                         </span>
                     </div>
 
-                    <!-- Right: theme picker + dark toggle + github -->
+                    <!-- Right: theme picker popover + dark toggle + github -->
                     <div class="flex items-center gap-1.5 shrink-0">
 
-                        <!-- Theme picker -->
-                        <div class="flex items-center gap-1.5
-                                    px-2.5 py-1.5 rounded-lg
-                                    border border-gray-200 dark:border-gray-700
-                                    bg-gray-50 dark:bg-gray-900
-                                    hover:border-purple-400 dark:hover:border-purple-500
-                                    transition-colors duration-150">
-                            <dota-icon name="mdi:world" color="${this.theme}"></dota-icon>
-                            <select id="theme-picker"
-                                    class="text-xs font-medium
-                                           text-gray-700 dark:text-gray-200
-                                           bg-transparent border-none outline-none
-                                           cursor-pointer appearance-none
-                                           pr-1">
-                                ${this.buildThemeOptions()}
-                            </select>
-                        </div>
+                        <!-- Theme picker popover -->
+                        <dota-popover placement="bottom-end" offset="8" anchored-selector="theme-picker">
+                            <dota-icon name="material-symbols-light:circles-rounded" color="${this.theme}" variant="ghost" size="md"></dota-icon>
+                        </dota-popover>
                         <dark-mode-button color="${this.theme}"></dark-mode-button>
                         <github-button></github-button>
                     </div>
