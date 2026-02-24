@@ -16,7 +16,7 @@ export class GithubButtonComponent extends BaseElement{
         return `
             <span id="github-button" class="active:scale-95 cursor-pointer">
                 <a href="https://github.com/ayu-sh-kr" target="_blank">
-                    <dota-icon name="mdi:github" color="gray" variant="ghost" size="md"/>
+                    <dota-icon name="mdi:github" color="none" variant="ghost" size="md"/>
                 </a>
             </span>
         `;
