@@ -15,7 +15,7 @@ import {
   OurToolsComponent,
   ReactiveSectionComponent
 } from "@dota/components/home";
-import {AvatarComponent, ButtonComponent, IconsComponent} from "@ayu-sh-kr/dota-ui";
+import {AvatarComponent, ButtonComponent, IconsComponent, PopoverComponent} from "@ayu-sh-kr/dota-ui";
 import {
   DarkModeButtonComponent,
   FooterComponent,
@@ -23,7 +23,7 @@ import {
   NotificationComponent,
   NotificationHolderComponent
 } from "@dota/components/utils";
-import {DocContentComponent, DocHeaderComponent, DocPathComponent, DocSectionComponent, DocSidebarComponent} from "@dota/components/docs";
+import {DocContentComponent, DocHeaderComponent, DocPathComponent, DocSectionComponent, DocSidebarComponent, ThemePickerComponent} from "@dota/components/docs";
 import {CounterComponent} from "@dota/components/example/counter.component.ts";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
 import {ComponentClass, Router, RouterService} from "@ayu-sh-kr/dota-router";
@@ -38,7 +38,7 @@ let routerService!: RouterService<Router<HTMLElement>>;
 let notificationService!: NotificationService
 initializeApp({
   modules: components,
-  externalComponents: [IconsComponent] as unknown as ComponentClass[],
+  externalComponents: [IconsComponent, PopoverComponent] as unknown as ComponentClass[],
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},
   root: AppComponent,
@@ -93,6 +93,8 @@ declare global {
     'counter-component': CounterComponent,
     "dota-button": ButtonComponent,
     "d-avatar": AvatarComponent,
-    "dota-icon": IconsComponent
+    "dota-icon": IconsComponent,
+    "dota-popover": PopoverComponent,
+    "theme-picker": ThemePickerComponent,
   }
 }

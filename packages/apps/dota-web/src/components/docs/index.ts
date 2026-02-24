@@ -3,3 +3,4 @@ export {DocPathComponent} from "@dota/components/docs/doc-path.component.ts";
 export {DocSectionComponent} from "@dota/components/docs/doc-section.component.ts";
 export {DocHeaderComponent} from "@dota/components/docs/doc-header.component.ts";
 export {DocSidebarComponent} from "@dota/components/docs/doc-sidebar.component.ts";
+export {ThemePickerComponent} from "@dota/components/docs/theme-picker.component.ts";
