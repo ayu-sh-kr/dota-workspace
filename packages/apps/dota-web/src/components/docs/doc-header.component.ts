@@ -11,6 +11,7 @@ import {
 import type {MarkdownTheme} from "@dota/configs/markdown.config.ts";
 import {MarkdownThemeConfig} from "@dota/configs/markdown.config.ts";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
+import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 @Component({
   selector: 'doc-header',
   shadow: false
@@ -27,14 +28,17 @@ export class DocHeaderComponent extends BaseElement {
     super();
   }
 
-  /**
-   * System dark-mode changed (e.g. user clicked the button) — swap the icon.
-   * This is a window CustomEvent, not an application event, so @WindowListener
-   * is the right decorator here.
-   */
-  @WindowListener({event: 'themeChange'})
-  onDarkModeChange() {
-    this.updateHTML();
+  @OnEvent('connected', true)
+  onConnected() {
+    console.log('DocHeaderComponent constructed, reading theme from local storage');
+    this.theme = LocalStorageService.get('docs-theme') ?? 'purple';
+    ApplicationEventService.getInstance()
+      .getPublisher()
+      .publishAsync({
+        name: 'docs:theme-change',
+        data: {theme: this.theme}
+      });
+
   }
 
   /**
@@ -52,6 +56,7 @@ export class DocHeaderComponent extends BaseElement {
     const incoming = event?.data?.theme;
     if (incoming) {
       this.theme = incoming;
+      LocalStorageService.add('docs-theme', incoming);
     }
   }
 
@@ -163,7 +168,7 @@ export class DocHeaderComponent extends BaseElement {
                                 ${this.buildThemeOptions()}
                             </select>
                         </div>
-                        <dark-mode-button></dark-mode-button>
+                        <dark-mode-button color="${this.theme}"></dark-mode-button>
                         <github-button></github-button>
                     </div>
                 </div>
