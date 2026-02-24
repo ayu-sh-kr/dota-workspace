@@ -112,19 +112,22 @@ class IconsComponent extends BaseElement {
    * Triggered by the ATTRIBUTE_CHANGED lifecycle event via the component's scoped EventChannel.
    * Fires after BaseElement has already applied the new value to the property and re-rendered.
    *
+   * Re-render wipes the inner HTML back to the empty container returned by render(), so for
+   * any attribute change we must always re-inject the SVG from cache before styling.
+   *
    * Uses event.data.name (the exact attribute that changed) to route with zero guesswork:
-   *   - 'name'      → re-inject SVG (cache hit or network fetch) then re-style
-   *   - anything else → re-style the cached SVG in-place (no fetch, no DOM re-injection)
+   *   - 'name'      → reset loaded guard so the new icon is fetched/injected
+   *   - anything else → re-inject SVG from cache (instant) then re-style
    */
   @OnEvent(LifecycleEventConstants.ATTRIBUTE_CHANGED, true)
   onAttributeChanged(event: ApplicationEvent) {
     const { name } = event.data as { name: string; oldValue: string; newValue: string };
     if (name === 'name') {
-      this.loadIcon()
-        .catch(err => console.warn('[IconsComponent] load error on name change:', err));
-    } else {
-      this.applyStyles();
+      this._loadedName = null; // force re-injection for the new icon name
     }
+    // Always reload: re-render has wiped the container, so we need to re-inject the SVG.
+    this.loadIcon()
+      .catch(err => console.warn('[IconsComponent] load error on attribute change:', err));
   }
 
   /**
@@ -145,8 +148,8 @@ class IconsComponent extends BaseElement {
     const container = this.querySelector('#svg');
     if (!container) return;
 
-    // Guard against redundant DOM re-injection on reconnect when the same icon is already loaded
-    if (this._loadedName !== name) {
+    // Re-inject if the name changed OR if the container was wiped by a re-render
+    if (this._loadedName !== name || !container.innerHTML.trim()) {
       container.innerHTML = svgText;
       this._loadedName = name;
     }
