@@ -1,8 +1,20 @@
-import {AfterInit, BaseElement, Component, DotaPageElement, HTML, SEO} from "@ayu-sh-kr/dota-core";
+import {AfterInit, Component, DotaPageElement, HTML, SEO} from "@ayu-sh-kr/dota-core";
 import {Route} from "@ayu-sh-kr/dota-router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 
+/**
+ * DocPage
+ *
+ * Full-page shell for the documentation section.
+ * The <doc-section> component owns everything:
+ *   - its own sticky header (with breadcrumb + theme picker + dark toggle)
+ *   - the sidebar / drawer navigation
+ *   - the markdown content area
+ *
+ * <app-header> and <app-footer> are intentionally omitted here so the doc
+ * layout can use the full viewport height without a floating nav bar on top.
+ */
 @Route({path: '/docs'})
 @Component({
   selector: 'doc-page',
@@ -17,27 +29,23 @@ export class DocPage extends DotaPageElement {
   get seo(): SEO {
     return {
       title: 'Dota Web - Documentation',
-      description: 'Explore the comprehensive documentation for Dota Web, your go-to resource for understanding and utilizing the powerful features of our web application built on the Dota framework.',
-      keywords: ['Dota Web Documentation', 'Dota Framework Guide', 'Web Application Docs', 'Dota Web Features', 'Dota Web API'],
+      description: 'Explore the comprehensive documentation for Dota Web.',
+      keywords: ['Dota Web Documentation', 'Dota Framework Guide', 'Web Application Docs'],
       og: {
-        title: 'Dota Web Documentation - Your Guide to Mastering Dota Web',
-        description: 'Dive into the detailed documentation for Dota Web, your essential guide to mastering the features and capabilities of our cutting-edge web application built on the Dota framework.',
+        title: 'Dota Web Documentation',
+        description: 'Dive into the detailed documentation for Dota Web.',
       }
-    }
+    };
   }
 
   @AfterInit()
   afterViewInit() {
-    GeneralUtils.scrollToTop('instant')
+    GeneralUtils.scrollToTop('instant');
   }
 
   render(): string {
-    // language=html
     return HTML`
-      <app-header></app-header>
-      <doc-section></doc-section>
-      <app-footer></app-footer>
-      <scroll-bottom-button></scroll-bottom-button>
-    `;
+            <doc-section></doc-section>
+        `;
   }
 }
