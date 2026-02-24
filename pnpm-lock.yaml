@@ -90,8 +90,8 @@ importers:
         specifier: workspace:*
         version: link:../../libs/dota-router
       '@ayu-sh-kr/dota-ui':
-        specifier: 0.0.7
-        version: 0.0.7
+        specifier: workspace:*
+        version: link:../../ui/dota-ui
       '@ayu-sh-kr/dota-wrap':
         specifier: workspace:*
         version: link:../../libs/dota-wrap
@@ -174,6 +174,25 @@ importers:
         specifier: ^3.3.3
         version: 3.3.3
 
+  packages/ui/dota-ui:
+    dependencies:
+      '@ayu-sh-kr/dota-core':
+        specifier: workspace:*
+        version: link:../../libs/dota-core
+      '@ayu-sh-kr/dota-event':
+        specifier: workspace:*
+        version: link:../../libs/dota-event
+    devDependencies:
+      autoprefixer:
+        specifier: ^10.4.19
+        version: 10.4.24(postcss@8.5.6)
+      postcss:
+        specifier: ^8.4.39
+        version: 8.5.6
+      tailwindcss:
+        specifier: ^3.4.4
+        version: 3.4.19
+
 packages:
 
   '@alloc/quick-lru@5.2.0':
@@ -182,12 +201,6 @@ packages:
 
   '@asamuzakjp/css-color@3.2.0':
     resolution: {integrity: sha512-K1A6z8tS3XsmCMM86xoWdn7Fkdn9m6RSVtocUrJYIwZnFVkng/PvkEoWtOWmP+Scc6saYWHWZYbndEEXxl24jw==}
-
-  '@ayu-sh-kr/dota-core@1.8.2':
-    resolution: {integrity: sha512-S2x+bDGHOGpzzFNKnjKyWjlQgGu107/mJa730AbIq9no6SylWqr4d6IGENrxkVJiShvbHoJSl2Nij5b65b2myg==}
-
-  '@ayu-sh-kr/dota-ui@0.0.7':
-    resolution: {integrity: sha512-Ttr7ZE/p7Up11kiGb5BGE4Sr0EXTcmbCllzCf7YuklLBRRJ6+xUMJjKR6WbJbWFmSXzJ4m1NZUOzUMl0ZXUrVw==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -3417,14 +3430,6 @@ snapshots:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
-
-  '@ayu-sh-kr/dota-core@1.8.2':
-    dependencies:
-      reflect-metadata: 0.2.2
-
-  '@ayu-sh-kr/dota-ui@0.0.7':
-    dependencies:
-      '@ayu-sh-kr/dota-core': 1.8.2
 
   '@babel/code-frame@7.27.1':
     dependencies:
