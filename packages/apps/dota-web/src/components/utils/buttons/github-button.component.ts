@@ -2,24 +2,24 @@ import {BaseElement, Component} from "@ayu-sh-kr/dota-core";
 
 
 @Component({
-    selector: 'github-button',
-    shadow: false
+  selector: 'github-button',
+  shadow: false
 })
-export class GithubButtonComponent extends BaseElement{
+export class GithubButtonComponent extends BaseElement {
 
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
-    render(): string {
-        // language=HTML
-        return `
-            <span id="github-button" class="active:scale-95 cursor-pointer">
-                <a href="https://github.com/ayu-sh-kr" target="_blank">
-                    <dota-icon name="mdi:github" color="none" variant="ghost" size="md"/>
-                </a>
-            </span>
-        `;
-    }
+  render(): string {
+    // language=HTML
+    return `
+      <span id="github-button" class="active:scale-95 cursor-pointer">
+        <a href="https://github.com/ayu-sh-kr" target="_blank">
+            <dota-icon name="mdi:github" color="none" variant="ghost" size="md"/>
+        </a>
+      </span>
+    `;
+  }
 
 }
