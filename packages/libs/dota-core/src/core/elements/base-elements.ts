@@ -165,7 +165,8 @@ export abstract class BaseElement extends HTMLElement {
       this.bindProperty(name, newValue);
       this.updateHTML();
       this.__eventChannel.emit({
-        name: LifecycleEventConstants.ATTRIBUTE_CHANGED
+        name: LifecycleEventConstants.ATTRIBUTE_CHANGED,
+        data: {name, oldValue, newValue}
       });
     }
   }
