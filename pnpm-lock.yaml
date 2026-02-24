@@ -182,6 +182,9 @@ importers:
       '@ayu-sh-kr/dota-event':
         specifier: workspace:*
         version: link:../../libs/dota-event
+      '@floating-ui/dom':
+        specifier: ^1.7.5
+        version: 1.7.5
     devDependencies:
       autoprefixer:
         specifier: ^10.4.19

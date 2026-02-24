@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
-    "@ayu-sh-kr/dota-event": "workspace:*"
+    "@ayu-sh-kr/dota-event": "workspace:*",
+    "@floating-ui/dom": "^1.7.5"
   }
 }
