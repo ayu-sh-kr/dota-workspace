@@ -131,7 +131,7 @@ export class DocHeaderComponent extends BaseElement {
                     <div class="flex items-center gap-1.5 shrink-0">
 
                         <!-- Theme picker popover -->
-                        <dota-popover placement="bottom-end" offset="8" anchored-selector="theme-picker">
+                        <dota-popover placement="bottom" offset="20" anchored-selector="theme-picker" class="cursor-pointer active:scale-95">
                             <dota-icon name="material-symbols-light:circles-rounded" color="${this.theme}" variant="ghost" size="md"></dota-icon>
                         </dota-popover>
                         <dark-mode-button color="${this.theme}"></dark-mode-button>
