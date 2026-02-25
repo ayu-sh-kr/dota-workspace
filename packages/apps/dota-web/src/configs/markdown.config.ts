@@ -30,6 +30,17 @@ export interface MarkdownElementTheme {
         light: { bg: string; text: string };
         dark:  { bg: string; text: string };
     };
+    /**
+     * TOC sidebar theming — active link and indicator styles.
+     */
+    toc: {
+        /** Tailwind classes for a normal (inactive) TOC link */
+        link: string;
+        /** Tailwind classes for the active TOC item link */
+        activeLink: string;
+        /** Tailwind classes for the active left-bar indicator */
+        activeBar: string;
+    };
 }
 
 
@@ -94,6 +105,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#a855f7', text: '#ffffff' }, dark: { bg: '#c084fc', text: '#1a0030' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400', activeLink: 'text-purple-600 dark:text-purple-400 font-medium', activeBar: 'bg-purple-500 dark:bg-purple-400' },
     },
   blue: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -113,6 +125,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#3b82f6', text: '#ffffff' }, dark: { bg: '#60a5fa', text: '#001a40' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400', activeLink: 'text-blue-600 dark:text-blue-400 font-medium', activeBar: 'bg-blue-500 dark:bg-blue-400' },
     },
   green: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -132,6 +145,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#22c55e', text: '#ffffff' }, dark: { bg: '#4ade80', text: '#002010' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400', activeLink: 'text-green-600 dark:text-green-400 font-medium', activeBar: 'bg-green-500 dark:bg-green-400' },
     },
   emerald: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -151,6 +165,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#10b981', text: '#ffffff' }, dark: { bg: '#34d399', text: '#001a0f' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400', activeLink: 'text-emerald-600 dark:text-emerald-400 font-medium', activeBar: 'bg-emerald-500 dark:bg-emerald-400' },
     },
   teal: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -170,6 +185,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#14b8a6', text: '#ffffff' }, dark: { bg: '#2dd4bf', text: '#001a18' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400', activeLink: 'text-teal-600 dark:text-teal-400 font-medium', activeBar: 'bg-teal-500 dark:bg-teal-400' },
     },
   cyan: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -189,6 +205,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#06b6d4', text: '#ffffff' }, dark: { bg: '#22d3ee', text: '#001a20' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400', activeLink: 'text-cyan-600 dark:text-cyan-400 font-medium', activeBar: 'bg-cyan-500 dark:bg-cyan-400' },
     },
   sky: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -208,6 +225,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#0ea5e9', text: '#ffffff' }, dark: { bg: '#38bdf8', text: '#001828' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-sky-600 dark:hover:text-sky-400', activeLink: 'text-sky-600 dark:text-sky-400 font-medium', activeBar: 'bg-sky-500 dark:bg-sky-400' },
     },
   indigo: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -227,6 +245,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#6366f1', text: '#ffffff' }, dark: { bg: '#818cf8', text: '#10002b' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400', activeLink: 'text-indigo-600 dark:text-indigo-400 font-medium', activeBar: 'bg-indigo-500 dark:bg-indigo-400' },
     },
   violet: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -246,6 +265,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#8b5cf6', text: '#ffffff' }, dark: { bg: '#a78bfa', text: '#1a0035' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400', activeLink: 'text-violet-600 dark:text-violet-400 font-medium', activeBar: 'bg-violet-500 dark:bg-violet-400' },
     },
   fuchsia: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -265,6 +285,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#d946ef', text: '#ffffff' }, dark: { bg: '#e879f9', text: '#2d0030' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-fuchsia-600 dark:hover:text-fuchsia-400', activeLink: 'text-fuchsia-600 dark:text-fuchsia-400 font-medium', activeBar: 'bg-fuchsia-500 dark:bg-fuchsia-400' },
     },
   pink: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -284,6 +305,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#ec4899', text: '#ffffff' }, dark: { bg: '#f472b6', text: '#2d001a' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400', activeLink: 'text-pink-600 dark:text-pink-400 font-medium', activeBar: 'bg-pink-500 dark:bg-pink-400' },
     },
   rose: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -303,6 +325,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#f43f5e', text: '#ffffff' }, dark: { bg: '#fb7185', text: '#2d0010' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400', activeLink: 'text-rose-600 dark:text-rose-400 font-medium', activeBar: 'bg-rose-500 dark:bg-rose-400' },
     },
   red: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -322,6 +345,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#ef4444', text: '#ffffff' }, dark: { bg: '#f87171', text: '#2d0000' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400', activeLink: 'text-red-600 dark:text-red-400 font-medium', activeBar: 'bg-red-500 dark:bg-red-400' },
     },
   yellow: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -341,6 +365,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#eab308', text: '#1a1000' }, dark: { bg: '#facc15', text: '#1a1000' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400', activeLink: 'text-yellow-600 dark:text-yellow-400 font-medium', activeBar: 'bg-yellow-500 dark:bg-yellow-400' },
     },
   amber: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -360,6 +385,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#f59e0b', text: '#1a0f00' }, dark: { bg: '#fbbf24', text: '#1a0f00' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-400', activeLink: 'text-amber-600 dark:text-amber-400 font-medium', activeBar: 'bg-amber-500 dark:bg-amber-400' },
     },
   orange: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -379,6 +405,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#f97316', text: '#ffffff' }, dark: { bg: '#fb923c', text: '#1a0800' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400', activeLink: 'text-orange-600 dark:text-orange-400 font-medium', activeBar: 'bg-orange-500 dark:bg-orange-400' },
     },
   lime: {
         wrapper:    t(WRAPPER,    'text-gray-800 dark:text-gray-200'),
@@ -398,6 +425,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-800 dark:text-gray-200'),
         ol:         t(OL,         'text-gray-800 dark:text-gray-200'),
         selection:  { light: { bg: '#84cc16', text: '#1a2000' }, dark: { bg: '#a3e635', text: '#1a2000' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-lime-600 dark:hover:text-lime-400', activeLink: 'text-lime-600 dark:text-lime-400 font-medium', activeBar: 'bg-lime-500 dark:bg-lime-400' },
     },
   slate: {
         wrapper:    t(WRAPPER,    'text-slate-700 dark:text-slate-300'),
@@ -417,6 +445,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-slate-700 dark:text-slate-300'),
         ol:         t(OL,         'text-slate-700 dark:text-slate-300'),
         selection:  { light: { bg: '#475569', text: '#ffffff' }, dark: { bg: '#94a3b8', text: '#0f172a' } },
+        toc: { link: 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200', activeLink: 'text-slate-800 dark:text-slate-100 font-medium', activeBar: 'bg-slate-600 dark:bg-slate-300' },
     },
   gray: {
         wrapper:    t(WRAPPER,    'text-gray-700 dark:text-gray-300'),
@@ -436,6 +465,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-700 dark:text-gray-300'),
         ol:         t(OL,         'text-gray-700 dark:text-gray-300'),
         selection:  { light: { bg: '#6b7280', text: '#ffffff' }, dark: { bg: '#9ca3af', text: '#111827' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200', activeLink: 'text-gray-800 dark:text-gray-100 font-medium', activeBar: 'bg-gray-600 dark:bg-gray-300' },
     },
   zinc: {
         wrapper:    t(WRAPPER,    'text-zinc-700 dark:text-zinc-300'),
@@ -455,6 +485,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-zinc-700 dark:text-zinc-300'),
         ol:         t(OL,         'text-zinc-700 dark:text-zinc-300'),
         selection:  { light: { bg: '#52525b', text: '#ffffff' }, dark: { bg: '#a1a1aa', text: '#18181b' } },
+        toc: { link: 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200', activeLink: 'text-zinc-800 dark:text-zinc-100 font-medium', activeBar: 'bg-zinc-600 dark:bg-zinc-300' },
     },
   neutral: {
         wrapper:    t(WRAPPER,    'text-neutral-700 dark:text-neutral-300'),
@@ -474,6 +505,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-neutral-700 dark:text-neutral-300'),
         ol:         t(OL,         'text-neutral-700 dark:text-neutral-300'),
         selection:  { light: { bg: '#525252', text: '#ffffff' }, dark: { bg: '#a3a3a3', text: '#171717' } },
+        toc: { link: 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200', activeLink: 'text-neutral-800 dark:text-neutral-100 font-medium', activeBar: 'bg-neutral-600 dark:bg-neutral-300' },
     },
   stone: {
         wrapper:    t(WRAPPER,    'text-stone-700 dark:text-stone-300'),
@@ -493,6 +525,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-stone-700 dark:text-stone-300'),
         ol:         t(OL,         'text-stone-700 dark:text-stone-300'),
         selection:  { light: { bg: '#57534e', text: '#ffffff' }, dark: { bg: '#a8a29e', text: '#1c1917' } },
+        toc: { link: 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-200', activeLink: 'text-stone-800 dark:text-stone-100 font-medium', activeBar: 'bg-stone-600 dark:bg-stone-300' },
     },
   none: {
         wrapper:    t(WRAPPER,    'text-gray-900 dark:text-gray-100'),
@@ -512,6 +545,7 @@ export const MarkdownThemeConfig: Record<string, MarkdownElementTheme> = {
         ul:         t(UL,         'text-gray-900 dark:text-gray-100'),
         ol:         t(OL,         'text-gray-900 dark:text-gray-100'),
         selection:  { light: { bg: '#111827', text: '#ffffff' }, dark: { bg: '#f9fafb', text: '#111827' } },
+        toc: { link: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200', activeLink: 'text-gray-900 dark:text-white font-medium', activeBar: 'bg-gray-700 dark:bg-gray-200' },
     },
 };
 
