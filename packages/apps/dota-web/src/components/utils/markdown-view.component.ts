@@ -27,32 +27,32 @@ function buildSelectionStyle(uid: string, theme: MarkdownTheme): string {
 }
 
 function applyThemeClasses(html: string, theme: MarkdownTheme): string {
-  const t = MarkdownThemeConfig[theme] ?? MarkdownThemeConfig['purple'];
+  const mdTheme = MarkdownThemeConfig[theme] ?? MarkdownThemeConfig['purple'];
 
   // Order matters: more specific patterns first (pre code before code)
   return html
     // wrapper body classes applied via the container div, not here
-    .replace(/<h1(\s[^>]*)?>/g, (_, a = '') => `<h1${a} class="${t.h1}">`)
-    .replace(/<h2(\s[^>]*)?>/g, (_, a = '') => `<h2${a} class="${t.h2}">`)
-    .replace(/<h3(\s[^>]*)?>/g, (_, a = '') => `<h3${a} class="${t.h3}">`)
-    .replace(/<h4(\s[^>]*)?>/g, (_, a = '') => `<h4${a} class="${t.h4}">`)
-    .replace(/<a(\s[^>]*)?>/g, (_, a = '') => `<a${a} class="${t.a}">`)
-    .replace(/<pre(\s[^>]*)?>/g, (_, a = '') => `<pre${a} class="${t.pre}">`)
+    .replace(/<h1(\s[^>]*)?>/g, (_, a = '') => `<h1${a} class="${mdTheme.h1}">`)
+    .replace(/<h2(\s[^>]*)?>/g, (_, a = '') => `<h2${a} class="${mdTheme.h2}">`)
+    .replace(/<h3(\s[^>]*)?>/g, (_, a = '') => `<h3${a} class="${mdTheme.h3}">`)
+    .replace(/<h4(\s[^>]*)?>/g, (_, a = '') => `<h4${a} class="${mdTheme.h4}">`)
+    .replace(/<a(\s[^>]*)?>/g, (_, a = '') => `<a${a} class="${mdTheme.a}">`)
+    .replace(/<pre(\s[^>]*)?>/g, (_, a = '') => `<pre${a} class="${mdTheme.pre}">`)
     // inline code only — pre > code gets its own minimal classes
     .replace(/<code(\s[^>]*)?>/g, (match, a = '') => {
       // inside a pre block markdown-it emits <code class="language-*">
       // we must not double-stamp pre's code — keep existing class if present
       if (a && a.includes('class=')) return match;
-      return `<code${a} class="${t.code}">`;
+      return `<code${a} class="${mdTheme.code}">`;
     })
-    .replace(/<blockquote(\s[^>]*)?>/g, (_, a = '') => `<blockquote${a} class="${t.blockquote}">`)
-    .replace(/<hr(\s[^>]*)?>/g, (_, a = '') => `<hr${a} class="${t.hr}">`)
+    .replace(/<blockquote(\s[^>]*)?>/g, (_, a = '') => `<blockquote${a} class="${mdTheme.blockquote}">`)
+    .replace(/<hr(\s[^>]*)?>/g, (_, a = '') => `<hr${a} class="${mdTheme.hr}">`)
     .replace(/<table(\s[^>]*)?>/g, (_, a = '') => `<table${a} class="w-full my-4 sm:my-6 border-collapse text-xs sm:text-sm overflow-x-auto block">`)
-    .replace(/<th(\s[^>]*)?>/g, (_, a = '') => `<th${a} class="${t.th}">`)
-    .replace(/<td(\s[^>]*)?>/g, (_, a = '') => `<td${a} class="${t.td}">`)
-    .replace(/<strong(\s[^>]*)?>/g, (_, a = '') => `<strong${a} class="${t.strong}">`)
-    .replace(/<ul(\s[^>]*)?>/g, (_, a = '') => `<ul${a} class="${t.ul}">`)
-    .replace(/<ol(\s[^>]*)?>/g, (_, a = '') => `<ol${a} class="${t.ol}">`)
+    .replace(/<th(\s[^>]*)?>/g, (_, a = '') => `<th${a} class="${mdTheme.th}">`)
+    .replace(/<td(\s[^>]*)?>/g, (_, a = '') => `<td${a} class="${mdTheme.td}">`)
+    .replace(/<strong(\s[^>]*)?>/g, (_, a = '') => `<strong${a} class="${mdTheme.strong}">`)
+    .replace(/<ul(\s[^>]*)?>/g, (_, a = '') => `<ul${a} class="${mdTheme.ul}">`)
+    .replace(/<ol(\s[^>]*)?>/g, (_, a = '') => `<ol${a} class="${mdTheme.ol}">`)
     .replace(/<li(\s[^>]*)?>/g, (_, a = '') => `<li${a} class="my-0.5 sm:my-1">`)
     .replace(/<img(\s[^>]*)?>/g, (_, a = '') => `<img${a} class="rounded-md sm:rounded-lg shadow-md my-4 sm:my-6 max-w-full h-auto">`)
     .replace(/<p(\s[^>]*)?>/g, (_, a = '') => `<p${a} class="my-3 sm:my-4 leading-6 sm:leading-7">`);
