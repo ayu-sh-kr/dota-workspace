@@ -65,7 +65,7 @@ export class ThemePickerComponent extends BaseElement {
           <button
             data-theme="${key}"
             title="${key}"
-            class="theme-swatch w-6 h-6 rounded-full transition-transform duration-150 focus:outline-none ${ring}"
+            class="theme-swatch max-md:w-4 max-md:h-4 md:w-6 md:h-6 rounded-full transition-transform duration-150 focus:outline-none ${ring}"
             style="background-color: ${color};"
             aria-label="Theme ${key}"
           ></button>`;
@@ -84,7 +84,7 @@ export class ThemePickerComponent extends BaseElement {
   render() {
     // language=html
     return HTML`
-      <div class="z-50 p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl">
+      <div class="z-[100] p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl">
         <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2.5 uppercase tracking-wide">Theme</p>
         <div class="grid grid-cols-6 gap-2">
           ${this.buildSwatches()}
