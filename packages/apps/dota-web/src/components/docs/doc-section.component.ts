@@ -57,6 +57,7 @@ export class DocSectionComponent extends BaseElement {
                       max-width="max-w-4xl">
                     </doc-content>
                   </main>
+                  <doc-toc theme="${this.currentTheme}"></doc-toc>
                 </div>
               </div>
             </section>
