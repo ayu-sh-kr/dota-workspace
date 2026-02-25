@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, Param, Property, State, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, ApplicationEventService, BaseElement, Component, Param, Property, State, String, WindowListener} from "@ayu-sh-kr/dota-core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {WithLoading} from "@dota/utils/DecoratorUtils.ts";
 import {MarkdownService} from "@dota/service/markdown.service.ts";
@@ -32,13 +32,47 @@ export class DocContentComponent extends BaseElement {
     this.docLoaderService = new DocLoaderService();
   }
 
+  /** Scroll to hash anchor in the URL, or to top if none. */
+  private scrollToAnchor() {
+    const hash = window.location.hash;
+    if (hash) {
+      const id = hash.slice(1); // strip leading '#'
+      // Use rAF to let the DOM settle after renderMarkdown
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({behavior: 'smooth', block: 'start'});
+        } else {
+          window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+      });
+    } else {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  }
+
+  /** Re-scroll when the URL hash changes (e.g. TOC click updates the hash). */
+  @WindowListener({event: 'hashchange'})
+  onHashChange() {
+    const hash = window.location.hash;
+    if (hash) {
+      const el = document.getElementById(hash.slice(1));
+      if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+  }
+
   @AfterInit()
   @WithLoading()
   async afterViewInit() {
     const path = (this.filePath ?? 'Getting-Started.md').replace('/', '');
     const raw = await this.docLoaderService.loadDoc(path);
-    this.content = MarkdownService.renderMarkdown(raw);
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    const result = MarkdownService.renderMarkdownWithToc(raw);
+    this.content = result.html;
+    // Notify the TOC component about the new headings
+    ApplicationEventService.getInstance()
+      .getPublisher()
+      .publishAsync({ name: 'docs:toc-update', data: { toc: result.toc } });
+    this.scrollToAnchor();
   }
 
   @OnEvent('docs:theme-change')
