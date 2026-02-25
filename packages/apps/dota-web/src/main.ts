@@ -23,7 +23,7 @@ import {
   NotificationComponent,
   NotificationHolderComponent
 } from "@dota/components/utils";
-import {DocContentComponent, DocHeaderComponent, DocPathComponent, DocSectionComponent, DocSidebarComponent, ThemePickerComponent} from "@dota/components/docs";
+import {DocContentComponent, DocHeaderComponent, DocPathComponent, DocSectionComponent, DocSidebarComponent, ThemePickerComponent, DocTocComponent} from "@dota/components/docs";
 import {CounterComponent} from "@dota/components/example/counter.component.ts";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
 import {ComponentClass, Router, RouterService} from "@ayu-sh-kr/dota-router";
@@ -85,6 +85,7 @@ declare global {
     'doc-section': DocSectionComponent,
     'doc-header': DocHeaderComponent,
     'doc-sidebar': DocSidebarComponent,
+    'doc-toc': DocTocComponent,
     'feature-component': FeatureComponent,
     'footer-component': FooterComponent,
     'error-page': ErrorPage,
