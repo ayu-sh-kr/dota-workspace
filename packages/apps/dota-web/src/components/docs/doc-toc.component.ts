@@ -1,9 +1,27 @@
 import {BaseElement, Component, HostListener, HTML, Property, String, WindowListener} from "@ayu-sh-kr/dota-core";
-import {MarkdownThemeConfig, type MarkdownTheme} from "@dota/configs/markdown.config.ts";
 import type {TocEntry} from "@dota/service/markdown.service.ts";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
+import {THEMES, type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 
+
+/**
+ * Derive TOC link/bar classes from the dota-md color token for `a` on the
+ * active theme+color combo. Falls back to neutral gray if tokens are absent.
+ */
+function tocClasses(theme: ThemeName, color: ColorName) {
+  const entry = THEMES[theme]?.color?.[color];
+  const aToken = entry?.a;
+  const active  = aToken?.text  ?? 'text-indigo-600 dark:text-indigo-400';
+  const hover   = aToken?.hover ?? 'hover:text-indigo-600 dark:hover:text-indigo-400';
+  const borderColor = (entry?.hr?.border ?? 'border-indigo-500 dark:border-indigo-400')
+    .replace('border-', 'bg-');           // convert border-* → bg-* for the bar
+  return {
+    link:       `text-gray-500 dark:text-gray-400 ${hover}`,
+    activeLink: `${active} font-medium`,
+    activeBar:  borderColor,
+  };
+}
 
 /**
  * DocTocComponent
@@ -27,7 +45,10 @@ import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 export class DocTocComponent extends BaseElement {
 
   @Property({name: 'theme', type: String})
-  theme: MarkdownTheme = 'purple';
+  theme: ThemeName = 'flat';
+
+  @Property({name: 'color', type: String})
+  color: ColorName = 'indigo';
 
   private toc: TocEntry[] = [];
   private activeId: string = '';
@@ -43,7 +64,8 @@ export class DocTocComponent extends BaseElement {
    */
   @OnEvent('connected', true)
   onConnected() {
-    this.theme = (LocalStorageService.get('docs-theme') ?? 'purple') as MarkdownTheme;
+    this.theme = (LocalStorageService.get('docs-theme') ?? 'flat') as ThemeName;
+    this.color = (LocalStorageService.get('docs-color') ?? 'indigo') as ColorName;
   }
 
   /**
@@ -55,11 +77,21 @@ export class DocTocComponent extends BaseElement {
    */
   @OnEvent('docs:theme-change')
   onThemeChange(event: ApplicationEvent<'docs:theme-change'>) {
-    const incoming = event?.data?.theme;
-    if (incoming) {
-      this.theme = incoming as MarkdownTheme;
-      this.updateHTML();
-    }
+    const t = event?.data?.theme;
+    if (t) { this.theme = t as ThemeName; this.updateHTML(); }
+  }
+
+  /**
+   * Handles application-wide color change events.
+   * Extracts the new color from event.data, updates the local color property,
+   * and triggers a re-render to apply the new color scheme to TOC links and
+   * the active heading indicator bar. This keeps the TOC styling synchronized
+   * with the color picker selection in the header.
+   */
+  @OnEvent('docs:color-change')
+  onColorChange(event: ApplicationEvent<'docs:color-change'>) {
+    const c = event?.data?.color;
+    if (c) { this.color = c as ColorName; this.updateHTML(); }
   }
 
   /**
@@ -155,13 +187,13 @@ export class DocTocComponent extends BaseElement {
    */
   private buildItems(entries: TocEntry[], depth = 0): string {
     if (!entries.length) return '';
-    const t = MarkdownThemeConfig[this.theme] ?? MarkdownThemeConfig['purple'];
+    const toc = tocClasses(this.theme, this.color);
     const indent = depth === 0 ? '' : depth === 1 ? 'pl-3' : 'pl-6';
 
     return entries.map(entry => {
-      const isActive = entry.id === this.activeId;
-      const linkClass = isActive ? t.toc.activeLink : t.toc.link;
-      const barClass  = isActive ? t.toc.activeBar  : 'bg-transparent';
+      const isActive  = entry.id === this.activeId;
+      const linkClass = isActive ? toc.activeLink : toc.link;
+      const barClass  = isActive ? toc.activeBar  : 'bg-transparent';
 
       const children = entry.children.length
         ? `<ul class="mt-1 space-y-1">${this.buildItems(entry.children, depth + 1)}</ul>`
