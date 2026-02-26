@@ -7,9 +7,21 @@ import {
   Property,
   String
 } from "@ayu-sh-kr/dota-core";
-import type {MarkdownTheme} from "@dota/configs/markdown.config.ts";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
+import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
+
+/** bg-500 Tailwind class per ColorName — used for the indicator dot only. */
+const COLOR_BG: Record<ColorName, string> = {
+  slate: 'bg-slate-500',   gray: 'bg-gray-500',    zinc: 'bg-zinc-500',
+  neutral: 'bg-neutral-500', stone: 'bg-stone-500', red: 'bg-red-500',
+  orange: 'bg-orange-500', amber: 'bg-amber-500',  yellow: 'bg-yellow-500',
+  lime: 'bg-lime-500',     green: 'bg-green-500',  emerald: 'bg-emerald-500',
+  teal: 'bg-teal-500',     cyan: 'bg-cyan-500',    sky: 'bg-sky-500',
+  blue: 'bg-blue-500',     indigo: 'bg-indigo-500', violet: 'bg-violet-500',
+  purple: 'bg-purple-500', fuchsia: 'bg-fuchsia-500', pink: 'bg-pink-500',
+  rose: 'bg-rose-500',
+};
 
 @Component({
   selector: 'doc-header',
@@ -21,7 +33,10 @@ export class DocHeaderComponent extends BaseElement {
   activeFile: string = 'Getting-Started.md';
 
   @Property({name: 'theme', type: String})
-  theme: MarkdownTheme = 'purple';
+  theme: ThemeName = 'flat';
+
+  @Property({name: 'color', type: String})
+  color: ColorName = 'indigo';
 
   constructor() {
     super();
@@ -29,117 +44,112 @@ export class DocHeaderComponent extends BaseElement {
 
   @OnEvent('connected', true)
   onConnected() {
-    console.log('DocHeaderComponent constructed, reading theme from local storage');
-    this.theme = LocalStorageService.get('docs-theme') ?? 'purple';
-    ApplicationEventService.getInstance()
-      .getPublisher()
-      .publishAsync({
-        name: 'docs:theme-change',
-        data: {theme: this.theme}
-      });
-
+    const savedTheme = LocalStorageService.get('docs-theme') as ThemeName | null;
+    const savedColor = LocalStorageService.get('docs-color') as ColorName | null;
+    this.theme = savedTheme ?? 'flat';
+    this.color = savedColor ?? 'indigo';
+    this._publishTheme(this.theme);
+    this._publishColor(this.color);
   }
 
-  /**
-   * Markdown theme changed via the picker or any other publisher.
-   * Read the new theme from event.data, store it, then re-render so the
-   * icon colour and the selected option in the picker both update.
-   *
-   * WHY this works for doc-content but not here before the fix:
-   * doc-content was reading event.data and writing this.theme; the old
-   * handler here only called updateHTML() without updating this.theme first,
-   * so the hardcoded color="purple" never changed.
-   */
   @OnEvent('docs:theme-change')
   onThemeChange(event: ApplicationEvent<'docs:theme-change'>) {
-    const incoming = event?.data?.theme;
-    if (incoming) {
-      this.theme = incoming;
-      LocalStorageService.add('docs-theme', incoming);
+    const t = event?.data?.theme as ThemeName | undefined;
+    if (t && t !== this.theme) {
+      this.theme = t;
+      LocalStorageService.add('docs-theme', t);
     }
   }
 
-  // ── mobile sidebar toggle ─────────────────────────────────────────────────
+  @OnEvent('docs:color-change')
+  onColorChange(event: ApplicationEvent<'docs:color-change'>) {
+    const c = event?.data?.color as ColorName | undefined;
+    if (c && c !== this.color) {
+      this.color = c;
+      LocalStorageService.add('docs-color', c);
+    }
+  }
 
   @BindEvent({event: 'click', id: '#hdr-sidebar-btn'})
   handleSidebarToggle() {
     window.dispatchEvent(new CustomEvent('doc:sidebar-toggle'));
   }
 
-  // ── helpers ───────────────────────────────────────────────────────────────
-
-  private get breadcrumb(): string {
-    const file = this.activeFile ?? 'Getting-Started.md';
-    return file.replace('.md', '').replace(/-/g, ' ');
+  private _publishColor(color: ColorName) {
+    ApplicationEventService.getInstance().getPublisher()
+      .publishAsync({ name: 'docs:color-change', data: { color } });
   }
 
+  private _publishTheme(theme: ThemeName) {
+    ApplicationEventService.getInstance().getPublisher()
+      .publishAsync({ name: 'docs:theme-change', data: { theme } });
+  }
+
+  private get breadcrumb(): string {
+    return (this.activeFile ?? 'Getting-Started.md').replace('.md', '').replace(/-/g, ' ');
+  }
 
   render(): string {
+    const activeBg = COLOR_BG[this.color] ?? 'bg-indigo-500';
+
     return HTML`
-            <header class="sticky top-0 z-40 w-full
-                           border-b border-gray-200 dark:border-gray-800
-                           bg-white/90 dark:bg-gray-950/90
-                           backdrop-blur-md
-                           font-dm">
+      <header class="sticky top-0 z-40 w-full
+                     border-b border-gray-200 dark:border-gray-800
+                     bg-white/90 dark:bg-gray-950/90
+                     backdrop-blur-md font-dm">
 
-                <div class="flex items-center justify-between h-14 px-4 lg:px-6">
+        <div class="flex items-center justify-between h-14 px-4 lg:px-6">
 
-                    <!-- Left: mobile sidebar button + logo + breadcrumb -->
-                    <div class="flex items-center gap-3 min-w-0">
+          <!-- Left: mobile sidebar toggle + breadcrumb -->
+          <div class="flex items-center gap-3 min-w-0">
 
-                        <!-- Mobile sidebar toggle — hidden on lg+ -->
-                        <button id="hdr-sidebar-btn"
-                                class="lg:hidden flex items-center justify-center
-                                       w-9 h-9 rounded-lg
-                                       text-gray-600 dark:text-gray-300
-                                       hover:bg-gray-100 dark:hover:bg-gray-800
-                                       transition-colors duration-150"
-                                aria-label="Toggle sidebar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="3" y1="6"  x2="21" y2="6"/>
-                                <line x1="3" y1="12" x2="21" y2="12"/>
-                                <line x1="3" y1="18" x2="21" y2="18"/>
-                            </svg>
-                        </button>
+            <button id="hdr-sidebar-btn"
+                    class="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg
+                           text-gray-600 dark:text-gray-300
+                           hover:bg-gray-100 dark:hover:bg-gray-800
+                           transition-colors duration-150"
+                    aria-label="Toggle sidebar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="6"  x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
 
-                        <!-- Logo / back home -->
-                        <a href="/"
-                           class="hidden lg:flex items-center gap-1.5 shrink-0
-                                  font-extrabold text-xl
-                                  text-gray-900 dark:text-gray-100
-                                  hover:text-purple-600 dark:hover:text-purple-400
-                                  transition-colors duration-150">
-                            Dota
-                        </a>
+            <a href="/"
+               class="hidden lg:flex items-center gap-1.5 shrink-0
+                      font-extrabold text-xl text-gray-900 dark:text-gray-100
+                      hover:text-indigo-600 dark:hover:text-indigo-400
+                      transition-colors duration-150">Dota</a>
+            <span class="hidden lg:block text-gray-300 dark:text-gray-600 text-lg select-none">/</span>
+            <span class="hidden lg:block text-sm font-medium text-gray-500 dark:text-gray-400 shrink-0">Docs</span>
+            <span class="hidden lg:block text-gray-300 dark:text-gray-600 text-lg select-none">/</span>
+            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate capitalize">
+              ${this.breadcrumb}
+            </span>
+          </div>
 
-                        <span class="hidden lg:block text-gray-300 dark:text-gray-600 text-lg select-none">/</span>
+          <!-- Right: color-picker + theme-picker + dark-mode + github -->
+          <div class="flex items-center gap-1 shrink-0">
 
-                        <span class="hidden lg:block text-sm font-medium text-gray-500 dark:text-gray-400 shrink-0">
-                            Docs
-                        </span>
+            <!-- ── Color picker ── -->
+            <dota-popover placement="bottom-end" offset="8" anchored-selector="color-picker">
+              <dota-icon name="stash:circle-solid" color="${this.color}" size="md" variant="ghost" class="cursor-pointer"></dota-icon>
+            </dota-popover>
 
-                        <span class="hidden lg:block text-gray-300 dark:text-gray-600 text-lg select-none">/</span>
+            <!-- ── Theme picker ── -->
+            <dota-popover placement="bottom-end" offset="8" anchored-selector="theme-picker">
+              <dota-icon name="material-icon-theme:code-climate" color="${this.color}" size="md" variant="ghost" class="cursor-pointer"></dota-icon>
+            </dota-popover>
 
-                        <span class="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate capitalize">
-                            ${this.breadcrumb}
-                        </span>
-                    </div>
-
-                    <!-- Right: theme picker popover + dark toggle + github -->
-                    <div class="flex items-center gap-1.5 shrink-0">
-
-                        <!-- Theme picker popover -->
-                        <dota-popover placement="bottom" offset="20" anchored-selector="theme-picker" class="cursor-pointer active:scale-95">
-                            <dota-icon name="material-symbols-light:circles-rounded" color="${this.theme}" variant="ghost" size="md"></dota-icon>
-                        </dota-popover>
-                        <dark-mode-button color="${this.theme}"></dark-mode-button>
-                        <github-button></github-button>
-                    </div>
-                </div>
-            </header>
-        `;
+            <dark-mode-button color="${this.color}"></dark-mode-button>
+            <github-button></github-button>
+          </div>
+        </div>
+      </header>
+    `;
   }
 }
 
