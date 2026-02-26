@@ -8,7 +8,7 @@ import {
   DocumentListener,
   HostListener
 } from "@ayu-sh-kr/dota-core";
-import { OnEvent } from "@ayu-sh-kr/dota-event";
+import {OnEvent} from "@ayu-sh-kr/dota-event";
 
 
 /**
@@ -64,6 +64,9 @@ class PopoverComponent extends BaseElement {
 
   anchoredEL: HTMLElement | null = null
 
+  /** Cleanup function returned by autoUpdate — must be called on disconnect. */
+  private _cleanupAutoUpdate: (() => void) | null = null
+
   /**
    * Content of the trigger element
    */
@@ -81,31 +84,54 @@ class PopoverComponent extends BaseElement {
 
   @OnEvent('connected', true)
   onConnected() {
-    if (!this.anchoredEL) {
-      this.anchoredEL = document.createElement(this.anchoredSelector) as HTMLElement
-      this.anchoredEL.style.position = 'absolute'
-      this.anchoredEL.style.display = 'none'
-      document.body.appendChild(this.anchoredEL)
+    // Stop any previous autoUpdate loop before (re-)initialising.
+    if (this._cleanupAutoUpdate) {
+      this._cleanupAutoUpdate();
+      this._cleanupAutoUpdate = null;
     }
 
-    autoUpdate(this, this.anchoredEL, () => {
+    // Locate or create the anchored element exactly once.
+    if (!this.anchoredEL) {
+      const existing = document.querySelector<HTMLElement>(this.anchoredSelector);
+      if (existing) {
+        this.anchoredEL = existing;
+      } else {
+        this.anchoredEL = document.createElement(this.anchoredSelector) as HTMLElement;
+        this.anchoredEL.style.position = 'absolute';
+        this.anchoredEL.style.display  = 'none';
+        document.body.appendChild(this.anchoredEL);
+      }
+    }
+
+    // Guard: floating-ui requires both elements to be in the DOM.
+    if (!this.anchoredEL) return;
+
+    this._cleanupAutoUpdate = autoUpdate(this, this.anchoredEL, () => {
+      // Both elements must still be in the DOM when the callback fires.
+      if (!this.isConnected || !this.anchoredEL?.isConnected) return;
+
       computePosition(this, this.anchoredEL!, {
         placement: this.placement,
         middleware: [offset(this.offset), flip(), shift()]
       }).then(({x, y}) => {
-        Object.assign(this.anchoredEL!.style, {
+        if (!this.anchoredEL) return;
+        Object.assign(this.anchoredEL.style, {
           left: `${x}px`,
-          top: `${y}px`
-        })
-      })
-    })
+          top:  `${y}px`,
+        });
+      });
+    });
   }
 
   @OnEvent('disconnected', true)
   onDisconnected() {
+    if (this._cleanupAutoUpdate) {
+      this._cleanupAutoUpdate();
+      this._cleanupAutoUpdate = null;
+    }
     if (this.anchoredEL) {
-      this.anchoredEL.remove()
-      this.anchoredEL = null
+      this.anchoredEL.remove();
+      this.anchoredEL = null;
     }
   }
 
@@ -143,6 +169,7 @@ class PopoverComponent extends BaseElement {
       this.anchoredEL.style.display = 'block';
     }
   }
+
 
   render(): string {
     return `
