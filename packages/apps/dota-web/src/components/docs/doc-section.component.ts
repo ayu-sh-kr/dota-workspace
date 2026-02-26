@@ -1,5 +1,6 @@
 import {BaseElement, Component} from "@ayu-sh-kr/dota-core";
-import type {MarkdownTheme} from "@dota/configs/markdown.config.ts";
+import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
+import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
 
 /**
  * DocSectionComponent
@@ -22,14 +23,28 @@ import type {MarkdownTheme} from "@dota/configs/markdown.config.ts";
 })
 export class DocSectionComponent extends BaseElement {
 
-  /** Active markdown theme — shared between header picker and content renderer. */
-  private currentTheme: MarkdownTheme = 'purple';
+  private currentTheme: ThemeName = 'flat';
+  private currentColor: ColorName = 'indigo';
 
   constructor() {
     super();
   }
 
-  // ── helpers ───────────────────────────────────────────────────────────────
+  @OnEvent('docs:theme-change')
+  onThemeChange(event: ApplicationEvent<'docs:theme-change'>) {
+    const t = event?.data?.theme;
+    if (t) { this.currentTheme = t as ThemeName; }
+    // Do NOT call updateHTML() — re-rendering doc-section destroys the
+    // <dota-popover> elements and causes duplicate anchoredEL creation.
+    // doc-content and doc-toc listen to the event directly and update themselves.
+  }
+
+  @OnEvent('docs:color-change')
+  onColorChange(event: ApplicationEvent<'docs:color-change'>) {
+    const c = event?.data?.color;
+    if (c) { this.currentColor = c as ColorName; }
+    // Same — no updateHTML() here.
+  }
 
   /** Active file name derived from the ?content= query param. */
   private get activeFile(): string {
@@ -41,26 +56,30 @@ export class DocSectionComponent extends BaseElement {
   render(): string {
     //language=HTML
     return `
-            <section class="mx-auto md:max-w-7xl w-full">
-              <!-- Doc-specific header (replaces app-header on this page) -->
-              <doc-header
-                active-file="${this.activeFile}"
-                theme="${this.currentTheme}">
-              </doc-header>
+      <section class="mx-auto md:max-w-7xl w-full">
+        <doc-header
+          active-file="${this.activeFile}"
+          theme="${this.currentTheme}"
+          color="${this.currentColor}">
+        </doc-header>
 
-              <div class="min-h-[calc(100vh-3.5rem)] font-dm bg-white dark:bg-gray-950">
-                <div class="flex max-w-screen-2xl mx-auto min-h-[calc(100vh-3.5rem)]">
-                  <doc-sidebar></doc-sidebar>
-                  <main class="flex-1 min-w-0 overflow-auto">
-                    <doc-content
-                      theme="${this.currentTheme}"
-                      max-width="max-w-4xl">
-                    </doc-content>
-                  </main>
-                  <doc-toc theme="${this.currentTheme}"></doc-toc>
-                </div>
-              </div>
-            </section>
-        `;
+        <div class="min-h-[calc(100vh-3.5rem)] font-dm bg-white dark:bg-gray-950">
+          <div class="flex max-w-screen-2xl mx-auto min-h-[calc(100vh-3.5rem)]">
+            <doc-sidebar></doc-sidebar>
+            <main class="flex-1 min-w-0 overflow-auto">
+              <doc-content
+                theme="${this.currentTheme}"
+                color="${this.currentColor}"
+                max-width="max-w-4xl">
+              </doc-content>
+            </main>
+            <doc-toc
+              theme="${this.currentTheme}"
+              color="${this.currentColor}">
+            </doc-toc>
+          </div>
+        </div>
+      </section>
+    `;
   }
 }
