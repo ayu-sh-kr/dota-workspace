@@ -2,8 +2,8 @@ import {AfterInit, ApplicationEventService, BaseElement, Component, Param, Prope
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {WithLoading} from "@dota/utils/DecoratorUtils.ts";
 import {MarkdownService} from "@dota/service/markdown.service.ts";
-import type {MarkdownTheme} from "@dota/configs/markdown.config.ts";
 import {type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-event";
+import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
 
 @Component({
   selector: 'doc-content',
@@ -14,11 +14,12 @@ export class DocContentComponent extends BaseElement {
   @Param('content')
   filePath: string = 'Getting-Started.md';
 
-  /** Theme passed straight through to <markdown-view>. Default: 'purple'. */
   @Property({name: 'theme', type: String})
-  theme: MarkdownTheme = 'purple';
+  theme: ThemeName = 'flat';
 
-  /** max-width passed straight through to <markdown-view>. Default: 'max-w-4xl'. */
+  @Property({name: 'color', type: String})
+  color: ColorName = 'indigo';
+
   @Property({name: 'max-width', type: String})
   maxWidth: string = 'max-w-4xl';
 
@@ -32,26 +33,20 @@ export class DocContentComponent extends BaseElement {
     this.docLoaderService = new DocLoaderService();
   }
 
-  /** Scroll to hash anchor in the URL, or to top if none. */
   private scrollToAnchor() {
     const hash = window.location.hash;
     if (hash) {
-      const id = hash.slice(1); // strip leading '#'
-      // Use rAF to let the DOM settle after renderMarkdown
+      const id = hash.slice(1);
       requestAnimationFrame(() => {
         const el = document.getElementById(id);
-        if (el) {
-          el.scrollIntoView({behavior: 'smooth', block: 'start'});
-        } else {
-          window.scrollTo({top: 0, behavior: 'smooth'});
-        }
+        if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+        else     window.scrollTo({top: 0, behavior: 'smooth'});
       });
     } else {
       window.scrollTo({top: 0, behavior: 'smooth'});
     }
   }
 
-  /** Re-scroll when the URL hash changes (e.g. TOC click updates the hash). */
   @WindowListener({event: 'hashchange'})
   onHashChange() {
     const hash = window.location.hash;
@@ -68,7 +63,6 @@ export class DocContentComponent extends BaseElement {
     const raw = await this.docLoaderService.loadDoc(path);
     const result = MarkdownService.renderMarkdownWithToc(raw);
     this.content = result.html;
-    // Notify the TOC component about the new headings
     ApplicationEventService.getInstance()
       .getPublisher()
       .publishAsync({ name: 'docs:toc-update', data: { toc: result.toc } });
@@ -76,19 +70,23 @@ export class DocContentComponent extends BaseElement {
   }
 
   @OnEvent('docs:theme-change')
-  onThemeChaneg(event: ApplicationEvent<'docs:theme-change'>) {
-    const data = event.data;
-    if (data && data.theme) {
-      this.theme = data.theme;
-    }
+  onThemeChange(event: ApplicationEvent<'docs:theme-change'>) {
+    const t = event?.data?.theme;
+    if (t) this.theme = t as ThemeName;
+  }
+
+  @OnEvent('docs:color-change')
+  onColorChange(event: ApplicationEvent<'docs:color-change'>) {
+    const c = event?.data?.color;
+    if (c) this.color = c as ColorName;
   }
 
   render(): string {
-    const theme    = this.theme    ?? 'purple';
-    const maxWidth = this.maxWidth ?? 'max-w-4xl';
-    // language=html
     return `
-      <markdown-view theme="${theme}" max-width="${maxWidth}">
+      <markdown-view
+        theme="${this.theme}"
+        color="${this.color}"
+        max-width="${this.maxWidth ?? 'max-w-4xl'}">
         ${this.content}
       </markdown-view>
     `;
