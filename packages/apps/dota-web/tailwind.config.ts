@@ -2,7 +2,12 @@ import { Config } from "tailwindcss";
 
 export default <Partial<Config>>{
   darkMode: "class",
-  content: ["./src/**/*.{ts, js, html}", "./node_modules/@ayu-sh-kr/dota-ui/**/*.{html,ts}"],
+  content: [
+    "./src/**/*.{ts,js,html}",
+    "./node_modules/@ayu-sh-kr/dota-ui/**/*.{html,ts}",
+    "./node_modules/@ayu-sh-kr/dota-md/dist/**/*.{mjs,js}",
+    "../../packages/ui/dota-md/src/**/*.ts",
+  ],
   theme: {
     extend: {
       backgroundImage: {
