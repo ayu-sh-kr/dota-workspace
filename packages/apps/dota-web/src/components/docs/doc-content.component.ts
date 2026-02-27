@@ -1,9 +1,7 @@
-import {AfterInit, ApplicationEventService, BaseElement, Component, Param, Property, State, String, WindowListener} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, Param, Property, String, WindowListener} from "@ayu-sh-kr/dota-core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {WithLoading} from "@dota/utils/DecoratorUtils.ts";
-import {MarkdownService} from "@dota/service/markdown.service.ts";
-import {type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-event";
-import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
+import {MDService} from "@ayu-sh-kr/dota-md";
 
 @Component({
   selector: 'doc-content',
@@ -14,19 +12,10 @@ export class DocContentComponent extends BaseElement {
   @Param('content')
   filePath: string = 'Getting-Started.md';
 
-  @Property({name: 'theme', type: String})
-  theme: ThemeName = 'flat';
-
-  @Property({name: 'color', type: String})
-  color: ColorName = 'indigo';
-
   @Property({name: 'max-width', type: String})
   maxWidth: string = 'max-w-4xl';
 
-  docLoaderService: DocLoaderService;
-
-  @State()
-  content: string = '';
+  private docLoaderService: DocLoaderService;
 
   constructor() {
     super();
@@ -36,14 +25,10 @@ export class DocContentComponent extends BaseElement {
   /** Height of the sticky header in px — matches `h-14` (3.5 rem = 56 px) + a small buffer. */
   private static readonly HEADER_HEIGHT = 64;
 
-  /**
-   * Scroll an element into view so it appears just below the sticky header,
-   * with an extra 8 px breathing room so the heading is never clipped.
-   */
   private static scrollBelowHeader(el: HTMLElement): void {
     const top = el.getBoundingClientRect().top + window.scrollY
       - DocContentComponent.HEADER_HEIGHT - 8;
-    window.scrollTo({top, behavior: 'smooth'});
+    window.scrollTo({ top, behavior: 'smooth' });
   }
 
   private scrollToAnchor() {
@@ -53,14 +38,14 @@ export class DocContentComponent extends BaseElement {
       requestAnimationFrame(() => {
         const el = document.getElementById(id);
         if (el) DocContentComponent.scrollBelowHeader(el);
-        else    window.scrollTo({top: 0, behavior: 'smooth'});
+        else    window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     } else {
-      window.scrollTo({top: 0, behavior: 'smooth'});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  @WindowListener({event: 'hashchange'})
+  @WindowListener({ event: 'hashchange' })
   onHashChange() {
     const hash = window.location.hash;
     if (hash) {
@@ -69,40 +54,23 @@ export class DocContentComponent extends BaseElement {
     }
   }
 
+  /**
+   * Load the markdown file, render via MDService and publish as md:render.
+   * <md-view> listens to md:render / md:theme-change / md:color-change directly
+   * and manages its own content + styling — doc-content never needs to track
+   * or forward theme/color.
+   */
   @AfterInit()
   @WithLoading()
   async afterViewInit() {
     const path = (this.filePath ?? 'Getting-Started.md').replace('/', '');
-    const raw = await this.docLoaderService.loadDoc(path);
-    const result = MarkdownService.renderMarkdownWithToc(raw);
-    this.content = result.html;
-    ApplicationEventService.getInstance()
-      .getPublisher()
-      .publishAsync({ name: 'docs:toc-update', data: { toc: result.toc } });
+    const raw  = await this.docLoaderService.loadDoc(path);
+    MDService.render(raw, { publish: true });
     this.scrollToAnchor();
   }
 
-  @OnEvent('docs:theme-change')
-  onThemeChange(event: ApplicationEvent<'docs:theme-change'>) {
-    const t = event?.data?.theme;
-    if (t) this.theme = t as ThemeName;
-  }
-
-  @OnEvent('docs:color-change')
-  onColorChange(event: ApplicationEvent<'docs:color-change'>) {
-    const c = event?.data?.color;
-    if (c) this.color = c as ColorName;
-  }
-
   render(): string {
-    return `
-      <markdown-view
-        theme="${this.theme}"
-        color="${this.color}"
-        max-width="${this.maxWidth ?? 'max-w-4xl'}">
-        ${this.content}
-      </markdown-view>
-    `;
+    return `<md-view></md-view>`;
   }
 
 }
