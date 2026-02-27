@@ -1,16 +1,10 @@
 import {BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-core";
 import {
-  applyMarkdownTheme,
-  flatMarkdownTheme,
+  THEMES,
   materialMarkdownTheme,
+  applyMarkdownTheme,
   type ColorName,
 } from "@ayu-sh-kr/dota-md";
-
-
-const THEMES = {
-  flat:     flatMarkdownTheme,
-  material: materialMarkdownTheme,
-} as const;
 
 type ThemeName = keyof typeof THEMES;
 
@@ -71,8 +65,9 @@ export class MarkdownViewComponent extends BaseElement {
             <div class="${maxWidth} mx-auto w-full
                          px-3 sm:px-5 lg:px-8
                          py-4 sm:py-6 lg:py-8
-                         font-sans antialiased text-sm sm:text-base leading-6 sm:leading-7
-                         ${selection}">
+                         antialiased text-sm sm:text-base leading-6 sm:leading-7
+                         ${selection}"
+                 style="font-family: ${theme.fontFamily}">
                 ${themed}
             </div>
         `;
