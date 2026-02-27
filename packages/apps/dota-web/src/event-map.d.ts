@@ -1,5 +1,4 @@
 import type { SoftNotification } from '@dota/components/utils/notification/notification.service.ts';
-import type { TocEntry } from '@dota/service/markdown.service.ts';
 
 declare module "@ayu-sh-kr/dota-event" {
   interface ApplicationEventMap {
@@ -12,7 +11,6 @@ declare module "@ayu-sh-kr/dota-event" {
     "docs:theme-change": { theme: string };
     /** Fired when the user picks a different color (indigo / teal / rose …). */
     "docs:color-change": { color: string };
-    "docs:toc-update": { toc: TocEntry[] };
   }
 }
 
