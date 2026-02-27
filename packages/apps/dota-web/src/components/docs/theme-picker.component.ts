@@ -10,6 +10,7 @@ const THEME_DESC: Record<ThemeName, string> = {
   flat:     'Clean, minimal typography',
   material: 'Google Material 3 inspired',
   apple:    'SF Pro · Cupertino design language',
+  github:   'GitHub Docs style',
 };
 
 @Component({
