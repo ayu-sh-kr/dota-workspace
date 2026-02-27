@@ -33,14 +33,27 @@ export class DocContentComponent extends BaseElement {
     this.docLoaderService = new DocLoaderService();
   }
 
+  /** Height of the sticky header in px — matches `h-14` (3.5 rem = 56 px) + a small buffer. */
+  private static readonly HEADER_HEIGHT = 64;
+
+  /**
+   * Scroll an element into view so it appears just below the sticky header,
+   * with an extra 8 px breathing room so the heading is never clipped.
+   */
+  private static scrollBelowHeader(el: HTMLElement): void {
+    const top = el.getBoundingClientRect().top + window.scrollY
+      - DocContentComponent.HEADER_HEIGHT - 8;
+    window.scrollTo({top, behavior: 'smooth'});
+  }
+
   private scrollToAnchor() {
     const hash = window.location.hash;
     if (hash) {
       const id = hash.slice(1);
       requestAnimationFrame(() => {
         const el = document.getElementById(id);
-        if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
-        else     window.scrollTo({top: 0, behavior: 'smooth'});
+        if (el) DocContentComponent.scrollBelowHeader(el);
+        else    window.scrollTo({top: 0, behavior: 'smooth'});
       });
     } else {
       window.scrollTo({top: 0, behavior: 'smooth'});
@@ -52,7 +65,7 @@ export class DocContentComponent extends BaseElement {
     const hash = window.location.hash;
     if (hash) {
       const el = document.getElementById(hash.slice(1));
-      if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      if (el) DocContentComponent.scrollBelowHeader(el);
     }
   }
 
