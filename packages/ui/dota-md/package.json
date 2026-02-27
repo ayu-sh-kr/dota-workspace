@@ -42,6 +42,7 @@
     "release": "pnpm run build && changeset publish"
   },
   "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4"
@@ -49,6 +50,9 @@
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
-    "@floating-ui/dom": "^1.7.5"
+    "markdown-it": "latest",
+    "markdown-it-anchor": "^9.2.0",
+    "markdown-it-highlightjs": "^4.2.0",
+    "markdown-it-toc-done-right": "^4.2.0"
   }
 }
