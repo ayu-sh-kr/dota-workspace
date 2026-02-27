@@ -48,8 +48,15 @@ export class DocHeaderComponent extends BaseElement {
     const savedColor = LocalStorageService.get('docs-color') as ColorName | null;
     this.theme = savedTheme ?? 'flat';
     this.color = savedColor ?? 'indigo';
-    this._publishTheme(this.theme);
-    this._publishColor(this.color);
+    // Publish docs: immediately so doc-section / doc-header siblings sync up.
+    this._publishDocsTheme(this.theme);
+    this._publishDocsColor(this.color);
+    // Defer md: events by one animation frame so md-view and md-toc are
+    // fully connected before receiving the initial theme/color.
+    requestAnimationFrame(() => {
+      this._publishMdTheme(this.theme);
+      this._publishMdColor(this.color);
+    });
   }
 
   @OnEvent('docs:theme-change')
@@ -75,14 +82,24 @@ export class DocHeaderComponent extends BaseElement {
     window.dispatchEvent(new CustomEvent('doc:sidebar-toggle'));
   }
 
-  private _publishColor(color: ColorName) {
+  private _publishDocsColor(color: ColorName) {
     ApplicationEventService.getInstance().getPublisher()
       .publishAsync({ name: 'docs:color-change', data: { color } });
   }
 
-  private _publishTheme(theme: ThemeName) {
+  private _publishMdColor(color: ColorName) {
+    ApplicationEventService.getInstance().getPublisher()
+      .publishAsync({ name: 'md:color-change', data: { color } });
+  }
+
+  private _publishDocsTheme(theme: ThemeName) {
     ApplicationEventService.getInstance().getPublisher()
       .publishAsync({ name: 'docs:theme-change', data: { theme } });
+  }
+
+  private _publishMdTheme(theme: ThemeName) {
+    ApplicationEventService.getInstance().getPublisher()
+      .publishAsync({ name: 'md:theme-change', data: { theme } });
   }
 
   private get breadcrumb(): string {
@@ -90,7 +107,6 @@ export class DocHeaderComponent extends BaseElement {
   }
 
   render(): string {
-    const activeBg = COLOR_BG[this.color] ?? 'bg-indigo-500';
 
     return HTML`
       <header class="sticky top-0 z-40 w-full
