@@ -1,7 +1,7 @@
 import {AfterInit, BaseElement, Component, Param, Property, String} from "@ayu-sh-kr/dota-core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {MarkdownService} from "@dota/service/markdown.service.ts";
-import type {MarkdownTheme} from "@dota/configs/markdown.config.ts";
+import {type ColorName} from "@ayu-sh-kr/dota-md";
 
 @Component({
   selector: "blog-view",
@@ -13,7 +13,7 @@ export class BlogViewComponent extends BaseElement {
 
   /** Theme passed through to <markdown-view>. Default: 'purple'. */
   @Property({name: 'theme', type: String})
-  theme: MarkdownTheme = 'purple';
+  theme: ColorName = 'purple';
 
   /** max-width passed through to <markdown-view>. Default: 'max-w-3xl'. */
   @Property({name: 'max-width', type: String})
