@@ -4,9 +4,8 @@ import {
   materialMarkdownTheme,
   applyMarkdownTheme,
   type ColorName,
+  type ThemeName,
 } from "@ayu-sh-kr/dota-md";
-
-type ThemeName = keyof typeof THEMES;
 
 /**
  * MarkdownViewComponent — renders pre-converted HTML from MarkdownService
@@ -62,7 +61,7 @@ export class MarkdownViewComponent extends BaseElement {
 
     // Wrapper: selection utility sits here so Tailwind picks it up at build time
     return HTML`
-            <div class="${maxWidth} mx-auto w-full
+            <div class="w-full
                          px-3 sm:px-5 lg:px-8
                          py-4 sm:py-6 lg:py-8
                          antialiased text-sm sm:text-base leading-6 sm:leading-7
