@@ -25,7 +25,6 @@ export class MdViewComponent extends BaseElement {
     const data = event.data;
     if (data.theme) {
       this.theme = data.theme as ThemeName;
-      this.updateHTML();
       return;
     }
     console.warn('[MdViewComponent] Received md:theme-change event without theme data.');
@@ -36,7 +35,6 @@ export class MdViewComponent extends BaseElement {
     const data = event.data;
     if (data.color) {
       this.color = data.color as ColorName;
-      this.updateHTML();
       return;
     }
     console.warn('[MdViewComponent] Received md:color-change event without color data.');
