@@ -112,23 +112,45 @@ export class DocTocComponent extends BaseElement {
   }
 
   /**
+   * Sticky header height in px — must match the `h-14` value (3.5 rem = 56 px)
+   * plus a small buffer so calculations stay consistent with doc-content scrolling.
+   */
+  private static readonly HEADER_HEIGHT = 64;
+
+  /**
+   * Scroll a heading element into view below the sticky header (same logic as
+   * doc-content so both TOC clicks and hash-links land identically).
+   */
+  private static scrollBelowHeader(el: HTMLElement): void {
+    const top = el.getBoundingClientRect().top + window.scrollY
+      - DocTocComponent.HEADER_HEIGHT - 8;
+    window.scrollTo({top, behavior: 'smooth'});
+  }
+
+  /**
    * Listens to window scroll events and dynamically highlights the active heading.
-   * Walks through all heading IDs top-to-bottom; the last heading whose top edge
-   * is at or above the 64px header offset becomes the active one. This accounts
-   * for the sticky header height so the highlight switches exactly when a heading
-   * passes under the header. Updates the active ID and re-renders only if changed.
+   *
+   * A heading is considered "active" when its top edge has entered the viewport
+   * below the sticky header — i.e. its `getBoundingClientRect().top` is ≤
+   * `HEADER_HEIGHT + ACTIVATION_ZONE`. We walk all headings top-to-bottom and
+   * keep the last one that satisfies this condition, so the highlight always
+   * follows the heading that is currently at the top of the readable area, not
+   * the one that has already scrolled *behind* the header.
    */
   @WindowListener({event: 'scroll'})
   onScroll() {
     const ids = this.flatIds(this.toc);
     if (!ids.length) return;
 
-    // Walk headings top-to-bottom; last one whose top is ≤ header height wins
-    const HEADER_OFFSET = 64; // px — matches sticky header h-16 (top-14 = 3.5rem = 56px + buffer)
+    // A heading becomes active as soon as it is in the top portion of the
+    // visible content area (below the sticky header). ACTIVATION_ZONE gives
+    // a generous window so the highlight switches the moment the heading is
+    // clearly readable, rather than only after it has scrolled past the header.
+    const THRESHOLD = DocTocComponent.HEADER_HEIGHT + 120; // px
     let current = ids[0];
     for (const id of ids) {
       const el = document.getElementById(id);
-      if (el && el.getBoundingClientRect().top <= HEADER_OFFSET) {
+      if (el && el.getBoundingClientRect().top <= THRESHOLD) {
         current = id;
       }
     }
@@ -156,7 +178,7 @@ export class DocTocComponent extends BaseElement {
     if (!id) return;
     const target = document.getElementById(id);
     if (target) {
-      target.scrollIntoView({behavior: 'smooth', block: 'start'});
+      DocTocComponent.scrollBelowHeader(target);
       this.activeId = id;
       this.updateHTML();
     }
