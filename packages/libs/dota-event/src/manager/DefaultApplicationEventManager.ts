@@ -1,4 +1,4 @@
-import {ApplicationEventCallback, ApplicationEventManager} from "@dota/Types.ts";
+import {ApplicationEventCallback, ApplicationEventManager, KnownEventKey} from "@dota/Types.ts";
 
 /**
  * Default implementation of ApplicationEventManager that maintains event-to-callback mappings.
@@ -12,14 +12,31 @@ export class DefaultApplicationEventManager implements ApplicationEventManager {
   private store: Map<string, Set<ApplicationEventCallback>> = new Map();
 
   /**
-   * Registers a callback for a specific event name.
-   * Creates a new Set for the event if it doesn't exist in the store.
-   * Uses Set collection to automatically prevent duplicate callback registrations.
-   * Multiple different callbacks can be registered for the same event.
-   * @param event - The event name to associate the callback with
-   * @param callback - The callback function to register
+   * Registers a strongly-typed callback for a known event.
+   *
+   * Resolved when `event` is a literal key of {@link ApplicationEventMap}.
+   * The `callback` parameter is narrowed so that `event.data` inside the
+   * handler carries the exact payload type declared for that event.
+   *
+   * @param event    - A key of {@link ApplicationEventMap}.
+   * @param callback - Handler whose `event.data` is typed to the mapped payload.
    */
-  add(event: string, callback: ApplicationEventCallback): void {
+  add<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K>): void;
+
+  /**
+   * Registers a loosely-typed callback for any arbitrary event name.
+   *
+   * Fallback overload for events not registered in {@link ApplicationEventMap}.
+   * The callback receives `event.data` as `any`, preserving the original
+   * behaviour for untyped events.
+   *
+   * @param event    - Any string event name.
+   * @param callback - Handler that receives the event with `data` typed as `any`.
+   */
+  add(event: string, callback: ApplicationEventCallback): void;
+
+  /** @internal Implementation — TypeScript overloads above are the public API. */
+  add(event: any, callback: any): void {
     if (!this.store.has(event)) {
       this.store.set(event, new Set());
     }
@@ -28,14 +45,30 @@ export class DefaultApplicationEventManager implements ApplicationEventManager {
   }
 
   /**
-   * Removes callbacks associated with an event name.
-   * If callback is null, removes the entire event and all its callbacks.
-   * If callback is provided, removes only that specific callback from the event.
-   * No action is taken if the event doesn't exist when removing specific callbacks.
-   * @param event - The event name to remove callbacks from
-   * @param callback - The specific callback to remove, or null to remove all
+   * Removes a strongly-typed callback previously registered for a known event.
+   *
+   * Passing `null` as `callback` removes **all** handlers registered under
+   * the given event name.  Resolved when `event` is a literal key of
+   * {@link ApplicationEventMap}.
+   *
+   * @param event    - A key of {@link ApplicationEventMap}.
+   * @param callback - The exact callback instance to remove, or `null` to clear all.
    */
-  remove(event: string, callback: ApplicationEventCallback | null): void {
+  remove<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K> | null): void;
+
+  /**
+   * Removes a callback previously registered for an arbitrary event name.
+   *
+   * Fallback overload for events not present in {@link ApplicationEventMap}.
+   * Passing `null` removes all callbacks registered under `event`.
+   *
+   * @param event    - Any string event name.
+   * @param callback - The exact callback instance to remove, or `null` to clear all.
+   */
+  remove(event: string, callback: ApplicationEventCallback | null): void;
+
+  /** @internal Implementation — TypeScript overloads above are the public API. */
+  remove(event: any, callback: any): void {
     if (!callback) {
       this.store.delete(event);
       return;
@@ -47,14 +80,29 @@ export class DefaultApplicationEventManager implements ApplicationEventManager {
   }
 
   /**
-   * Retrieves all registered callbacks for a specific event name.
-   * Returns undefined if the event has no registered callbacks.
-   * The returned Set reference allows direct iteration over callbacks.
-   * Modifications to the returned Set will affect the internal store.
-   * @param event - The event name to retrieve callbacks for
-   * @returns Set of callbacks or undefined if event not found
+   * Returns the set of callbacks registered for a known event.
+   *
+   * Resolved when `event` is a literal key of {@link ApplicationEventMap}.
+   * The returned `Set` is typed to `ApplicationEventCallback<K>`, so iterating
+   * over it gives correctly typed handlers.  Returns `undefined` if nothing
+   * is registered.
+   *
+   * @param event - A key of {@link ApplicationEventMap}.
    */
-  resolve(event: string): Set<ApplicationEventCallback> | undefined {
+  resolve<K extends KnownEventKey>(event: K): Set<ApplicationEventCallback<K>> | undefined;
+
+  /**
+   * Returns the set of callbacks registered for an arbitrary event name.
+   *
+   * Fallback overload for unregistered event names.  The returned `Set` holds
+   * loosely-typed callbacks.  Returns `undefined` if nothing is registered.
+   *
+   * @param event - Any string event name.
+   */
+  resolve(event: string): Set<ApplicationEventCallback> | undefined;
+
+  /** @internal Implementation — TypeScript overloads above are the public API. */
+  resolve(event: any): Set<ApplicationEventCallback> | undefined {
     if (!this.store.has(event)) return;
     return this.store.get(event);
   }

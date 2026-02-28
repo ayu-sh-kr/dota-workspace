@@ -3,7 +3,8 @@ import {
   ApplicationEventBus,
   ApplicationEventCallback,
   ApplicationEventListener,
-  ApplicationEventPublisher
+  ApplicationEventPublisher,
+  KnownEventKey
 } from "@dota/Types.ts";
 
 
@@ -31,38 +32,87 @@ export class EventChannel implements ApplicationEventBus {
   }
 
   /**
-   * Registers an event listener callback for the specified event within this channel's namespace.
-   * Automatically prepends the channel prefix to the event name before registration.
-   * The callback will be invoked when the prefixed event is emitted through this or any channel.
-   * Multiple callbacks can be registered for the same event name within this channel.
-   * @param event - The unprefixed event name to listen for (prefix will be added automatically)
-   * @param callback - The function to execute when the namespaced event is emitted
+   * Subscribes a strongly-typed handler to a known event within this channel's namespace.
+   *
+   * Resolved when `event` is a literal key of {@link ApplicationEventMap}.
+   * The channel prefix is prepended to the event name before registration, so
+   * `'ready'` becomes `'<prefix>:ready'` in the underlying listener.
+   *
+   * @param event    - A key of {@link ApplicationEventMap} (without the channel prefix).
+   * @param callback - Handler whose `event.data` is typed to the mapped payload.
    */
-  on(event: string, callback: ApplicationEventCallback): void {
-    this.eventListener.on(`${this.prefix}:${event}`, callback);
+  on<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K>): Promise<void>;
+
+  /**
+   * Subscribes a loosely-typed handler to any event name within this channel's namespace.
+   *
+   * Fallback for event names not registered in {@link ApplicationEventMap}.
+   * The channel prefix is prepended automatically; `event.data` is `any`.
+   *
+   * @param event    - Any string event name (without the channel prefix).
+   * @param callback - Handler that receives the event with `data` typed as `any`.
+   */
+  on(event: string, callback: ApplicationEventCallback): Promise<void>;
+
+  /** @internal Implementation — TypeScript overloads above are the public API. */
+  async on(event: any, callback: any): Promise<void> {
+    await this.eventListener.on(`${this.prefix}:${event}`, callback);
   }
 
   /**
-   * Unregisters an event listener callback for the specified event within this channel's namespace.
-   * Guards against null callbacks by returning early without attempting removal.
-   * Automatically prepends the channel prefix to the event name before unregistration.
-   * Only removes the specific callback provided; other callbacks for the same event remain active.
-   * @param event - The unprefixed event name to stop listening for (prefix will be added automatically)
-   * @param callback - The specific callback to remove, or null to silently skip removal
+   * Unsubscribes a strongly-typed handler from a known event within this channel's namespace.
+   *
+   * Resolved when `event` is a literal key of {@link ApplicationEventMap}.
+   * Passing `null` as `callback` is silently ignored — use the underlying
+   * listener directly if a full clear is needed.
+   *
+   * @param event    - A key of {@link ApplicationEventMap} (without the channel prefix).
+   * @param callback - The exact callback instance to remove, or `null` to skip removal.
    */
-  off(event: string, callback: ApplicationEventCallback | null): void {
+  off<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K> | null): Promise<void>;
+
+  /**
+   * Unsubscribes a handler from any event name within this channel's namespace.
+   *
+   * Fallback for events not registered in {@link ApplicationEventMap}.
+   * Passing `null` as `callback` is silently ignored.
+   *
+   * @param event    - Any string event name (without the channel prefix).
+   * @param callback - The exact callback instance to remove, or `null` to skip removal.
+   */
+  off(event: string, callback: ApplicationEventCallback | null): Promise<void>;
+
+  /** @internal Implementation — TypeScript overloads above are the public API. */
+  async off(event: any, callback: any): Promise<void> {
     if (callback == null) return;
-    this.eventListener.off(`${this.prefix}:${event}`, callback);
+    await this.eventListener.off(`${this.prefix}:${event}`, callback);
   }
 
   /**
-   * Emits an event through this channel's namespace by publishing it with the prefixed name.
-   * Creates a new event object with all original properties but replaces the name with the prefixed version.
-   * All listeners registered for the prefixed event name will receive the event, regardless of channel.
-   * Delegates the actual publication to the underlying event publisher instance.
-   * @param event - The application event to emit with the channel prefix applied to its name
+   * Emits a strongly-typed event through this channel's namespace.
+   *
+   * Resolved when the `event` object's `name` is a literal key of
+   * {@link ApplicationEventMap}.  The channel prefix is prepended to the name
+   * before publishing, and the compiler enforces that `data` matches the
+   * declared payload shape.
+   *
+   * @param event - A fully typed event object whose `data` matches the mapped payload.
    */
-  emit(event: ApplicationEvent): void {
+  emit<K extends KnownEventKey>(event: ApplicationEvent<K>): Promise<void>;
+
+  /**
+   * Emits a loosely-typed event through this channel's namespace.
+   *
+   * Fallback for events not registered in {@link ApplicationEventMap}.
+   * The channel prefix is prepended to the event name before publishing.
+   * All listeners registered for the prefixed name will receive the event.
+   *
+   * @param event - An event object with an arbitrary name and optional `data`.
+   */
+  emit(event: ApplicationEvent): Promise<void>;
+
+  /** @internal Implementation — TypeScript overloads above are the public API. */
+  async emit(event: any): Promise<void> {
     this.eventPublisher.publish({
       ...event,
       name: `${this.prefix}:${event.name}`

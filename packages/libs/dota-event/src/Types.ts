@@ -28,7 +28,7 @@ export type ApplicationEventMetadata = {
 export interface ApplicationEventMap {}
 
 /** Union of every key registered in {@link ApplicationEventMap}. */
-type KnownEventKey = keyof ApplicationEventMap
+export type KnownEventKey = keyof ApplicationEventMap
 
 /** Catch-all type that represents any event name not registered in the map. */
 type AnyEventKey = string
@@ -48,7 +48,7 @@ export type EventKey = KnownEventKey | AnyEventKey
  *   **optional**, preserving the original loosely-typed behaviour.
  */
 export type ApplicationEvent<Name extends EventKey = AnyEventKey> =
-  Name extends KnownEventKey
+  [Name] extends [KnownEventKey]
     ? { name: Name; data: ApplicationEventMap[Name] }
     : { name: Name; data?: any }
 
@@ -173,7 +173,7 @@ export interface ApplicationEventBus {
    * @param event    - A key of {@link ApplicationEventMap}.
    * @param callback - Handler whose `event.data` is typed to the mapped payload.
    */
-  on<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K>): void;
+  on<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K>): Promise<void>;
 
   /**
    * Subscribes a loosely-typed handler to any event name.
@@ -185,7 +185,7 @@ export interface ApplicationEventBus {
    * @param event    - Any string event name.
    * @param callback - Handler that receives the event with `data` typed as `any`.
    */
-  on(event: string, callback: ApplicationEventCallback): void;
+  on(event: string, callback: ApplicationEventCallback): Promise<void>;
 
   /**
    * Unsubscribes a strongly-typed handler from a known event.
@@ -196,7 +196,7 @@ export interface ApplicationEventBus {
    * @param event    - A key of {@link ApplicationEventMap}.
    * @param callback - The exact callback instance to remove, or `null` to clear all.
    */
-  off<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K> | null): void;
+  off<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K> | null): Promise<void>;
 
   /**
    * Unsubscribes a handler from any event name.
@@ -207,7 +207,7 @@ export interface ApplicationEventBus {
    * @param event    - Any string event name.
    * @param callback - The exact callback instance to remove, or `null` to clear all.
    */
-  off(event: string, callback: ApplicationEventCallback | null): void;
+  off(event: string, callback: ApplicationEventCallback | null): Promise<void>;
 
   /**
    * Emits a strongly-typed event to all registered handlers.
@@ -218,7 +218,7 @@ export interface ApplicationEventBus {
    *
    * @param event - A fully typed event object whose `data` matches the mapped payload.
    */
-  emit<K extends KnownEventKey>(event: ApplicationEvent<K>): void;
+  emit<K extends KnownEventKey>(event: ApplicationEvent<K>): Promise<void>;
 
   /**
    * Emits a loosely-typed event to all registered handlers.
@@ -228,7 +228,7 @@ export interface ApplicationEventBus {
    *
    * @param event - An event object with an arbitrary name and optional `data`.
    */
-  emit(event: ApplicationEvent): void;
+  emit(event: ApplicationEvent): Promise<void>;
 }
 
 /**
@@ -251,7 +251,7 @@ export interface ApplicationEventListener {
    * @param event    - A key of {@link ApplicationEventMap}.
    * @param callback - Handler whose `event.data` is typed to the mapped payload.
    */
-  on<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K>): void;
+  on<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K>): Promise<void>;
 
   /**
    * Registers a loosely-typed handler for any event name.
@@ -263,7 +263,7 @@ export interface ApplicationEventListener {
    * @param event    - Any string event name.
    * @param callback - Handler that receives the event with `data` typed as `any`.
    */
-  on(event: string, callback: ApplicationEventCallback): void;
+  on(event: string, callback: ApplicationEventCallback): Promise<void>;
 
   /**
    * Removes a strongly-typed handler from a known event.
@@ -275,7 +275,7 @@ export interface ApplicationEventListener {
    * @param event    - A key of {@link ApplicationEventMap}.
    * @param callback - The exact callback instance to remove.
    */
-  off<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K>): void;
+  off<K extends KnownEventKey>(event: K, callback: ApplicationEventCallback<K>): Promise<void>;
 
   /**
    * Removes a handler from any event name.
@@ -286,7 +286,7 @@ export interface ApplicationEventListener {
    * @param event    - Any string event name.
    * @param callback - The exact callback instance to remove.
    */
-  off(event: string, callback: ApplicationEventCallback): void;
+  off(event: string, callback: ApplicationEventCallback): Promise<void>;
 }
 
 /**

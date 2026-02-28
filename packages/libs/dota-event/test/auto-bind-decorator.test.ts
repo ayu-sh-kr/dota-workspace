@@ -327,12 +327,12 @@ describe('@AutoBind() decorator', () => {
 
       // Bind and confirm the handler fires.
       await manager.bind();
-      isolatedPublisher.publish({ name: 'user:created', data: { id: 1, name: 'Before' } });
+      isolatedPublisher.publish({name: 'user:created', data: {id: 1, name: 'Before'}});
       expect(service.receivedEvents).toHaveLength(1);
 
       // Unbind and confirm the handler is silent afterwards.
       await manager.unbind();
-      isolatedPublisher.publish({ name: 'user:created', data: { id: 2, name: 'After' } });
+      isolatedPublisher.publish({name: 'user:created', data: {id: 2, name: 'After'}});
       expect(service.receivedEvents).toHaveLength(1);
     });
 
