@@ -399,7 +399,7 @@ describe('DefaultApplicationEventManager', () => {
       eventManager.add('test:event', callback3);
 
       const callbacks = eventManager.resolve('test:event');
-      const callbackArray: ApplicationEventCallback[] = [];
+      const callbackArray: ApplicationEventCallback<'test:event'>[] = [];
 
       callbacks?.forEach(cb => callbackArray.push(cb));
 
@@ -412,7 +412,7 @@ describe('DefaultApplicationEventManager', () => {
     it('should return Set that can be used to invoke callbacks', () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
-      const mockEvent: ApplicationEvent = { name: 'test:event', data: { value: 42 } };
+      const mockEvent: ApplicationEvent<'test:event'> = { name: 'test:event', data: { value: 42 } };
 
       eventManager.add('test:event', callback1);
       eventManager.add('test:event', callback2);
@@ -588,7 +588,7 @@ describe('DefaultApplicationEventManager', () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
       const callback3 = vi.fn();
-      const mockEvent: ApplicationEvent = { name: 'test:event', data: { id: 1 } };
+      const mockEvent: ApplicationEvent<'test:event'> = { name: 'test:event', data: { id: 1 } };
 
       eventManager.add('test:event', callback1);
       eventManager.add('test:event', callback2);
@@ -629,10 +629,10 @@ describe('DefaultApplicationEventManager', () => {
 
     it('should maintain callback execution order within Set', () => {
       const executionOrder: number[] = [];
-      const callback1: ApplicationEventCallback = () => executionOrder.push(1);
-      const callback2: ApplicationEventCallback = () => executionOrder.push(2);
-      const callback3: ApplicationEventCallback = () => executionOrder.push(3);
-      const mockEvent: ApplicationEvent = { name: 'test:event' };
+      const callback1: ApplicationEventCallback<'test:event'> = () => executionOrder.push(1);
+      const callback2: ApplicationEventCallback<'test:event'> = () => executionOrder.push(2);
+      const callback3: ApplicationEventCallback<'test:event'> = () => executionOrder.push(3);
+      const mockEvent: ApplicationEvent<'test:event'> = { name: 'test:event', data: undefined };
 
       eventManager.add('test:event', callback1);
       eventManager.add('test:event', callback2);
@@ -686,11 +686,11 @@ describe('DefaultApplicationEventManager', () => {
 
   describe('Edge cases and error handling', () => {
     it('should handle callback that throws error during invocation', () => {
-      const errorCallback: ApplicationEventCallback = () => {
+      const errorCallback: ApplicationEventCallback<'test:event'> = () => {
         throw new Error('Callback error');
       };
       const normalCallback = vi.fn();
-      const mockEvent: ApplicationEvent = { name: 'test:event' };
+      const mockEvent: ApplicationEvent<'test:event'> = { name: 'test:event', data: undefined };
 
       eventManager.add('test:event', errorCallback);
       eventManager.add('test:event', normalCallback);
@@ -727,7 +727,7 @@ describe('DefaultApplicationEventManager', () => {
 
       expect(extractedCallback).toBe(callback);
 
-      const mockEvent: ApplicationEvent = { name: 'test:event', data: 'test' };
+      const mockEvent: ApplicationEvent<'test:event'> = { name: 'test:event', data: 'test' };
       extractedCallback(mockEvent);
 
       expect(callback).toHaveBeenCalledWith(mockEvent);
