@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-router
 
+## 0.0.26
+
+### Patch Changes
+
+- @ayu-sh-kr/dota-core@1.9.5
+
 ## 0.0.25
 
 ### Patch Changes
