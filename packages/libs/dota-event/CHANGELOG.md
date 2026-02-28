@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-event
 
+## 0.0.5
+
+### Patch Changes
+
+- 70aec54: Fix the dota-event to support even better ts intellisense for ApplicationEvent<'event-name'>
+
 ## 0.0.4
 
 ### Patch Changes

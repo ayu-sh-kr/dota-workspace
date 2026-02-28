@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-core
 
+## 1.9.5
+
+### Patch Changes
+
+- Updated dependencies [70aec54]
+  - @ayu-sh-kr/dota-event@0.0.5
+
 ## 1.9.4
 
 ### Patch Changes
