@@ -13,5 +13,7 @@ export {EmitterSectionComponent} from "@dota/components/home/emitter-section.com
 export {DevicePreviewComponent} from "@dota/components/home/utils/device-preview.component.ts";
 export {CodeSnippetComponent} from "@dota/components/home/utils/code-snippet.component.ts";
 export {TabHolderComponent} from "@dota/components/home/utils/tab-holder.component.ts";
+export {ToolListItemComponent} from "@dota/components/home/utils/tool-list-item.component.ts";
+export {ToolDetailComponent} from "@dota/components/home/utils/tool-detail.component.ts";
 
 
