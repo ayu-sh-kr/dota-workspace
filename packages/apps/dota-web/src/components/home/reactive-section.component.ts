@@ -20,7 +20,7 @@ export class ReactiveSectionComponent extends BaseElement{
                     />
                     <div class="space-y-5 order-1 lg:order-2">
                         <h4 class="text-gray-700 dark:text-gray-300 font-semibold">Reactive Components</h4>
-                        <h2 class="ld:text-5xl md:text-4xl text-3xl font-extrabold tracking-wide text-gray-950 dark:text-gray-100">
+                        <h2 class="lg:text-5xl md:text-4xl text-3xl font-extrabold tracking-wide text-gray-950 dark:text-gray-100">
                             Reactive Support.</h2>
                         <p class="text-gray-600 dark:text-gray-400 font-light lg:text-2xl md:text-xl text-lg">
                             With reactivity dom gets update each time a property marked as <span
