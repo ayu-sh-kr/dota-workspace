@@ -29,21 +29,13 @@ export class EmitterSectionComponent extends BaseElement {
                             <code-snippet filename="form.component.ts"
                                           language="typescript"
                                           data-locked="true">
-                                import { Component, Emitter, BindEvent } from '@ayu-sh-kr/dota-core';
-
                                 @Component({ selector: 'app-form' })
                                 class FormComponent extends BaseElement {
-
-                                  @Emitter({ name: 'form:submit' })
-                                  onSubmit!: EventEmitter&lt;{ email: string }&gt;;
-
+                                  
+                                  constructor() { super(); }
+                                  
                                   @Emitter({ name: 'form:reset' })
                                   onReset!: EventEmitter&lt;void&gt;;
-
-                                  @BindEvent({ event: 'click', id: '#submit' })
-                                  handleSubmit() {
-                                    this.onSubmit.emit({ email: 'user@example.com' });
-                                  }
 
                                   @BindEvent({ event: 'click', id: '#reset' })
                                   handleReset() {
