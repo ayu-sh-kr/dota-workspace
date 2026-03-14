@@ -40,7 +40,7 @@ export class HomePage extends DotaPageElement {
            <app-feature></app-feature>
            <code-section></code-section>
            <reactive-dota></reactive-dota>
-           <capabiltiy-section></capabiltiy-section>
+           <capability-section></capability-section>
            <emitter-section></emitter-section>
            <device-section></device-section>
            <our-tools></our-tools>
