@@ -11,6 +11,8 @@ declare module "@ayu-sh-kr/dota-event" {
     "docs:theme-change": { theme: string };
     /** Fired when the user picks a different color (indigo / teal / rose …). */
     "docs:color-change": { color: string };
+    /** Fired when a tool-list-item is selected in the our-tools section. */
+    "tools:select": { toolId: string };
   }
 }
 
