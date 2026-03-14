@@ -1,10 +1,10 @@
 import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-core";
 
 @Component({
-    selector: "hostlistener-section",
+    selector: "capability-section",
     shadow:false
 })
-export class HostListenerSectionComponent extends BaseElement{
+export class CapabilitySectionComponent extends BaseElement{
     constructor() {
         super();
     }
