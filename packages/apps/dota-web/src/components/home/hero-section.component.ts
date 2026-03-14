@@ -23,33 +23,80 @@ export class HeroSectionComponent extends BaseElement {
 
   render(): string {
     return HTML`
-            <div class="flex flex-col items-center justify-center py-20 font-dm px-2">
-                <h1 
-                    class="text-5xl sm:text-7xl font-extrabold text-gray-900 dark:text-gray-100 max-w-5xl text-wrap py-10 leading-[3.25rem] tracking-wide text-center">
-                    Build. Customize. Distribute. <span class="bg-gradient-to-r from-purple-600 via-purple-600 to-purple-400 bg-clip-text text-transparent">Reuse.</span>
+        <section class="relative overflow-hidden font-dm">
+
+            <!-- Dot-grid background -->
+            <div class="absolute inset-0 bg-[radial-gradient(circle,_#9333ea14_1px,_transparent_1px)] [background-size:28px_28px] pointer-events-none"></div>
+
+            <!-- Ambient glow blobs -->
+            <div class="absolute -top-40 -left-40 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-500/8 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative flex flex-col items-center justify-center py-16 px-4 text-center">
+
+                <!-- Brand name -->
+                <span class="mb-6 text-xs font-bold tracking-[0.2em] uppercase text-purple-400 dark:text-purple-300">
+                    Dota
+                </span>
+
+                <!-- Headline -->
+                <h1 class="text-5xl sm:text-6xl font-extrabold text-gray-800 dark:text-gray-100/90
+                           max-w-4xl leading-tight tracking-tight text-center">
+                    Framework-Agnostic Web Components,
+                    <span class="bg-gradient-to-r from-purple-500 via-purple-400 to-purple-300 bg-clip-text text-transparent">
+                        Powered by TypeScript.
+                    </span>
                 </h1>
-                
-                <div class="text-center flex flex-col gap-y-2 text-gray-800 dark:text-gray-200 sm:text-lg md:text-xl lg:text-2xl">
-                    <p class="tracking-wide">
-                        Dota is a library for building-reusable, customizable UI components libraries.
-                    </p>
-                    <p class="tracking-wide">
-                        Generate small, blazing fast Web Components that run everywhere.
-                    </p>
+
+                <!-- Subheadline -->
+                <p class="mt-6 text-gray-400 dark:text-gray-500 text-lg max-w-xl leading-relaxed">
+                    A decorator-based library for authoring standard Custom Elements &mdash;
+                    no framework lock-in, no boilerplate, runs anywhere the web does.
+                </p>
+
+                <!-- Value bullets — 3-column card grid -->
+                <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl w-full">
+                    <div class="flex flex-col items-center gap-1.5 px-4 py-5 rounded-2xl
+                                border border-gray-200/60 dark:border-gray-700/40
+                                bg-white/50 dark:bg-gray-900/40 text-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400/80 mb-0.5"></span>
+                        <strong class="text-sm text-gray-700 dark:text-gray-300 font-semibold">Zero lock-in</strong>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">React, Vue, Angular, or plain HTML</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5 px-4 py-5 rounded-2xl
+                                border border-gray-200/60 dark:border-gray-700/40
+                                bg-white/50 dark:bg-gray-900/40 text-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400/80 mb-0.5"></span>
+                        <strong class="text-sm text-gray-700 dark:text-gray-300 font-semibold">Decorator API</strong>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
+                            <code class="text-purple-400/80">@Component</code>,
+                            <code class="text-purple-400/80">@Property</code>,
+                            <code class="text-purple-400/80">@BindEvent</code>
+                        </span>
+                    </div>
+                    <div class="flex flex-col items-center gap-1.5 px-4 py-5 rounded-2xl
+                                border border-gray-200/60 dark:border-gray-700/40
+                                bg-white/50 dark:bg-gray-900/40 text-center">
+                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400/80 mb-0.5"></span>
+                        <strong class="text-sm text-gray-700 dark:text-gray-300 font-semibold">Native performance</strong>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">Custom Elements, no virtual DOM</span>
+                    </div>
                 </div>
-                
-                <div class="flex py-10 justify-center sm:justify-between items-center gap-y-5 gap-x-10 flex-wrap text-gray-100 md:text-xl text-lg">
+
+                <!-- CTAs -->
+                <div class="mt-10 flex items-center justify-center gap-4">
                     <get-started-button></get-started-button>
-                    <p  class="border lg:rounded-3xl md:rounded-2xl rounded-xl flex items-center gap-x-2 
-                    dark:text-gray-200 text-gray-800 md:py-3 md:px-4 py-1 px-2 md:text-xl sm:text-lg text-sm"
-                    >
-                        npm install @ayu-sh-kr/dota-core 
-                        <span class="active:scale-95 cursor-pointer" id="copy"">
-                            <dota-icon name="material-symbols:content-copy-rounded" color="purple" variant="ghost" size="md"/>
-                        </span> 
-                    </p> 
+                    <a href="/docs"
+                       class="text-sm font-medium text-gray-400 dark:text-gray-500
+                              hover:text-purple-400 dark:hover:text-purple-400
+                              transition-colors duration-200 flex items-center gap-1">
+                        Browse the docs
+                        <span class="text-base leading-none">&rarr;</span>
+                    </a>
                 </div>
+
             </div>
+        </section>
         `
   }
 
