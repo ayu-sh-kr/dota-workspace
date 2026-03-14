@@ -11,5 +11,6 @@ export { HostListenerSectionComponent } from "@dota/components/home/hostlistener
 export {ClientSectionComponent} from "@dota/components/home/client-section.component.ts";
 export {EmitterSectionComponent} from "@dota/components/home/emitter-section.component.ts"
 export {DevicePreviewComponent} from "@dota/components/home/utils/device-preview.component.ts";
+export {CodeSnippetComponent} from "@dota/components/home/utils/code-snippet.component.ts";
 
 
