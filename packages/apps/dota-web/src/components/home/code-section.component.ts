@@ -12,35 +12,55 @@ export class CodeSectionComponent extends BaseElement {
   render(): string {
     // language=HTML
     return HTML`
-        <section class="font-dm mx-auto max-w-7xl px-4 sm:px-6 py-10 mt-10">
-            <div class="grid lg:grid-cols-2 gap-x-16 gap-y-10 items-center">
-                <div class="space-y-5">
-                    <h4 class="text-gray-700 dark:text-gray-300 font-semibold">Component Libraries</h4>
-                    <h2 class="lg:text-5xl md:text-4xl text-3xl font-extrabold tracking-wide text-gray-950 dark:text-gray-100">
-                        Web Component Tool.</h2>
-                    <p class="text-gray-600 dark:text-gray-400 font-light lg:text-2xl md:text-xl text-lg">
-                        Ensure consistent UX and brand experiences at scale with components that run on any platform or
-                        device.
-                        Build custom UIs that work seamlessly across teams and projects.
-                    </p>
-                </div>
-                <div class="w-full min-w-0">
-                <code-snippet filename="app-button.component.ts" language="typescript">import { Component, Property, HTML } from '@ayu-sh-kr/dota-core';
+        <section class="hero-fade-up font-dm w-full">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
 
-@Component({ selector: 'app-button' })
-class ButtonComponent extends BaseElement {
+                <!-- Inner card with soft elevation -->
+                <div class="rounded-3xl border border-gray-200/60 dark:border-gray-700/30
+                            bg-gray-50/80 dark:bg-gray-900/50 backdrop-blur-sm
+                            px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
 
-  @Property({ name: 'label', type: String })
-  label: string = 'Click me';
+                    <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-  render() {
-    return HTML\`
-      <button class="btn-primary">
-        \${this.label}
-      </button>
-    \`;
-  }
-}</code-snippet>
+                        <!-- Left: text -->
+                        <div class="flex flex-col gap-5 lg:max-w-lg">
+                            <span class="text-xs font-semibold tracking-[0.18em] uppercase
+                                         text-purple-400 dark:text-purple-300">
+                                Component Libraries
+                            </span>
+                            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight
+                                       text-gray-800 dark:text-gray-100/90 leading-tight">
+                                Web Component Tool.</h2>
+                            <p class="text-base lg:text-lg text-gray-400 dark:text-gray-500
+                                      leading-relaxed max-w-[60ch]">
+                                Ensure consistent UX and brand experiences at scale with components that run on any platform or
+                                device.
+                                Build custom UIs that work seamlessly across teams and projects.
+                            </p>
+                        </div>
+
+                        <!-- Right: code snippet -->
+                        <div class="w-full min-w-0">
+                            <code-snippet filename="app-button.component.ts" language="typescript">
+                              import { Component, Property, HTML } from '@ayu-sh-kr/dota-core';
+                                @Component({ selector: 'app-button' })
+                                class ButtonComponent extends BaseElement {
+                                
+                                  @Property({ name: 'label', type: String })
+                                  label: string = 'Click me';
+                                
+                                  render() {
+                                    return HTML\`
+                                      &lt;button class="btn-primary"&gt;
+                                        \${this.label}
+                                      &lt;/button&gt;
+                                    \`;
+                                  }
+                                }
+                            </code-snippet>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </section>
