@@ -12,5 +12,6 @@ export {ClientSectionComponent} from "@dota/components/home/client-section.compo
 export {EmitterSectionComponent} from "@dota/components/home/emitter-section.component.ts"
 export {DevicePreviewComponent} from "@dota/components/home/utils/device-preview.component.ts";
 export {CodeSnippetComponent} from "@dota/components/home/utils/code-snippet.component.ts";
+export {TabHolderComponent} from "@dota/components/home/utils/tab-holder.component.ts";
 
 
