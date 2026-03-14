@@ -21,8 +21,27 @@ export class CodeSnippetComponent extends BaseElement {
 
   constructor() {
     super();
-    // Read code from text content, same pattern as MarkdownViewComponent
-    this.rawCode = this.textContent?.trim() ?? '';
+    // Read code from text content, same pattern as MarkdownViewComponent,
+    // then dedent so template indentation doesn't appear in the rendered output.
+    this.rawCode = CodeSnippetComponent.dedent(this.textContent ?? '');
+  }
+
+  /**
+   * Strips the common leading whitespace from all non-empty lines so that
+   * indented template literals render without extra left padding.
+   */
+  private static dedent(text: string): string {
+    const lines = text.split('\n');
+    const indent = lines
+      .filter(l => l.trim().length > 0)
+      .reduce((min, l) => {
+        const leading = l.match(/^(\s*)/)?.[1].length ?? 0;
+        return Math.min(min, leading);
+      }, Infinity);
+    return lines
+      .map(l => l.slice(indent === Infinity ? 0 : indent))
+      .join('\n')
+      .trim();
   }
 
   @AfterInit()
