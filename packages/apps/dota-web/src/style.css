@@ -162,7 +162,8 @@
 /* ── code-snippet: block display so it fills its grid cell ─
    Justified: custom elements are inline by default; without
    this the element ignores width constraints from the parent. */
-code-snippet {
+code-snippet,
+app-hero {
     display: block;
     width: 100%;
     min-width: 0;
