@@ -164,19 +164,27 @@
    this the element ignores width constraints from the parent. */
 code-snippet,
 app-hero,
-blob-separator {
+blob-separator,
+blob-wrapper {
     display: block;
     width: 100%;
     min-width: 0;
 }
 
 .blob-inner {
-    opacity: 0.38;
+    z-index: 0;
 }
 
 .dark .blob-inner {
-    opacity: 0.60;
     filter: brightness(3) saturate(1.4);
+}
+
+/* Sections stack above blobs so blobs act as background decoration */
+app-hero, app-feature, code-section, reactive-dota,
+capability-section, emitter-section, device-section,
+our-tools, client-section {
+    position: relative;
+    z-index: 1;
 }
 
 /* ── code-snippet: strip pre/hljs frame ───────────────────
