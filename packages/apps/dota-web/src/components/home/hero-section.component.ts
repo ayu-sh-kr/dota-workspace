@@ -25,74 +25,120 @@ export class HeroSectionComponent extends BaseElement {
     return HTML`
         <section class="relative overflow-hidden font-dm">
 
-            <!-- Dot-grid background -->
-            <div class="absolute inset-0 bg-[radial-gradient(circle,_#9333ea14_1px,_transparent_1px)] [background-size:28px_28px] pointer-events-none"></div>
+            <!-- Top-right quarter-arc decoration -->
+            <svg class="absolute -top-px -right-px w-[min(520px,70vw)] h-[min(520px,70vw)] pointer-events-none opacity-[0.35] dark:opacity-25"
+                 viewBox="0 0 520 520" fill="none" aria-hidden="true">
+                <circle cx="520" cy="0" r="100" stroke="#7c3aed" stroke-width="2"/>
+                <circle cx="520" cy="0" r="190" stroke="#7c3aed" stroke-width="2"/>
+                <circle cx="520" cy="0" r="280" stroke="#7c3aed" stroke-width="2"/>
+                <circle cx="520" cy="0" r="370" stroke="#7c3aed" stroke-width="2"/>
+                <circle cx="520" cy="0" r="460" stroke="#7c3aed" stroke-width="2"/>
+            </svg>
 
-            <!-- Ambient glow blobs -->
-            <div class="absolute -top-40 -left-40 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-500/8 rounded-full blur-3xl pointer-events-none"></div>
+            <!-- Bottom-left mirror arc -->
+            <svg class="absolute -bottom-px -left-px w-[min(340px,50vw)] h-[min(340px,50vw)] pointer-events-none opacity-25 dark:opacity-[0.18]"
+                 viewBox="0 0 340 340" fill="none" aria-hidden="true">
+                <circle cx="0" cy="340" r="100" stroke="#7c3aed" stroke-width="2"/>
+                <circle cx="0" cy="340" r="200" stroke="#7c3aed" stroke-width="2"/>
+                <circle cx="0" cy="340" r="300" stroke="#7c3aed" stroke-width="2"/>
+            </svg>
 
-            <div class="relative flex flex-col items-center justify-center py-16 px-4 text-center">
+            <!-- Central ambient blob glow -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                        w-[580px] h-[580px] opacity-[0.07] blur-[110px]
+                        pointer-events-none select-none" aria-hidden="true">
+                ${CIRCULAR_BLOB_A}
+            </div>
 
-                <!-- Brand name -->
-                <span class="mb-6 text-xs font-bold tracking-[0.2em] uppercase text-purple-400 dark:text-purple-300">
-                    Dota
+            <div class="relative flex flex-col items-center justify-center py-12 sm:py-20 px-5 text-center">
+
+                <!-- Brand eyebrow -->
+                <span class="mb-6 text-xs font-semibold tracking-[0.2em] uppercase text-purple-500 dark:text-purple-400">
+                    Dota Framework
                 </span>
 
-                <!-- Headline -->
-                <h1 class="text-5xl sm:text-6xl font-extrabold text-gray-800 dark:text-gray-100/90
-                           max-w-4xl leading-tight tracking-tight text-center">
-                    Framework-Agnostic Web Components,
-                    <span class="bg-gradient-to-r from-purple-500 via-purple-400 to-purple-300 bg-clip-text text-transparent">
-                        Powered by TypeScript.
-                    </span>
+                <!-- Headline — punchy, short -->
+                <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold
+                           text-gray-900 dark:text-gray-50
+                           w-full max-w-3xl leading-[1.07] tracking-tight text-center">
+                    Web Components,
+                    <br/>
+                    <span class="text-purple-500 dark:text-purple-400">done right.</span>
                 </h1>
 
                 <!-- Subheadline -->
-                <p class="mt-6 text-gray-400 dark:text-gray-500 text-lg max-w-xl leading-relaxed">
-                    A decorator-based library for authoring standard Custom Elements &mdash;
+                <p class="mt-5 text-gray-500 dark:text-gray-400 text-sm sm:text-lg w-full max-w-lg leading-relaxed font-normal">
+                    A decorator-based TypeScript library for authoring standard Custom Elements &mdash;
                     no framework lock-in, no boilerplate, runs anywhere the web does.
                 </p>
 
-                <!-- Value bullets — 3-column card grid -->
-                <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl w-full">
-                    <div class="flex flex-col items-center gap-1.5 px-4 py-5 rounded-2xl
-                                border border-gray-200/60 dark:border-gray-700/40
-                                bg-white/50 dark:bg-gray-900/40 text-center">
-                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400/80 mb-0.5"></span>
-                        <strong class="text-sm text-gray-700 dark:text-gray-300 font-semibold">Zero lock-in</strong>
-                        <span class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">React, Vue, Angular, or plain HTML</span>
-                    </div>
-                    <div class="flex flex-col items-center gap-1.5 px-4 py-5 rounded-2xl
-                                border border-gray-200/60 dark:border-gray-700/40
-                                bg-white/50 dark:bg-gray-900/40 text-center">
-                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400/80 mb-0.5"></span>
-                        <strong class="text-sm text-gray-700 dark:text-gray-300 font-semibold">Decorator API</strong>
-                        <span class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
-                            <code class="text-purple-400/80">@Component</code>,
-                            <code class="text-purple-400/80">@Property</code>,
-                            <code class="text-purple-400/80">@BindEvent</code>
-                        </span>
-                    </div>
-                    <div class="flex flex-col items-center gap-1.5 px-4 py-5 rounded-2xl
-                                border border-gray-200/60 dark:border-gray-700/40
-                                bg-white/50 dark:bg-gray-900/40 text-center">
-                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400/80 mb-0.5"></span>
-                        <strong class="text-sm text-gray-700 dark:text-gray-300 font-semibold">Native performance</strong>
-                        <span class="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">Custom Elements, no virtual DOM</span>
-                    </div>
+                <!-- Inline decorator chips — replaces heavy card grid -->
+                <div class="mt-9 flex flex-wrap items-center justify-center gap-2">
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg
+                                 bg-gray-100/80 dark:bg-gray-800/50
+                                 border border-gray-200/60 dark:border-gray-700/40
+                                 text-xs font-mono font-medium text-purple-500 dark:text-purple-400">
+                        @Component
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg
+                                 bg-gray-100/80 dark:bg-gray-800/50
+                                 border border-gray-200/60 dark:border-gray-700/40
+                                 text-xs font-mono font-medium text-purple-500 dark:text-purple-400">
+                        @Property
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg
+                                 bg-gray-100/80 dark:bg-gray-800/50
+                                 border border-gray-200/60 dark:border-gray-700/40
+                                 text-xs font-mono font-medium text-purple-500 dark:text-purple-400">
+                        @BindEvent
+                    </span>
+                    <span class="text-gray-300 dark:text-gray-600 select-none px-0.5">&middot;</span>
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg
+                                 bg-gray-100/80 dark:bg-gray-800/50
+                                 border border-gray-200/60 dark:border-gray-700/40
+                                 text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Zero lock-in
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg
+                                 bg-gray-100/80 dark:bg-gray-800/50
+                                 border border-gray-200/60 dark:border-gray-700/40
+                                 text-xs font-medium text-gray-500 dark:text-gray-400">
+                        No virtual DOM
+                    </span>
                 </div>
 
                 <!-- CTAs -->
-                <div class="mt-10 flex items-center justify-center gap-4">
+                <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full">
                     <get-started-button></get-started-button>
                     <a href="/docs"
                        class="text-sm font-medium text-gray-400 dark:text-gray-500
-                              hover:text-purple-400 dark:hover:text-purple-400
+                              hover:text-purple-500 dark:hover:text-purple-400
                               transition-colors duration-200 flex items-center gap-1">
                         Browse the docs
                         <span class="text-base leading-none">&rarr;</span>
                     </a>
+                </div>
+
+                <!-- Install strip -->
+                <div class="mt-8 flex w-full max-w-xs sm:max-w-sm items-center gap-2 px-4 py-2.5 rounded-xl
+                            bg-gray-950/[0.04] dark:bg-white/[0.04]
+                            border border-gray-200/80 dark:border-gray-700/40">
+                    <code class="flex-1 min-w-0 truncate text-xs sm:text-sm font-mono text-gray-500 dark:text-gray-400 select-all text-left">
+                        npm install @ayu-sh-kr/dota-core
+                    </code>
+                    <button id="copy"
+                            class="p-1 rounded-md text-gray-400
+                                   hover:bg-gray-200/60 dark:hover:bg-gray-700/50
+                                   hover:text-gray-600 dark:hover:text-gray-300
+                                   transition-colors duration-150"
+                            title="Copy to clipboard">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                    </button>
                 </div>
 
             </div>
