@@ -37,13 +37,21 @@ export class HomePage extends DotaPageElement {
            <app-offer visible="true"></app-offer>
            <app-header></app-header>
            <app-hero></app-hero>
+           <blob-separator side="left" index="0"></blob-separator>
            <app-feature></app-feature>
+           <blob-separator side="right" index="1"></blob-separator>
            <code-section></code-section>
+           <blob-separator side="left" index="2"></blob-separator>
            <reactive-dota></reactive-dota>
+           <blob-separator side="right" index="3"></blob-separator>
            <capability-section></capability-section>
+           <blob-separator side="left" index="1"></blob-separator>
            <emitter-section></emitter-section>
+           <blob-separator side="right" index="2"></blob-separator>
            <device-section></device-section>
+           <blob-separator side="left" index="3"></blob-separator>
            <our-tools></our-tools>
+           <blob-separator side="right" index="0"></blob-separator>
            <client-section></client-section>
            <app-footer></app-footer>
         `

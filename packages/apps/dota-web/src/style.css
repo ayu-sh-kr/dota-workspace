@@ -162,10 +162,36 @@
 /* ── code-snippet: block display so it fills its grid cell ─
    Justified: custom elements are inline by default; without
    this the element ignores width constraints from the parent. */
-code-snippet {
+code-snippet,
+app-hero,
+blob-separator,
+blob-wrapper {
     display: block;
     width: 100%;
     min-width: 0;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+.blob-inner {
+    z-index: 0;
+    opacity: 0.40;
+    filter: blur(65px);
+}
+
+.dark .blob-inner {
+    opacity: 0.60;
+    filter: blur(70px) brightness(1) saturate(1.8);
+}
+
+/* Sections stack above blobs so blobs act as background decoration */
+app-hero, app-feature, code-section, reactive-dota,
+capability-section, emitter-section, device-section,
+our-tools, client-section {
+    position: relative;
+    z-index: 1;
 }
 
 /* ── code-snippet: strip pre/hljs frame ───────────────────
