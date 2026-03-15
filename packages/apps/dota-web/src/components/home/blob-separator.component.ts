@@ -26,7 +26,7 @@ export class BlobSeparatorComponent extends BaseElement {
       : 'right-0 translate-x-1/2 -translate-y-1/2';
 
     return HTML`
-      <div class="relative h-0 overflow-visible pointer-events-none select-none" aria-hidden="true">
+      <div class="overflow-x-clip relative h-0 pointer-events-none select-none" aria-hidden="true">
         <div class="blob-inner absolute ${posClass} w-[min(960px,100vw)] h-[min(960px,100vw)]">
           ${blob}
         </div>
