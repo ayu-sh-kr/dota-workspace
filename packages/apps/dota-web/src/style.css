@@ -163,10 +163,20 @@
    Justified: custom elements are inline by default; without
    this the element ignores width constraints from the parent. */
 code-snippet,
-app-hero {
+app-hero,
+blob-separator {
     display: block;
     width: 100%;
     min-width: 0;
+}
+
+.blob-inner {
+    opacity: 0.38;
+}
+
+.dark .blob-inner {
+    opacity: 0.60;
+    filter: brightness(3) saturate(1.4);
 }
 
 /* ── code-snippet: strip pre/hljs frame ───────────────────
