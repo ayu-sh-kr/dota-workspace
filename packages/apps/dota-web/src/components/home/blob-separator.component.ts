@@ -22,12 +22,12 @@ export class BlobSeparatorComponent extends BaseElement {
   render(): string {
     const blob = BLOBS[this.index % BLOBS.length];
     const posClass = this.side === 'left'
-      ? 'left-[-60px] -translate-y-1/2'
-      : 'right-[-60px] -translate-y-1/2';
+      ? 'left-0 -translate-x-1/2 -translate-y-1/2'
+      : 'right-0 translate-x-1/2 -translate-y-1/2';
 
     return HTML`
       <div class="relative h-0 overflow-visible pointer-events-none select-none" aria-hidden="true">
-        <div class="blob-inner absolute ${posClass} w-[min(800px,90vw)] h-[min(800px,90vw)]">
+        <div class="blob-inner absolute ${posClass} w-[min(960px,100vw)] h-[min(960px,100vw)]">
           ${blob}
         </div>
       </div>
