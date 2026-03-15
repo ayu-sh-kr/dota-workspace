@@ -1,4 +1,4 @@
-import {AfterInit, DotaPageElement, Component, HTML, SEO} from "@ayu-sh-kr/dota-core";
+import {AfterInit, DotaPageElement, Component, SEO} from "@ayu-sh-kr/dota-core";
 import {Route} from "@ayu-sh-kr/dota-router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
@@ -33,9 +33,9 @@ export class HomePage extends DotaPageElement {
 
   render(): string {
     //language=html
-    return HTML`
-           <app-offer visible="true"></app-offer>
+    return `
            <app-header></app-header>
+           <blob-separator side="right" index="5"></blob-separator>
            <app-hero></app-hero>
            <blob-separator side="left" index="0"></blob-separator>
            <app-feature></app-feature>
