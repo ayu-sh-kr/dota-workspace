@@ -171,12 +171,19 @@ blob-wrapper {
     min-width: 0;
 }
 
+body {
+    overflow-x: hidden;
+}
+
 .blob-inner {
     z-index: 0;
+    opacity: 0.40;
+    filter: blur(65px);
 }
 
 .dark .blob-inner {
-    filter: brightness(3) saturate(1.4);
+    opacity: 0.60;
+    filter: blur(70px) brightness(1) saturate(1.8);
 }
 
 /* Sections stack above blobs so blobs act as background decoration */
