@@ -1,7 +1,7 @@
 import {BaseElement, Component, HTML, Property, String, Number} from "@ayu-sh-kr/dota-core";
-import {BLOB_A, BLOB_B, BLOB_C, BLOB_D} from "@dota/components/blobs/Blobs.ts";
+import {BLOB_A, BLOB_B, BLOB_C, BLOB_D, CIRCULAR_BLOB_A, CIRCULAR_BLOB_B} from "@dota/components/blobs/Blobs.ts";
 
-const BLOBS = [BLOB_A, BLOB_B, BLOB_C, BLOB_D];
+const BLOBS = [BLOB_A, BLOB_B, BLOB_C, BLOB_D, CIRCULAR_BLOB_A, CIRCULAR_BLOB_B];
 
 @Component({
   selector: 'blob-separator',

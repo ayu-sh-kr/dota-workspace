@@ -24,7 +24,7 @@ export class HeroSectionComponent extends BaseElement {
 
   render(): string {
     return HTML`
-        <section class="relative overflow-hidden font-dm">
+        <section class="relative overflow-hidden font-dm min-h-screen flex flex-col justify-center">
 
             <!-- Top-right quarter-arc decoration -->
             <svg class="absolute -top-px -right-px w-[min(520px,70vw)] h-[min(520px,70vw)] pointer-events-none opacity-[0.35] dark:opacity-25"
@@ -51,7 +51,7 @@ export class HeroSectionComponent extends BaseElement {
                 ${CIRCULAR_BLOB_A}
             </div>
 
-            <div class="relative flex flex-col items-center justify-center py-12 sm:py-20 px-5 text-center">
+            <div class="relative flex flex-col items-center justify-center pt-28 sm:pt-32 pb-16 sm:pb-24 px-5 text-center">
 
                 <!-- Brand eyebrow -->
                 <span class="mb-6 text-xs font-semibold tracking-[0.2em] uppercase text-purple-500 dark:text-purple-400">

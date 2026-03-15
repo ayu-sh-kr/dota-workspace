@@ -33,7 +33,7 @@ export class HeaderComponent extends BaseElement {
 
   render(): string {
     return HTML`
-           <header class="z-50 px-2 font-dm sticky top-4 left-0 ">
+           <header class="z-50 px-2 font-dm fixed top-4 left-0 w-full">
                 <nav class="flex py-3 justify-between items-center shadow-sm backdrop-blur-lg backdrop-brightness-125 dark:backdrop-brightness-110 
                     dark:shadow-purple-400 max-w-5xl rounded-full mx-auto">
                      <div class="font-extrabold text-2xl w-1/6 px-5 text-gray-900 dark:text-gray-100">
