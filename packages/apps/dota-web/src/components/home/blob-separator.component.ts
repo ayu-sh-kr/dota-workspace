@@ -27,7 +27,7 @@ export class BlobSeparatorComponent extends BaseElement {
 
     return HTML`
       <div class="relative h-0 overflow-visible pointer-events-none select-none -z-10" aria-hidden="true">
-        <div class="absolute ${posClass} w-[560px] h-[560px] opacity-[0.40] dark:opacity-[0.55] dark:[filter:brightness(2.5)]">
+        <div class="blob-inner absolute ${posClass} w-[min(800px,90vw)] h-[min(800px,90vw)]">
           ${blob}
         </div>
       </div>
