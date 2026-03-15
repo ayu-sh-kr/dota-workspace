@@ -69,27 +69,27 @@ export class ToolDetailComponent extends BaseElement {
 
     return HTML`
         <div data-detail-panel
-             class="rounded-2xl p-7 lg:p-8 flex flex-col gap-6 min-h-[320px]
+             class="rounded-2xl p-4 sm:p-6 lg:p-8 flex flex-col gap-5 min-h-0 sm:min-h-[320px]
                     border border-gray-200/80 dark:border-gray-700/40
                     bg-white/80 dark:bg-gray-950/60
-                    shadow-sm dark:shadow-none">
+                    shadow-sm dark:shadow-none overflow-hidden">
 
             <!-- Icon + package name -->
-            <div class="flex items-start gap-4">
-                <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0
                             bg-purple-500/10 border border-purple-400/30 dark:border-purple-500/20">
                     <dota-icon data-detail-icon
                                name="${first.icon}" color="purple" size="lg">
                     </dota-icon>
                 </div>
-                <div class="pt-1">
+                <div class="pt-1 min-w-0">
                     <p class="text-xs font-semibold tracking-[0.18em] uppercase mb-1
                                text-purple-500 dark:text-purple-400">
                         Package
                     </p>
                     <h3 data-detail-name
-                        class="text-2xl font-bold font-mono leading-none
-                               text-gray-900 dark:text-gray-100">
+                        class="text-base sm:text-2xl font-bold font-mono leading-none
+                               text-gray-900 dark:text-gray-100 break-all">
                         ${first.name}
                     </h3>
                 </div>
@@ -97,16 +97,16 @@ export class ToolDetailComponent extends BaseElement {
 
             <!-- Pull-quote tagline -->
             <p data-detail-tagline
-               class="text-base font-medium italic pl-4 leading-relaxed
+               class="text-sm sm:text-base font-medium italic pl-4 leading-relaxed
                       border-l-2 border-purple-500/50
-                      text-gray-700 dark:text-gray-300">
+                      text-gray-700 dark:text-gray-300 break-words">
                 "${first.tagline}"
             </p>
 
             <!-- Description -->
             <p data-detail-desc
                class="text-sm leading-relaxed flex-1
-                      text-gray-500 dark:text-gray-400">
+                      text-gray-500 dark:text-gray-400 break-words overflow-hidden">
                 ${first.description}
             </p>
 

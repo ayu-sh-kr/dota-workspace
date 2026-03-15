@@ -50,14 +50,14 @@ export class ToolListItemComponent extends BaseElement {
 
     return HTML`
         <button ${isInitial ? 'data-active=""' : ''}
-                class="group flex items-center gap-3 w-full px-4 py-3 rounded-xl text-left
+                class="group flex items-center gap-2 sm:gap-3 w-full px-2 sm:px-4 py-2 sm:py-3 rounded-xl text-left
                        cursor-pointer transition-all duration-200
                        border border-transparent
                        hover:bg-gray-100/80 dark:hover:bg-gray-800/40
                        hover:border-gray-200/80 dark:hover:border-gray-700/30
                        data-[active]:bg-gray-100/90 dark:data-[active]:bg-gray-800/80
                        data-[active]:border-gray-200/80 dark:data-[active]:border-gray-700/60">
-            <div class="flex-shrink-0 w-9 h-9 rounded-lg
+            <div class="flex-shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg
                         bg-gray-200/70 dark:bg-gray-800/60
                         flex items-center justify-center
                         transition-colors duration-200
