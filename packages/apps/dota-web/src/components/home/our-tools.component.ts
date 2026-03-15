@@ -15,11 +15,7 @@ export class OurToolsComponent extends BaseElement {
     return HTML`
         <section role="region" aria-labelledby="tools-heading"
                  class="hero-fade-up font-dm w-full">
-            <div class="mx-auto max-w-7xl px-2 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
-
-                <div class="rounded-3xl border border-gray-200/60 dark:border-gray-700/30
-                            bg-gray-50/80 dark:bg-gray-900/50 backdrop-blur-sm
-                            px-3 sm:px-8 lg:px-16 py-6 sm:py-8 lg:py-16 overflow-hidden">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
 
                     <!-- Section header -->
                     <div class="mb-8">
@@ -47,8 +43,6 @@ export class OurToolsComponent extends BaseElement {
                         <tool-detail></tool-detail>
 
                     </div>
-
-                </div>
             </div>
         </section>
     `;

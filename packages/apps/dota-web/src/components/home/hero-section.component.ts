@@ -1,6 +1,7 @@
 import {BaseElement, BindEvent, Component, HTML} from "@ayu-sh-kr/dota-core";
 
 import {notificationService} from "@dota/main.ts";
+import {CIRCULAR_BLOB_A} from "@dota/components/blobs/Blobs.ts";
 
 @Component({
   selector: 'app-hero',

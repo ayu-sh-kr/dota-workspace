@@ -15,11 +15,6 @@ export class CodeSectionComponent extends BaseElement {
         <section class="hero-fade-up font-dm w-full">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
 
-                <!-- Inner card with soft elevation -->
-                <div class="rounded-3xl border border-gray-200/60 dark:border-gray-700/30
-                            bg-gray-50/80 dark:bg-gray-900/50 backdrop-blur-sm
-                            px-6 sm:px-10 lg:px-16 py-12 lg:py-16">
-
                     <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
                         <!-- Left: text -->
@@ -61,7 +56,6 @@ export class CodeSectionComponent extends BaseElement {
                         </div>
 
                     </div>
-                </div>
             </div>
         </section>
     `;
