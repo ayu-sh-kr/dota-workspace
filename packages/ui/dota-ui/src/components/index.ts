@@ -10,3 +10,5 @@ export * from "@dota/components/button/button.component.ts";
 export * from "@dota/components/popover/popover.component.ts";
 export * from "@dota/components/placeholder/placeholder.component.ts";
 export * from "@dota/components/animations/blobs/blobs.component.ts";
+export * from "@dota/components/carousel/dota-carousel.component.ts";
+export * from "@dota/components/carousel/dota-slide.component.ts";
