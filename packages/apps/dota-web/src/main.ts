@@ -2,7 +2,7 @@ import './style.css'
 
 import {AppComponent} from "@dota/app.component.ts";
 import {ErrorPage, HomePage} from "@dota/pages";
-import {IconsComponent, PopoverComponent} from "@ayu-sh-kr/dota-ui";
+import {DotaCarouselComponent, DotaSlideComponent, IconsComponent, PopoverComponent, ButtonComponent} from "@ayu-sh-kr/dota-ui";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
 import {Router, RouterService} from "@ayu-sh-kr/dota-router";
 import components from "virtual:dota-components";
@@ -17,7 +17,11 @@ let routerService!: RouterService<Router<HTMLElement>>;
 let notificationService!: NotificationService
 initializeApp({
   modules: components,
-  externalComponents: [IconsComponent, PopoverComponent, MdViewComponent, MdTocComponent],
+  externalComponents: [
+    IconsComponent, PopoverComponent, MdViewComponent,
+    MdTocComponent, DotaCarouselComponent, DotaSlideComponent,
+    ButtonComponent
+  ],
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},
   root: AppComponent,
