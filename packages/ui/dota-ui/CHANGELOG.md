@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.0.11
+
+### Patch Changes
+
+- 84ebb1f: Added carousel component
+
 ## 0.0.10
 
 ### Patch Changes
