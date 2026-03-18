@@ -189,7 +189,7 @@ body {
 /* Sections stack above blobs so blobs act as background decoration */
 app-hero, app-feature, code-section, reactive-dota,
 capability-section, emitter-section, device-section,
-our-tools, client-section {
+our-tools, client-section, app-notification, notification-holder {
     position: relative;
     z-index: 1;
 }

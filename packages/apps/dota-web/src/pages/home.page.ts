@@ -1,4 +1,5 @@
-import {AfterInit, DotaPageElement, Component, SEO} from "@ayu-sh-kr/dota-core";
+import {DotaPageElement, Component, SEO} from "@ayu-sh-kr/dota-core";
+import { OnEvent } from "@ayu-sh-kr/dota-event";
 import {Route} from "@ayu-sh-kr/dota-router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
@@ -26,9 +27,9 @@ export class HomePage extends DotaPageElement {
   }
 
 
-  @AfterInit()
-  afterViewInit() {
-    GeneralUtils.scrollToTop('instant');
+  @OnEvent("connected", true)
+  async onConnected() {
+    GeneralUtils.scrollToTop('smooth');
   }
 
   render(): string {

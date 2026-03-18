@@ -1,7 +1,8 @@
-import {AfterInit, BaseElement, Component, Param, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Param, Property, String} from "@ayu-sh-kr/dota-core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {MarkdownService} from "@dota/service/markdown.service.ts";
-import {type ColorName} from "@ayu-sh-kr/dota-md";
+import {MDService, type ColorName} from "@ayu-sh-kr/dota-md";
+import { OnEvent } from "@ayu-sh-kr/dota-event";
 
 @Component({
   selector: "blog-view",
@@ -32,29 +33,19 @@ export class BlogViewComponent extends BaseElement {
     this.docLoader = new DocLoaderService();
   }
 
-  @AfterInit()
+  @OnEvent('connected', true)
   async afterViewInit() {
     if (this.blog && this.category) {
       const raw = await this.docLoader.loadBlog(`${this.category.toLowerCase()}/${this.blog}`);
+      MDService.render(raw, { publish: true })
       this.content = MarkdownService.renderMarkdown(raw);
-      this.setContent();
-      window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-  }
-
-  /** Push content into the child markdown-view and trigger its re-render. */
-  private setContent() {
-    const view = this.querySelector('markdown-view') as any;
-    if (view) {
-      view.content = this.content;
-      view.updateHTML();
     }
   }
 
   render() {
     // language=html
     return `
-      <markdown-view theme="${this.theme}" max-width="${this.maxWidth}"></markdown-view>
+      <md-view theme="apple" color="purple"></md-view>
     `;
   }
 }

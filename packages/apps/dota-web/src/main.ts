@@ -2,16 +2,24 @@ import './style.css'
 
 import {AppComponent} from "@dota/app.component.ts";
 import {ErrorPage, HomePage} from "@dota/pages";
-import {DotaCarouselComponent, DotaSlideComponent, IconsComponent, PopoverComponent, ButtonComponent} from "@ayu-sh-kr/dota-ui";
+import {
+  ButtonComponent,
+  DotaCarouselComponent,
+  DotaSlideComponent,
+  IconsComponent,
+  PopoverComponent
+} from "@ayu-sh-kr/dota-ui";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap"
 import {Router, RouterService} from "@ayu-sh-kr/dota-router";
 import components from "virtual:dota-components";
 import {ApplicationEventService} from "@ayu-sh-kr/dota-core";
 import {NotificationService} from "@dota/components/utils/notification/notification.service.ts";
 import {DefaultApplicationEventListenerRegistry} from "@ayu-sh-kr/dota-event";
-import {MdTocComponent, MdViewComponent } from "@ayu-sh-kr/dota-md";
+import {MdTocComponent, MdViewComponent} from "@ayu-sh-kr/dota-md";
 
 const applicationEventService = ApplicationEventService.getInstance();
+const applicationEventPublisher = applicationEventService.getPublisher();
+const applicationEventListener = applicationEventService.getListener();
 
 let routerService!: RouterService<Router<HTMLElement>>;
 let notificationService!: NotificationService
@@ -27,13 +35,10 @@ initializeApp({
   root: AppComponent,
 })
   .then((value) => {
-    const listener = applicationEventService
-      .getListener();
-    DefaultApplicationEventListenerRegistry.setListener(listener)
+    DefaultApplicationEventListenerRegistry.setListener(applicationEventListener)
     routerService = value.routerService
     notificationService = new NotificationService()
-    applicationEventService
-      .getPublisher()
+    applicationEventPublisher
       .publishAsync({
         name: "app:initialized",
         data: null
@@ -42,4 +47,4 @@ initializeApp({
   .catch(error => console.error(error))
 
 
-export {routerService, notificationService}
+export {routerService, notificationService, applicationEventService, applicationEventPublisher, applicationEventListener}
