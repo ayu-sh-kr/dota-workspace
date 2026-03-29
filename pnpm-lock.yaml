@@ -173,6 +173,9 @@ importers:
 
   packages/plugins/dota-vite-preloader:
     dependencies:
+      '@ayu-sh-kr/dota-ast-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-ast-utils
       '@swc/core':
         specifier: ^1.13.5
         version: 1.13.5
@@ -238,6 +241,17 @@ importers:
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.19
+
+  packages/utils/dota-ast-utils:
+    dependencies:
+      '@swc/core':
+        specifier: ^1.13.5
+        version: 1.13.5
+      fast-glob:
+        specifier: ^3.3.3
+        version: 3.3.3
+
+  packages/utils/dota-common-utils: {}
 
 packages:
 
