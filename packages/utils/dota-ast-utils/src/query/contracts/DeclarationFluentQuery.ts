@@ -1,16 +1,23 @@
 import {
   ClassDeclaration,
+  ClassExpression,
   ClassMethod,
   ClassProperty,
   Constructor,
-  Decorator,
+  Decorator, ExportAllDeclaration,
   ExportDeclaration,
+  ExportDefaultDeclaration,
   ExportDefaultSpecifier,
   ExportNamedDeclaration,
   ExportNamespaceSpecifier,
   FunctionDeclaration,
+  FunctionExpression,
+  ImportDeclaration,
+  ImportDefaultSpecifier,
+  ImportNamespaceSpecifier,
   Module,
   NamedExportSpecifier,
+  NamedImportSpecifier,
   Param,
   PrivateMethod,
   PrivateProperty,
@@ -246,4 +253,83 @@ export interface ExportDeclarationQuery extends DeclarationFluentQuery<ExportDec
    * @example export namespace Foo {} → TsModuleDeclaration { id: "Foo", ... }
    */
   getTsModuleDeclarations(): DeclarationTerminalQuery<TsModuleDeclaration>;
+}
+
+export interface ImportDeclarationQuery extends DeclarationFluentQuery<ImportDeclaration> {
+  readonly ast: Module;
+  readonly selection: ImportDeclaration[];
+
+  /**
+   * Filters `selection` to `ImportDeclaration` nodes whose `typeOnly === true`,
+   * and returns them as the new selection.
+   * @example import type { Foo } from './mod' → ImportDeclaration { typeOnly: true, ... }
+   */
+  filterTypeOnly(): ImportDeclarationQuery;
+
+  /**
+   * Filters `selection` to `ImportDeclaration` nodes whose `source.value` matches `source`,
+   * and returns them as the new selection.
+   * @example filterBySource('./utils') → matches `import { foo } from './utils'`
+   */
+  filterBySource(source: string): ImportDeclarationQuery;
+
+  /**
+   * Iterates `selection`, filters `ImportDeclaration.specifiers` whose `type === "ImportSpecifier"`,
+   * and returns the flattened list of `NamedImportSpecifier` nodes as the new selection.
+   * @example import { foo, bar as baz } from './mod' → [NamedImportSpecifier { local: "foo" }, NamedImportSpecifier { local: "baz", imported: "bar" }]
+   */
+  getNamedSpecifiers(): DeclarationTerminalQuery<NamedImportSpecifier>;
+
+  /**
+   * Iterates `selection`, filters `ImportDeclaration.specifiers` whose `type === "ImportDefaultSpecifier"`,
+   * and returns the flattened list of `ImportDefaultSpecifier` nodes as the new selection.
+   * @example import Foo from './mod' → [ImportDefaultSpecifier { local: "Foo" }]
+   */
+  getDefaultSpecifiers(): DeclarationTerminalQuery<ImportDefaultSpecifier>;
+
+  /**
+   * Iterates `selection`, filters `ImportDeclaration.specifiers` whose `type === "ImportNamespaceSpecifier"`,
+   * and returns the flattened list of `ImportNamespaceSpecifier` nodes as the new selection.
+   * @example import * as ns from './mod' → [ImportNamespaceSpecifier { local: "ns" }]
+   */
+  getNamespaceSpecifiers(): DeclarationTerminalQuery<ImportNamespaceSpecifier>;
+}
+
+export interface ExportDefaultDeclarationQuery extends DeclarationFluentQuery<ExportDefaultDeclaration> {
+  readonly ast: Module;
+  readonly selection: ExportDefaultDeclaration[];
+
+  /**
+   * Filters `selection` to `ExportDefaultDeclaration` nodes whose `decl` is a `ClassExpression`,
+   * then unwraps and returns those inner `ClassExpression` nodes as the new selection.
+   * @example export default class Foo {} → ClassExpression { identifier: "Foo", body: [...] }
+   */
+  getClassExpressions(): DeclarationTerminalQuery<ClassExpression>;
+
+  /**
+   * Filters `selection` to `ExportDefaultDeclaration` nodes whose `decl` is a `FunctionExpression`,
+   * then unwraps and returns those inner `FunctionExpression` nodes as the new selection.
+   * @example export default function foo() {} → FunctionExpression { identifier: "foo", params: [...] }
+   */
+  getFunctionExpressions(): DeclarationTerminalQuery<FunctionExpression>;
+
+  /**
+   * Filters `selection` to `ExportDefaultDeclaration` nodes whose `decl` is a `TsInterfaceDeclaration`,
+   * then unwraps and returns those inner `TsInterfaceDeclaration` nodes as the new selection.
+   * @example export default interface Foo {} → TsInterfaceDeclaration { id: "Foo", body: [...] }
+   */
+  getTsInterfaceDeclarations(): DeclarationTerminalQuery<TsInterfaceDeclaration>;
+}
+
+
+export interface ExportAllDeclarationQuery extends DeclarationFluentQuery<ExportAllDeclaration> {
+  readonly ast: Module;
+  readonly selection: ExportAllDeclaration[];
+
+  /**
+   * Filters `selection` to `ExportAllDeclaration` nodes whose `source.value` matches `source`,
+   * and returns them as the new selection.
+   * @example filterBySource('./utils') → matches `export * from './utils'`
+   */
+  filterBySource(source: string): ExportAllDeclarationQuery;
 }
