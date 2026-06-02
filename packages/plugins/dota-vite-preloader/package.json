@@ -35,6 +35,7 @@
     "release": "pnpm run build && changeset publish"
   },
   "dependencies": {
+    "@ayu-sh-kr/dota-ast-utils": "workspace:*",
     "@swc/core": "^1.13.5",
     "fast-glob": "^3.3.3",
     "consola": "3.4.2"
