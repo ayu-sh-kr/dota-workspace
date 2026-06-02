@@ -1,9 +1,11 @@
 import {ASTFilterConstants, ComponentScanPath, VirtualImportID} from "@dota/Constants.ts";
 import fg from "fast-glob";
 import {readFile} from "node:fs/promises";
+import {relative} from "node:path";
 import {ClassDeclaration, type Module, parse} from "@swc/core";
-import {Plugin} from "vite";
+import {Plugin, ViteDevServer} from "vite";
 import {ASTHelperUtils} from "@dota/ASTHelperUtils.ts";
+import {ComponentUtils} from "@dota/ComponentUtils.ts";
 import {consola, createConsola, LogLevels, LogType} from 'consola';
 
 
@@ -204,6 +206,14 @@ export default function dotaVitePreloader({ root = process.cwd(), logType = 'inf
     return cachedCandidates;
   }
 
+  function invalidateVirtualModule(server: ViteDevServer) {
+    const mod = server.moduleGraph.getModuleById(VirtualImportID.RESOLVED_DOTA_COMPONENTS);
+    if (mod) {
+      server.moduleGraph.invalidateModule(mod);
+    }
+    server.ws.send({ type: 'full-reload' });
+  }
+
   return {
     name: 'vite-plugin-dota-preloader',
     resolveId(id) {
@@ -220,6 +230,63 @@ export default function dotaVitePreloader({ root = process.cwd(), logType = 'inf
     async buildStart() {
       cachedCandidates = await scanDotaComponents(root); // Cache the candidates for potential later use
       logger.info(`Loaded Dota Component Candidates: ${cachedCandidates.length} components found.`);
+    },
+
+    configureServer(server: ViteDevServer) {
+      const reloadVirtualModule = (file: string, event: string) => {
+        logger.debug(`Component file ${event}: ${file}. Reloading virtual module...`);
+        cachedCandidates = null;
+        invalidateVirtualModule(server);
+      };
+
+      server.watcher.on('add', (file) => {
+        if (!ComponentUtils.isComponentFile(file, root)) return;
+        reloadVirtualModule(file, 'added');
+      });
+
+      server.watcher.on('unlink', (file) => {
+        if (!ComponentUtils.isComponentFile(file, root)) return;
+        reloadVirtualModule(file, 'removed');
+      });
+
+      server.watcher.on('change', async (file) => {
+        if (!ComponentUtils.isComponentFile(file, root)) return;
+
+        // Only reload the virtual module if registration metadata (class name / selector)
+        // actually changed. Pure implementation edits are handled by Vite's normal HMR.
+        const relPath = relative(root, file).replace(/\\/g, '/');
+        const prevCandidates = cachedCandidates?.filter(c => c.filePath === relPath) ?? [];
+
+        let code: string;
+        try {
+          code = await readFile(file, 'utf-8');
+        } catch {
+          reloadVirtualModule(file, 'changed (read error)');
+          return;
+        }
+
+        let ast: Module;
+        try {
+          ast = await parse(code, { syntax: 'typescript', decorators: true });
+        } catch {
+          reloadVirtualModule(file, 'changed (parse error)');
+          return;
+        }
+
+        const nextCandidates = extractComponentCandidateFromAst(ast).filter(Boolean);
+
+        const metadataChanged =
+          nextCandidates.length !== prevCandidates.length ||
+          nextCandidates.some((next, i) => {
+            const prev = prevCandidates[i];
+            return !prev || next.name !== prev.name || next.tagName !== prev.tagName;
+          });
+
+        if (metadataChanged) {
+          reloadVirtualModule(file, 'changed');
+        }
+        // else: let Vite HMR handle the implementation-only change
+      });
     },
   }
 }
