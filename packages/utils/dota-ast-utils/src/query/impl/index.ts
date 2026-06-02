@@ -4,3 +4,6 @@ export {FunctionDeclarationQueryImpl} from "./FunctionDeclarationQueryImpl";
 export {VariableDeclarationQueryImpl} from "./VariableDeclarationQueryImpl";
 export {ExportDeclarationQueryImpl} from "./ExportDeclarationQueryImpl";
 export {ExportNamedDeclarationQueryImpl} from "./ExportNamedDeclarationQueryImpl";
+export {ImportDeclarationQueryImpl} from "./ImportDeclarationQueryImpl";
+export {ExportAllDeclarationQueryImpl} from "./ExportAllDeclarationQueryImpl";
+export {ExportDefaultDeclarationQueryImpl} from "./ExportDefaultDeclarationQueryImpl";
