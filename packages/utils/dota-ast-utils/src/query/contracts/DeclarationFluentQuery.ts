@@ -1,4 +1,4 @@
-import {
+import type {
   ClassDeclaration,
   ClassExpression,
   ClassMethod,
@@ -32,7 +32,7 @@ import {
   VariableDeclarator,
 } from "@swc/core";
 
-import {DeclarationTerminalQuery} from "@dota/query/contracts/DeclarationTerminalQuery.ts";
+import type {DeclarationTerminalQuery} from "@dota/query/contracts/DeclarationTerminalQuery.ts";
 
 
 export interface DeclarationFluentQuery<T = Module> extends DeclarationTerminalQuery<T>{
@@ -120,6 +120,11 @@ export interface VariableDeclarationQuery extends DeclarationFluentQuery<Variabl
   getDeclarators(): DeclarationTerminalQuery<VariableDeclarator>;
 }
 
+/**
+ * Fluent query over top-level class declarations selected from a module.
+ * Use it to inspect class members after narrowing by name, kind, or predicate.
+ * It exposes constructors, methods, properties, private members, static blocks, index signatures, and decorators.
+ */
 export interface ClassDeclarationQuery extends DeclarationFluentQuery<ClassDeclaration> {
   readonly ast: Module;
   readonly selection: ClassDeclaration[];
@@ -172,6 +177,15 @@ export interface ClassDeclarationQuery extends DeclarationFluentQuery<ClassDecla
    * @example [key: string]: number → TsIndexSignature { params, typeAnnotation, isStatic, readonly }
    */
   getTsIndexSignatures(): DeclarationTerminalQuery<TsIndexSignature>;
+
+  /**
+   * Iterates `selection`, collects `ClassDeclaration.decorators` from each class,
+   * and returns the flattened list of `Decorator` nodes as the new selection.
+   * Use this to inspect annotations such as `@sealed` or `@entity("user")`.
+   * When present, the terminal query matches `@foo` and `@foo(...)` by `foo`.
+   * @example @sealed class Foo {} → [Decorator { expression: Identifier("sealed") }]
+   */
+  getDecorators(): DeclarationTerminalQuery<Decorator>;
 }
 
 export interface FunctionDeclarationQuery extends DeclarationFluentQuery<FunctionDeclaration> {
