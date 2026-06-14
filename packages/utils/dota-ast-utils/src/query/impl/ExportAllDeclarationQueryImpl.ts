@@ -1,7 +1,12 @@
 import {ExportAllDeclarationQuery} from "@dota/query/contracts/DeclarationFluentQuery.ts";
 import {ExportAllDeclaration, Module} from "@swc/core";
 
-
+/**
+ * Fluent query for `export * from ...` statements.
+ * Each item is a re-export of another module and exposes the module path through `source`.
+ * Use this when you want to inspect barrel files, package entry points, or re-export chains.
+ * The query supports filtering by source path and by custom predicates over the raw export node.
+ */
 export class ExportAllDeclarationQueryImpl implements ExportAllDeclarationQuery {
   readonly ast: Module;
   readonly selection: ExportAllDeclaration[];
@@ -12,7 +17,8 @@ export class ExportAllDeclarationQueryImpl implements ExportAllDeclarationQuery 
   }
 
   /**
-   * Narrows the selection to declarations whose `source.value` matches `name`.
+   * Narrows the selection to re-exports whose module path matches `name`.
+   * Here `source` is the string literal after `from` in `export * from './mod'`.
    * @example findByName('./utils') → matches `export * from './utils'`
    */
   findByName(name: string): ExportAllDeclarationQuery {
@@ -22,7 +28,7 @@ export class ExportAllDeclarationQueryImpl implements ExportAllDeclarationQuery 
     );
   }
 
-  /** Narrows the selection to declarations that satisfy `predicate`. */
+  /** Narrows the selection to re-exports that satisfy `predicate`. */
   filter(predicate: (item: ExportAllDeclaration) => boolean): ExportAllDeclarationQuery {
     return new ExportAllDeclarationQueryImpl(
       this.ast,
@@ -31,7 +37,8 @@ export class ExportAllDeclarationQueryImpl implements ExportAllDeclarationQuery 
   }
 
   /**
-   * Narrows the selection to declarations whose `source.value` matches `source`.
+   * Narrows the selection to re-exports whose module path matches `source`.
+   * `source` means the string literal module specifier in the `from` clause.
    * @example filterBySource('./utils') → matches `export * from './utils'`
    */
   filterBySource(source: string): ExportAllDeclarationQuery {
