@@ -6,8 +6,35 @@ import {
   Module,
   NamedExportSpecifier,
 } from "@swc/core";
-import {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery";
+import type {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery.ts";
 import {DeclarationTerminalQueryImpl} from "./DeclarationTerminalQueryImpl";
+
+/**
+ * Terminal query for named export specifiers.
+ * It matches both the original binding name and the exported alias.
+ * Use it for `export { foo }` and `export { foo as bar }` forms.
+ */
+class NamedExportSpecifierQueryImpl extends DeclarationTerminalQueryImpl<NamedExportSpecifier> {
+  constructor(ast: Module, selection: NamedExportSpecifier[]) {
+    super(ast, selection, s => s.orig.value);
+  }
+
+  /** Narrows the selection to specifiers that match `name`. */
+  findByName(name: string): DeclarationTerminalQuery<NamedExportSpecifier> {
+    return new NamedExportSpecifierQueryImpl(
+      this.ast,
+      this.selection.filter(s => s.orig.value === name || s.exported?.value === name),
+    );
+  }
+
+  /** Narrows the selection to specifiers that satisfy `predicate`. */
+  filter(predicate: (item: NamedExportSpecifier) => boolean): DeclarationTerminalQuery<NamedExportSpecifier> {
+    return new NamedExportSpecifierQueryImpl(
+      this.ast,
+      this.selection.filter(predicate),
+    );
+  }
+}
 
 
 export class ExportNamedDeclarationQueryImpl implements ExportNamedDeclarationQuery {
@@ -59,7 +86,7 @@ export class ExportNamedDeclarationQueryImpl implements ExportNamedDeclarationQu
   filterReExports(): ExportNamedDeclarationQuery {
     return new ExportNamedDeclarationQueryImpl(
       this.ast,
-      this.selection.filter(d => d.source !== undefined),
+      this.selection.filter(d => d.source != null),
     );
   }
 
@@ -70,21 +97,21 @@ export class ExportNamedDeclarationQueryImpl implements ExportNamedDeclarationQu
   filterLocalExports(): ExportNamedDeclarationQuery {
     return new ExportNamedDeclarationQueryImpl(
       this.ast,
-      this.selection.filter(d => d.source === undefined),
+      this.selection.filter(d => d.source == null),
     );
   }
 
   /**
    * Collects all `NamedExportSpecifier` entries (`type === "ExportSpecifier"`) across the selection,
    * flattens them, and returns a terminal query over those specifiers.
-   * `findByName` on the result matches against `orig.value` (the local binding name).
-   * @example export { foo, bar as baz } → [{ orig: "foo" }, { orig: "bar", exported: "baz" }]
+   * `findByName` on the result matches against the local binding name or the exported alias.
+   * @example export { foo, bar as baz } → query over `foo`, `bar`, and `baz`
    */
   getNamedSpecifiers(): DeclarationTerminalQuery<NamedExportSpecifier> {
     const specifiers = this.selection.flatMap(d =>
       d.specifiers.filter((s): s is NamedExportSpecifier => s.type === "ExportSpecifier"),
     );
-    return new DeclarationTerminalQueryImpl(this.ast, specifiers, s => s.orig.value);
+    return new NamedExportSpecifierQueryImpl(this.ast, specifiers);
   }
 
   /**
