@@ -1,5 +1,5 @@
 import {Module} from "@swc/core";
-import {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery";
+import type {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery.ts";
 
 
 export class DeclarationTerminalQueryImpl<T> implements DeclarationTerminalQuery<T> {
