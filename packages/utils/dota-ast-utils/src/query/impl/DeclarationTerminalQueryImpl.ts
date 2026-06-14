@@ -2,6 +2,13 @@ import {Module} from "@swc/core";
 import type {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery.ts";
 
 
+/**
+ * Concrete implementation of `DeclarationTerminalQuery` backed by an in-memory array.
+ * An optional `nameExtractor` teaches the instance how to resolve a name from each item,
+ * enabling `findByName`. Every filtering operation (`findByName`, `filter`) returns a new
+ * instance that shares the same AST and extractor but holds the narrowed selection, so
+ * chains remain immutable. Construct via query builder methods rather than directly.
+ */
 export class DeclarationTerminalQueryImpl<T> implements DeclarationTerminalQuery<T> {
   readonly ast: Module;
   readonly selection: T[];
