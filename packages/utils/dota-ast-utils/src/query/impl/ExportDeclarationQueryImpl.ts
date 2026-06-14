@@ -16,7 +16,7 @@ import {
   TsTypeAliasDeclaration,
   VariableDeclaration,
 } from "@swc/core";
-import {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery";
+import type {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery.ts";
 import {DeclarationTerminalQueryImpl} from "./DeclarationTerminalQueryImpl";
 import {ClassDeclarationQueryImpl} from "./ClassDeclarationQueryImpl";
 import {FunctionDeclarationQueryImpl} from "./FunctionDeclarationQueryImpl";
@@ -42,7 +42,12 @@ function nameFromDeclaration(declaration: Declaration): string | undefined {
   }
 }
 
-
+/**
+ * Fluent query for exports that wrap a real declaration node.
+ * Use this when a file contains `export class`, `export function`, or `export const` forms.
+ * The query keeps the full export node so you can inspect, filter, and then unwrap the inner declaration.
+ * It also supports name lookup across the wrapped declaration's identifier or declared name.
+ */
 export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
   readonly ast: Module;
   readonly selection: ExportDeclaration[];
@@ -53,9 +58,10 @@ export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
   }
 
   /**
-   * Narrows the selection to declarations whose inner declaration name matches `name`.
-   * The name is resolved via the declared identifier/id of the wrapped declaration.
-   * @example findByName("Foo") → matches `export class Foo {}`, `export function Foo() {}`, etc.
+   * Narrows the selection to exports whose wrapped declaration name matches `name`.
+   * For classes and functions this is the declared identifier; for interfaces, types, enums,
+   * and namespaces it is the inner `id`; for variables it is the first identifier declarator.
+   * @example findByName("Foo") → matches `export class Foo {}` and `export function Foo() {}`
    */
   findByName(name: string): ExportDeclarationQuery {
     return new ExportDeclarationQueryImpl(
@@ -64,15 +70,15 @@ export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
     );
   }
 
-  /** Narrows the selection to declarations that satisfy `predicate`. */
+  /** Narrows the selection to exports that satisfy `predicate`. */
   filter(predicate: (item: ExportDeclaration) => boolean): ExportDeclarationQuery {
     return new ExportDeclarationQueryImpl(this.ast, this.selection.filter(predicate));
   }
 
   /**
-   * Filters the selection to `ExportDeclaration` nodes whose inner declaration is a `ClassDeclaration`,
-   * unwraps them, and returns a `ClassDeclarationQuery` over the inner nodes.
-   * @example export class Foo {} → ClassDeclaration { identifier: "Foo", body: [...] }
+   * Keeps only `export class` nodes, then unwraps the inner class declarations.
+   * This is useful when you want class-specific queries like methods, fields, or constructors.
+   * @example export class Foo {} → query over the inner class declaration
    */
   getClassDeclarations(): ClassDeclarationQuery {
     const inner = this.selection
@@ -84,9 +90,9 @@ export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
   }
 
   /**
-   * Filters the selection to `ExportDeclaration` nodes whose inner declaration is a `FunctionDeclaration`,
-   * unwraps them, and returns a `FunctionDeclarationQuery` over the inner nodes.
-   * @example export function foo() {} → FunctionDeclaration { identifier: "foo", params: [...] }
+   * Keeps only `export function` nodes and unwraps the inner function declarations.
+   * Use the returned query to inspect params, decorators, or type parameters.
+   * @example export function foo() {} → query over the inner function declaration
    */
   getFunctionDeclarations(): FunctionDeclarationQuery {
     const inner = this.selection
@@ -98,9 +104,9 @@ export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
   }
 
   /**
-   * Filters the selection to `ExportDeclaration` nodes whose inner declaration is a `VariableDeclaration`,
-   * unwraps them, and returns a `VariableDeclarationQuery` over the inner nodes.
-   * @example export const foo = 1 → VariableDeclaration { kind: "const", declarations: [...] }
+   * Keeps only `export const`, `export let`, and `export var` declarations, then unwraps them.
+   * Use the returned query to inspect the actual variable declaration and its declarators.
+   * @example export const foo = 1 → query over the inner variable declaration
    */
   getVariableDeclarations(): VariableDeclarationQuery {
     const inner = this.selection
@@ -112,10 +118,9 @@ export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
   }
 
   /**
-   * Filters the selection to `ExportDeclaration` nodes whose inner declaration is a `TsInterfaceDeclaration`,
-   * unwraps them, and returns a terminal query over the inner nodes.
-   * `findByName` on the result matches against `id.value`.
-   * @example export interface Foo {} → TsInterfaceDeclaration { id: "Foo", ... }
+   * Keeps only exported TypeScript interfaces and unwraps them into a terminal query.
+   * The returned query matches names against the interface `id`.
+   * @example export interface Foo {} → query over the inner interface declaration
    */
   getTsInterfaceDeclarations(): DeclarationTerminalQuery<TsInterfaceDeclaration> {
     const inner = this.selection
@@ -127,10 +132,9 @@ export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
   }
 
   /**
-   * Filters the selection to `ExportDeclaration` nodes whose inner declaration is a `TsTypeAliasDeclaration`,
-   * unwraps them, and returns a terminal query over the inner nodes.
-   * `findByName` on the result matches against `id.value`.
-   * @example export type Foo = string → TsTypeAliasDeclaration { id: "Foo", ... }
+   * Keeps only exported TypeScript type aliases and unwraps them into a terminal query.
+   * The returned query matches names against the alias `id`.
+   * @example export type Foo = string → query over the inner type alias declaration
    */
   getTsTypeAliasDeclarations(): DeclarationTerminalQuery<TsTypeAliasDeclaration> {
     const inner = this.selection
@@ -142,10 +146,9 @@ export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
   }
 
   /**
-   * Filters the selection to `ExportDeclaration` nodes whose inner declaration is a `TsEnumDeclaration`,
-   * unwraps them, and returns a terminal query over the inner nodes.
-   * `findByName` on the result matches against `id.value`.
-   * @example export enum Foo { A, B } → TsEnumDeclaration { id: "Foo", members: [...] }
+   * Keeps only exported TypeScript enums and unwraps them into a terminal query.
+   * The returned query matches names against the enum `id`.
+   * @example export enum Foo { A, B } → query over the inner enum declaration
    */
   getTsEnumDeclarations(): DeclarationTerminalQuery<TsEnumDeclaration> {
     const inner = this.selection
@@ -157,10 +160,9 @@ export class ExportDeclarationQueryImpl implements ExportDeclarationQuery {
   }
 
   /**
-   * Filters the selection to `ExportDeclaration` nodes whose inner declaration is a `TsModuleDeclaration`,
-   * unwraps them, and returns a terminal query over the inner nodes.
-   * `findByName` on the result matches against `id.value` (works for both `Identifier` and `StringLiteral`).
-   * @example export namespace Foo {} → TsModuleDeclaration { id: "Foo", ... }
+   * Keeps only exported namespaces/modules and unwraps them into a terminal query.
+   * The returned query matches names against the namespace `id`, whether it is an identifier or string literal.
+   * @example export namespace Foo {} → query over the inner namespace declaration
    */
   getTsModuleDeclarations(): DeclarationTerminalQuery<TsModuleDeclaration> {
     const inner = this.selection
