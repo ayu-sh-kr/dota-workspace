@@ -1,6 +1,6 @@
 import {FunctionDeclarationQuery} from "@dota/query/contracts/DeclarationFluentQuery.ts";
 import {Decorator, FunctionDeclaration, Module, Param, TsTypeParameter} from "@swc/core";
-import {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery";
+import type {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery.ts";
 import {DeclarationTerminalQueryImpl} from "./DeclarationTerminalQueryImpl";
 
 
