@@ -1,6 +1,6 @@
 import {VariableDeclarationQuery} from "@dota/query/contracts/DeclarationFluentQuery.ts";
 import {Module, VariableDeclaration, VariableDeclarator} from "@swc/core";
-import {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery";
+import type {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery.ts";
 import {DeclarationTerminalQueryImpl} from "./DeclarationTerminalQueryImpl";
 
 
