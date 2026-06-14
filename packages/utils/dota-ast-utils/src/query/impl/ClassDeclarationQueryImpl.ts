@@ -1,19 +1,45 @@
-import {ClassDeclarationQuery} from "@dota/query/contracts/DeclarationFluentQuery.ts";
-import {
+import type {ClassDeclarationQuery} from "../contracts/DeclarationFluentQuery.ts";
+import type {
   ClassDeclaration,
   ClassMember,
   ClassMethod,
   ClassProperty,
   Constructor,
+  Decorator,
   Module,
   PrivateMethod,
+  PrivateName,
   PrivateProperty,
   StaticBlock,
   TsIndexSignature,
 } from "@swc/core";
-import {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery";
+import type {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery.ts";
 import {DeclarationTerminalQueryImpl} from "./DeclarationTerminalQueryImpl";
 
+
+function decoratorName(decorator: Decorator): string | undefined {
+  const expression = decorator.expression;
+
+  if (expression.type === "Identifier") {
+    return expression.value;
+  }
+
+  if (expression.type === "CallExpression" && expression.callee.type === "Identifier") {
+    return expression.callee.value;
+  }
+
+  return undefined;
+}
+
+function privateNameValue(name: PrivateMethod["key"] | PrivateProperty["key"]): string | undefined {
+  if (name.type !== "PrivateName") {
+    return undefined;
+  }
+
+  const privateName = name as PrivateName & { value?: string };
+
+  return privateName.value ?? privateName.id.value;
+}
 
 export class ClassDeclarationQueryImpl implements ClassDeclarationQuery {
   readonly ast: Module;
@@ -54,11 +80,11 @@ export class ClassDeclarationQueryImpl implements ClassDeclarationQuery {
 
   /**
    * Collects all `PrivateMethod` members (`type === "PrivateMethod"`) across the selection.
-   * `findByName` on the result matches against the `PrivateName` id value (without the `#`).
+   * `findByName` on the result matches against the `PrivateName` value (without the `#`).
    */
   getPrivateMethods(): DeclarationTerminalQuery<PrivateMethod> {
     const members = this.members<PrivateMethod>("PrivateMethod");
-    return new DeclarationTerminalQueryImpl(this.ast, members, m => m.key.id.value);
+    return new DeclarationTerminalQueryImpl(this.ast, members, m => privateNameValue(m.key));
   }
 
   /**
@@ -74,11 +100,11 @@ export class ClassDeclarationQueryImpl implements ClassDeclarationQuery {
 
   /**
    * Collects all `PrivateProperty` members (`type === "PrivateProperty"`) across the selection.
-   * `findByName` on the result matches against the `PrivateName` id value (without the `#`).
+   * `findByName` on the result matches against the `PrivateName` value (without the `#`).
    */
   getPrivateProperties(): DeclarationTerminalQuery<PrivateProperty> {
     const members = this.members<PrivateProperty>("PrivateProperty");
-    return new DeclarationTerminalQueryImpl(this.ast, members, p => p.key.id.value);
+    return new DeclarationTerminalQueryImpl(this.ast, members, p => privateNameValue(p.key));
   }
 
   /**
@@ -95,6 +121,16 @@ export class ClassDeclarationQueryImpl implements ClassDeclarationQuery {
    */
   getTsIndexSignatures(): DeclarationTerminalQuery<TsIndexSignature> {
     return new DeclarationTerminalQueryImpl(this.ast, this.members<TsIndexSignature>("TsIndexSignature"));
+  }
+
+  /**
+   * Collects `ClassDeclaration.decorators` from all classes in the selection and returns the flattened list.
+   * Supports `findByName()` for decorator identifiers and decorator calls such as `@sealed` or `@sealed(...)`.
+   * Skips classes with no decorators.
+   */
+  getDecorators(): DeclarationTerminalQuery<Decorator> {
+    const decorators = this.selection.flatMap(d => d.decorators ?? []);
+    return new DeclarationTerminalQueryImpl(this.ast, decorators, decoratorName);
   }
 
   /** Returns the first class in the selection, or `null` if empty. */
