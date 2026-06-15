@@ -28,7 +28,7 @@
     "declaration": true,
     "declarationDir": "./dist/types",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
 
     /* Path */
     "paths": {
@@ -37,7 +37,8 @@
 
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ],
   "exclude": ["node_modules", "dist"]
 }
