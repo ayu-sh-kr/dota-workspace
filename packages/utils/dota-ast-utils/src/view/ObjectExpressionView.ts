@@ -1,0 +1,53 @@
+import {KeyValueProperty, ObjectExpression} from "@swc/core";
+
+/**
+ * Behavior-focused wrapper around an object expression.
+ *
+ * This view indexes only key-value properties whose keys are simple
+ * identifiers or string literals, making property lookup predictable and fast.
+ */
+export class ObjectExpressionView {
+
+  private readonly propertiesByKey: Map<string, KeyValueProperty> = new Map();
+
+  constructor(private readonly objectExpression: ObjectExpression) {
+    this.objectExpression.properties.forEach(property => {
+      if (property.type === 'KeyValueProperty') {
+        if (property.key.type === 'Identifier' || property.key.type === 'StringLiteral') {
+          this.propertiesByKey.set(property.key.value, property);
+        }
+      }
+    });
+  }
+
+  /** Creates a view for the given object expression. */
+  static from(objectExpression: ObjectExpression): ObjectExpressionView {
+    return new ObjectExpressionView(objectExpression);
+  }
+
+  /** Returns `true` when the object expression contains at least one property node. */
+  hasProperties(): boolean {
+    return this.objectExpression.properties.length > 0;
+  }
+
+  /** Returns the raw SWC property list exactly as stored on the object expression. */
+  getProperties(): ObjectExpression['properties'] {
+    return this.objectExpression.properties;
+  }
+
+  /**
+   * Returns the names of indexable properties.
+   *
+   * Only `KeyValueProperty` entries with `Identifier` or `StringLiteral` keys
+   * are included in the result.
+   */
+  getPropertiesNames(spread: boolean = false): string[] {
+    return Array.from(this.propertiesByKey.keys());
+  }
+
+  /** Returns the indexed property with the given name, or `null` if missing. */
+  getProperty(name: string): KeyValueProperty | null {
+    return this.propertiesByKey.get(name) ?? null;
+  }
+
+}
