@@ -15,21 +15,7 @@ import type {
 } from "@swc/core";
 import type {DeclarationTerminalQuery} from "../contracts/DeclarationTerminalQuery.ts";
 import {DeclarationTerminalQueryImpl} from "./DeclarationTerminalQueryImpl";
-
-
-function decoratorName(decorator: Decorator): string | undefined {
-  const expression = decorator.expression;
-
-  if (expression.type === "Identifier") {
-    return expression.value;
-  }
-
-  if (expression.type === "CallExpression" && expression.callee.type === "Identifier") {
-    return expression.callee.value;
-  }
-
-  return undefined;
-}
+import {DecoratorUtils} from "../../utils/DecoratorUtils.ts";
 
 function privateNameValue(name: PrivateMethod["key"] | PrivateProperty["key"]): string | undefined {
   if (name.type !== "PrivateName") {
@@ -130,7 +116,7 @@ export class ClassDeclarationQueryImpl implements ClassDeclarationQuery {
    */
   getDecorators(): DeclarationTerminalQuery<Decorator> {
     const decorators = this.selection.flatMap(d => d.decorators ?? []);
-    return new DeclarationTerminalQueryImpl(this.ast, decorators, decoratorName);
+    return new DeclarationTerminalQueryImpl(this.ast, decorators, DecoratorUtils.decoratorName);
   }
 
   /** Returns the first class in the selection, or `null` if empty. */
