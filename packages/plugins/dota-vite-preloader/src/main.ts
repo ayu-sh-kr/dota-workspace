@@ -7,11 +7,18 @@ import {Plugin, ViteDevServer} from "vite";
 import {ASTHelperUtils} from "@dota/ASTHelperUtils.ts";
 import {ComponentUtils} from "@dota/ComponentUtils.ts";
 import {consola, createConsola, LogLevels, LogType} from 'consola';
+import {
+  DeclarationUtils,
+  DecoratorView,
+  ExportDeclarationQueryImpl,
+  KeyValuePropertyView,
+  ObjectExpressionView
+} from "@ayu-sh-kr/dota-ast-utils";
 
 
 /**
  * Represents a candidate Dota component discovered during the scanning process.
- * Contains metadata about the component including its class name, file location,
+ * Contains metadata about the component, including its class name, file location,
  * and the custom element tag name used for registration.
  *
  * @property name - The class name of the component
@@ -37,25 +44,43 @@ let logger = consola;
 function extractComponentCandidateFromClassDeclaration(classDecl: ClassDeclaration): DotaComponentCandidate | null {
   const decorators = ASTHelperUtils.getDecorators(classDecl);
   for (const decorator of decorators) {
-    const decoratorName = ASTHelperUtils.getDecoratorName(decorator);
-    if (decoratorName && decoratorName === ASTFilterConstants.COMPONENT_DECORATOR_NAME) {
-      const args = ASTHelperUtils.getDecoratorArguments(decorator);
-      if (args.length > 0 && args[0].expression.type === 'ObjectExpression') {
-        const componentExpression = args[0].expression;
-        const componentSelector = ASTHelperUtils.getKeyValuePropertyFromObject(componentExpression, ASTFilterConstants.COMPONENT_TAG_NAME_PROPERTY);
-        if (componentSelector.value.type === 'StringLiteral') {
-          const tagName = componentSelector.value.value;
-          const className = ASTHelperUtils.getClassName(classDecl);
-          if (className) {
-            return {
-              name: className,
-              filePath: '',
-              tagName
-            }
-          }
-        }
-      }
+    const decoratorView = DecoratorView.from(decorator);
+    const decoratorName = decoratorView.getName();
+    if (decoratorName == null || decoratorName !== ASTFilterConstants.COMPONENT_DECORATOR_NAME) {
+      continue;
     }
+
+    const args = decoratorView.getArguments();
+    if (args.length === 0) {
+      continue;
+    }
+
+    const firstArgument = args[0];
+    if (firstArgument == null || firstArgument.expression.type !== "ObjectExpression") {
+      continue;
+    }
+
+    const componentObjectExpression = ObjectExpressionView.from(firstArgument.expression);
+    const componentTagProperty = componentObjectExpression.getProperty(ASTFilterConstants.COMPONENT_TAG_NAME_PROPERTY);
+    if (componentTagProperty == null) {
+      continue;
+    }
+
+    const keyValuePropertyView = KeyValuePropertyView.from(componentTagProperty);
+    const tagValue = keyValuePropertyView.getString();
+    if (tagValue == null) {
+      continue;
+    }
+    const className = ASTHelperUtils.getClassName(classDecl);
+    if (className == null) {
+      continue;
+    }
+
+    return {
+      name: className,
+      filePath: '',
+      tagName: tagValue
+    };
   }
   return null;
 }
@@ -70,10 +95,10 @@ function extractComponentCandidateFromClassDeclaration(classDecl: ClassDeclarati
  */
 function extractComponentCandidateFromAst(ast: Module): DotaComponentCandidate[] {
   const body = ast.body;
-  const exportDeclarations = ASTHelperUtils.getExportDeclarations(body);
-  const classDeclarations = ASTHelperUtils.getClassDeclarations(exportDeclarations);
-  return classDeclarations
-    .map(classDecl => extractComponentCandidateFromClassDeclaration(classDecl));
+  return new ExportDeclarationQueryImpl(ast, DeclarationUtils.extractDeclarations(body, 'ExportDeclaration'))
+    .getClassDeclarations()
+    .filter(classDecl => classDecl.decorators != null)
+    .map(classDecl => extractComponentCandidateFromClassDeclaration(classDecl))
 }
 
 /**
@@ -90,9 +115,9 @@ async function scanDotaComponents(root: string): Promise<DotaComponentCandidate[
     ComponentScanPath.SOURCE_ROOT_DIRECTORY_SCAN_PATH,
     ComponentScanPath.SOURCE_COMPONENT_DIRECTORY_SCAN_PATH,
     ComponentScanPath.SOURCE_PAGE_DIRECTORY_SCAN_PATH
-  ], { cwd: root, absolute: false });
+  ], {cwd: root, absolute: false});
 
-  const candidated:DotaComponentCandidate[] = []
+  const candidated: DotaComponentCandidate[] = []
 
   for (const file of files) {
     const code = await readFile(file, 'utf-8');
@@ -188,7 +213,7 @@ export type PluginConfig = {
  * @param config - Plugin configuration with optional root path and log level
  * @returns Vite plugin instance with resolveId, load, and buildStart hooks
  */
-export default function dotaVitePreloader({ root = process.cwd(), logType = 'info' }: PluginConfig): Plugin {
+export default function dotaVitePreloader({root = process.cwd(), logType = 'info'}: PluginConfig): Plugin {
   // Plugin-scope cache: accessible from buildStart/resolveId/load/etc.
   let cachedCandidates: DotaComponentCandidate[] | null = null;
   logger = createConsola({
@@ -211,13 +236,13 @@ export default function dotaVitePreloader({ root = process.cwd(), logType = 'inf
     if (mod) {
       server.moduleGraph.invalidateModule(mod);
     }
-    server.ws.send({ type: 'full-reload' });
+    server.ws.send({type: 'full-reload'});
   }
 
   return {
     name: 'vite-plugin-dota-preloader',
     resolveId(id) {
-      if(id === VirtualImportID.DOTA_COMPONENTS) return VirtualImportID.RESOLVED_DOTA_COMPONENTS;
+      if (id === VirtualImportID.DOTA_COMPONENTS) return VirtualImportID.RESOLVED_DOTA_COMPONENTS;
       return null;
     },
 
@@ -267,7 +292,7 @@ export default function dotaVitePreloader({ root = process.cwd(), logType = 'inf
 
         let ast: Module;
         try {
-          ast = await parse(code, { syntax: 'typescript', decorators: true });
+          ast = await parse(code, {syntax: 'typescript', decorators: true});
         } catch {
           reloadVirtualModule(file, 'changed (parse error)');
           return;
