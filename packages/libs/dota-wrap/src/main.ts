@@ -14,6 +14,7 @@ export type AnyModule = Record<string, unknown>;
 export type AppConfig = {
   modules: Record<string, unknown> | DotaElementConstructor[];
   externalComponents?: ComponentClass[];
+  routes?: RouteConfig<HTMLElement>[];
   errorRoute: RouteConfig<HTMLElement>;
   defaultRoute: RouteConfig<HTMLElement>;
   root: ComponentClass;
@@ -102,17 +103,20 @@ export async function registerComponents(
  * @param errorRoute - The route configuration to use for error handling.
  * @param defaultRoute - The route configuration to use as the default route.
  * @param root - The root component class for the application.
+ * @param routes - Optional array of route configurations to register.
  * @returns A promise that resolves to an instance of DotaRouterService configured with the discovered components and routes.
  */
 export async function registerRoutes(
   components: ComponentClass[],
   errorRoute: RouteConfig<HTMLElement>,
   defaultRoute: RouteConfig<HTMLElement>,
-  root: ComponentClass
+  root: ComponentClass,
+  routes: RouteConfig<HTMLElement>[] = []
 ): Promise<RouterService<Router<HTMLElement>>> {
   return DotaRouterService.fromComponents({
     router: DomHistoryRouter,
     components: [...components],
+    routes: routes.length > 0 ? [...routes] : undefined,
     errorRoute: errorRoute,
     defaultRoute: defaultRoute,
     root: root
@@ -137,7 +141,7 @@ export async function initializeApp(config: AppConfig): Promise<{
   console.info(`${components.length} Components registered.`);
 
   const routerService = await registerRoutes(
-    components, config.errorRoute, config.defaultRoute, config.root
+    components, config.errorRoute, config.defaultRoute, config.root, config.routes ?? []
   );
   routerService.init();
   console.info(`${routerService._routes.length} Routes registered.`);

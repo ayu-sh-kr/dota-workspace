@@ -1,11 +1,11 @@
 {
-  "name": "@ayu-sh-kr/dota-preloader-plugin",
+  "name": "@ayu-sh-kr/dota-ast-utils",
   "private": false,
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.2",
-  "description": "dota-vite-preloader-plugin is a Vite plugin that preloads Web Components for Dota Core Web Apps. It scans the specified directory for Web Component files, generates a preload script, and injects it into the HTML. This ensures that Web Components are loaded and ready to use when the application starts.",
+  "version": "0.0.1",
+  "description": "dota-ast-utils provides AST parsing and transformation utilities for use across dota ecosystem projects and beyond.",
   "author": {
     "name": "ayu-sh-kr",
     "email": "akjaiswal2003@gmail.com",
@@ -13,9 +13,10 @@
   },
   "license": "MIT",
   "keywords": [
-    "Dota Core Plugins",
-    "Web Components",
-    "Web Component Loader"
+    "Dota AST",
+    "AST",
+    "Parser",
+    "Transformer"
   ],
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -31,18 +32,18 @@
     }
   },
   "scripts": {
+    "dev": "vite",
     "build": "tsc && vite build",
+    "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:verbose": "vitest run --reporter=verbose",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@ayu-sh-kr/dota-core": "workspace:*",
-    "@ayu-sh-kr/dota-router": "workspace:*",
-    "@ayu-sh-kr/dota-ast-utils": "workspace:*",
     "@swc/core": "^1.13.5",
-    "fast-glob": "^3.3.3",
-    "consola": "3.4.2",
-    "reflect-metadata": "^0.2.2"
+    "fast-glob": "^3.3.3"
   },
   "files": [
     "dist/",

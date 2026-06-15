@@ -16,6 +16,7 @@ import {ApplicationEventService} from "@ayu-sh-kr/dota-core";
 import {NotificationService} from "@dota/components/utils/notification/notification.service.ts";
 import {DefaultApplicationEventListenerRegistry} from "@ayu-sh-kr/dota-event";
 import {MdTocComponent, MdViewComponent} from "@ayu-sh-kr/dota-md";
+import {routeConfig} from "virtual:dota-routes";
 
 const applicationEventService = ApplicationEventService.getInstance();
 const applicationEventPublisher = applicationEventService.getPublisher();
@@ -23,11 +24,12 @@ const applicationEventListener = applicationEventService.getListener();
 
 let routerService!: RouterService<Router<HTMLElement>>;
 let notificationService!: NotificationService
-initializeApp({
-  modules: components,
-  externalComponents: [
-    IconsComponent, PopoverComponent, MdViewComponent,
-    MdTocComponent, DotaCarouselComponent, DotaSlideComponent,
+  initializeApp({
+    modules: components,
+    routes: routeConfig,
+    externalComponents: [
+      IconsComponent, PopoverComponent, MdViewComponent,
+      MdTocComponent, DotaCarouselComponent, DotaSlideComponent,
     ButtonComponent
   ],
   errorRoute: {path: '/error', component: ErrorPage},

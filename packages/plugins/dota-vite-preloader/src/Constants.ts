@@ -8,8 +8,12 @@ export class ComponentScanPath {
 
 export class ASTFilterConstants {
   static COMPONENT_DECORATOR_NAME = 'Component';
+  static ROUTE_DECORATOR_NAME = 'Route';
   static CLASS_RENDER_METHOD_NAME = 'render';
   static COMPONENT_TAG_NAME_PROPERTY = 'selector';
+  static ROUTE_PATH_NAME_PROPERTY = 'path';
+  static ROUTE_DEFAULT_NAME_PROPERTY = 'default';
+  static ROUTE_RENDER_NAME_PROPERTY = 'render';
 }
 
 export class ImportPath {
@@ -19,4 +23,6 @@ export class ImportPath {
 export class VirtualImportID {
   static DOTA_COMPONENTS = "virtual:dota-components";
   static RESOLVED_DOTA_COMPONENTS = "\0virtual:dota-components";
+  static DOTA_ROUTES = "virtual:dota-routes";
+  static RESOLVED_DOTA_ROUTES = "\0virtual:dota-routes";
 }
