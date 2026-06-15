@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     dotaVitePreloader({
       root: resolve(__dirname),
-      logType: 'info'
+      logType: 'debug'
     })
   ],
   css: {
