@@ -32,13 +32,17 @@
   },
   "scripts": {
     "build": "tsc && vite build",
-    "release": "pnpm run build && changeset publish"
+    "release": "pnpm run build && changeset publish",
+    "test": "vitest run"
   },
   "dependencies": {
+    "@ayu-sh-kr/dota-core": "workspace:*",
+    "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-ast-utils": "workspace:*",
     "@swc/core": "^1.13.5",
     "fast-glob": "^3.3.3",
-    "consola": "3.4.2"
+    "consola": "3.4.2",
+    "reflect-metadata": "^0.2.2"
   },
   "files": [
     "dist/",
