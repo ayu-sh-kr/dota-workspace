@@ -1,0 +1,502 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json",
+  "name": "",
+  "version": "",
+  "contributions": {
+    "html": {
+      "elements": [
+        {
+          "name": "app-root",
+          "attributes": []
+        },
+        {
+          "name": "blog-icon",
+          "attributes": []
+        },
+        {
+          "name": "blog-preview",
+          "attributes": [
+            {
+              "name": "date",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "writer",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "header",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "category",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "path",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "blog-section",
+          "attributes": []
+        },
+        {
+          "name": "blog-view",
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "maxWidth",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "ai-form",
+          "attributes": []
+        },
+        {
+          "name": "message-box",
+          "attributes": []
+        },
+        {
+          "name": "message-card",
+          "attributes": []
+        },
+        {
+          "name": "community-card",
+          "attributes": [
+            {
+              "name": "imageSrc",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "role",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "githubLink",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "linkedinLink",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "quote",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "community-component",
+          "attributes": []
+        },
+        {
+          "name": "social-button",
+          "attributes": []
+        },
+        {
+          "name": "social-section",
+          "attributes": []
+        },
+        {
+          "name": "counter-component",
+          "attributes": [
+            {
+              "name": "counter",
+              "type": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "color-picker",
+          "attributes": [
+            {
+              "name": "currentColor",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "doc-content",
+          "attributes": [
+            {
+              "name": "maxWidth",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "doc-header",
+          "attributes": [
+            {
+              "name": "activeFile",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "theme",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "doc-path",
+          "attributes": []
+        },
+        {
+          "name": "doc-section",
+          "attributes": []
+        },
+        {
+          "name": "doc-sidebar",
+          "attributes": []
+        },
+        {
+          "name": "doc-toc",
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "theme-picker",
+          "attributes": [
+            {
+              "name": "currentTheme",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "blob-separator",
+          "attributes": [
+            {
+              "name": "side",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "index",
+              "type": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "blob-wrapper",
+          "attributes": [
+            {
+              "name": "side",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "index",
+              "type": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "capability-section",
+          "attributes": []
+        },
+        {
+          "name": "client-section",
+          "attributes": []
+        },
+        {
+          "name": "code-section",
+          "attributes": []
+        },
+        {
+          "name": "device-section",
+          "attributes": []
+        },
+        {
+          "name": "emitter-section",
+          "attributes": []
+        },
+        {
+          "name": "app-feature",
+          "attributes": []
+        },
+        {
+          "name": "app-hero",
+          "attributes": []
+        },
+        {
+          "name": "app-offer",
+          "attributes": [
+            {
+              "name": "isVisible",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "our-tools",
+          "attributes": []
+        },
+        {
+          "name": "reactive-dota",
+          "attributes": []
+        },
+        {
+          "name": "resource-content",
+          "attributes": []
+        },
+        {
+          "name": "resource-path",
+          "attributes": []
+        },
+        {
+          "name": "resource-section",
+          "attributes": []
+        },
+        {
+          "name": "navigation-sidebar",
+          "attributes": [
+            {
+              "name": "visible",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "app-footer",
+          "attributes": []
+        },
+        {
+          "name": "app-icon",
+          "attributes": []
+        },
+        {
+          "name": "markdown-view",
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "color",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "maxWidth",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "self-end",
+          "attributes": []
+        },
+        {
+          "name": "code-snippet",
+          "attributes": [
+            {
+              "name": "filename",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "language",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "device-preview",
+          "attributes": []
+        },
+        {
+          "name": "get-started-button",
+          "attributes": []
+        },
+        {
+          "name": "tab-holder",
+          "attributes": [
+            {
+              "name": "key",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "tool-detail",
+          "attributes": []
+        },
+        {
+          "name": "tool-list-item",
+          "attributes": [
+            {
+              "name": "toolId",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "ai-button",
+          "attributes": []
+        },
+        {
+          "name": "dark-mode-button",
+          "attributes": [
+            {
+              "name": "color",
+              "type": "string",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "github-button",
+          "attributes": []
+        },
+        {
+          "name": "ham-burger-button",
+          "attributes": []
+        },
+        {
+          "name": "scroll-bottom-button",
+          "attributes": []
+        },
+        {
+          "name": "app-header",
+          "attributes": []
+        },
+        {
+          "name": "section-header",
+          "attributes": []
+        },
+        {
+          "name": "notification-holder",
+          "attributes": []
+        },
+        {
+          "name": "app-notification",
+          "attributes": []
+        },
+        {
+          "name": "loader-section",
+          "attributes": [
+            {
+              "name": "isLoading",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "app-loader",
+          "attributes": []
+        },
+        {
+          "name": "no-content",
+          "attributes": []
+        },
+        {
+          "name": "page-wrapper",
+          "attributes": []
+        },
+        {
+          "name": "section-wrapper",
+          "attributes": []
+        },
+        {
+          "name": "blog-content",
+          "attributes": []
+        },
+        {
+          "name": "blog-page",
+          "attributes": []
+        },
+        {
+          "name": "chat-page",
+          "attributes": []
+        },
+        {
+          "name": "community-page",
+          "attributes": []
+        },
+        {
+          "name": "doc-page",
+          "attributes": []
+        },
+        {
+          "name": "app-error",
+          "attributes": [
+            {
+              "name": "status",
+              "type": "number",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "home-page",
+          "attributes": []
+        },
+        {
+          "name": "resource-page",
+          "attributes": []
+        }
+      ]
+    }
+  }
+}
