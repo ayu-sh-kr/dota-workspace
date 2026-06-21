@@ -1,4 +1,5 @@
 export {DeclarationTerminalQueryImpl} from "./DeclarationTerminalQueryImpl";
+export {DeclarationBaseQueryImpl} from "./DeclarationBaseQueryImpl";
 export {ClassDeclarationQueryImpl} from "./ClassDeclarationQueryImpl";
 export {FunctionDeclarationQueryImpl} from "./FunctionDeclarationQueryImpl";
 export {VariableDeclarationQueryImpl} from "./VariableDeclarationQueryImpl";
