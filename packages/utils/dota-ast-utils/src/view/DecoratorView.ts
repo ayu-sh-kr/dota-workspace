@@ -24,7 +24,7 @@ export class DecoratorView {
     return this.decorator.expression.type === "CallExpression" && this.decorator.expression.arguments.length > 0;
   }
 
-  /** Returns the decorator call arguments, or an empty array for non-call decorators. */
+  /** Returns the decorator call arguments or an empty array for non-call decorators. */
   getArguments(): Argument[] {
     if (this.decorator.expression.type !== "CallExpression") {
       return [];
