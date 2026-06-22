@@ -1,11 +1,9 @@
 import type {
-  ClassProperty,
   ClassDeclaration,
   ClassMember,
-  ArrayExpression,
+  ClassProperty,
   Decorator,
   Expression,
-  ObjectExpression,
   PrivateName,
   PrivateProperty,
   PropertyName,
@@ -13,6 +11,10 @@ import type {
 import {ObjectExpressionView} from "./ObjectExpressionView.ts";
 import {KeyValuePropertyView} from "./KeyValuePropertyView.ts";
 import {DecoratorUtils} from "../utils/DecoratorUtils.ts";
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 /**
  * Behavior-focused wrapper around a single class property node.
@@ -42,14 +44,21 @@ export class PropertyView {
       .map(property => new PropertyView(property));
   }
 
-  /** Returns the underlying SWC node type. */
+  /** Returns a simplified property type inferred from the initializer or type annotation. */
   getType(): string | null {
     const value = this.defaultValue();
 
-    if (!value) {
-      return null;
+    if (value) {
+      const inferredType = this.getTypeFromExpression(value);
+      if (inferredType) {
+        return inferredType;
+      }
     }
 
+    return this.getTypeFromTypeAnnotation();
+  }
+
+  private getTypeFromExpression(value: Expression): string | null {
     switch (value.type) {
       case "StringLiteral":
         return "string";
@@ -72,6 +81,53 @@ export class PropertyView {
     }
   }
 
+  private getTypeFromTypeAnnotation(): string | null {
+    const typeAnnotation = this.property.typeAnnotation?.typeAnnotation;
+    if (!typeAnnotation) {
+      return null;
+    }
+
+    switch (typeAnnotation.type) {
+      case "TsKeywordType":
+        return typeAnnotation.kind;
+      case "TsArrayType":
+        return "array";
+      case "TsTypeReference":
+        if (typeAnnotation.typeName.type === "Identifier") {
+          const typeName = typeAnnotation.typeName.value;
+
+          switch (typeName) {
+            case "String":
+            case "Boolean":
+            case "Number":
+            case "BigInt":
+              return typeName.toLowerCase();
+            case "Array":
+              return "array";
+            case "Object":
+              return "object";
+            default:
+              return typeName;
+          }
+        }
+
+        return "custom";
+      case "TsLiteralType":
+        switch (typeAnnotation.literal.type) {
+          case "StringLiteral":
+            return "string";
+          case "BooleanLiteral":
+            return "boolean";
+          case "NumericLiteral":
+            return "number";
+          default:
+            return "custom";
+        }
+      default:
+        return "custom";
+    }
+  }
+
   /** Returns `true` when the property has a decorator with the given name. */
   hasDecorator(name: string): boolean {
     return this.getDecorator(name) !== null;
@@ -86,6 +142,35 @@ export class PropertyView {
   /** Returns the property's initializer expression, or `null` when not initialized. */
   defaultValue(): Expression | null {
     return this.property.value ?? null;
+  }
+
+  /** Returns the start offset for the property declaration when SWC provides one. */
+  getSourceOffset(sourceText?: string): number | null {
+    return this.determineSourceOffset(sourceText);
+  }
+
+  private determineSourceOffset(sourceText?: string): number | null {
+    const span = this.property.span;
+    if (span && typeof span.start === "number") {
+      if (sourceText == null || span.start <= sourceText.length) {
+        return span.start;
+      }
+    }
+
+    if (sourceText != null) {
+      const propertyName = this.propertyName();
+      if (propertyName) {
+        const propertyPattern = new RegExp(
+          String.raw`(?:^|\n)\s*(?:@[^\n]*\n\s*)*${escapeRegExp(propertyName)}\s*[!:?=]`,
+        );
+        const match = sourceText.match(propertyPattern);
+        if (match?.index != null) {
+          return match.index;
+        }
+      }
+    }
+
+    return span && typeof span.start === "number" ? span.start : null;
   }
 
   /**
@@ -122,8 +207,7 @@ export class PropertyView {
       return null;
     }
 
-    const requiredValue = KeyValuePropertyView.from(requiredProperty).getBoolean();
-    return requiredValue;
+    return KeyValuePropertyView.from(requiredProperty).getBoolean();
   }
 
   /**
@@ -143,7 +227,9 @@ export class PropertyView {
       case "BigIntLiteral":
         return String(key.value);
       case "PrivateName":
-        return key.id.value;
+        return (key as PrivateName & { value?: string; id?: { value?: string } }).value
+          ?? (key as PrivateName & { value?: string; id?: { value?: string } }).id?.value
+          ?? null;
       default:
         return null;
     }
