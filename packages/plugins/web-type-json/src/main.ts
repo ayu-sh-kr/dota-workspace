@@ -12,6 +12,10 @@ import type {PackageJsonWithWebTypes, WebComponentInfo, WebTypeJsonPluginConfig,
 
 let log: ConsolaInstance
 let viteConfig: ResolvedConfig | null = null;
+let stagedWebTypesJson: string | null = null;
+let stagedBuildOutputPath: string | null = null;
+let stagedBuildOutDir: string | null = null;
+let stagedWebComponentInfos: WebComponentInfo[] | null = null;
 
 export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-types.json', logType = 'info' }: WebTypeJsonPluginConfig = {}): Plugin {
   log = createConsola({
@@ -111,7 +115,6 @@ export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-t
       const outputPath = resolve(root, outFile);
       const buildOutDir = viteConfig?.build.outDir ?? 'dist';
       const buildOutputPath = resolve(root, buildOutDir, outFile);
-      await mkdir(dirname(buildOutputPath), { recursive: true });
       const webTypesSchema: WebTypesSchema = {
         $schema: "https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json",
         name: "",
@@ -135,22 +138,17 @@ export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-t
       };
 
       const webTypesJson = JSON.stringify(webTypesSchema, null, 2);
+      stagedWebTypesJson = webTypesJson;
+      stagedBuildOutputPath = buildOutputPath;
+      stagedBuildOutDir = buildOutDir;
+      stagedWebComponentInfos = scannedWebComponentInfos;
       await writeFile(outputPath, webTypesJson, "utf-8");
-      if (buildOutputPath !== outputPath) {
-        await writeFile(buildOutputPath, webTypesJson, "utf-8");
-      }
       log.debug(`Wrote web component info JSON to ${outputPath}`);
-      if (buildOutputPath !== outputPath) {
-        log.debug(`Wrote web component info JSON to ${buildOutputPath}`);
-      }
 
       const packageJsonPath = resolve(root, "package.json");
       const packageJsonRaw = await readFile(packageJsonPath, "utf-8");
       const packageJson = JSON.parse(packageJsonRaw) as PackageJsonWithWebTypes;
-      const normalizedBuildOutDir = buildOutDir.replace(/\\/g, '/');
-      const webTypesEntry = normalizedBuildOutDir === '.'
-        ? `./${outFile}`
-        : `./${normalizedBuildOutDir}/${outFile}`;
+      const webTypesEntry = `./${outFile}`;
       if (packageJson["web-types"] !== webTypesEntry) {
         packageJson["web-types"] = webTypesEntry;
         await writeFile(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, "utf-8");
@@ -158,8 +156,22 @@ export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-t
       } else {
         log.debug(`package.json already has web-types entry: ${webTypesEntry}`);
       }
+    },
 
-      log.debug('Scanned web components:', scannedWebComponentInfos);
+    async closeBundle() {
+      if (!stagedWebTypesJson || !stagedBuildOutputPath) {
+        return;
+      }
+
+      if (stagedBuildOutputPath === resolve(root, outFile)) {
+        return;
+      }
+
+      await mkdir(dirname(stagedBuildOutputPath), { recursive: true });
+      await writeFile(stagedBuildOutputPath, stagedWebTypesJson, "utf-8");
+      log.debug(`Wrote web component info JSON to ${stagedBuildOutputPath}`);
+
+      log.debug('Scanned web components:', stagedWebComponentInfos);
     }
   };
 }
