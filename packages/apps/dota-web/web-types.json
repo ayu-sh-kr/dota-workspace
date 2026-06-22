@@ -130,68 +130,6 @@
           ]
         },
         {
-          "name": "ai-form",
-          "source": {
-            "file": "./src/components/chat/ai-form.component.ts",
-            "offset": 379
-          },
-          "attributes": [
-            {
-              "name": "is-loading",
-              "type": "Boolean",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/ai-form.component.ts",
-                "offset": 513
-              }
-            }
-          ]
-        },
-        {
-          "name": "message-box",
-          "source": {
-            "file": "./src/components/chat/message-box.component.ts",
-            "offset": 317
-          },
-          "attributes": []
-        },
-        {
-          "name": "message-card",
-          "source": {
-            "file": "./src/components/chat/message-card.component.ts",
-            "offset": 290
-          },
-          "attributes": [
-            {
-              "name": "key",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 387
-              }
-            },
-            {
-              "name": "message-type",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 364
-              }
-            },
-            {
-              "name": "message",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 545
-              }
-            }
-          ]
-        },
-        {
           "name": "community-card",
           "source": {
             "file": "./src/components/community/community-card.component.ts",
@@ -204,7 +142,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2563567519
+                "offset": 2569865708
               }
             },
             {
@@ -213,7 +151,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2563567591
+                "offset": 2569865780
               }
             },
             {
@@ -222,7 +160,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2563567654
+                "offset": 2569865843
               }
             },
             {
@@ -231,7 +169,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2563567717
+                "offset": 2569865906
               }
             },
             {
@@ -240,7 +178,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2563567793
+                "offset": 2569865982
               }
             },
             {
@@ -249,7 +187,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2563567873
+                "offset": 2569866062
               }
             }
           ]
@@ -305,24 +243,6 @@
             "offset": 137
           },
           "attributes": []
-        },
-        {
-          "name": "counter-component",
-          "source": {
-            "file": "./src/components/example/counter.component.ts",
-            "offset": 170
-          },
-          "attributes": [
-            {
-              "name": "counter",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/example/counter.component.ts",
-                "offset": 266
-              }
-            }
-          ]
         },
         {
           "name": "color-picker",
@@ -476,6 +396,24 @@
           ]
         },
         {
+          "name": "counter-component",
+          "source": {
+            "file": "./src/components/example/counter.component.ts",
+            "offset": 170
+          },
+          "attributes": [
+            {
+              "name": "counter",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/example/counter.component.ts",
+                "offset": 266
+              }
+            }
+          ]
+        },
+        {
           "name": "resource-content",
           "source": {
             "file": "./src/components/resource/resource-content.component.ts",
@@ -527,24 +465,6 @@
             "offset": 309
           },
           "attributes": []
-        },
-        {
-          "name": "navigation-sidebar",
-          "source": {
-            "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-            "offset": 297
-          },
-          "attributes": [
-            {
-              "name": "visible",
-              "type": "Boolean",
-              "required": false,
-              "source": {
-                "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-                "offset": 696
-              }
-            }
-          ]
         },
         {
           "name": "blob-separator",
@@ -700,6 +620,24 @@
           "attributes": []
         },
         {
+          "name": "navigation-sidebar",
+          "source": {
+            "file": "./src/components/sidebar/navigation-sidebar.component.ts",
+            "offset": 297
+          },
+          "attributes": [
+            {
+              "name": "visible",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/sidebar/navigation-sidebar.component.ts",
+                "offset": 696
+              }
+            }
+          ]
+        },
+        {
           "name": "app-footer",
           "source": {
             "file": "./src/components/utils/footer.component.ts",
@@ -788,54 +726,66 @@
           "attributes": []
         },
         {
-          "name": "ai-button",
+          "name": "ai-form",
           "source": {
-            "file": "./src/components/utils/buttons/ai-button.component.ts",
-            "offset": 194
-          },
-          "attributes": []
-        },
-        {
-          "name": "dark-mode-button",
-          "source": {
-            "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-            "offset": 243
+            "file": "./src/components/chat/ai-form.component.ts",
+            "offset": 379
           },
           "attributes": [
             {
-              "name": "color",
-              "type": "String",
-              "required": false,
+              "name": "is-loading",
+              "type": "Boolean",
+              "required": true,
               "source": {
-                "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-                "offset": 343
+                "file": "./src/components/chat/ai-form.component.ts",
+                "offset": 513
               }
             }
           ]
         },
         {
-          "name": "github-button",
+          "name": "message-box",
           "source": {
-            "file": "./src/components/utils/buttons/github-button.component.ts",
-            "offset": 137
+            "file": "./src/components/chat/message-box.component.ts",
+            "offset": 317
           },
           "attributes": []
         },
         {
-          "name": "ham-burger-button",
+          "name": "message-card",
           "source": {
-            "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
-            "offset": 223
+            "file": "./src/components/chat/message-card.component.ts",
+            "offset": 290
           },
-          "attributes": []
-        },
-        {
-          "name": "scroll-bottom-button",
-          "source": {
-            "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
-            "offset": 157
-          },
-          "attributes": []
+          "attributes": [
+            {
+              "name": "key",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 387
+              }
+            },
+            {
+              "name": "message-type",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 364
+              }
+            },
+            {
+              "name": "message",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 545
+              }
+            }
+          ]
         },
         {
           "name": "code-snippet",
@@ -962,6 +912,56 @@
           ]
         },
         {
+          "name": "ai-button",
+          "source": {
+            "file": "./src/components/utils/buttons/ai-button.component.ts",
+            "offset": 194
+          },
+          "attributes": []
+        },
+        {
+          "name": "dark-mode-button",
+          "source": {
+            "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
+            "offset": 243
+          },
+          "attributes": [
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
+                "offset": 343
+              }
+            }
+          ]
+        },
+        {
+          "name": "github-button",
+          "source": {
+            "file": "./src/components/utils/buttons/github-button.component.ts",
+            "offset": 137
+          },
+          "attributes": []
+        },
+        {
+          "name": "ham-burger-button",
+          "source": {
+            "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
+            "offset": 223
+          },
+          "attributes": []
+        },
+        {
+          "name": "scroll-bottom-button",
+          "source": {
+            "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
+            "offset": 157
+          },
+          "attributes": []
+        },
+        {
           "name": "app-header",
           "source": {
             "file": "./src/components/utils/header/header.component.ts",
@@ -1059,6 +1059,22 @@
           ]
         },
         {
+          "name": "page-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
+            "offset": 137
+          },
+          "attributes": []
+        },
+        {
+          "name": "section-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
+            "offset": 145
+          },
+          "attributes": []
+        },
+        {
           "name": "loader-section",
           "source": {
             "file": "./src/components/utils/section/loader-section.component.ts",
@@ -1099,22 +1115,6 @@
           "source": {
             "file": "./src/components/utils/section/no-content.component.ts",
             "offset": 133
-          },
-          "attributes": []
-        },
-        {
-          "name": "page-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
-            "offset": 137
-          },
-          "attributes": []
-        },
-        {
-          "name": "section-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
-            "offset": 145
           },
           "attributes": []
         },
