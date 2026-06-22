@@ -68,6 +68,65 @@ describe("ObjectExpressionView", () => {
     expect(view.getProperty("missing")).toBeNull();
   });
 
+  it("returns a plain object from toObject()", () => {
+    const objectExpression = loadObjectExpression(`
+      const value = {
+        plain: "text",
+        nested: {
+          inner: 1,
+        },
+        withArray: [1, 2],
+      };
+    `);
+    const view = new ObjectExpressionView(objectExpression);
+
+    expect(view.toObject()).toEqual({
+      plain: "text",
+      nested: {
+        inner: 1,
+      },
+      withArray: [1, 2],
+    });
+  });
+
+  it("recursively converts an object expression into a plain JavaScript object", () => {
+    const objectExpression = loadObjectExpression(`
+      const value = {
+        selector: "notification-holder",
+        shadow: false,
+        type: String,
+        nested: {
+          inner: 1,
+        },
+        withArray: [1, 2, 3],
+        nestedArray: [[1], [2, 3]],
+        nestedObjectWithArrayValues: {
+          items: ["a", "b"],
+          meta: {
+            tags: ["x"],
+          },
+        },
+      };
+    `);
+
+    expect(ObjectExpressionView.toPlainObject(objectExpression)).toEqual({
+      selector: "notification-holder",
+      shadow: false,
+      type: "String",
+      nested: {
+        inner: 1,
+      },
+      withArray: [1, 2, 3],
+      nestedArray: [[1], [2, 3]],
+      nestedObjectWithArrayValues: {
+        items: ["a", "b"],
+        meta: {
+          tags: ["x"],
+        },
+      },
+    });
+  });
+
   it("handles empty objects robustly", () => {
     const objectExpression = loadObjectExpression(`
       const value = {};
