@@ -22,22 +22,22 @@ const BLOBS = [
 ];
 
 const COLOR_PLACEMENTS = [
-  "text-purple-500 dark:text-purple-200",
-  "text-red-400 dark:text-red-200",
-  "text-rose-400 dark:text-rose-200",
-  "text-orange-400 dark:text-orange-200",
-  "text-amber-400 dark:text-amber-200",
-  "text-yellow-400 dark:text-yellow-200",
-  "text-lime-400 dark:text-lime-200",
-  "text-green-400 dark:text-green-200",
-  "text-emerald-400 dark:text-emerald-200",
-  "text-teal-400 dark:text-teal-200",
-  "text-cyan-400 dark:text-cyan-200",
-  "text-sky-400 dark:text-sky-200",
-  "text-blue-400 dark:text-blue-200",
-  "text-indigo-400 dark:text-indigo-200",
-  "text-violet-400 dark:text-violet-200",
-  "text-fuchsia-400 dark:text-fuchsia-200"
+  "text-purple-500 dark:text-purple-300",
+  "text-red-400 dark:text-red-300",
+  "text-rose-400 dark:text-rose-300",
+  "text-orange-400 dark:text-orange-300",
+  "text-amber-400 dark:text-amber-300",
+  "text-yellow-400 dark:text-yellow-300",
+  "text-lime-400 dark:text-lime-300",
+  "text-green-400 dark:text-green-300",
+  "text-emerald-400 dark:text-emerald-300",
+  "text-teal-400 dark:text-teal-300",
+  "text-cyan-400 dark:text-cyan-300",
+  "text-sky-400 dark:text-sky-300",
+  "text-blue-400 dark:text-blue-300",
+  "text-indigo-400 dark:text-indigo-300",
+  "text-violet-400 dark:text-violet-300",
+  "text-fuchsia-400 dark:text-fuchsia-300"
 ];
 
 type BlobLayer = {
