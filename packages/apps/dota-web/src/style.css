@@ -150,6 +150,13 @@
         opacity: 1 !important;
         transform: none !important;
     }
+
+    .blob-separator-layer,
+    .blob-separator-glow .blob-separator-svg,
+    .blob-separator-shape .blob-separator-svg {
+        animation: none !important;
+        transform: none !important;
+    }
 }
 
 /* ── Hero secondary CTA focus ──────────────────────────── */
@@ -184,6 +191,84 @@ body {
 .dark .blob-inner {
     opacity: 0.60;
     filter: blur(70px) brightness(1) saturate(1.8);
+}
+
+.blob-separator-layer {
+    color: var(--blob-layer-color, var(--separator-color));
+    opacity: var(--blob-opacity);
+    transform-origin: center;
+    will-change: transform, opacity;
+    animation: blob-separator-drift var(--blob-duration) cubic-bezier(0.45, 0.05, 0.2, 1) infinite;
+    animation-delay: var(--blob-delay);
+}
+
+.blob-separator-glow {
+    opacity: calc(var(--blob-opacity) + 0.14);
+    filter: blur(calc(var(--blob-blur) * 1.45)) saturate(1.34) brightness(1.08);
+}
+
+.dark .blob-separator-glow {
+    opacity: calc(var(--blob-opacity) + 0.18);
+    filter: blur(calc(var(--blob-blur) * 1.62)) saturate(1.7) brightness(1.24);
+    mix-blend-mode: screen;
+}
+
+.blob-separator-shape {
+    filter: blur(calc(var(--blob-blur) * 0.62)) saturate(1.24);
+}
+
+.dark .blob-separator-shape {
+    filter: blur(calc(var(--blob-blur) * 0.74)) saturate(1.56) brightness(1.03);
+    mix-blend-mode: screen;
+}
+
+.blob-separator-glow .blob-separator-svg,
+.blob-separator-shape .blob-separator-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    animation: blob-separator-breathe var(--blob-breathe-duration) ease-in-out infinite alternate;
+    animation-delay: var(--blob-delay);
+}
+
+@keyframes blob-separator-drift {
+    0%, 100% {
+        transform:
+            translate3d(var(--blob-shift-x), var(--blob-shift-y), 0)
+            scale(var(--blob-scale-start))
+            rotate(var(--blob-rotate-start));
+    }
+
+    30% {
+        transform:
+            translate3d(calc(var(--blob-shift-x) + var(--blob-drift-x-mid)), calc(var(--blob-shift-y) + var(--blob-drift-y-mid)), 0)
+            scale(var(--blob-scale-mid))
+            rotate(var(--blob-rotate-mid));
+    }
+
+    65% {
+        transform:
+            translate3d(calc(var(--blob-shift-x) + var(--blob-drift-x)), calc(var(--blob-shift-y) + var(--blob-drift-y)), 0)
+            scale(var(--blob-scale-end))
+            rotate(var(--blob-rotate-end));
+    }
+
+    82% {
+        transform:
+            translate3d(calc(var(--blob-shift-x) + var(--blob-drift-x-alt)), calc(var(--blob-shift-y) + var(--blob-drift-y-alt)), 0)
+            scale(calc(var(--blob-scale-end) - 0.06))
+            rotate(var(--blob-rotate-mid));
+    }
+}
+
+@keyframes blob-separator-breathe {
+    0% {
+        transform: scale(0.97);
+    }
+
+    100% {
+        transform: scale(1.03);
+    }
 }
 
 /* Sections stack above blobs so blobs act as background decoration */
@@ -281,4 +366,3 @@ code-snippet #snippet-body code.hljs {
     .tab-content-enter { animation: none; opacity: 1; transform: none; }
     .tab-content-exit  { transition: none; }
 }
-
