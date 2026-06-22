@@ -50,4 +50,77 @@ export class ObjectExpressionView {
     return this.propertiesByKey.get(name) ?? null;
   }
 
+  toObject(): Record<string, any> {
+    return ObjectExpressionView.toPlainObject(this.objectExpression);
+  }
+
+  /**
+   * Recursively converts an SWC object expression into a plain JavaScript object.
+   *
+   * This keeps nested object and array structures intact while turning literal
+   * nodes into their native JS values.
+   */
+  static toPlainObject(objectExpression: ObjectExpression): Record<string, any> {
+    const convertExpression = (expression: any): any => {
+      if (expression == null) {
+        return null;
+      }
+
+      switch (expression.type) {
+        case "StringLiteral":
+        case "BooleanLiteral":
+        case "NumericLiteral":
+          return expression.value;
+        case "BigIntLiteral":
+          return expression.value;
+        case "NullLiteral":
+          return null;
+        case "Identifier":
+          return expression.value;
+        case "ArrayExpression":
+          return expression.elements.map((element: any) => {
+            if (element == null) {
+              return null;
+            }
+
+            if (element.expression == null) {
+              return null;
+            }
+
+            return convertExpression(element.expression);
+          });
+        case "ObjectExpression":
+          return ObjectExpressionView.toPlainObject(expression);
+        case "ParenthesisExpression":
+          return convertExpression(expression.expression);
+        case "TsAsExpression":
+          return convertExpression(expression.expression);
+        case "TsNonNullExpression":
+          return convertExpression(expression.expression);
+        default:
+          return expression;
+      }
+    };
+
+    const result: Record<string, any> = {};
+    objectExpression.properties.forEach(property => {
+      if (property.type !== "KeyValueProperty") {
+        return;
+      }
+
+      const key =
+        property.key.type === "Identifier" || property.key.type === "StringLiteral" || property.key.type === "NumericLiteral" || property.key.type === "BigIntLiteral"
+          ? String(property.key.value)
+          : null;
+
+      if (!key) {
+        return;
+      }
+
+      result[key] = convertExpression(property.value);
+    });
+
+    return result;
+  }
+
 }
