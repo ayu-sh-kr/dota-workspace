@@ -95,6 +95,9 @@ importers:
       '@ayu-sh-kr/dota-ui':
         specifier: workspace:*
         version: link:../../ui/dota-ui
+      '@ayu-sh-kr/dota-web-type-json':
+        specifier: workspace:*
+        version: link:../../plugins/web-type-json
       '@ayu-sh-kr/dota-wrap':
         specifier: workspace:*
         version: link:../../libs/dota-wrap
@@ -195,6 +198,24 @@ importers:
         specifier: ^0.2.2
         version: 0.2.2
 
+  packages/plugins/web-type-json:
+    dependencies:
+      '@ayu-sh-kr/dota-ast-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-ast-utils
+      '@ayu-sh-kr/dota-core':
+        specifier: workspace:*
+        version: link:../../libs/dota-core
+      '@swc/core':
+        specifier: ^1.13.5
+        version: 1.13.5
+      consola:
+        specifier: 3.4.2
+        version: 3.4.2
+      fast-glob:
+        specifier: ^3.3.3
+        version: 3.3.3
+
   packages/ui/dota-md:
     dependencies:
       '@ayu-sh-kr/dota-core':
@@ -237,16 +258,19 @@ importers:
       '@ayu-sh-kr/dota-event':
         specifier: workspace:*
         version: link:../../libs/dota-event
+      '@ayu-sh-kr/dota-web-type-json':
+        specifier: workspace:*
+        version: link:../../plugins/web-type-json
       '@floating-ui/dom':
         specifier: ^1.7.5
         version: 1.7.5
     devDependencies:
       autoprefixer:
         specifier: ^10.4.19
-        version: 10.4.24(postcss@8.5.6)
+        version: 10.4.24(postcss@8.5.10)
       postcss:
-        specifier: ^8.4.39
-        version: 8.5.6
+        specifier: 8.5.10
+        version: 8.5.10
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.19
@@ -6826,7 +6850,7 @@ snapshots:
       esbuild: 0.27.3
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
-      postcss: 8.5.6
+      postcss: 8.5.10
       rollup: 4.52.5
       tinyglobby: 0.2.15
     optionalDependencies:

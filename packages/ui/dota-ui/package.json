@@ -40,12 +40,14 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.39",
+    "postcss": "8.5.10",
     "tailwindcss": "^3.4.4"
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
+    "@ayu-sh-kr/dota-web-type-json": "workspace:*",
     "@floating-ui/dom": "^1.7.5"
-  }
+  },
+  "web-types": "./web-types.json"
 }

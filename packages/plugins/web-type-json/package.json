@@ -1,0 +1,51 @@
+{
+  "name": "@ayu-sh-kr/dota-web-type-json",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.1",
+  "description": "dota-web-type-json is a Vite plugin that generates web-types JSON by scanning Web Component files. It extracts component metadata and produces IDE-friendly web-types for better autocompletion and documentation support.",
+  "author": {
+    "name": "ayu-sh-kr",
+    "email": "akjaiswal2003@gmail.com",
+    "url": "https://linkedin.com/in/ayu-sh-kr"
+  },
+  "license": "MIT",
+  "keywords": [
+    "Dota Core Plugins",
+    "Web Components",
+    "Web Types",
+    "IDE Support"
+  ],
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && vite build",
+    "release": "pnpm run build && changeset publish",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ayu-sh-kr/dota-core": "workspace:*",
+    "@ayu-sh-kr/dota-ast-utils": "workspace:*",
+    "@swc/core": "^1.13.5",
+    "fast-glob": "^3.3.3",
+    "consola": "3.4.2"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ]
+}

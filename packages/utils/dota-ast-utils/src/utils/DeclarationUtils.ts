@@ -1,7 +1,16 @@
-import {ModuleItem} from "@swc/core";
+import type {Module, ModuleItem} from "@swc/core";
+import {DeclarationBaseQueryImpl} from "../query/impl/DeclarationBaseQueryImpl.ts";
 
 
 export class DeclarationUtils {
+
+  /**
+   * Creates the top-level declaration query for a module.
+   * Use this as the entry point before narrowing to imports, exports, or declarations.
+   */
+  static queryOf(ast: Module): DeclarationBaseQueryImpl {
+    return new DeclarationBaseQueryImpl(ast);
+  }
 
   /**
    * Extracts all module items of a specific type from the module body.
