@@ -7,12 +7,12 @@ export default defineConfig({
   plugins: [
     dotaVitePreloader({
       root: resolve(__dirname),
-      logType: 'debug'
+      logType: 'info'
     }),
     dotaWebTypeJson({
       root: resolve(__dirname),
       outFile: 'web-types.json',
-      logType: 'debug'
+      logType: 'info'
     }),
   ],
   css: {
