@@ -1,5 +1,4 @@
-import { DeclarationUtils, DecoratorUtils, DecoratorView, ExportDeclarationQueryImpl, KeyValuePropertyView,
-  ObjectExpressionView, PropertyView } from "@ayu-sh-kr/dota-ast-utils";
+import {ClassView, DeclarationUtils, DecoratorUtils, DecoratorView, ObjectExpressionView, PropertyView} from "@ayu-sh-kr/dota-ast-utils";
 import type { Plugin } from 'vite';
 import {ComponentScanPath} from "@dota/Constants.ts";
 import fg from "fast-glob";
@@ -23,11 +22,13 @@ export type PropertyInfo = {
   description?: string;
   default?: string;
   required?: boolean;
+  source?: WebTypesSource;
 }
 
 export type WebComponentInfo = {
   className: string;
   tagName: string;
+  source?: WebTypesSource;
   properties: PropertyInfo[];
 }
 
@@ -45,11 +46,18 @@ type WebTypesAttribute = {
   description?: string;
   default?: string;
   required?: boolean;
+  source?: WebTypesSource;
+};
+
+type WebTypesSource = {
+  file: string;
+  offset?: number;
 };
 
 type WebTypesElement = {
   name: string;
   description?: string;
+  source?: WebTypesSource;
   attributes: WebTypesAttribute[];
 };
 
@@ -110,29 +118,42 @@ export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-t
           }
 
           const componentObjectExpression = ObjectExpressionView.from(firstArgument.expression);
-          const componentTagProperty = componentObjectExpression.getProperty('selector');
-          if (componentTagProperty == null) return [];
-
-          const keyValuePropertyView = KeyValuePropertyView.from(componentTagProperty);
-          const tagValue = keyValuePropertyView.getString();
-          if (tagValue == null) {
-            return [];
-          }
+          const componentConfig = componentObjectExpression.toObject();
+          const tagValue = componentConfig['selector'];
+          if (tagValue == null || typeof tagValue !== 'string') return [];
 
           return {
             className: classDeclaration.identifier.value,
             tagName: tagValue,
+            source: {
+              file,
+              offset: ClassView.from(classDeclaration).getSourceOffset(code) ?? classDeclaration.span.start,
+            },
             properties: PropertyView.extractProperties(classDeclaration)
               .filter(propertyView => propertyView.hasDecorator('Property'))
               .flatMap(propertyView => {
-                const propertyName = propertyView.propertyName()
-                const propertyType = propertyView.getType()
+                const propertyDecorator = propertyView.getDecorator('Property');
+                const propertyDecoratorView = DecoratorView.from(propertyDecorator);
+                const propertyDecoratorArgs = propertyDecoratorView.getArguments();
+                if (propertyDecoratorArgs.length === 0) return []
+                const propertyConfigArg = propertyDecoratorArgs[0]
+                if (propertyConfigArg == null || propertyConfigArg.expression.type !== 'ObjectExpression') return []
+                const propertyConfig = ObjectExpressionView.from(propertyConfigArg.expression)
+                  .toObject();
+
+                const propertyName = String(propertyConfig['name'] ?? propertyView.propertyName())
+                const propertyType = propertyConfig['type'] ?? propertyView.getType()
+                const propertySourceOffset = propertyView.getSourceOffset(code);
 
                 if (propertyName == null || propertyType == null) return []
                 return {
                   name: propertyName,
                   type: propertyType,
                   required: propertyView.isRequired(),
+                  source: propertySourceOffset == null ? undefined : {
+                    file,
+                    offset: propertySourceOffset,
+                  },
                 }
               })
           }
@@ -149,12 +170,14 @@ export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-t
           html: {
             elements: scannedWebComponentInfos.map(component => ({
               name: component.tagName,
+              source: component.source,
               attributes: component.properties.map(property => ({
                 name: property.name,
                 type: property.type,
                 description: property.description,
                 default: property.default,
                 required: property.required,
+                source: property.source,
               })),
             })),
           },
