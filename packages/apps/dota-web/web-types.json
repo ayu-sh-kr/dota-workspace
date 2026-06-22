@@ -192,24 +192,6 @@
           ]
         },
         {
-          "name": "counter-component",
-          "source": {
-            "file": "./src/components/example/counter.component.ts",
-            "offset": 170
-          },
-          "attributes": [
-            {
-              "name": "counter",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/example/counter.component.ts",
-                "offset": 266
-              }
-            }
-          ]
-        },
-        {
           "name": "community-card",
           "source": {
             "file": "./src/components/community/community-card.component.ts",
@@ -222,7 +204,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 35007
+                "offset": 2865743963
               }
             },
             {
@@ -231,7 +213,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 35079
+                "offset": 2865744035
               }
             },
             {
@@ -240,7 +222,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 35142
+                "offset": 2865744098
               }
             },
             {
@@ -249,7 +231,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 35205
+                "offset": 2865744161
               }
             },
             {
@@ -258,7 +240,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 35281
+                "offset": 2865744237
               }
             },
             {
@@ -267,7 +249,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 35361
+                "offset": 2865744317
               }
             }
           ]
@@ -323,6 +305,24 @@
             "offset": 137
           },
           "attributes": []
+        },
+        {
+          "name": "counter-component",
+          "source": {
+            "file": "./src/components/example/counter.component.ts",
+            "offset": 170
+          },
+          "attributes": [
+            {
+              "name": "counter",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/example/counter.component.ts",
+                "offset": 266
+              }
+            }
+          ]
         },
         {
           "name": "color-picker",
@@ -479,7 +479,7 @@
           "name": "blob-separator",
           "source": {
             "file": "./src/components/home/blob-separator.component.ts",
-            "offset": 366
+            "offset": 1880
           },
           "attributes": [
             {
@@ -488,16 +488,25 @@
               "required": false,
               "source": {
                 "file": "./src/components/home/blob-separator.component.ts",
-                "offset": 410
+                "offset": 1924
               }
             },
             {
-              "name": "index",
+              "name": "speed",
               "type": "Number",
               "required": false,
               "source": {
                 "file": "./src/components/home/blob-separator.component.ts",
-                "offset": 478
+                "offset": 1992
+              }
+            },
+            {
+              "name": "color-placement",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/home/blob-separator.component.ts",
+                "offset": 2057
               }
             }
           ]
@@ -779,72 +788,6 @@
           "attributes": []
         },
         {
-          "name": "ai-button",
-          "source": {
-            "file": "./src/components/utils/buttons/ai-button.component.ts",
-            "offset": 194
-          },
-          "attributes": []
-        },
-        {
-          "name": "dark-mode-button",
-          "source": {
-            "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-            "offset": 243
-          },
-          "attributes": [
-            {
-              "name": "color",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-                "offset": 343
-              }
-            }
-          ]
-        },
-        {
-          "name": "github-button",
-          "source": {
-            "file": "./src/components/utils/buttons/github-button.component.ts",
-            "offset": 137
-          },
-          "attributes": []
-        },
-        {
-          "name": "ham-burger-button",
-          "source": {
-            "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
-            "offset": 223
-          },
-          "attributes": []
-        },
-        {
-          "name": "scroll-bottom-button",
-          "source": {
-            "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
-            "offset": 157
-          },
-          "attributes": []
-        },
-        {
-          "name": "app-header",
-          "source": {
-            "file": "./src/components/utils/header/header.component.ts",
-            "offset": 140
-          },
-          "attributes": []
-        },
-        {
-          "name": "section-header",
-          "source": {
-            "file": "./src/components/utils/header/section-header.component.ts",
-            "offset": 137
-          },
-          "attributes": []
-        },
-        {
           "name": "code-snippet",
           "source": {
             "file": "./src/components/home/utils/code-snippet.component.ts",
@@ -969,6 +912,72 @@
           ]
         },
         {
+          "name": "ai-button",
+          "source": {
+            "file": "./src/components/utils/buttons/ai-button.component.ts",
+            "offset": 194
+          },
+          "attributes": []
+        },
+        {
+          "name": "dark-mode-button",
+          "source": {
+            "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
+            "offset": 243
+          },
+          "attributes": [
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
+                "offset": 343
+              }
+            }
+          ]
+        },
+        {
+          "name": "github-button",
+          "source": {
+            "file": "./src/components/utils/buttons/github-button.component.ts",
+            "offset": 137
+          },
+          "attributes": []
+        },
+        {
+          "name": "ham-burger-button",
+          "source": {
+            "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
+            "offset": 223
+          },
+          "attributes": []
+        },
+        {
+          "name": "scroll-bottom-button",
+          "source": {
+            "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
+            "offset": 157
+          },
+          "attributes": []
+        },
+        {
+          "name": "app-header",
+          "source": {
+            "file": "./src/components/utils/header/header.component.ts",
+            "offset": 140
+          },
+          "attributes": []
+        },
+        {
+          "name": "section-header",
+          "source": {
+            "file": "./src/components/utils/header/section-header.component.ts",
+            "offset": 137
+          },
+          "attributes": []
+        },
+        {
           "name": "loader-section",
           "source": {
             "file": "./src/components/utils/section/loader-section.component.ts",
@@ -1009,6 +1018,22 @@
           "source": {
             "file": "./src/components/utils/section/no-content.component.ts",
             "offset": 133
+          },
+          "attributes": []
+        },
+        {
+          "name": "page-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
+            "offset": 137
+          },
+          "attributes": []
+        },
+        {
+          "name": "section-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
+            "offset": 145
           },
           "attributes": []
         },
@@ -1092,22 +1117,6 @@
               }
             }
           ]
-        },
-        {
-          "name": "page-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
-            "offset": 137
-          },
-          "attributes": []
-        },
-        {
-          "name": "section-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
-            "offset": 145
-          },
-          "attributes": []
         },
         {
           "name": "blog-content",
