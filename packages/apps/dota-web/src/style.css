@@ -208,9 +208,9 @@ body {
 }
 
 .dark .blob-separator-glow {
-    opacity: calc(var(--blob-opacity) + 0.18);
-    filter: blur(calc(var(--blob-blur) * 1.62)) saturate(1.7) brightness(1.24);
-    mix-blend-mode: screen;
+    opacity: calc(var(--blob-opacity) + 0.08);
+    filter: blur(calc(var(--blob-blur) * 1.42)) saturate(1.22) brightness(0.98);
+    mix-blend-mode: normal;
 }
 
 .blob-separator-shape {
@@ -218,8 +218,8 @@ body {
 }
 
 .dark .blob-separator-shape {
-    filter: blur(calc(var(--blob-blur) * 0.74)) saturate(1.56) brightness(1.03);
-    mix-blend-mode: screen;
+    filter: blur(calc(var(--blob-blur) * 0.66)) saturate(1.18) brightness(0.98);
+    mix-blend-mode: normal;
 }
 
 .blob-separator-glow .blob-separator-svg,
