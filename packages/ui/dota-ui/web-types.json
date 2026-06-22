@@ -1,0 +1,478 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json",
+  "name": "",
+  "version": "",
+  "contributions": {
+    "html": {
+      "elements": [
+        {
+          "name": "d-avatar",
+          "source": {
+            "file": "./src/components/avatar/avatar.component.ts",
+            "offset": 4487
+          },
+          "attributes": [
+            {
+              "name": "img",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 4530
+              }
+            },
+            {
+              "name": "img-alt",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 4613
+              }
+            },
+            {
+              "name": "label",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 4703
+              }
+            },
+            {
+              "name": "icon",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 4791
+              }
+            },
+            {
+              "name": "is-chip",
+              "type": "Boolean",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 4877
+              }
+            },
+            {
+              "name": "chip-text",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 4970
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 5065
+              }
+            },
+            {
+              "name": "chip-position",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 5157
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 5259
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 5351
+              }
+            }
+          ]
+        },
+        {
+          "name": "avatar-wrapper",
+          "source": {
+            "file": "./src/components/avatar/avatar.component.ts",
+            "offset": 5156
+          },
+          "attributes": [
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 5415
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1612
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1701
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-card",
+          "source": {
+            "file": "./src/components/card/card.component.ts",
+            "offset": 779
+          },
+          "attributes": [
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-title",
+          "source": {
+            "file": "./src/components/card/card.component.ts",
+            "offset": 1411
+          },
+          "attributes": [
+            {
+              "name": "title",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/card/card.component.ts",
+                "offset": 1451
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-header",
+          "source": {
+            "file": "./src/components/card/card.component.ts",
+            "offset": 2141
+          },
+          "attributes": [
+            {
+              "name": "",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/card/card.component.ts",
+                "offset": 2182
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-description",
+          "source": {
+            "file": "./src/components/card/card.component.ts",
+            "offset": 2833
+          },
+          "attributes": [
+            {
+              "name": "description",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/card/card.component.ts",
+                "offset": 2879
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-footer",
+          "source": {
+            "file": "./src/components/card/card.component.ts",
+            "offset": 3620
+          },
+          "attributes": [
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-carousel",
+          "source": {
+            "file": "./src/components/carousel/dota-carousel.component.ts",
+            "offset": 452
+          },
+          "attributes": [
+            {
+              "name": "name",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 495
+              }
+            },
+            {
+              "name": "indicator",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 555
+              }
+            },
+            {
+              "name": "indicator-active-icon",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 644
+              }
+            },
+            {
+              "name": "indicator-regular-icon",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 757
+              }
+            },
+            {
+              "name": "prev-icon",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 871
+              }
+            },
+            {
+              "name": "next-icon",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 969
+              }
+            },
+            {
+              "name": "index",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1069
+              }
+            },
+            {
+              "name": "autoplay",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1134
+              }
+            },
+            {
+              "name": "loop",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1211
+              }
+            },
+            {
+              "name": "interval",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1280
+              }
+            },
+            {
+              "name": "pause-on-hover",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1354
+              }
+            },
+            {
+              "name": "navigation",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1440
+              }
+            },
+            {
+              "name": "keyboard-navigation",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1532
+              }
+            },
+            {
+              "name": "slides-per-view",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1629
+              }
+            },
+            {
+              "name": "gap-per-slide",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1712
+              }
+            },
+            {
+              "name": "snap",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1801
+              }
+            },
+            {
+              "name": "draggable",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1870
+              }
+            },
+            {
+              "name": "animation",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 1949
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/dota-carousel.component.ts",
+                "offset": 2039
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-slide",
+          "source": {
+            "file": "./src/components/carousel/dota-slide.component.ts",
+            "offset": 137
+          },
+          "attributes": []
+        },
+        {
+          "name": "dota-placeholder",
+          "source": {
+            "file": "./src/components/placeholder/placeholder.component.ts",
+            "offset": 628
+          },
+          "attributes": [
+            {
+              "name": "classname",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/placeholder/placeholder.component.ts",
+                "offset": 840
+              }
+            }
+          ]
+        },
+        {
+          "name": "app-scaffold",
+          "source": {
+            "file": "./src/components/utils/scaffold.component.ts",
+            "offset": 459
+          },
+          "attributes": [
+            {
+              "name": "classname",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/scaffold.component.ts",
+                "offset": 583
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
