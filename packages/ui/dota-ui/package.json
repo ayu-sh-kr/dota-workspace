@@ -49,5 +49,5 @@
     "@ayu-sh-kr/dota-web-type-json": "workspace:*",
     "@floating-ui/dom": "^1.7.5"
   },
-  "web-types": "./dist/web-types.json"
+  "web-types": "./web-types.json"
 }
