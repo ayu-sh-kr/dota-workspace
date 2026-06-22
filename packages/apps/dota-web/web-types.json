@@ -130,68 +130,6 @@
           ]
         },
         {
-          "name": "ai-form",
-          "source": {
-            "file": "./src/components/chat/ai-form.component.ts",
-            "offset": 379
-          },
-          "attributes": [
-            {
-              "name": "is-loading",
-              "type": "Boolean",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/ai-form.component.ts",
-                "offset": 513
-              }
-            }
-          ]
-        },
-        {
-          "name": "message-box",
-          "source": {
-            "file": "./src/components/chat/message-box.component.ts",
-            "offset": 317
-          },
-          "attributes": []
-        },
-        {
-          "name": "message-card",
-          "source": {
-            "file": "./src/components/chat/message-card.component.ts",
-            "offset": 290
-          },
-          "attributes": [
-            {
-              "name": "key",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 387
-              }
-            },
-            {
-              "name": "message-type",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 364
-              }
-            },
-            {
-              "name": "message",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 545
-              }
-            }
-          ]
-        },
-        {
           "name": "community-card",
           "source": {
             "file": "./src/components/community/community-card.component.ts",
@@ -204,7 +142,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2865743963
+                "offset": 2889082452
               }
             },
             {
@@ -213,7 +151,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2865744035
+                "offset": 2889082524
               }
             },
             {
@@ -222,7 +160,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2865744098
+                "offset": 2889082587
               }
             },
             {
@@ -231,7 +169,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2865744161
+                "offset": 2889082650
               }
             },
             {
@@ -240,7 +178,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2865744237
+                "offset": 2889082726
               }
             },
             {
@@ -249,7 +187,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2865744317
+                "offset": 2889082806
               }
             }
           ]
@@ -305,24 +243,6 @@
             "offset": 137
           },
           "attributes": []
-        },
-        {
-          "name": "counter-component",
-          "source": {
-            "file": "./src/components/example/counter.component.ts",
-            "offset": 170
-          },
-          "attributes": [
-            {
-              "name": "counter",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/example/counter.component.ts",
-                "offset": 266
-              }
-            }
-          ]
         },
         {
           "name": "color-picker",
@@ -471,6 +391,68 @@
               "source": {
                 "file": "./src/components/docs/theme-picker.component.ts",
                 "offset": 795
+              }
+            }
+          ]
+        },
+        {
+          "name": "ai-form",
+          "source": {
+            "file": "./src/components/chat/ai-form.component.ts",
+            "offset": 379
+          },
+          "attributes": [
+            {
+              "name": "is-loading",
+              "type": "Boolean",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/ai-form.component.ts",
+                "offset": 513
+              }
+            }
+          ]
+        },
+        {
+          "name": "message-box",
+          "source": {
+            "file": "./src/components/chat/message-box.component.ts",
+            "offset": 317
+          },
+          "attributes": []
+        },
+        {
+          "name": "message-card",
+          "source": {
+            "file": "./src/components/chat/message-card.component.ts",
+            "offset": 290
+          },
+          "attributes": [
+            {
+              "name": "key",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 387
+              }
+            },
+            {
+              "name": "message-type",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 364
+              }
+            },
+            {
+              "name": "message",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 545
               }
             }
           ]
@@ -695,6 +677,24 @@
               "source": {
                 "file": "./src/components/sidebar/navigation-sidebar.component.ts",
                 "offset": 696
+              }
+            }
+          ]
+        },
+        {
+          "name": "counter-component",
+          "source": {
+            "file": "./src/components/example/counter.component.ts",
+            "offset": 170
+          },
+          "attributes": [
+            {
+              "name": "counter",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/example/counter.component.ts",
+                "offset": 266
               }
             }
           ]
@@ -978,66 +978,6 @@
           "attributes": []
         },
         {
-          "name": "loader-section",
-          "source": {
-            "file": "./src/components/utils/section/loader-section.component.ts",
-            "offset": 154
-          },
-          "attributes": [
-            {
-              "name": "is-loader",
-              "type": "Boolean",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/section/loader-section.component.ts",
-                "offset": 258
-              }
-            }
-          ]
-        },
-        {
-          "name": "app-loader",
-          "source": {
-            "file": "./src/components/utils/section/loader.component.ts",
-            "offset": 149
-          },
-          "attributes": [
-            {
-              "name": "size",
-              "type": "Number",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/section/loader.component.ts",
-                "offset": 273
-              }
-            }
-          ]
-        },
-        {
-          "name": "no-content",
-          "source": {
-            "file": "./src/components/utils/section/no-content.component.ts",
-            "offset": 133
-          },
-          "attributes": []
-        },
-        {
-          "name": "page-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
-            "offset": 137
-          },
-          "attributes": []
-        },
-        {
-          "name": "section-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
-            "offset": 145
-          },
-          "attributes": []
-        },
-        {
           "name": "notification-holder",
           "source": {
             "file": "./src/components/utils/notification/notification-holder.component.ts",
@@ -1117,6 +1057,66 @@
               }
             }
           ]
+        },
+        {
+          "name": "loader-section",
+          "source": {
+            "file": "./src/components/utils/section/loader-section.component.ts",
+            "offset": 154
+          },
+          "attributes": [
+            {
+              "name": "is-loader",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/section/loader-section.component.ts",
+                "offset": 258
+              }
+            }
+          ]
+        },
+        {
+          "name": "app-loader",
+          "source": {
+            "file": "./src/components/utils/section/loader.component.ts",
+            "offset": 149
+          },
+          "attributes": [
+            {
+              "name": "size",
+              "type": "Number",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/section/loader.component.ts",
+                "offset": 273
+              }
+            }
+          ]
+        },
+        {
+          "name": "no-content",
+          "source": {
+            "file": "./src/components/utils/section/no-content.component.ts",
+            "offset": 133
+          },
+          "attributes": []
+        },
+        {
+          "name": "page-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
+            "offset": 137
+          },
+          "attributes": []
+        },
+        {
+          "name": "section-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
+            "offset": 145
+          },
+          "attributes": []
         },
         {
           "name": "blog-content",
