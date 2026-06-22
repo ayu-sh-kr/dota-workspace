@@ -5,6 +5,10 @@ import {BaseElement, Component, Property, Boolean} from "@ayu-sh-kr/dota-core";
   shadow: false
 })
 export class BetaComponent extends BaseElement {
-  @Property({ name: "enabled", type: Boolean, default: true })
+  @Property({ name: "enabled", type: Boolean, default: "true" })
   enabled: boolean = true;
+
+  render(): string {
+    return `<div>${this.enabled}</div>`;
+  }
 }

@@ -1,4 +1,4 @@
-import {DotaPageElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {DotaPageElement, Component, Property, String, SEO} from "@ayu-sh-kr/dota-core";
 
 @Component({
   selector: "many-page",
@@ -7,4 +7,15 @@ import {DotaPageElement, Component, Property, String} from "@ayu-sh-kr/dota-core
 export class ManyPage extends DotaPageElement {
   @Property({ name: "heading", type: String })
   heading: string = "many";
+
+  get seo(): SEO {
+    return {
+      title: "Many Page",
+      description: "Many page fixture",
+    };
+  }
+
+  render(): string {
+    return `<main>${this.heading}</main>`;
+  }
 }
