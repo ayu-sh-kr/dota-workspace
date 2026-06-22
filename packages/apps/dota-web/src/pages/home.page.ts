@@ -36,23 +36,23 @@ export class HomePage extends DotaPageElement {
     //language=html
     return `
            <app-header></app-header>
-           <blob-separator side="right" index="5"></blob-separator>
+           <blob-separator side="right" color-placement="0" speed="8"></blob-separator>
            <app-hero></app-hero>
-           <blob-separator side="left" index="0"></blob-separator>
+           <blob-separator side="left" color-placement="1" speed="6"></blob-separator>
            <app-feature></app-feature>
-           <blob-separator side="right" index="1"></blob-separator>
+           <blob-separator side="right" color-placement="3" speed="5"></blob-separator>
            <code-section></code-section>
-           <blob-separator side="left" index="2"></blob-separator>
+           <blob-separator side="left" color-placement="5" speed="7"></blob-separator>
            <reactive-dota></reactive-dota>
-           <blob-separator side="right" index="3"></blob-separator>
+           <blob-separator side="right" color-placement="8" speed="4"></blob-separator>
            <capability-section></capability-section>
-           <blob-separator side="left" index="1"></blob-separator>
+           <blob-separator side="left" color-placement="10" speed="3"></blob-separator>
            <emitter-section></emitter-section>
-           <blob-separator side="right" index="2"></blob-separator>
+           <blob-separator side="right" color-placement="12" speed="5"></blob-separator>
            <device-section></device-section>
-           <blob-separator side="left" index="3"></blob-separator>
+           <blob-separator side="left" color-placement="14" speed="4"></blob-separator>
            <our-tools></our-tools>
-           <blob-separator side="right" index="0"></blob-separator>
+           <blob-separator side="right" color-placement="15" speed="3"></blob-separator>
            <client-section></client-section>
            <app-footer></app-footer>
         `
