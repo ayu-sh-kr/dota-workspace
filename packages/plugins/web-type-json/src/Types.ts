@@ -4,6 +4,7 @@ export type WebTypeJsonPluginConfig = {
   root?: string;
   outFile?: string;
   logType?: LogType;
+  scanRoots?: string[];
 }
 
 export type WebTypesSource = {
