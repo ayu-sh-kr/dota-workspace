@@ -74,30 +74,12 @@ importers:
 
   packages/apps/dota-web:
     dependencies:
-      '@ayu-sh-kr/dota-core':
-        specifier: workspace:*
-        version: link:../../libs/dota-core
-      '@ayu-sh-kr/dota-event':
-        specifier: workspace:*
-        version: link:../../libs/dota-event
       '@ayu-sh-kr/dota-md':
         specifier: workspace:*
         version: link:../../ui/dota-md
-      '@ayu-sh-kr/dota-preloader-plugin':
-        specifier: workspace:*
-        version: link:../../plugins/dota-vite-preloader
-      '@ayu-sh-kr/dota-rest':
-        specifier: workspace:*
-        version: link:../../libs/dota-rest
-      '@ayu-sh-kr/dota-router':
-        specifier: workspace:*
-        version: link:../../libs/dota-router
       '@ayu-sh-kr/dota-ui':
         specifier: workspace:*
         version: link:../../ui/dota-ui
-      '@ayu-sh-kr/dota-web-type-json':
-        specifier: workspace:*
-        version: link:../../plugins/web-type-json
       '@ayu-sh-kr/dota-wrap':
         specifier: workspace:*
         version: link:../../libs/dota-wrap
@@ -170,9 +152,21 @@ importers:
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../dota-core
+      '@ayu-sh-kr/dota-event':
+        specifier: workspace:*
+        version: link:../dota-event
+      '@ayu-sh-kr/dota-preloader-plugin':
+        specifier: workspace:*
+        version: link:../../plugins/dota-vite-preloader
+      '@ayu-sh-kr/dota-rest':
+        specifier: workspace:*
+        version: link:../dota-rest
       '@ayu-sh-kr/dota-router':
         specifier: workspace:*
         version: link:../dota-router
+      '@ayu-sh-kr/dota-web-type-json':
+        specifier: workspace:*
+        version: link:../../plugins/web-type-json
 
   packages/plugins/dota-vite-preloader:
     dependencies:
@@ -224,6 +218,9 @@ importers:
       '@ayu-sh-kr/dota-event':
         specifier: workspace:*
         version: link:../../libs/dota-event
+      '@ayu-sh-kr/dota-web-type-json':
+        specifier: workspace:*
+        version: link:../../plugins/web-type-json
       markdown-it:
         specifier: latest
         version: 14.2.0
@@ -242,10 +239,10 @@ importers:
         version: 14.1.2
       autoprefixer:
         specifier: ^10.4.19
-        version: 10.4.24(postcss@8.5.6)
+        version: 10.4.24(postcss@8.5.10)
       postcss:
-        specifier: ^8.4.39
-        version: 8.5.6
+        specifier: 8.5.10
+        version: 8.5.10
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.19
@@ -4914,15 +4911,6 @@ snapshots:
       fraction.js: 5.3.4
       picocolors: 1.1.1
       postcss: 8.5.10
-      postcss-value-parser: 4.2.0
-
-  autoprefixer@10.4.24(postcss@8.5.6):
-    dependencies:
-      browserslist: 4.28.1
-      caniuse-lite: 1.0.30001769
-      fraction.js: 5.3.4
-      picocolors: 1.1.1
-      postcss: 8.5.6
       postcss-value-parser: 4.2.0
 
   babel-jest@29.7.0(@babel/core@7.28.4):
