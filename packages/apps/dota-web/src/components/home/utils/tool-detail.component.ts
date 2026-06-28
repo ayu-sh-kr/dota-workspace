@@ -1,5 +1,5 @@
-import { BaseElement, Component, HTML } from "@ayu-sh-kr/dota-core";
-import { type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-event";
+import { BaseElement, Component, HTML } from "@ayu-sh-kr/dota-wrap/core";
+import { type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 import { DOTA_TOOLS, DotaTool } from "@dota/components/home/utils/tools.config.ts";
 
 /**
@@ -22,8 +22,8 @@ export class ToolDetailComponent extends BaseElement {
 
   private tagChip(tag: string): string {
     return `<span class="px-3 py-1 rounded-full text-xs font-medium
-                         bg-purple-500/10 text-purple-600 dark:text-purple-300
-                         border border-purple-400/30 dark:border-purple-500/20"
+                         bg-white/50 text-purple-600 dark:bg-white/[0.055] dark:text-purple-300
+                         border border-purple-300/25 dark:border-purple-300/15 backdrop-blur-xl"
                   >${tag}</span>`;
   }
 
@@ -69,17 +69,21 @@ export class ToolDetailComponent extends BaseElement {
 
     return HTML`
         <div data-detail-panel
-             class="rounded-2xl p-4 sm:p-6 lg:p-8 flex flex-col gap-5 min-h-0 sm:min-h-[320px]
-                    border border-gray-200/80 dark:border-gray-700/40
-                    bg-white/80 dark:bg-gray-950/60
-                    shadow-sm dark:shadow-none overflow-hidden">
+             class="group flex min-h-0 flex-col gap-5 overflow-hidden rounded-2xl p-4 sm:min-h-[320px] sm:p-6 lg:p-8
+                    border border-white/70 dark:border-white/10
+                    bg-white/[0.58] dark:bg-white/[0.045] backdrop-blur-2xl
+                    shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_18px_60px_-46px_rgba(15,23,42,0.88)]
+                    dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_18px_64px_-48px_rgba(0,0,0,0.92)]
+                    hover:-translate-y-1 hover:border-purple-300/30 dark:hover:border-purple-300/20
+                    hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_24px_74px_-50px_rgba(15,23,42,0.95)]
+                    transition-all duration-300">
 
             <!-- Icon + package name -->
             <div class="flex items-start gap-3">
                 <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0
-                            bg-purple-500/10 border border-purple-400/30 dark:border-purple-500/20">
+                            bg-white/55 dark:bg-white/[0.055] border border-purple-300/25 dark:border-purple-300/15 backdrop-blur-xl">
                     <dota-icon data-detail-icon
-                               name="${first.icon}" color="purple" size="lg">
+                               name="${first.icon}" color="purple" size="lg" variant="ghost">
                     </dota-icon>
                 </div>
                 <div class="pt-1 min-w-0">
@@ -113,7 +117,7 @@ export class ToolDetailComponent extends BaseElement {
             <!-- Feature tags -->
             <div data-detail-tags
                  class="flex flex-wrap gap-2 pt-2
-                        border-t border-gray-200/80 dark:border-gray-800/60">
+                        border-t border-slate-200/70 dark:border-white/10">
                 ${this.renderTags(first.tags)}
             </div>
 
