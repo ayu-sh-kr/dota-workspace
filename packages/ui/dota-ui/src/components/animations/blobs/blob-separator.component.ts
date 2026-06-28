@@ -1,4 +1,4 @@
-import {BaseElement, Component, HTML, Property, String, Number} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HTML, Number, Property, String} from "@ayu-sh-kr/dota-core";
 import {
   BLOB_A,
   BLOB_B,
@@ -8,7 +8,7 @@ import {
   CIRCULAR_BLOB_B,
   CIRCULAR_BLOB_C,
   CIRCULAR_BLOB_D
-} from "@dota/components/blobs/Blobs.ts";
+} from "@dota/components/animations/blobs/blob-shapes.ts";
 
 const BLOBS = [
   BLOB_A,
@@ -72,22 +72,22 @@ function prepareBlob(blob: string): string {
 }
 
 @Component({
-  selector: 'blob-separator',
+  selector: "blob-separator",
   shadow: false
 })
 export class BlobSeparatorComponent extends BaseElement {
 
-  @Property({name: 'side', type: String})
-  side: string = 'left';
+  @Property({name: "side", type: String})
+  side: string = "left";
 
-  @Property({name: 'speed', type: Number})
+  @Property({name: "speed", type: Number})
   speed: number = 4;
 
-  @Property({name: 'color-placement', type: Number})
+  @Property({name: "color-placement", type: Number})
   colorPlacement: number = 0;
 
   private layers: BlobLayer[] = [];
-  private layerSignature: string = '';
+  private layerSignature: string = "";
 
   constructor() {
     super();
@@ -123,6 +123,7 @@ export class BlobSeparatorComponent extends BaseElement {
     const driftYAlt = rand(-3.4, 3.4) * speedFactor;
     const durationSeconds = rand(28, 36) - (speed - 1) * 1.35 + index * 0.65;
     const duration = `${Math.max(10, durationSeconds).toFixed(2)}s`;
+
     return [
       `--blob-shift-x:${(layerOffset * 2.6 + rand(-1.4, 1.4)).toFixed(2)}%`,
       `--blob-shift-y:${(layerOffset * -1.8 + rand(-1.2, 1.2)).toFixed(2)}%`,
@@ -143,7 +144,7 @@ export class BlobSeparatorComponent extends BaseElement {
       `--blob-delay:${rand(-12, 0).toFixed(2)}s`,
       `--blob-opacity:${rand(0.2, 0.3).toFixed(3)}`,
       `--blob-blur:${rand(38, 58).toFixed(2)}px`
-    ].filter(Boolean).join(';');
+    ].join(";");
   }
 
   private ensureLayers(): BlobLayer[] {
@@ -166,21 +167,21 @@ export class BlobSeparatorComponent extends BaseElement {
 
   render(): string {
     const layers = this.ensureLayers();
-    const side = this.side === 'right' ? 'right' : 'left';
+    const side = this.side === "right" ? "right" : "left";
     const speed = this.resolveSpeed();
     const placementClass = this.resolvePlacementClass();
-    const stackPositionClass = side === 'right'
-      ? 'right-0 translate-x-[34%] -translate-y-1/2'
-      : 'left-0 -translate-x-[34%] -translate-y-1/2';
+    const stackPositionClass = side === "right"
+      ? "right-0 translate-x-[34%]"
+      : "left-0 -translate-x-[34%]";
 
     return HTML`
       <div
-        class="relative my-[clamp(-1rem,-1.4vw,-0.375rem)] h-[clamp(2.25rem,5.5vw,4.25rem)] overflow-x-clip pointer-events-none select-none isolate ${placementClass}"
+        class="blob-separator ${placementClass}"
         data-color-placement="${this.resolveColorPlacement()}"
         data-speed="${speed}"
         aria-hidden="true"
       >
-        <div class="absolute top-1/2 aspect-square w-[min(58rem,88vw)] ${stackPositionClass}">
+        <div class="blob-separator-stack ${stackPositionClass}">
           ${layers.map((layer) => `
             <div class="blob-separator-layer absolute inset-0" style="${layer.style}">
               <div class="blob-separator-glow absolute inset-0">
@@ -190,7 +191,7 @@ export class BlobSeparatorComponent extends BaseElement {
                 ${layer.svg}
               </div>
             </div>
-          `).join('')}
+          `).join("")}
         </div>
       </div>
     `;
