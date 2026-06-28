@@ -6,8 +6,8 @@ import {
   HTML,
   Property,
   String
-} from "@ayu-sh-kr/dota-core";
-import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
+} from "@ayu-sh-kr/dota-wrap/core";
+import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 

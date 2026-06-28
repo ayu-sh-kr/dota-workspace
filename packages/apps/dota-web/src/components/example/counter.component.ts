@@ -1,4 +1,4 @@
-import {BaseElement, BindEvent, Component, Number, Property} from "@ayu-sh-kr/dota-core";
+import {BaseElement, BindEvent, Component, Number, Property} from "@ayu-sh-kr/dota-wrap/core";
 
 
 @Component({

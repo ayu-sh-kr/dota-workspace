@@ -1,5 +1,5 @@
-import {ApplicationEventService, BaseElement, Component} from "@ayu-sh-kr/dota-core";
-import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
+import {ApplicationEventService, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
 
 /**
@@ -7,14 +7,14 @@ import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
  *
  * Top-level layout shell for the documentation page.
  * Renders:
- *   <doc-header>  — sticky top bar with breadcrumb + theme picker + dark toggle
+ *   <doc-header> — sticky top bar with breadcrumb + theme picker + dark toggle
  *   <doc-sidebar> — left column (desktop) / drawer (mobile)
- *   <doc-content> — scrollable markdown content area (hosts <md-view>)
- *   <md-toc>      — sticky right-hand TOC panel from dota-md
+ *   <doc-content> — scrollable Markdown content area (hosts <md-view>)
+ *   <md-toc> — sticky right-hand TOC panel from dota-md
  *
  * Listens to:
- *   'docs:theme-change'  — saves state and forwards as 'md:theme-change'
- *   'docs:color-change'  — saves state and forwards as 'md:color-change'
+ *   'docs:theme-change' — saves state and forwards as 'md:theme-change'
+ *   'docs:color-change' — saves state and forwards as 'md:color-change'
  */
 @Component({
   selector: 'doc-section',
@@ -51,7 +51,6 @@ export class DocSectionComponent extends BaseElement {
       ApplicationEventService.getInstance().getPublisher()
         .publishAsync({ name: 'md:color-change', data: { color: c } });
     }
-    // Same — no updateHTML() here.
   }
 
   /** Active file name derived from the ?content= query param. */

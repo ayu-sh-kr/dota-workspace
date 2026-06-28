@@ -1,4 +1,4 @@
-import {BaseElement, Component, Boolean, Property} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Boolean, Property} from "@ayu-sh-kr/dota-wrap/core";
 
 @Component({
   selector:"loader-section",

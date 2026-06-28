@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {type MessageType} from "@dota/pages/chat.page.ts";
 import {MarkdownService} from "@dota/service/markdown.service.ts";
 

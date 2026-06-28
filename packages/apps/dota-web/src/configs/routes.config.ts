@@ -10,8 +10,8 @@ import {
   ResourcePage
 } from "@dota/pages";
 import {AppComponent} from "@dota/app.component.ts";
-import {BaseElement} from "@ayu-sh-kr/dota-core";
-import {RouteConfig} from "@ayu-sh-kr/dota-router";
+import {BaseElement} from "@ayu-sh-kr/dota-wrap/core";
+import {RouteConfig} from "@ayu-sh-kr/dota-wrap/router";
 import {docRoutes} from "@dota/configs/doc.config.ts";
 
 export const routesConfig: RouteConfig<BaseElement>[] = [

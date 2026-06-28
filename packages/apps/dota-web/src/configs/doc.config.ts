@@ -1,6 +1,6 @@
 import {DocPage} from "@dota/pages";
-import {RouteConfig} from "@ayu-sh-kr/dota-router";
-import {BaseElement} from "@ayu-sh-kr/dota-core";
+import {RouteConfig} from "@ayu-sh-kr/dota-wrap/router";
+import {BaseElement} from "@ayu-sh-kr/dota-wrap/core";
 
 
 export interface DocConfig {

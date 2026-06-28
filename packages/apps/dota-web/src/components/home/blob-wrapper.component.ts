@@ -1,5 +1,5 @@
-import {BaseElement, Component, HTML, Property, String, Number} from "@ayu-sh-kr/dota-core";
-import {BLOB_A, BLOB_B, BLOB_C, BLOB_D} from "@dota/components/blobs/Blobs.ts";
+import {BaseElement, Component, HTML, Property, String, Number} from "@ayu-sh-kr/dota-wrap/core";
+import {BLOB_A, BLOB_B, BLOB_C, BLOB_D} from "@ayu-sh-kr/dota-ui";
 
 const BLOBS = [BLOB_A, BLOB_B, BLOB_C, BLOB_D];
 

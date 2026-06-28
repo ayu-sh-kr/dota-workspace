@@ -1,4 +1,4 @@
-import { BaseElement, Component, Emitter, EventEmitter, HostListener, Property, String} from "@ayu-sh-kr/dota-core";
+import { BaseElement, Component, Emitter, EventEmitter, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 
 @Component({
   selector: "resource-path",

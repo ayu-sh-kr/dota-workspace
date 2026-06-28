@@ -1,4 +1,4 @@
-import {BaseElement, Component, BindEvent, Property, String, WindowListener} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, BindEvent, Property, String, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 

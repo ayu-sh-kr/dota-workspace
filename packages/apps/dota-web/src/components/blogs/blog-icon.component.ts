@@ -1,4 +1,4 @@
-import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-wrap/core";
 import {type BlogCategory, BlogTypeConfig} from "@dota/configs/blogs.config.ts";
 
 @Component({

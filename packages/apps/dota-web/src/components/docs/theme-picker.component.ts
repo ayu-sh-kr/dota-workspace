@@ -1,5 +1,5 @@
-import {ApplicationEventService, BaseElement, Component, HTML, HostListener, Property, String} from "@ayu-sh-kr/dota-core";
-import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
+import {ApplicationEventService, BaseElement, Component, HTML, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import {THEMES, type ThemeName} from "@ayu-sh-kr/dota-md";
 

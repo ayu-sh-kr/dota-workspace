@@ -1,4 +1,4 @@
-import {BaseElement, Component} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
 
 @Component({
   selector: "no-content",

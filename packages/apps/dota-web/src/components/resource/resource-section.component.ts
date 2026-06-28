@@ -1,4 +1,4 @@
-import {BaseElement, Component, WindowListener} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
 import {resources} from "@dota/constants/resources.ts";
 import {ResourceContentComponent} from "@dota/components/resource/resource-content.component.ts";
 

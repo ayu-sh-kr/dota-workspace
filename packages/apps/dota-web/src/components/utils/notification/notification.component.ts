@@ -8,7 +8,7 @@ import {
   Number as DNumber,
   Property,
   String, ApplicationEventService
-} from "@ayu-sh-kr/dota-core";
+} from "@ayu-sh-kr/dota-wrap/core";
 
 
 @Component({

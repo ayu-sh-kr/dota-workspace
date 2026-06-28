@@ -2,7 +2,7 @@ import {
   AfterInit, BaseElement,
   Component, Element,
   State, WindowListener
-} from "@ayu-sh-kr/dota-core";
+} from "@ayu-sh-kr/dota-wrap/core";
 import {MessageRecord} from "@dota/pages/chat.page.ts";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 

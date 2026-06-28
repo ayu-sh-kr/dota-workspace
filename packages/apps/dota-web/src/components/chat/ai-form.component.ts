@@ -1,4 +1,4 @@
-import {BaseElement, BindEvent, Boolean, Component, Emitter, EventEmitter, Property} from "@ayu-sh-kr/dota-core";
+import {BaseElement, BindEvent, Boolean, Component, Emitter, EventEmitter, Property} from "@ayu-sh-kr/dota-wrap/core";
 import {OpenAIService} from "@dota/service/OpenAIService.ts";
 import {MessageRecord} from "@dota/pages/chat.page.ts";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
