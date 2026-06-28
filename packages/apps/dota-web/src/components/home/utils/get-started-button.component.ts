@@ -1,4 +1,4 @@
-import {BaseElement, Component, HostListener} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HostListener} from "@ayu-sh-kr/dota-wrap/core";
 
 import {routerService} from "@dota/main.ts";
 
@@ -22,12 +22,16 @@ export class GetStartedButtonComponent extends BaseElement {
     // language=HTML
     return `
       <div class="relative group">
-        <div class="absolute -inset-0.5 bg-gradient-to-r dark:from-pink-400 dark:to-purple-400 from-pink-600 to-purple-600 
-            rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"
+        <div class="absolute -inset-px rounded-2xl bg-purple-500/20 blur-md opacity-45
+                    transition duration-500 group-hover:opacity-[0.65] dark:bg-purple-300/[0.16]"
         >
         </div>
         <button
-          class="relative bg-gray-950 text-gray-50 dark:bg-gray-50 dark:text-gray-900 px-4 py-3 rounded-2xl active:scale-95 transition-all">
+          class="relative rounded-2xl border border-white/15 bg-gray-950/[0.92] px-4 py-3
+                 text-gray-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_18px_46px_-36px_rgba(15,23,42,0.95)]
+                 backdrop-blur-xl active:scale-95 transition-all
+                 dark:bg-gray-50/[0.92] dark:text-gray-900 dark:border-white/70
+                 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_18px_46px_-36px_rgba(255,255,255,0.36)]">
           Getting Started
         </button>
       </div>
