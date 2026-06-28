@@ -275,7 +275,7 @@ describe("scanWebComponents", () => {
       ],
       {
         cwd: root,
-        absolute: false,
+        absolute: true,
       },
     );
   });
@@ -303,7 +303,7 @@ describe("scanWebComponents", () => {
     ]);
     expect(scannedWebComponents[0]).toMatchObject({
       source: {
-        file: resolve(root, "src/components/alpha.component.ts"),
+        file: "./src/components/alpha.component.ts",
         offset: expect.any(Number),
       },
       properties: [
@@ -312,7 +312,7 @@ describe("scanWebComponents", () => {
           type: "String",
           required: false,
           source: {
-            file: resolve(root, "src/components/alpha.component.ts"),
+            file: "./src/components/alpha.component.ts",
             offset: expect.any(Number),
           },
         },
@@ -320,7 +320,7 @@ describe("scanWebComponents", () => {
     });
     expect(scannedWebComponents[1]).toMatchObject({
       source: {
-        file: resolve(root, "src/components/beta.component.ts"),
+        file: "./src/components/beta.component.ts",
         offset: expect.any(Number),
       },
       properties: [
@@ -329,7 +329,7 @@ describe("scanWebComponents", () => {
           type: "Boolean",
           required: false,
           source: {
-            file: resolve(root, "src/components/beta.component.ts"),
+            file: "./src/components/beta.component.ts",
             offset: expect.any(Number),
           },
         },
@@ -337,7 +337,7 @@ describe("scanWebComponents", () => {
     });
     expect(scannedWebComponents[2]).toMatchObject({
       source: {
-        file: resolve(root, "src/pages/many.page.ts"),
+        file: "./src/pages/many.page.ts",
         offset: expect.any(Number),
       },
       properties: [
@@ -346,7 +346,7 @@ describe("scanWebComponents", () => {
           type: "String",
           required: false,
           source: {
-            file: resolve(root, "src/pages/many.page.ts"),
+            file: "./src/pages/many.page.ts",
             offset: expect.any(Number),
           },
         },
@@ -398,7 +398,7 @@ describe("web-types artifact generation", () => {
             {
               name: "single-component",
               source: {
-                file: resolve(root, "src/components/single.component.ts"),
+                file: "./src/components/single.component.ts",
                 offset: expect.any(Number),
               },
               attributes: [
@@ -407,7 +407,7 @@ describe("web-types artifact generation", () => {
                   type: "String",
                   required: false,
                   source: {
-                    file: resolve(root, "src/components/single.component.ts"),
+                    file: "./src/components/single.component.ts",
                     offset: expect.any(Number),
                   },
                 },
