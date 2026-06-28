@@ -1,4 +1,4 @@
-import {RestClient} from "@ayu-sh-kr/dota-rest";
+import {RestClient} from "@ayu-sh-kr/dota-wrap/rest";
 
 import {routerService} from "@dota/main.ts";
 

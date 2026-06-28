@@ -1,4 +1,4 @@
-import {RestClient} from "@ayu-sh-kr/dota-rest";
+import {RestClient} from "@ayu-sh-kr/dota-wrap/rest";
 import {SYSTEM_PROMPT} from "@dota/constants/prompt.ts";
 import {notificationService} from "@dota/main.ts";
 

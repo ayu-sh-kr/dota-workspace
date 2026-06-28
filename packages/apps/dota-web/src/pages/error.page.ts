@@ -1,5 +1,5 @@
-import {AfterInit, BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-core";
-import { Route } from "@ayu-sh-kr/dota-router";
+import {AfterInit, BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import { Route } from "@ayu-sh-kr/dota-wrap/router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 @Route({path: '/error'})

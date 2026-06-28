@@ -1,5 +1,5 @@
-import {Component, AfterInit, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-core";
-import {Route} from "@ayu-sh-kr/dota-router";
+import {Component, AfterInit, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
+import {Route} from "@ayu-sh-kr/dota-wrap/router";
 
 
 @Route({path: '/blogs'})
