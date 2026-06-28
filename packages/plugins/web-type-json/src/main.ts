@@ -3,7 +3,7 @@ import type { Plugin } from 'vite';
 import {ComponentScanPath} from "@dota/Constants.ts";
 import fg from "fast-glob";
 import {mkdir, readFile, writeFile} from "node:fs/promises";
-import {dirname, resolve} from "node:path";
+import {dirname, relative, resolve, sep} from "node:path";
 import {ClassDeclaration, parse} from "@swc/core";
 import {ConsolaInstance, createConsola, LogLevels} from "consola";
 import type {ResolvedConfig} from "vite";
@@ -16,6 +16,11 @@ let stagedWebTypesJson: string | null = null;
 let stagedBuildOutputPath: string | null = null;
 let stagedWebComponentInfos: WebComponentInfo[] | null = null;
 
+function toWebTypesSourceFile(root: string, file: string) {
+  const relativePath = relative(root, file).split(sep).join('/');
+  return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
+}
+
 export function resetWebTypeJsonState() {
   viteConfig = null;
   stagedWebTypesJson = null;
@@ -23,13 +28,15 @@ export function resetWebTypeJsonState() {
   stagedWebComponentInfos = null;
 }
 
-export async function scanWebComponents(root: string) {
+export async function scanWebComponents(root: string, scanRoots: string[] = [root]) {
   log.debug('Start scanning web components...')
-  const files = await fg([
-    ComponentScanPath.SOURCE_ROOT_DIRECTORY_SCAN_PATH,
-    ComponentScanPath.SOURCE_COMPONENT_DIRECTORY_SCAN_PATH,
-    ComponentScanPath.SOURCE_PAGE_DIRECTORY_SCAN_PATH
-  ], {cwd: root, absolute: false});
+  const files = (await Promise.all(scanRoots.map(async (scanRoot) => {
+    return fg([
+      ComponentScanPath.SOURCE_ROOT_DIRECTORY_SCAN_PATH,
+      ComponentScanPath.SOURCE_COMPONENT_DIRECTORY_SCAN_PATH,
+      ComponentScanPath.SOURCE_PAGE_DIRECTORY_SCAN_PATH
+    ], {cwd: scanRoot, absolute: true});
+  }))).flat();
   log.debug('Scanned files: ', files.length)
 
   const scannedWebComponentInfos: WebComponentInfo[] = [];
@@ -68,7 +75,7 @@ export async function scanWebComponents(root: string) {
         className: classDeclaration.identifier.value,
         tagName: tagValue,
         source: {
-          file,
+          file: toWebTypesSourceFile(root, file),
           offset: ClassView.from(classDeclaration).getSourceOffset(code) ?? classDeclaration.span.start,
         },
         properties: PropertyView.extractProperties(classDeclaration)
@@ -93,7 +100,7 @@ export async function scanWebComponents(root: string) {
               type: propertyType,
               required: propertyView.isRequired(),
               source: propertySourceOffset == null ? undefined : {
-                file,
+                file: toWebTypesSourceFile(root, file),
                 offset: propertySourceOffset,
               },
             }
@@ -176,7 +183,12 @@ export async function writeWebTypesArtifacts({
   }
 }
 
-export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-types.json', logType = 'info' }: WebTypeJsonPluginConfig = {}): Plugin {
+export default function dotaWebTypeJson({
+  root = process.cwd(),
+  outFile = 'web-types.json',
+  logType = 'info',
+  scanRoots = [root],
+}: WebTypeJsonPluginConfig = {}): Plugin {
   log = createConsola({
     level: LogLevels[logType],
     formatOptions: {
@@ -192,7 +204,7 @@ export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-t
     },
 
     async buildStart() {
-      const scannedWebComponentInfos = await scanWebComponents(root);
+      const scannedWebComponentInfos = await scanWebComponents(root, scanRoots);
       await writeWebTypesArtifacts({
         root,
         outFile,
@@ -209,8 +221,8 @@ export default function dotaWebTypeJson({ root = process.cwd(), outFile = 'web-t
           return pendingRefresh;
         }
 
-      pendingRefresh = (async () => {
-          const scannedWebComponentInfos = await scanWebComponents(root);
+        pendingRefresh = (async () => {
+          const scannedWebComponentInfos = await scanWebComponents(root, scanRoots);
           await writeWebTypesArtifacts({
             root,
             outFile,
