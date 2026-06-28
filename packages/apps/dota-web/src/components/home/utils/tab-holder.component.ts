@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {TAB_REGISTRY} from "./capability.config.ts";
 
 /**
