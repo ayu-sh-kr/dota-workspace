@@ -1,7 +1,7 @@
-import {BaseElement, BindEvent, Component, HTML} from "@ayu-sh-kr/dota-core";
+import {BaseElement, BindEvent, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {CIRCULAR_BLOB_A} from "@ayu-sh-kr/dota-ui";
 
 import {notificationService} from "@dota/main.ts";
-import {CIRCULAR_BLOB_A} from "@dota/components/blobs/Blobs.ts";
 
 @Component({
   selector: 'app-hero',
@@ -15,7 +15,7 @@ export class HeroSectionComponent extends BaseElement {
 
   @BindEvent({event: 'click', id: '#copy'})
   copyText() {
-    const text = 'npm install @ayu-sh-kr/dota-core'
+    const text = 'npm install @ayu-sh-kr/dota-wrap/core'
     navigator.clipboard.writeText(text)
       .then(() => {
         notificationService.info({duration: 5000, message: 'Text Copied to Clipboard', title: 'Notification'})
@@ -24,10 +24,18 @@ export class HeroSectionComponent extends BaseElement {
 
   render(): string {
     return HTML`
-        <section class="relative overflow-hidden font-dm min-h-screen flex flex-col justify-center">
+        <section class="relative isolate overflow-hidden font-dm min-h-screen flex flex-col justify-center
+                        bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.96),rgba(248,250,252,0.92)_42%,rgba(241,245,249,0.86)_100%)]
+                        dark:bg-[radial-gradient(circle_at_50%_16%,rgba(30,41,59,0.74),rgba(2,6,23,0.96)_54%,rgba(2,6,23,1)_100%)]
+                        before:absolute before:inset-0 before:-z-10
+                        before:bg-[linear-gradient(115deg,rgba(255,255,255,0.68),rgba(255,255,255,0.18)_38%,rgba(148,163,184,0.12))]
+                        dark:before:bg-[linear-gradient(115deg,rgba(255,255,255,0.08),rgba(255,255,255,0.025)_42%,rgba(124,58,237,0.08))]
+                        after:absolute after:inset-0 after:-z-10 after:opacity-[0.28] dark:after:opacity-[0.18]
+                        after:bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.16)_1px,transparent_0)]
+                        after:bg-[length:22px_22px]">
 
             <!-- Top-right quarter-arc decoration -->
-            <svg class="absolute -top-px -right-px w-[min(520px,70vw)] h-[min(520px,70vw)] pointer-events-none opacity-[0.35] dark:opacity-25"
+            <svg class="absolute -top-px -right-px w-[min(520px,70vw)] h-[min(520px,70vw)] pointer-events-none opacity-[0.18] dark:opacity-[0.14]"
                  viewBox="0 0 520 520" fill="none" aria-hidden="true">
                 <circle cx="520" cy="0" r="100" stroke="#7c3aed" stroke-width="2"/>
                 <circle cx="520" cy="0" r="190" stroke="#7c3aed" stroke-width="2"/>
@@ -37,7 +45,7 @@ export class HeroSectionComponent extends BaseElement {
             </svg>
 
             <!-- Bottom-left mirror arc -->
-            <svg class="absolute -bottom-px -left-px w-[min(340px,50vw)] h-[min(340px,50vw)] pointer-events-none opacity-25 dark:opacity-[0.18]"
+            <svg class="absolute -bottom-px -left-px w-[min(340px,50vw)] h-[min(340px,50vw)] pointer-events-none opacity-[0.14] dark:opacity-[0.1]"
                  viewBox="0 0 340 340" fill="none" aria-hidden="true">
                 <circle cx="0" cy="340" r="100" stroke="#7c3aed" stroke-width="2"/>
                 <circle cx="0" cy="340" r="200" stroke="#7c3aed" stroke-width="2"/>
@@ -46,7 +54,7 @@ export class HeroSectionComponent extends BaseElement {
 
             <!-- Central ambient blob glow -->
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                        w-[580px] h-[580px] opacity-[0.07] blur-[110px]
+                        w-[580px] h-[580px] opacity-[0.055] dark:opacity-[0.075] blur-[135px] saturate-75
                         pointer-events-none select-none" aria-hidden="true">
                 ${CIRCULAR_BLOB_A}
             </div>
@@ -76,33 +84,38 @@ export class HeroSectionComponent extends BaseElement {
                 <!-- Inline decorator chips — replaces heavy card grid -->
                 <div class="mt-9 flex flex-wrap items-center justify-center gap-2">
                     <span class="inline-flex items-center px-3 py-1.5 rounded-lg
-                                 bg-gray-100/80 dark:bg-gray-800/50
-                                 border border-gray-200/60 dark:border-gray-700/40
+                                 bg-white/55 dark:bg-white/[0.055] backdrop-blur-xl
+                                 border border-white/70 dark:border-white/10
+                                 shadow-[0_12px_40px_-30px_rgba(15,23,42,0.7)]
                                  text-xs font-mono font-medium text-purple-500 dark:text-purple-400">
                         @Component
                     </span>
                     <span class="inline-flex items-center px-3 py-1.5 rounded-lg
-                                 bg-gray-100/80 dark:bg-gray-800/50
-                                 border border-gray-200/60 dark:border-gray-700/40
+                                 bg-white/55 dark:bg-white/[0.055] backdrop-blur-xl
+                                 border border-white/70 dark:border-white/10
+                                 shadow-[0_12px_40px_-30px_rgba(15,23,42,0.7)]
                                  text-xs font-mono font-medium text-purple-500 dark:text-purple-400">
                         @Property
                     </span>
                     <span class="inline-flex items-center px-3 py-1.5 rounded-lg
-                                 bg-gray-100/80 dark:bg-gray-800/50
-                                 border border-gray-200/60 dark:border-gray-700/40
+                                 bg-white/55 dark:bg-white/[0.055] backdrop-blur-xl
+                                 border border-white/70 dark:border-white/10
+                                 shadow-[0_12px_40px_-30px_rgba(15,23,42,0.7)]
                                  text-xs font-mono font-medium text-purple-500 dark:text-purple-400">
                         @BindEvent
                     </span>
                     <span class="text-gray-300 dark:text-gray-600 select-none px-0.5">&middot;</span>
                     <span class="inline-flex items-center px-3 py-1.5 rounded-lg
-                                 bg-gray-100/80 dark:bg-gray-800/50
-                                 border border-gray-200/60 dark:border-gray-700/40
+                                 bg-white/55 dark:bg-white/[0.055] backdrop-blur-xl
+                                 border border-white/70 dark:border-white/10
+                                 shadow-[0_12px_40px_-30px_rgba(15,23,42,0.7)]
                                  text-xs font-medium text-gray-500 dark:text-gray-400">
                         Zero lock-in
                     </span>
                     <span class="inline-flex items-center px-3 py-1.5 rounded-lg
-                                 bg-gray-100/80 dark:bg-gray-800/50
-                                 border border-gray-200/60 dark:border-gray-700/40
+                                 bg-white/55 dark:bg-white/[0.055] backdrop-blur-xl
+                                 border border-white/70 dark:border-white/10
+                                 shadow-[0_12px_40px_-30px_rgba(15,23,42,0.7)]
                                  text-xs font-medium text-gray-500 dark:text-gray-400">
                         No virtual DOM
                     </span>
@@ -122,10 +135,12 @@ export class HeroSectionComponent extends BaseElement {
 
                 <!-- Install strip -->
                 <div class="mt-8 flex w-full max-w-xs sm:max-w-sm items-center gap-2 px-4 py-2.5 rounded-xl
-                            bg-gray-950/[0.04] dark:bg-white/[0.04]
-                            border border-gray-200/80 dark:border-gray-700/40">
+                            bg-white/60 dark:bg-white/[0.055] backdrop-blur-2xl
+                            border border-white/75 dark:border-white/10
+                            shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_18px_56px_-42px_rgba(15,23,42,0.9)]
+                            dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_60px_-44px_rgba(0,0,0,0.9)]">
                     <code class="flex-1 min-w-0 truncate text-xs sm:text-sm font-mono text-gray-500 dark:text-gray-400 select-all text-left">
-                        npm install @ayu-sh-kr/dota-core
+                        npm install @ayu-sh-kr/dota-wrap/core
                     </code>
                     <button id="copy"
                             class="p-1 rounded-md text-gray-400

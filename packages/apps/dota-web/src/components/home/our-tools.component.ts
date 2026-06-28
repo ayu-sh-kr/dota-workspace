@@ -1,4 +1,4 @@
-import { BaseElement, Component, HTML } from "@ayu-sh-kr/dota-core";
+import { BaseElement, Component, HTML } from "@ayu-sh-kr/dota-wrap/core";
 import { DOTA_TOOLS, type DotaTool } from "@dota/components/home/utils/tools.config.ts";
 
 @Component({
@@ -15,8 +15,8 @@ export class OurToolsComponent extends BaseElement {
     // language=html
     return `
         <span class="px-3 py-1 rounded-full text-xs font-medium
-         bg-purple-500/10 text-purple-600 dark:text-purple-300
-         border border-purple-400/30 dark:border-purple-500/20">
+         bg-white/50 text-purple-600 dark:bg-white/[0.055] dark:text-purple-300
+         border border-purple-300/25 dark:border-purple-300/15 backdrop-blur-xl">
           ${tag}
         </span>
     `;
@@ -25,15 +25,19 @@ export class OurToolsComponent extends BaseElement {
   private toolSlide(tool: DotaTool): string {
     return `
       <dota-slide>
-        <div class="rounded-2xl p-4 sm:p-6 flex flex-col gap-5 h-full
-                    border border-gray-200/80 dark:border-gray-700/40
-                    bg-white/80 dark:bg-gray-950/60
-                    shadow-sm dark:shadow-none overflow-hidden">
+        <div class="group flex h-full flex-col gap-5 overflow-hidden rounded-2xl p-4 sm:p-6
+                    border border-white/70 dark:border-white/10
+                    bg-white/[0.58] dark:bg-white/[0.045] backdrop-blur-2xl
+                    shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_18px_60px_-46px_rgba(15,23,42,0.88)]
+                    dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_18px_64px_-48px_rgba(0,0,0,0.92)]
+                    hover:-translate-y-1 hover:border-purple-300/30 dark:hover:border-purple-300/20
+                    hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_24px_74px_-50px_rgba(15,23,42,0.95)]
+                    transition-all duration-300">
 
           <div class="flex items-start gap-3">
             <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0
-                        bg-purple-500/10 border border-purple-400/30 dark:border-purple-500/20">
-              <dota-icon name="${tool.icon}" color="purple" size="lg"></dota-icon>
+                        bg-white/55 dark:bg-white/[0.055] border border-purple-300/25 dark:border-purple-300/15 backdrop-blur-xl">
+              <dota-icon name="${tool.icon}" color="purple" size="lg" variant="ghost"></dota-icon>
             </div>
             <div class="pt-1 min-w-0">
               <p class="text-xs font-semibold tracking-[0.18em] uppercase mb-1
@@ -51,7 +55,7 @@ export class OurToolsComponent extends BaseElement {
                     text-gray-500 dark:text-gray-400">${tool.description}</p>
 
           <div class="flex flex-wrap gap-2 pt-2
-                      border-t border-gray-200/80 dark:border-gray-800/60">
+                      border-t border-slate-200/70 dark:border-white/10">
             ${tool.tags.map(t => this.tagChip(t)).join('')}
           </div>
         </div>
@@ -62,7 +66,10 @@ export class OurToolsComponent extends BaseElement {
   render(): string {
     return HTML`
         <section role="region" aria-labelledby="tools-heading"
-                 class="hero-fade-up font-dm w-full">
+                 class="hero-fade-up relative isolate font-dm w-full
+                        before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
+                        before:from-transparent before:via-slate-200/70 before:to-transparent
+                        dark:before:via-white/10 before:-z-10">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
 
                 <!-- Section header -->

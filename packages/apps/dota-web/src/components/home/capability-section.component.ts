@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, HTML} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
 import {MDService} from "@ayu-sh-kr/dota-md";
 import {notificationService} from "@dota/main.ts";
 import {CapabilityTab, TAB_REGISTRY} from "@dota/components/home/utils/capability.config.ts";
@@ -83,7 +83,10 @@ export class CapabilitySectionComponent extends BaseElement {
 
     return HTML`
         <section role="region" aria-labelledby="capability-heading"
-                 class="hero-fade-up font-dm w-full">
+                 class="hero-fade-up relative isolate font-dm w-full
+                        before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
+                        before:from-transparent before:via-slate-200/70 before:to-transparent
+                        dark:before:via-white/10 before:-z-10">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
 
                     <!-- Two-column grid: left = header + tabs + description, right = code -->
@@ -116,12 +119,15 @@ export class CapabilitySectionComponent extends BaseElement {
 
                         <!-- Right: code card -->
                         <div id="cap-code-card"
-                             class="w-full min-w-0 rounded-xl border border-gray-700/40
-                                    bg-gray-950 shadow-2xl overflow-hidden">
+                             class="w-full min-w-0 rounded-2xl border border-white/10
+                                    bg-slate-950/95 backdrop-blur-2xl
+                                    shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_28px_90px_-54px_rgba(15,23,42,0.95)]
+                                    dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_28px_90px_-52px_rgba(0,0,0,0.96)]
+                                    overflow-hidden">
 
                             <!-- Title bar -->
                             <div class="flex items-center justify-between px-4 py-3
-                                        bg-gray-900/80 border-b border-gray-800/60">
+                                        bg-white/[0.045] border-b border-white/10">
                                 <div class="flex items-center gap-2" aria-hidden="true">
                                     <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
                                     <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/70"></span>

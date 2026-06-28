@@ -1,4 +1,4 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
 import {FrameworkStyleConfig} from "@dota/components/home/utils/device-preview.component.ts";
 
 
@@ -15,7 +15,10 @@ export class DeviceSectionComponent extends BaseElement {
   render(): string {
     // language=html
     return HTML`
-      <section class="font-dm mx-auto max-w-7xl px-6  py-20">
+      <section class="relative isolate font-dm mx-auto max-w-7xl px-6 py-20
+                      before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
+                      before:from-transparent before:via-slate-200/70 before:to-transparent
+                      dark:before:via-white/10 before:-z-10">
         <h1 class="text-3xl sm:text-4xl font-extrabold font-adaptive text-center mb-20">A single component library for
           all of your frameworks.
         </h1>

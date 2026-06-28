@@ -1,4 +1,4 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
 
 @Component({
   selector: "code-section",
@@ -12,7 +12,10 @@ export class CodeSectionComponent extends BaseElement {
   render(): string {
     // language=HTML
     return HTML`
-        <section class="hero-fade-up font-dm w-full">
+        <section class="hero-fade-up relative isolate font-dm w-full
+                        before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
+                        before:from-transparent before:via-slate-200/70 before:to-transparent
+                        dark:before:via-white/10 before:-z-10">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
 
                     <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -37,7 +40,7 @@ export class CodeSectionComponent extends BaseElement {
                         <!-- Right: code snippet -->
                         <div class="w-full min-w-0">
                             <code-snippet filename="app-button.component.ts" language="typescript">
-                              import { Component, Property, HTML } from '@ayu-sh-kr/dota-core';
+                              import { Component, Property, HTML } from '@ayu-sh-kr/dota-wrap/core';
                                 @Component({ selector: 'app-button' })
                                 class ButtonComponent extends BaseElement {
                                 
