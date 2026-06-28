@@ -249,7 +249,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3544302148
+                "offset": 3588769866
               }
             },
             {
@@ -258,7 +258,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3544302220
+                "offset": 3588769938
               }
             },
             {
@@ -267,7 +267,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3544302283
+                "offset": 3588770001
               }
             },
             {
@@ -276,7 +276,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3544302346
+                "offset": 3588770064
               }
             },
             {
@@ -285,7 +285,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3544302422
+                "offset": 3588770140
               }
             },
             {
@@ -294,7 +294,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3544302502
+                "offset": 3588770220
               }
             }
           ]
@@ -921,6 +921,22 @@
           ]
         },
         {
+          "name": "app-header",
+          "source": {
+            "file": "./src/components/utils/header/header.component.ts",
+            "offset": 145
+          },
+          "attributes": []
+        },
+        {
+          "name": "section-header",
+          "source": {
+            "file": "./src/components/utils/header/section-header.component.ts",
+            "offset": 142
+          },
+          "attributes": []
+        },
+        {
           "name": "ai-button",
           "source": {
             "file": "./src/components/utils/buttons/ai-button.component.ts",
@@ -967,6 +983,66 @@
           "source": {
             "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
             "offset": 162
+          },
+          "attributes": []
+        },
+        {
+          "name": "loader-section",
+          "source": {
+            "file": "./src/components/utils/section/loader-section.component.ts",
+            "offset": 159
+          },
+          "attributes": [
+            {
+              "name": "is-loader",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/section/loader-section.component.ts",
+                "offset": 263
+              }
+            }
+          ]
+        },
+        {
+          "name": "app-loader",
+          "source": {
+            "file": "./src/components/utils/section/loader.component.ts",
+            "offset": 154
+          },
+          "attributes": [
+            {
+              "name": "size",
+              "type": "Number",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/section/loader.component.ts",
+                "offset": 278
+              }
+            }
+          ]
+        },
+        {
+          "name": "no-content",
+          "source": {
+            "file": "./src/components/utils/section/no-content.component.ts",
+            "offset": 138
+          },
+          "attributes": []
+        },
+        {
+          "name": "page-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
+            "offset": 142
+          },
+          "attributes": []
+        },
+        {
+          "name": "section-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
+            "offset": 150
           },
           "attributes": []
         },
@@ -1050,82 +1126,6 @@
               }
             }
           ]
-        },
-        {
-          "name": "loader-section",
-          "source": {
-            "file": "./src/components/utils/section/loader-section.component.ts",
-            "offset": 159
-          },
-          "attributes": [
-            {
-              "name": "is-loader",
-              "type": "Boolean",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/section/loader-section.component.ts",
-                "offset": 263
-              }
-            }
-          ]
-        },
-        {
-          "name": "app-loader",
-          "source": {
-            "file": "./src/components/utils/section/loader.component.ts",
-            "offset": 154
-          },
-          "attributes": [
-            {
-              "name": "size",
-              "type": "Number",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/section/loader.component.ts",
-                "offset": 278
-              }
-            }
-          ]
-        },
-        {
-          "name": "no-content",
-          "source": {
-            "file": "./src/components/utils/section/no-content.component.ts",
-            "offset": 138
-          },
-          "attributes": []
-        },
-        {
-          "name": "page-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
-            "offset": 142
-          },
-          "attributes": []
-        },
-        {
-          "name": "section-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
-            "offset": 150
-          },
-          "attributes": []
-        },
-        {
-          "name": "app-header",
-          "source": {
-            "file": "./src/components/utils/header/header.component.ts",
-            "offset": 145
-          },
-          "attributes": []
-        },
-        {
-          "name": "section-header",
-          "source": {
-            "file": "./src/components/utils/header/section-header.component.ts",
-            "offset": 142
-          },
-          "attributes": []
         },
         {
           "name": "blog-content",
