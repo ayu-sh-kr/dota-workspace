@@ -27,11 +27,53 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "module": "./dist/core/index.mjs",
+      "import": "./dist/core/index.mjs",
+      "require": "./dist/core/index.js",
+      "default": "./dist/core/index.js"
+    },
+    "./event": {
+      "types": "./dist/event/index.d.ts",
+      "module": "./dist/event/index.mjs",
+      "import": "./dist/event/index.mjs",
+      "require": "./dist/event/index.js",
+      "default": "./dist/event/index.js"
+    },
+    "./router": {
+      "types": "./dist/router/index.d.ts",
+      "module": "./dist/router/index.mjs",
+      "import": "./dist/router/index.mjs",
+      "require": "./dist/router/index.js",
+      "default": "./dist/router/index.js"
+    },
+    "./rest": {
+      "types": "./dist/rest/index.d.ts",
+      "module": "./dist/rest/index.mjs",
+      "import": "./dist/rest/index.mjs",
+      "require": "./dist/rest/index.js",
+      "default": "./dist/rest/index.js"
+    },
+    "./preloader-plugin": {
+      "types": "./dist/preloader-plugin/index.d.ts",
+      "module": "./dist/preloader-plugin/index.mjs",
+      "import": "./dist/preloader-plugin/index.mjs",
+      "require": "./dist/preloader-plugin/index.js",
+      "default": "./dist/preloader-plugin/index.js"
+    },
+    "./web-type-json": {
+      "types": "./dist/web-type-json/index.d.ts",
+      "module": "./dist/web-type-json/index.mjs",
+      "import": "./dist/web-type-json/index.mjs",
+      "require": "./dist/web-type-json/index.js",
+      "default": "./dist/web-type-json/index.js"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
     "test": "vitest run",
@@ -40,7 +82,11 @@
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
-    "@ayu-sh-kr/dota-router": "workspace:*"
+    "@ayu-sh-kr/dota-event": "workspace:*",
+    "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
+    "@ayu-sh-kr/dota-rest": "workspace:*",
+    "@ayu-sh-kr/dota-router": "workspace:*",
+    "@ayu-sh-kr/dota-web-type-json": "workspace:*"
   },
   "files": [
     "dist/",
