@@ -34,7 +34,7 @@
     }
 
     .framework-logo {
-        @apply size-24 lg:size-36 transform transition-all duration-300 ease-in-out hover:translate-y-[-10px] hover:scale-110 drop-shadow-[0px_15px_25px_rgba(68,68,68,0.15)] dark:drop-shadow-[0px_15px_25px_rgba(68,68,68,.4)] ;
+        @apply size-24 lg:size-36 transform transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-105 drop-shadow-[0px_18px_32px_rgba(15,23,42,0.10)] dark:drop-shadow-[0px_18px_32px_rgba(0,0,0,0.34)] ;
     }
 
 
@@ -193,7 +193,38 @@ body {
     filter: blur(70px) brightness(1) saturate(1.8);
 }
 
+.blob-separator {
+    --separator-color: currentColor;
+    --blob-layer-color: var(--separator-color);
+
+    @apply relative my-[clamp(-1rem,-1.4vw,-0.375rem)] h-[clamp(2.25rem,5.5vw,4.25rem)] overflow-x-clip pointer-events-none select-none isolate;
+}
+
+.blob-separator-stack {
+    @apply absolute top-1/2 aspect-square w-[min(58rem,88vw)] -translate-y-1/2;
+}
+
 .blob-separator-layer {
+    --blob-opacity: 0.25;
+    --blob-duration: 28s;
+    --blob-delay: 0s;
+    --blob-blur: 48px;
+    --blob-breathe-duration: 16s;
+    --blob-shift-x: 0%;
+    --blob-shift-y: 0%;
+    --blob-drift-x: 0%;
+    --blob-drift-y: 0%;
+    --blob-drift-x-mid: 0%;
+    --blob-drift-y-mid: 0%;
+    --blob-drift-x-alt: 0%;
+    --blob-drift-y-alt: 0%;
+    --blob-scale-start: 1;
+    --blob-scale-mid: 1;
+    --blob-scale-end: 1;
+    --blob-rotate-start: 0deg;
+    --blob-rotate-mid: 0deg;
+    --blob-rotate-end: 0deg;
+
     color: var(--blob-layer-color, var(--separator-color));
     opacity: var(--blob-opacity);
     transform-origin: center;
