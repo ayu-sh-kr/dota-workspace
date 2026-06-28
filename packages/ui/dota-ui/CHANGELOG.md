@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.0.12
+
+### Patch Changes
+
+- 63a8619: Added new web-type-json to support IDE intellisense by generating web component metadata and further improved the ecosystem with bug fixes, tests and feature improvement
+- Updated dependencies [63a8619]
+  - @ayu-sh-kr/dota-web-type-json@0.0.2
+
 ## 0.0.11
 
 ### Patch Changes
