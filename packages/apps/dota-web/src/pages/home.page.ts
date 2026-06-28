@@ -1,6 +1,6 @@
-import {DotaPageElement, Component, SEO} from "@ayu-sh-kr/dota-core";
-import { OnEvent } from "@ayu-sh-kr/dota-event";
-import {Route} from "@ayu-sh-kr/dota-router";
+import {DotaPageElement, Component, SEO} from "@ayu-sh-kr/dota-wrap/core";
+import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
+import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 @Route({path: '/'})
@@ -36,25 +36,19 @@ export class HomePage extends DotaPageElement {
     //language=html
     return `
            <app-header></app-header>
-           <blob-separator side="right" color-placement="0" speed="8"></blob-separator>
-           <app-hero></app-hero>
-           <blob-separator side="left" color-placement="1" speed="6"></blob-separator>
-           <app-feature></app-feature>
-           <blob-separator side="right" color-placement="3" speed="5"></blob-separator>
-           <code-section></code-section>
-           <blob-separator side="left" color-placement="5" speed="7"></blob-separator>
-           <reactive-dota></reactive-dota>
-           <blob-separator side="right" color-placement="8" speed="4"></blob-separator>
-           <capability-section></capability-section>
-           <blob-separator side="left" color-placement="10" speed="3"></blob-separator>
-           <emitter-section></emitter-section>
-           <blob-separator side="right" color-placement="12" speed="5"></blob-separator>
-           <device-section></device-section>
-           <blob-separator side="left" color-placement="14" speed="4"></blob-separator>
-           <our-tools></our-tools>
-           <blob-separator side="right" color-placement="15" speed="3"></blob-separator>
-           <client-section></client-section>
-           <app-footer></app-footer>
+           <main class="min-h-screen overflow-hidden bg-slate-50 text-slate-950
+                        dark:bg-slate-950 dark:text-slate-50">
+             <app-hero></app-hero>
+             <app-feature></app-feature>
+             <code-section></code-section>
+             <reactive-dota></reactive-dota>
+             <capability-section></capability-section>
+             <emitter-section></emitter-section>
+             <device-section></device-section>
+             <our-tools></our-tools>
+             <client-section></client-section>
+             <app-footer></app-footer>
+           </main>
         `
   }
 
