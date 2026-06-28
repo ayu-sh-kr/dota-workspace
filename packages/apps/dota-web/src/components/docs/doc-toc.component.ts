@@ -1,6 +1,6 @@
-import {BaseElement, Component, HostListener, HTML, Property, String, WindowListener} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HostListener, HTML, Property, String, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
 import type {TocEntry} from "@dota/service/markdown.service.ts";
-import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
+import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import {THEMES, type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 

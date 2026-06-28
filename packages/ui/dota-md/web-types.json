@@ -1,0 +1,83 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json",
+  "name": "",
+  "version": "",
+  "contributions": {
+    "html": {
+      "elements": [
+        {
+          "name": "md-toc",
+          "source": {
+            "file": "./src/components/md-toc.component.ts",
+            "offset": 2041
+          },
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/md-toc.component.ts",
+                "offset": 2271
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/md-toc.component.ts",
+                "offset": 2346
+              }
+            },
+            {
+              "name": "header-height",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/md-toc.component.ts",
+                "offset": 2668
+              }
+            },
+            {
+              "name": "label",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/md-toc.component.ts",
+                "offset": 2841
+              }
+            }
+          ]
+        },
+        {
+          "name": "md-view",
+          "source": {
+            "file": "./src/components/md-view.component.ts",
+            "offset": 472
+          },
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/md-view.component.ts",
+                "offset": 509
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/md-view.component.ts",
+                "offset": 582
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,5 +1,6 @@
-import {AfterInit, Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-core";
-import {Route} from "@ayu-sh-kr/dota-router";
+import {AfterInit, Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
+import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
+import {Route} from "@ayu-sh-kr/dota-wrap/router";
 
 @Route({path: '/blogs/content'})
 @Component({
@@ -13,6 +14,12 @@ export class BlogContentPage extends DotaPageElement {
 
   @Param('category')
   category!: string;
+
+  @Param('theme')
+  theme: ThemeName = 'apple';
+
+  @Param('color')
+  color: ColorName = 'lime';
 
   constructor() {
     super();
@@ -45,7 +52,7 @@ export class BlogContentPage extends DotaPageElement {
     return `
       <app-header></app-header>
       <page-wrapper>
-        <blog-view theme="purple" max-width="max-w-5xl"></blog-view>
+        <blog-view theme="${this.theme}" color="${this.color}" max-width="max-w-5xl"></blog-view>
       </page-wrapper>
       <app-footer></app-footer>
     `

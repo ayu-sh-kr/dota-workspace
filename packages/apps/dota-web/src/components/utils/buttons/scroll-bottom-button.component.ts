@@ -1,4 +1,4 @@
-import {BaseElement, Component, HostListener} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HostListener} from "@ayu-sh-kr/dota-wrap/core";
 
 @Component({
   selector: "scroll-bottom-button",

@@ -9,7 +9,7 @@
           "name": "app-root",
           "source": {
             "file": "./src/app.component.ts",
-            "offset": 340
+            "offset": 309
           },
           "attributes": []
         },
@@ -17,7 +17,7 @@
           "name": "blog-icon",
           "source": {
             "file": "./src/components/blogs/blog-icon.component.ts",
-            "offset": 231
+            "offset": 237
           },
           "attributes": [
             {
@@ -26,7 +26,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/blogs/blog-icon.component.ts",
-                "offset": 329
+                "offset": 335
               }
             }
           ]
@@ -35,7 +35,7 @@
           "name": "blog-preview",
           "source": {
             "file": "./src/components/blogs/blog-preview.component.ts",
-            "offset": 312
+            "offset": 317
           },
           "attributes": [
             {
@@ -44,7 +44,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 417
+                "offset": 422
               }
             },
             {
@@ -53,7 +53,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 505
+                "offset": 510
               }
             },
             {
@@ -62,7 +62,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 595
+                "offset": 600
               }
             },
             {
@@ -71,7 +71,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 690
+                "offset": 695
               }
             },
             {
@@ -80,7 +80,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 787
+                "offset": 792
               }
             },
             {
@@ -89,7 +89,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 887
+                "offset": 892
               }
             }
           ]
@@ -98,24 +98,69 @@
           "name": "blog-section",
           "source": {
             "file": "./src/components/blogs/blog-section.component.ts",
-            "offset": 222
+            "offset": 227
           },
           "attributes": []
+        },
+        {
+          "name": "blog-suggestion",
+          "source": {
+            "file": "./src/components/blogs/blog-suggestion.component.ts",
+            "offset": 231
+          },
+          "attributes": [
+            {
+              "name": "current-blog",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/blogs/blog-suggestion.component.ts",
+                "offset": 339
+              }
+            },
+            {
+              "name": "limit",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/blogs/blog-suggestion.component.ts",
+                "offset": 424
+              }
+            }
+          ]
         },
         {
           "name": "blog-view",
           "source": {
             "file": "./src/components/blogs/blog-view.component.ts",
-            "offset": 405
+            "offset": 364
           },
           "attributes": [
+            {
+              "name": "current-blog",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/blogs/blog-view.component.ts",
+                "offset": 436
+              }
+            },
             {
               "name": "theme",
               "type": "String",
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 547
+                "offset": 578
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/blogs/blog-view.component.ts",
+                "offset": 713
               }
             },
             {
@@ -124,273 +169,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 698
-              }
-            }
-          ]
-        },
-        {
-          "name": "community-card",
-          "source": {
-            "file": "./src/components/community/community-card.component.ts",
-            "offset": 189
-          },
-          "attributes": [
-            {
-              "name": "image-src",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 2569865708
-              }
-            },
-            {
-              "name": "name",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 2569865780
-              }
-            },
-            {
-              "name": "role",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 2569865843
-              }
-            },
-            {
-              "name": "github-link",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 2569865906
-              }
-            },
-            {
-              "name": "linkedin-link",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 2569865982
-              }
-            },
-            {
-              "name": "quote",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 2569866062
-              }
-            }
-          ]
-        },
-        {
-          "name": "community-component",
-          "source": {
-            "file": "./src/components/community/community.component.ts",
-            "offset": 210
-          },
-          "attributes": []
-        },
-        {
-          "name": "social-button",
-          "source": {
-            "file": "./src/components/community/social-button.component.ts",
-            "offset": 220
-          },
-          "attributes": [
-            {
-              "name": "color",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/community/social-button.component.ts",
-                "offset": 319
-              }
-            },
-            {
-              "name": "text",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/community/social-button.component.ts",
-                "offset": 392
-              }
-            },
-            {
-              "name": "link",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/community/social-button.component.ts",
-                "offset": 464
-              }
-            }
-          ]
-        },
-        {
-          "name": "social-section",
-          "source": {
-            "file": "./src/components/community/social-section.component.ts",
-            "offset": 137
-          },
-          "attributes": []
-        },
-        {
-          "name": "color-picker",
-          "source": {
-            "file": "./src/components/docs/color-picker.component.ts",
-            "offset": 1870
-          },
-          "attributes": [
-            {
-              "name": "current-color",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/docs/color-picker.component.ts",
-                "offset": 1912
-              }
-            }
-          ]
-        },
-        {
-          "name": "doc-content",
-          "source": {
-            "file": "./src/components/docs/doc-content.component.ts",
-            "offset": 361
-          },
-          "attributes": [
-            {
-              "name": "max-width",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/docs/doc-content.component.ts",
-                "offset": 466
-              }
-            }
-          ]
-        },
-        {
-          "name": "doc-header",
-          "source": {
-            "file": "./src/components/docs/doc-header.component.ts",
-            "offset": 1092
-          },
-          "attributes": [
-            {
-              "name": "active-file",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/docs/doc-header.component.ts",
-                "offset": 1132
-              }
-            },
-            {
-              "name": "theme",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/docs/doc-header.component.ts",
-                "offset": 1227
-              }
-            },
-            {
-              "name": "color",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/docs/doc-header.component.ts",
-                "offset": 1300
-              }
-            }
-          ]
-        },
-        {
-          "name": "doc-path",
-          "source": {
-            "file": "./src/components/docs/doc-path.component.ts",
-            "offset": 607
-          },
-          "attributes": [
-            {
-              "name": "file-path",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/docs/doc-path.component.ts",
-                "offset": 705
-              }
-            }
-          ]
-        },
-        {
-          "name": "doc-section",
-          "source": {
-            "file": "./src/components/docs/doc-section.component.ts",
-            "offset": 833
-          },
-          "attributes": []
-        },
-        {
-          "name": "doc-sidebar",
-          "source": {
-            "file": "./src/components/docs/doc-sidebar.component.ts",
-            "offset": 634
-          },
-          "attributes": []
-        },
-        {
-          "name": "doc-toc",
-          "source": {
-            "file": "./src/components/docs/doc-toc.component.ts",
-            "offset": 1840
-          },
-          "attributes": [
-            {
-              "name": "theme",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/docs/doc-toc.component.ts",
-                "offset": 1877
-              }
-            },
-            {
-              "name": "color",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/docs/doc-toc.component.ts",
-                "offset": 1950
-              }
-            }
-          ]
-        },
-        {
-          "name": "theme-picker",
-          "source": {
-            "file": "./src/components/docs/theme-picker.component.ts",
-            "offset": 753
-          },
-          "attributes": [
-            {
-              "name": "current-theme",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/docs/theme-picker.component.ts",
-                "offset": 795
+                "offset": 856
               }
             }
           ]
@@ -399,7 +178,7 @@
           "name": "counter-component",
           "source": {
             "file": "./src/components/example/counter.component.ts",
-            "offset": 170
+            "offset": 175
           },
           "attributes": [
             {
@@ -408,96 +187,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/example/counter.component.ts",
-                "offset": 266
-              }
-            }
-          ]
-        },
-        {
-          "name": "resource-content",
-          "source": {
-            "file": "./src/components/resource/resource-content.component.ts",
-            "offset": 314
-          },
-          "attributes": [
-            {
-              "name": "resource-path",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/resource/resource-content.component.ts",
-                "offset": 425
-              }
-            }
-          ]
-        },
-        {
-          "name": "resource-path",
-          "source": {
-            "file": "./src/components/resource/resource-path.component.ts",
-            "offset": 192
-          },
-          "attributes": [
-            {
-              "name": "title",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/resource/resource-path.component.ts",
-                "offset": 289
-              }
-            },
-            {
-              "name": "path",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/resource/resource-path.component.ts",
-                "offset": 358
-              }
-            }
-          ]
-        },
-        {
-          "name": "resource-section",
-          "source": {
-            "file": "./src/components/resource/resource-section.component.ts",
-            "offset": 309
-          },
-          "attributes": []
-        },
-        {
-          "name": "blob-separator",
-          "source": {
-            "file": "./src/components/home/blob-separator.component.ts",
-            "offset": 1880
-          },
-          "attributes": [
-            {
-              "name": "side",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/home/blob-separator.component.ts",
-                "offset": 1924
-              }
-            },
-            {
-              "name": "speed",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/home/blob-separator.component.ts",
-                "offset": 1992
-              }
-            },
-            {
-              "name": "color-placement",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/home/blob-separator.component.ts",
-                "offset": 2057
+                "offset": 271
               }
             }
           ]
@@ -506,7 +196,7 @@
           "name": "blob-wrapper",
           "source": {
             "file": "./src/components/home/blob-wrapper.component.ts",
-            "offset": 296
+            "offset": 288
           },
           "attributes": [
             {
@@ -515,7 +205,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/home/blob-wrapper.component.ts",
-                "offset": 338
+                "offset": 330
               }
             },
             {
@@ -524,7 +214,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/home/blob-wrapper.component.ts",
-                "offset": 406
+                "offset": 398
               }
             }
           ]
@@ -533,7 +223,7 @@
           "name": "capability-section",
           "source": {
             "file": "./src/components/home/capability-section.component.ts",
-            "offset": 349
+            "offset": 354
           },
           "attributes": []
         },
@@ -541,7 +231,7 @@
           "name": "client-section",
           "source": {
             "file": "./src/components/home/client-section.component.ts",
-            "offset": 193
+            "offset": 198
           },
           "attributes": []
         },
@@ -549,7 +239,7 @@
           "name": "code-section",
           "source": {
             "file": "./src/components/home/code-section.component.ts",
-            "offset": 142
+            "offset": 147
           },
           "attributes": []
         },
@@ -557,7 +247,7 @@
           "name": "device-section",
           "source": {
             "file": "./src/components/home/device-section.component.ts",
-            "offset": 239
+            "offset": 244
           },
           "attributes": []
         },
@@ -565,7 +255,7 @@
           "name": "emitter-section",
           "source": {
             "file": "./src/components/home/emitter-section.component.ts",
-            "offset": 144
+            "offset": 149
           },
           "attributes": []
         },
@@ -573,7 +263,7 @@
           "name": "app-feature",
           "source": {
             "file": "./src/components/home/feature.component.ts",
-            "offset": 145
+            "offset": 150
           },
           "attributes": []
         },
@@ -581,7 +271,7 @@
           "name": "app-hero",
           "source": {
             "file": "./src/components/home/hero-section.component.ts",
-            "offset": 265
+            "offset": 257
           },
           "attributes": []
         },
@@ -589,7 +279,7 @@
           "name": "app-offer",
           "source": {
             "file": "./src/components/home/offer.component.ts",
-            "offset": 255
+            "offset": 260
           },
           "attributes": [
             {
@@ -598,7 +288,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/home/offer.component.ts",
-                "offset": 350
+                "offset": 355
               }
             }
           ]
@@ -607,7 +297,7 @@
           "name": "our-tools",
           "source": {
             "file": "./src/components/home/our-tools.component.ts",
-            "offset": 230
+            "offset": 235
           },
           "attributes": []
         },
@@ -615,113 +305,7 @@
           "name": "reactive-dota",
           "source": {
             "file": "./src/components/home/reactive-section.component.ts",
-            "offset": 348
-          },
-          "attributes": []
-        },
-        {
-          "name": "navigation-sidebar",
-          "source": {
-            "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-            "offset": 297
-          },
-          "attributes": [
-            {
-              "name": "visible",
-              "type": "Boolean",
-              "required": false,
-              "source": {
-                "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-                "offset": 696
-              }
-            }
-          ]
-        },
-        {
-          "name": "app-footer",
-          "source": {
-            "file": "./src/components/utils/footer.component.ts",
-            "offset": 139
-          },
-          "attributes": []
-        },
-        {
-          "name": "app-icon",
-          "source": {
-            "file": "./src/components/utils/icons.component.ts",
-            "offset": 171
-          },
-          "attributes": [
-            {
-              "name": "name",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/icons.component.ts",
-                "offset": 207
-              }
-            },
-            {
-              "name": "color",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/icons.component.ts",
-                "offset": 271
-              }
-            },
-            {
-              "name": "class",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/icons.component.ts",
-                "offset": 337
-              }
-            }
-          ]
-        },
-        {
-          "name": "markdown-view",
-          "source": {
-            "file": "./src/components/utils/markdown-view.component.ts",
-            "offset": 590
-          },
-          "attributes": [
-            {
-              "name": "theme",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/markdown-view.component.ts",
-                "offset": 679
-              }
-            },
-            {
-              "name": "color",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/markdown-view.component.ts",
-                "offset": 808
-              }
-            },
-            {
-              "name": "max-width",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/markdown-view.component.ts",
-                "offset": 996
-              }
-            }
-          ]
-        },
-        {
-          "name": "self-end",
-          "source": {
-            "file": "./src/components/utils/self-end.component.ts",
-            "offset": 131
+            "offset": 353
           },
           "attributes": []
         },
@@ -729,7 +313,7 @@
           "name": "ai-form",
           "source": {
             "file": "./src/components/chat/ai-form.component.ts",
-            "offset": 379
+            "offset": 384
           },
           "attributes": [
             {
@@ -738,7 +322,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/chat/ai-form.component.ts",
-                "offset": 513
+                "offset": 518
               }
             }
           ]
@@ -747,7 +331,7 @@
           "name": "message-box",
           "source": {
             "file": "./src/components/chat/message-box.component.ts",
-            "offset": 317
+            "offset": 322
           },
           "attributes": []
         },
@@ -755,7 +339,7 @@
           "name": "message-card",
           "source": {
             "file": "./src/components/chat/message-card.component.ts",
-            "offset": 290
+            "offset": 295
           },
           "attributes": [
             {
@@ -764,7 +348,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/chat/message-card.component.ts",
-                "offset": 387
+                "offset": 392
               }
             },
             {
@@ -773,7 +357,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/chat/message-card.component.ts",
-                "offset": 364
+                "offset": 369
               }
             },
             {
@@ -782,7 +366,432 @@
               "required": true,
               "source": {
                 "file": "./src/components/chat/message-card.component.ts",
-                "offset": 545
+                "offset": 550
+              }
+            }
+          ]
+        },
+        {
+          "name": "resource-content",
+          "source": {
+            "file": "./src/components/resource/resource-content.component.ts",
+            "offset": 319
+          },
+          "attributes": [
+            {
+              "name": "resource-path",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-content.component.ts",
+                "offset": 430
+              }
+            }
+          ]
+        },
+        {
+          "name": "resource-path",
+          "source": {
+            "file": "./src/components/resource/resource-path.component.ts",
+            "offset": 197
+          },
+          "attributes": [
+            {
+              "name": "title",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-path.component.ts",
+                "offset": 294
+              }
+            },
+            {
+              "name": "path",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-path.component.ts",
+                "offset": 363
+              }
+            }
+          ]
+        },
+        {
+          "name": "resource-section",
+          "source": {
+            "file": "./src/components/resource/resource-section.component.ts",
+            "offset": 314
+          },
+          "attributes": []
+        },
+        {
+          "name": "color-picker",
+          "source": {
+            "file": "./src/components/docs/color-picker.component.ts",
+            "offset": 1880
+          },
+          "attributes": [
+            {
+              "name": "current-color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/docs/color-picker.component.ts",
+                "offset": 1922
+              }
+            }
+          ]
+        },
+        {
+          "name": "doc-content",
+          "source": {
+            "file": "./src/components/docs/doc-content.component.ts",
+            "offset": 366
+          },
+          "attributes": [
+            {
+              "name": "max-width",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/docs/doc-content.component.ts",
+                "offset": 471
+              }
+            }
+          ]
+        },
+        {
+          "name": "doc-header",
+          "source": {
+            "file": "./src/components/docs/doc-header.component.ts",
+            "offset": 1102
+          },
+          "attributes": [
+            {
+              "name": "active-file",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/docs/doc-header.component.ts",
+                "offset": 1142
+              }
+            },
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/docs/doc-header.component.ts",
+                "offset": 1237
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/docs/doc-header.component.ts",
+                "offset": 1310
+              }
+            }
+          ]
+        },
+        {
+          "name": "doc-path",
+          "source": {
+            "file": "./src/components/docs/doc-path.component.ts",
+            "offset": 617
+          },
+          "attributes": [
+            {
+              "name": "file-path",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/docs/doc-path.component.ts",
+                "offset": 715
+              }
+            }
+          ]
+        },
+        {
+          "name": "doc-section",
+          "source": {
+            "file": "./src/components/docs/doc-section.component.ts",
+            "offset": 835
+          },
+          "attributes": []
+        },
+        {
+          "name": "doc-sidebar",
+          "source": {
+            "file": "./src/components/docs/doc-sidebar.component.ts",
+            "offset": 639
+          },
+          "attributes": []
+        },
+        {
+          "name": "doc-toc",
+          "source": {
+            "file": "./src/components/docs/doc-toc.component.ts",
+            "offset": 1850
+          },
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/docs/doc-toc.component.ts",
+                "offset": 1887
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/docs/doc-toc.component.ts",
+                "offset": 1960
+              }
+            }
+          ]
+        },
+        {
+          "name": "theme-picker",
+          "source": {
+            "file": "./src/components/docs/theme-picker.component.ts",
+            "offset": 763
+          },
+          "attributes": [
+            {
+              "name": "current-theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/docs/theme-picker.component.ts",
+                "offset": 805
+              }
+            }
+          ]
+        },
+        {
+          "name": "community-card",
+          "source": {
+            "file": "./src/components/community/community-card.component.ts",
+            "offset": 194
+          },
+          "attributes": [
+            {
+              "name": "image-src",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 3866726183
+              }
+            },
+            {
+              "name": "name",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 3866726255
+              }
+            },
+            {
+              "name": "role",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 3866726318
+              }
+            },
+            {
+              "name": "github-link",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 3866726381
+              }
+            },
+            {
+              "name": "linkedin-link",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 3866726457
+              }
+            },
+            {
+              "name": "quote",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 3866726537
+              }
+            }
+          ]
+        },
+        {
+          "name": "community-component",
+          "source": {
+            "file": "./src/components/community/community.component.ts",
+            "offset": 215
+          },
+          "attributes": []
+        },
+        {
+          "name": "social-button",
+          "source": {
+            "file": "./src/components/community/social-button.component.ts",
+            "offset": 225
+          },
+          "attributes": [
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/community/social-button.component.ts",
+                "offset": 324
+              }
+            },
+            {
+              "name": "text",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/community/social-button.component.ts",
+                "offset": 397
+              }
+            },
+            {
+              "name": "link",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/community/social-button.component.ts",
+                "offset": 469
+              }
+            }
+          ]
+        },
+        {
+          "name": "social-section",
+          "source": {
+            "file": "./src/components/community/social-section.component.ts",
+            "offset": 142
+          },
+          "attributes": []
+        },
+        {
+          "name": "app-footer",
+          "source": {
+            "file": "./src/components/utils/footer.component.ts",
+            "offset": 144
+          },
+          "attributes": []
+        },
+        {
+          "name": "app-icon",
+          "source": {
+            "file": "./src/components/utils/icons.component.ts",
+            "offset": 176
+          },
+          "attributes": [
+            {
+              "name": "name",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/icons.component.ts",
+                "offset": 212
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/icons.component.ts",
+                "offset": 276
+              }
+            },
+            {
+              "name": "class",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/icons.component.ts",
+                "offset": 342
+              }
+            }
+          ]
+        },
+        {
+          "name": "markdown-view",
+          "source": {
+            "file": "./src/components/utils/markdown-view.component.ts",
+            "offset": 595
+          },
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/markdown-view.component.ts",
+                "offset": 684
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/markdown-view.component.ts",
+                "offset": 813
+              }
+            },
+            {
+              "name": "max-width",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/markdown-view.component.ts",
+                "offset": 1001
+              }
+            }
+          ]
+        },
+        {
+          "name": "self-end",
+          "source": {
+            "file": "./src/components/utils/self-end.component.ts",
+            "offset": 136
+          },
+          "attributes": []
+        },
+        {
+          "name": "navigation-sidebar",
+          "source": {
+            "file": "./src/components/sidebar/navigation-sidebar.component.ts",
+            "offset": 302
+          },
+          "attributes": [
+            {
+              "name": "visible",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/sidebar/navigation-sidebar.component.ts",
+                "offset": 701
               }
             }
           ]
@@ -791,7 +800,7 @@
           "name": "code-snippet",
           "source": {
             "file": "./src/components/home/utils/code-snippet.component.ts",
-            "offset": 278
+            "offset": 283
           },
           "attributes": [
             {
@@ -800,7 +809,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/home/utils/code-snippet.component.ts",
-                "offset": 357
+                "offset": 362
               }
             },
             {
@@ -809,7 +818,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/home/utils/code-snippet.component.ts",
-                "offset": 497
+                "offset": 502
               }
             }
           ]
@@ -818,7 +827,7 @@
           "name": "device-preview",
           "source": {
             "file": "./src/components/home/utils/device-preview.component.ts",
-            "offset": 166
+            "offset": 171
           },
           "attributes": [
             {
@@ -827,7 +836,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/home/utils/device-preview.component.ts",
-                "offset": 266
+                "offset": 271
               }
             },
             {
@@ -836,7 +845,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/home/utils/device-preview.component.ts",
-                "offset": 340
+                "offset": 345
               }
             },
             {
@@ -845,7 +854,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/home/utils/device-preview.component.ts",
-                "offset": 414
+                "offset": 419
               }
             },
             {
@@ -854,7 +863,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/home/utils/device-preview.component.ts",
-                "offset": 495
+                "offset": 500
               }
             }
           ]
@@ -863,7 +872,7 @@
           "name": "get-started-button",
           "source": {
             "file": "./src/components/home/utils/get-started-button.component.ts",
-            "offset": 202
+            "offset": 207
           },
           "attributes": []
         },
@@ -871,7 +880,7 @@
           "name": "tab-holder",
           "source": {
             "file": "./src/components/home/utils/tab-holder.component.ts",
-            "offset": 664
+            "offset": 669
           },
           "attributes": [
             {
@@ -880,7 +889,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/home/utils/tab-holder.component.ts",
-                "offset": 704
+                "offset": 709
               }
             }
           ]
@@ -889,7 +898,7 @@
           "name": "tool-detail",
           "source": {
             "file": "./src/components/home/utils/tool-detail.component.ts",
-            "offset": 510
+            "offset": 520
           },
           "attributes": []
         },
@@ -897,7 +906,7 @@
           "name": "tool-list-item",
           "source": {
             "file": "./src/components/home/utils/tool-list-item.component.ts",
-            "offset": 631
+            "offset": 641
           },
           "attributes": [
             {
@@ -906,7 +915,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/home/utils/tool-list-item.component.ts",
-                "offset": 674
+                "offset": 684
               }
             }
           ]
@@ -915,7 +924,7 @@
           "name": "ai-button",
           "source": {
             "file": "./src/components/utils/buttons/ai-button.component.ts",
-            "offset": 194
+            "offset": 199
           },
           "attributes": []
         },
@@ -923,7 +932,7 @@
           "name": "dark-mode-button",
           "source": {
             "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-            "offset": 243
+            "offset": 248
           },
           "attributes": [
             {
@@ -932,7 +941,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-                "offset": 343
+                "offset": 348
               }
             }
           ]
@@ -941,7 +950,7 @@
           "name": "github-button",
           "source": {
             "file": "./src/components/utils/buttons/github-button.component.ts",
-            "offset": 137
+            "offset": 142
           },
           "attributes": []
         },
@@ -949,7 +958,7 @@
           "name": "ham-burger-button",
           "source": {
             "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
-            "offset": 223
+            "offset": 228
           },
           "attributes": []
         },
@@ -957,7 +966,7 @@
           "name": "scroll-bottom-button",
           "source": {
             "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
-            "offset": 157
+            "offset": 162
           },
           "attributes": []
         },
@@ -965,7 +974,7 @@
           "name": "app-header",
           "source": {
             "file": "./src/components/utils/header/header.component.ts",
-            "offset": 140
+            "offset": 145
           },
           "attributes": []
         },
@@ -973,96 +982,15 @@
           "name": "section-header",
           "source": {
             "file": "./src/components/utils/header/section-header.component.ts",
-            "offset": 137
+            "offset": 142
           },
           "attributes": []
-        },
-        {
-          "name": "notification-holder",
-          "source": {
-            "file": "./src/components/utils/notification/notification-holder.component.ts",
-            "offset": 533
-          },
-          "attributes": [
-            {
-              "name": "position",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/notification/notification-holder.component.ts",
-                "offset": 582
-              }
-            }
-          ]
-        },
-        {
-          "name": "app-notification",
-          "source": {
-            "file": "./src/components/utils/notification/notification.component.ts",
-            "offset": 264
-          },
-          "attributes": [
-            {
-              "name": "type",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/notification/notification.component.ts",
-                "offset": 307
-              }
-            },
-            {
-              "name": "duration",
-              "type": "DNumber",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/notification/notification.component.ts",
-                "offset": 367
-              }
-            },
-            {
-              "name": "message",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/notification/notification.component.ts",
-                "offset": 436
-              }
-            },
-            {
-              "name": "color",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/notification/notification.component.ts",
-                "offset": 502
-              }
-            },
-            {
-              "name": "icon",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/notification/notification.component.ts",
-                "offset": 574
-              }
-            },
-            {
-              "name": "title",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/notification/notification.component.ts",
-                "offset": 633
-              }
-            }
-          ]
         },
         {
           "name": "page-wrapper",
           "source": {
             "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
-            "offset": 137
+            "offset": 142
           },
           "attributes": []
         },
@@ -1070,7 +998,7 @@
           "name": "section-wrapper",
           "source": {
             "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
-            "offset": 145
+            "offset": 150
           },
           "attributes": []
         },
@@ -1078,7 +1006,7 @@
           "name": "loader-section",
           "source": {
             "file": "./src/components/utils/section/loader-section.component.ts",
-            "offset": 154
+            "offset": 159
           },
           "attributes": [
             {
@@ -1087,7 +1015,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/utils/section/loader-section.component.ts",
-                "offset": 258
+                "offset": 263
               }
             }
           ]
@@ -1096,7 +1024,7 @@
           "name": "app-loader",
           "source": {
             "file": "./src/components/utils/section/loader.component.ts",
-            "offset": 149
+            "offset": 154
           },
           "attributes": [
             {
@@ -1105,7 +1033,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/utils/section/loader.component.ts",
-                "offset": 273
+                "offset": 278
               }
             }
           ]
@@ -1114,15 +1042,96 @@
           "name": "no-content",
           "source": {
             "file": "./src/components/utils/section/no-content.component.ts",
-            "offset": 133
+            "offset": 138
           },
           "attributes": []
+        },
+        {
+          "name": "notification-holder",
+          "source": {
+            "file": "./src/components/utils/notification/notification-holder.component.ts",
+            "offset": 538
+          },
+          "attributes": [
+            {
+              "name": "position",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/notification/notification-holder.component.ts",
+                "offset": 587
+              }
+            }
+          ]
+        },
+        {
+          "name": "app-notification",
+          "source": {
+            "file": "./src/components/utils/notification/notification.component.ts",
+            "offset": 269
+          },
+          "attributes": [
+            {
+              "name": "type",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/notification/notification.component.ts",
+                "offset": 312
+              }
+            },
+            {
+              "name": "duration",
+              "type": "DNumber",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/notification/notification.component.ts",
+                "offset": 372
+              }
+            },
+            {
+              "name": "message",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/notification/notification.component.ts",
+                "offset": 441
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/notification/notification.component.ts",
+                "offset": 507
+              }
+            },
+            {
+              "name": "icon",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/notification/notification.component.ts",
+                "offset": 579
+              }
+            },
+            {
+              "name": "title",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/notification/notification.component.ts",
+                "offset": 638
+              }
+            }
+          ]
         },
         {
           "name": "blog-content",
           "source": {
             "file": "./src/pages/blog-content.page.ts",
-            "offset": 241
+            "offset": 318
           },
           "attributes": []
         },
@@ -1130,7 +1139,7 @@
           "name": "blog-page",
           "source": {
             "file": "./src/pages/blog.page.ts",
-            "offset": 231
+            "offset": 241
           },
           "attributes": []
         },
@@ -1138,7 +1147,7 @@
           "name": "chat-page",
           "source": {
             "file": "./src/pages/chat.page.ts",
-            "offset": 412
+            "offset": 422
           },
           "attributes": []
         },
@@ -1146,7 +1155,7 @@
           "name": "community-page",
           "source": {
             "file": "./src/pages/community.page.ts",
-            "offset": 283
+            "offset": 293
           },
           "attributes": []
         },
@@ -1154,7 +1163,7 @@
           "name": "doc-page",
           "source": {
             "file": "./src/pages/doc.page.ts",
-            "offset": 710
+            "offset": 720
           },
           "attributes": []
         },
@@ -1162,7 +1171,7 @@
           "name": "app-error",
           "source": {
             "file": "./src/pages/error.page.ts",
-            "offset": 298
+            "offset": 308
           },
           "attributes": [
             {
@@ -1171,7 +1180,7 @@
               "required": true,
               "source": {
                 "file": "./src/pages/error.page.ts",
-                "offset": 329
+                "offset": 339
               }
             },
             {
@@ -1180,7 +1189,7 @@
               "required": true,
               "source": {
                 "file": "./src/pages/error.page.ts",
-                "offset": 389
+                "offset": 399
               }
             },
             {
@@ -1189,7 +1198,7 @@
               "required": false,
               "source": {
                 "file": "./src/pages/error.page.ts",
-                "offset": 455
+                "offset": 465
               }
             }
           ]
@@ -1198,7 +1207,7 @@
           "name": "home-page",
           "source": {
             "file": "./src/pages/home.page.ts",
-            "offset": 314
+            "offset": 329
           },
           "attributes": []
         },
@@ -1206,9 +1215,584 @@
           "name": "resource-page",
           "source": {
             "file": "./src/pages/resource.page.ts",
-            "offset": 282
+            "offset": 292
           },
           "attributes": []
+        },
+        {
+          "name": "dota-card",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 779
+          },
+          "attributes": [
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-title",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 1411
+          },
+          "attributes": [
+            {
+              "name": "title",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 1451
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-header",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 2141
+          },
+          "attributes": [
+            {
+              "name": "",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 2182
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-description",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 2833
+          },
+          "attributes": [
+            {
+              "name": "description",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 2879
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-footer",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 3620
+          },
+          "attributes": [
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "d-avatar",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+            "offset": 776
+          },
+          "attributes": [
+            {
+              "name": "img",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 879
+              }
+            },
+            {
+              "name": "img-alt",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 966
+              }
+            },
+            {
+              "name": "label",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1054
+              }
+            },
+            {
+              "name": "icon",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1141
+              }
+            },
+            {
+              "name": "is-chip",
+              "type": "Boolean",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1231
+              }
+            },
+            {
+              "name": "chip-text",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1325
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1416
+              }
+            },
+            {
+              "name": "chip-position",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1516
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1612
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1701
+              }
+            }
+          ]
+        },
+        {
+          "name": "avatar-wrapper",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+            "offset": 5156
+          },
+          "attributes": [
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 5415
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1612
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
+                "offset": 1701
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-carousel",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+            "offset": 452
+          },
+          "attributes": [
+            {
+              "name": "name",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 495
+              }
+            },
+            {
+              "name": "indicator",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 555
+              }
+            },
+            {
+              "name": "indicator-active-icon",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 644
+              }
+            },
+            {
+              "name": "indicator-regular-icon",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 757
+              }
+            },
+            {
+              "name": "prev-icon",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 871
+              }
+            },
+            {
+              "name": "next-icon",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 969
+              }
+            },
+            {
+              "name": "index",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1069
+              }
+            },
+            {
+              "name": "autoplay",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1134
+              }
+            },
+            {
+              "name": "loop",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1211
+              }
+            },
+            {
+              "name": "interval",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1280
+              }
+            },
+            {
+              "name": "pause-on-hover",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1354
+              }
+            },
+            {
+              "name": "navigation",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1440
+              }
+            },
+            {
+              "name": "keyboard-navigation",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1532
+              }
+            },
+            {
+              "name": "slides-per-view",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1629
+              }
+            },
+            {
+              "name": "gap-per-slide",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1712
+              }
+            },
+            {
+              "name": "snap",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1801
+              }
+            },
+            {
+              "name": "draggable",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1870
+              }
+            },
+            {
+              "name": "animation",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 1949
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
+                "offset": 2039
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-slide",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/carousel/dota-slide.component.ts",
+            "offset": 137
+          },
+          "attributes": []
+        },
+        {
+          "name": "dota-placeholder",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/placeholder/placeholder.component.ts",
+            "offset": 628
+          },
+          "attributes": [
+            {
+              "name": "classname",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/placeholder/placeholder.component.ts",
+                "offset": 840
+              }
+            }
+          ]
+        },
+        {
+          "name": "app-scaffold",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/utils/scaffold.component.ts",
+            "offset": 459
+          },
+          "attributes": [
+            {
+              "name": "classname",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/utils/scaffold.component.ts",
+                "offset": 583
+              }
+            }
+          ]
+        },
+        {
+          "name": "blob-separator",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/animations/blobs/blob-separator.component.ts",
+            "offset": 1897
+          },
+          "attributes": [
+            {
+              "name": "side",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/blobs/blob-separator.component.ts",
+                "offset": 1941
+              }
+            },
+            {
+              "name": "speed",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/blobs/blob-separator.component.ts",
+                "offset": 2009
+              }
+            },
+            {
+              "name": "color-placement",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/blobs/blob-separator.component.ts",
+                "offset": 2074
+              }
+            }
+          ]
+        },
+        {
+          "name": "md-toc",
+          "source": {
+            "file": "../../ui/dota-md/src/components/md-toc.component.ts",
+            "offset": 2034
+          },
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-md/src/components/md-toc.component.ts",
+                "offset": 2152
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-md/src/components/md-toc.component.ts",
+                "offset": 2227
+              }
+            },
+            {
+              "name": "header-height",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-md/src/components/md-toc.component.ts",
+                "offset": 2550
+              }
+            },
+            {
+              "name": "label",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-md/src/components/md-toc.component.ts",
+                "offset": 2723
+              }
+            }
+          ]
+        },
+        {
+          "name": "md-view",
+          "source": {
+            "file": "../../ui/dota-md/src/components/md-view.component.ts",
+            "offset": 472
+          },
+          "attributes": [
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-md/src/components/md-view.component.ts",
+                "offset": 509
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-md/src/components/md-view.component.ts",
+                "offset": 582
+              }
+            }
+          ]
         }
       ]
     }

@@ -1,6 +1,6 @@
 import type { SoftNotification } from '@dota/components/utils/notification/notification.service.ts';
 
-declare module "@ayu-sh-kr/dota-event" {
+declare module "@ayu-sh-kr/dota-wrap/event" {
   interface ApplicationEventMap {
     "app:initialized": null;
     "notification:info": SoftNotification;

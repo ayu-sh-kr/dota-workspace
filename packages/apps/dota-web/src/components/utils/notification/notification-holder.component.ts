@@ -1,4 +1,4 @@
-import {BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import '@dota/components/utils/notification/notification.component.ts'
 import {NotificationComponent} from "@dota/components/utils/notification/notification.component.ts";
 

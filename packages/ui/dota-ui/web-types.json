@@ -471,6 +471,42 @@
               }
             }
           ]
+        },
+        {
+          "name": "blob-separator",
+          "source": {
+            "file": "./src/components/animations/blobs/blob-separator.component.ts",
+            "offset": 1897
+          },
+          "attributes": [
+            {
+              "name": "side",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/animations/blobs/blob-separator.component.ts",
+                "offset": 1941
+              }
+            },
+            {
+              "name": "speed",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/animations/blobs/blob-separator.component.ts",
+                "offset": 2009
+              }
+            },
+            {
+              "name": "color-placement",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/animations/blobs/blob-separator.component.ts",
+                "offset": 2074
+              }
+            }
+          ]
         }
       ]
     }

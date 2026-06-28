@@ -1,5 +1,5 @@
 // community-card.component.ts
-import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-core";
+import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-wrap/core";
 
 @Component({
   selector: "community-card",

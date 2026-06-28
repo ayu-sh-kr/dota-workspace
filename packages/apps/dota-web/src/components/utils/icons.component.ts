@@ -1,4 +1,4 @@
-import {BaseElement, Component, HTML, Property, AfterInit, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HTML, Property, AfterInit, String} from "@ayu-sh-kr/dota-wrap/core";
 
 
 @Component({

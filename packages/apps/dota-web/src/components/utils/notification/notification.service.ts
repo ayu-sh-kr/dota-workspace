@@ -1,5 +1,5 @@
-import {AutoBind, OnEvent} from "@ayu-sh-kr/dota-event";
-import type {ApplicationEvent} from "@ayu-sh-kr/dota-event";
+import {AutoBind, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import type {ApplicationEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {NotificationHolderComponent} from "@dota/components/utils/notification/notification-holder.component.ts";
 import {NotificationColor, NotificationComponent} from "@dota/components/utils/notification/notification.component.ts";
 

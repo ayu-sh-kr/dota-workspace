@@ -6,7 +6,7 @@ import {
   Boolean,
   Watcher,
   WindowListener, BindEvent
-} from "@ayu-sh-kr/dota-core";
+} from "@ayu-sh-kr/dota-wrap/core";
 import {Link} from "@dota/components/utils/header/header.component.ts";
 
 

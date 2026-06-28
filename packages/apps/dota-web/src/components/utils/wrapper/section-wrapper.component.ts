@@ -1,4 +1,4 @@
-import {BaseElement, Component, State} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, State} from "@ayu-sh-kr/dota-wrap/core";
 
 @Component({
   selector: "section-wrapper",

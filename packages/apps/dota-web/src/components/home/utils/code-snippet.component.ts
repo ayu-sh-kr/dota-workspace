@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, BindEvent, Component, HTML, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, BindEvent, Component, HTML, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {MDService} from "@ayu-sh-kr/dota-md";
 import {notificationService} from "@dota/main.ts";
 
@@ -66,10 +66,13 @@ export class CodeSnippetComponent extends BaseElement {
 
   render(): string {
     return HTML`
-        <div class="rounded-xl border border-gray-700/40 bg-gray-950 shadow-2xl w-full min-w-0" style="overflow:hidden">
+        <div class="rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur-2xl
+                    shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_28px_90px_-54px_rgba(15,23,42,0.95)]
+                    dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_28px_90px_-52px_rgba(0,0,0,0.96)]
+                    w-full min-w-0" style="overflow:hidden">
 
             <!-- Title bar -->
-            <div class="flex items-center justify-between px-4 py-3 bg-gray-900/80 border-b border-gray-800/60">
+            <div class="flex items-center justify-between px-4 py-3 bg-white/[0.045] border-b border-white/10">
 
                 <div class="flex items-center gap-2" aria-hidden="true">
                     <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>

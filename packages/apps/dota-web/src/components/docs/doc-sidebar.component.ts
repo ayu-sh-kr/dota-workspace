@@ -1,4 +1,4 @@
-import {BaseElement, BindEvent, Component, HTML, WindowListener} from "@ayu-sh-kr/dota-core";
+import {BaseElement, BindEvent, Component, HTML, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
 import {docConfigs} from "@dota/configs/doc.config.ts";
 
 /**

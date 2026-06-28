@@ -1,4 +1,4 @@
-import {BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 
 import {notificationService} from "@dota/main.ts";
 

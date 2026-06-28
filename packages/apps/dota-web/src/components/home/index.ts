@@ -15,6 +15,4 @@ export {CodeSnippetComponent} from "@dota/components/home/utils/code-snippet.com
 export {TabHolderComponent} from "@dota/components/home/utils/tab-holder.component.ts";
 export {ToolListItemComponent} from "@dota/components/home/utils/tool-list-item.component.ts";
 export {ToolDetailComponent} from "@dota/components/home/utils/tool-detail.component.ts";
-export {BlobSeparatorComponent} from "@dota/components/home/blob-separator.component.ts";
-
 

@@ -1,5 +1,5 @@
-import { ApplicationEventService, BaseElement, Component, HTML, HostListener, Property, String } from "@ayu-sh-kr/dota-core";
-import { type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-event";
+import { ApplicationEventService, BaseElement, Component, HTML, HostListener, Property, String } from "@ayu-sh-kr/dota-wrap/core";
+import { type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 import { DOTA_TOOLS } from "@dota/components/home/utils/tools.config.ts";
 
 /**
@@ -50,34 +50,36 @@ export class ToolListItemComponent extends BaseElement {
 
     return HTML`
         <button ${isInitial ? 'data-active=""' : ''}
-                class="group flex items-center gap-2 sm:gap-3 w-full px-2 sm:px-4 py-2 sm:py-3 rounded-xl text-left
-                       cursor-pointer transition-all duration-200
-                       border border-transparent
-                       hover:bg-gray-100/80 dark:hover:bg-gray-800/40
-                       hover:border-gray-200/80 dark:hover:border-gray-700/30
-                       data-[active]:bg-gray-100/90 dark:data-[active]:bg-gray-800/80
-                       data-[active]:border-gray-200/80 dark:data-[active]:border-gray-700/60">
+                class="group flex w-full items-center gap-2 sm:gap-3 rounded-2xl px-4 py-4 text-left
+                       cursor-pointer transition-all duration-300 backdrop-blur-2xl
+                       border border-white/70 dark:border-white/10
+                       bg-white/[0.52] dark:bg-white/[0.04]
+                       shadow-[inset_0_1px_0_rgba(255,255,255,0.68),0_14px_48px_-42px_rgba(15,23,42,0.86)]
+                       dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_14px_48px_-42px_rgba(0,0,0,0.9)]
+                       hover:-translate-y-0.5 hover:border-purple-300/30
+                       data-[active]:border-purple-300/35 data-[active]:bg-white/[0.68]
+                       dark:data-[active]:bg-white/[0.06]">
             <div class="flex-shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg
-                        bg-gray-200/70 dark:bg-gray-800/60
+                        bg-white/55 dark:bg-white/[0.055] border border-purple-300/25 dark:border-purple-300/15
                         flex items-center justify-center
                         transition-colors duration-200
-                        group-data-[active]:bg-purple-500/20">
-                <dota-icon name="${tool.icon}" color="purple" size="sm"></dota-icon>
+                        group-data-[active]:bg-purple-500/[0.12]">
+                <dota-icon name="${tool.icon}" color="purple" size="sm" variant="ghost"></dota-icon>
             </div>
             <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold font-mono truncate transition-colors duration-200
-                          text-gray-500 dark:text-gray-400
+                          text-gray-700 dark:text-gray-300
                           group-data-[active]:text-gray-900 dark:group-data-[active]:text-gray-100">
                     ${tool.name}
                 </p>
                 <p class="text-xs truncate mt-0.5 transition-colors duration-200
-                          text-gray-400 dark:text-gray-600
-                          group-data-[active]:text-gray-500 dark:group-data-[active]:text-gray-500">
+                          text-gray-400 dark:text-gray-500
+                          group-data-[active]:text-gray-500 dark:group-data-[active]:text-gray-400">
                     ${tool.tagline}
                 </p>
             </div>
-            <dota-icon name="material-symbols:chevron-right-rounded" color="gray" size="sm"
-                       class="opacity-0 group-hover:opacity-50 group-data-[active]:opacity-100
+            <dota-icon name="material-symbols:chevron-right-rounded" color="purple" size="sm"
+                       class="opacity-0 group-hover:opacity-60 group-data-[active]:opacity-100
                               transition-opacity duration-200"></dota-icon>
         </button>
     `;

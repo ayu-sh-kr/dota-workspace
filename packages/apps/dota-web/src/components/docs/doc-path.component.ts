@@ -1,5 +1,5 @@
-import { BaseElement, Component, HostListener, Property, String } from "@ayu-sh-kr/dota-core";
-import { RouterUtils } from "@ayu-sh-kr/dota-router";
+import { BaseElement, Component, HostListener, Property, String } from "@ayu-sh-kr/dota-wrap/core";
+import { RouterUtils } from "@ayu-sh-kr/dota-wrap/router";
 import { routerService } from "@dota/main.ts";
 
 /**
