@@ -180,5 +180,13 @@ export const blogPosts: Blog[] = [
     description: "An introduction to using Kotlin as a scripting language, with a focus on concise automation, JVM tooling, and practical use cases.",
     category: "Tools",
     path: "Kotlin-For-Scripting.md",
+  },
+  {
+    date: "2025-04-25",
+    writer: "Ayush Jaiswal",
+    header: "Towards Cryptography",
+    description: "An introduction to cryptography, covering its purpose, the basic working model, and a simple example using the Caesar cipher.",
+    category: "Tutorial",
+    path: "Towards-Cryptography.md",
   }
 ];
