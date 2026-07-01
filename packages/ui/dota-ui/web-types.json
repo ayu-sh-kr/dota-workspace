@@ -9,7 +9,7 @@
           "name": "d-avatar",
           "source": {
             "file": "./src/components/avatar/avatar.component.ts",
-            "offset": 4487
+            "offset": 776
           },
           "attributes": [
             {
@@ -18,7 +18,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 4530
+                "offset": 879
               }
             },
             {
@@ -27,7 +27,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 4613
+                "offset": 966
               }
             },
             {
@@ -36,7 +36,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 4703
+                "offset": 1054
               }
             },
             {
@@ -45,7 +45,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 4791
+                "offset": 1141
               }
             },
             {
@@ -54,7 +54,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 4877
+                "offset": 1231
               }
             },
             {
@@ -63,7 +63,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 4970
+                "offset": 1325
               }
             },
             {
@@ -72,7 +72,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5065
+                "offset": 1416
               }
             },
             {
@@ -81,7 +81,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5157
+                "offset": 1516
               }
             },
             {
@@ -90,7 +90,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5259
+                "offset": 1612
               }
             },
             {
@@ -99,7 +99,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5351
+                "offset": 1701
               }
             }
           ]
