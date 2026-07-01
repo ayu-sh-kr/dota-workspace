@@ -16,12 +16,13 @@ export class BlogSectionComponent extends BaseElement {
     // language=html
     return `
       <section class="relative isolate font-dm mx-auto max-w-7xl px-3 py-12 lg:pt-20">
-        <orb-background orbit-count="7" 
+        <orb-background orbit-count="7"
             orbit-spacing="10"
             orbit-speed="10"
             orbit-direction="clockwise"
             orbit-particle-size="0.8"
             orbit-particle-gap="11"
+            orbit-size="lg"
         >
         </orb-background>
 
