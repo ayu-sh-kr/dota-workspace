@@ -14,3 +14,4 @@ export * from "@dota/components/animations/blobs/blob-separator.component.ts";
 export * from "@dota/components/animations/blobs/blob-shapes.ts";
 export * from "@dota/components/carousel/dota-carousel.component.ts";
 export * from "@dota/components/carousel/dota-slide.component.ts";
+export * from "@dota/components/animations/orb/orb-background.component.ts";
