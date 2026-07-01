@@ -175,141 +175,6 @@
           ]
         },
         {
-          "name": "counter-component",
-          "source": {
-            "file": "./src/components/example/counter.component.ts",
-            "offset": 175
-          },
-          "attributes": [
-            {
-              "name": "counter",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/example/counter.component.ts",
-                "offset": 271
-              }
-            }
-          ]
-        },
-        {
-          "name": "blob-wrapper",
-          "source": {
-            "file": "./src/components/home/blob-wrapper.component.ts",
-            "offset": 288
-          },
-          "attributes": [
-            {
-              "name": "side",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/home/blob-wrapper.component.ts",
-                "offset": 330
-              }
-            },
-            {
-              "name": "index",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/home/blob-wrapper.component.ts",
-                "offset": 398
-              }
-            }
-          ]
-        },
-        {
-          "name": "capability-section",
-          "source": {
-            "file": "./src/components/home/capability-section.component.ts",
-            "offset": 354
-          },
-          "attributes": []
-        },
-        {
-          "name": "client-section",
-          "source": {
-            "file": "./src/components/home/client-section.component.ts",
-            "offset": 198
-          },
-          "attributes": []
-        },
-        {
-          "name": "code-section",
-          "source": {
-            "file": "./src/components/home/code-section.component.ts",
-            "offset": 147
-          },
-          "attributes": []
-        },
-        {
-          "name": "device-section",
-          "source": {
-            "file": "./src/components/home/device-section.component.ts",
-            "offset": 244
-          },
-          "attributes": []
-        },
-        {
-          "name": "emitter-section",
-          "source": {
-            "file": "./src/components/home/emitter-section.component.ts",
-            "offset": 149
-          },
-          "attributes": []
-        },
-        {
-          "name": "app-feature",
-          "source": {
-            "file": "./src/components/home/feature.component.ts",
-            "offset": 150
-          },
-          "attributes": []
-        },
-        {
-          "name": "app-hero",
-          "source": {
-            "file": "./src/components/home/hero-section.component.ts",
-            "offset": 257
-          },
-          "attributes": []
-        },
-        {
-          "name": "app-offer",
-          "source": {
-            "file": "./src/components/home/offer.component.ts",
-            "offset": 260
-          },
-          "attributes": [
-            {
-              "name": "visible",
-              "type": "Boolean",
-              "required": false,
-              "source": {
-                "file": "./src/components/home/offer.component.ts",
-                "offset": 355
-              }
-            }
-          ]
-        },
-        {
-          "name": "our-tools",
-          "source": {
-            "file": "./src/components/home/our-tools.component.ts",
-            "offset": 235
-          },
-          "attributes": []
-        },
-        {
-          "name": "reactive-dota",
-          "source": {
-            "file": "./src/components/home/reactive-section.component.ts",
-            "offset": 353
-          },
-          "attributes": []
-        },
-        {
           "name": "ai-form",
           "source": {
             "file": "./src/components/chat/ai-form.component.ts",
@@ -372,55 +237,117 @@
           ]
         },
         {
-          "name": "resource-content",
+          "name": "community-card",
           "source": {
-            "file": "./src/components/resource/resource-content.component.ts",
-            "offset": 319
+            "file": "./src/components/community/community-card.component.ts",
+            "offset": 194
           },
           "attributes": [
             {
-              "name": "resource-path",
+              "name": "image-src",
               "type": "String",
-              "required": true,
+              "required": false,
               "source": {
-                "file": "./src/components/resource/resource-content.component.ts",
-                "offset": 430
-              }
-            }
-          ]
-        },
-        {
-          "name": "resource-path",
-          "source": {
-            "file": "./src/components/resource/resource-path.component.ts",
-            "offset": 197
-          },
-          "attributes": [
-            {
-              "name": "title",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/resource/resource-path.component.ts",
-                "offset": 294
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 2618488826
               }
             },
             {
-              "name": "path",
+              "name": "name",
               "type": "String",
-              "required": true,
+              "required": false,
               "source": {
-                "file": "./src/components/resource/resource-path.component.ts",
-                "offset": 363
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 2618488898
+              }
+            },
+            {
+              "name": "role",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 2618488961
+              }
+            },
+            {
+              "name": "github-link",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 2618489024
+              }
+            },
+            {
+              "name": "linkedin-link",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 2618489100
+              }
+            },
+            {
+              "name": "quote",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/community/community-card.component.ts",
+                "offset": 2618489180
               }
             }
           ]
         },
         {
-          "name": "resource-section",
+          "name": "community-component",
           "source": {
-            "file": "./src/components/resource/resource-section.component.ts",
-            "offset": 314
+            "file": "./src/components/community/community.component.ts",
+            "offset": 215
+          },
+          "attributes": []
+        },
+        {
+          "name": "social-button",
+          "source": {
+            "file": "./src/components/community/social-button.component.ts",
+            "offset": 225
+          },
+          "attributes": [
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/community/social-button.component.ts",
+                "offset": 324
+              }
+            },
+            {
+              "name": "text",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/community/social-button.component.ts",
+                "offset": 397
+              }
+            },
+            {
+              "name": "link",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/community/social-button.component.ts",
+                "offset": 469
+              }
+            }
+          ]
+        },
+        {
+          "name": "social-section",
+          "source": {
+            "file": "./src/components/community/social-section.component.ts",
+            "offset": 142
           },
           "attributes": []
         },
@@ -576,117 +503,208 @@
           ]
         },
         {
-          "name": "community-card",
+          "name": "counter-component",
           "source": {
-            "file": "./src/components/community/community-card.component.ts",
-            "offset": 194
+            "file": "./src/components/example/counter.component.ts",
+            "offset": 175
           },
           "attributes": [
             {
-              "name": "image-src",
-              "type": "String",
+              "name": "counter",
+              "type": "Number",
               "required": false,
               "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 3866726183
-              }
-            },
-            {
-              "name": "name",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 3866726255
-              }
-            },
-            {
-              "name": "role",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 3866726318
-              }
-            },
-            {
-              "name": "github-link",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 3866726381
-              }
-            },
-            {
-              "name": "linkedin-link",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 3866726457
-              }
-            },
-            {
-              "name": "quote",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/community/community-card.component.ts",
-                "offset": 3866726537
+                "file": "./src/components/example/counter.component.ts",
+                "offset": 271
               }
             }
           ]
         },
         {
-          "name": "community-component",
+          "name": "blob-wrapper",
           "source": {
-            "file": "./src/components/community/community.component.ts",
-            "offset": 215
+            "file": "./src/components/home/blob-wrapper.component.ts",
+            "offset": 288
+          },
+          "attributes": [
+            {
+              "name": "side",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/home/blob-wrapper.component.ts",
+                "offset": 330
+              }
+            },
+            {
+              "name": "index",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/home/blob-wrapper.component.ts",
+                "offset": 398
+              }
+            }
+          ]
+        },
+        {
+          "name": "capability-section",
+          "source": {
+            "file": "./src/components/home/capability-section.component.ts",
+            "offset": 354
           },
           "attributes": []
         },
         {
-          "name": "social-button",
+          "name": "client-section",
           "source": {
-            "file": "./src/components/community/social-button.component.ts",
-            "offset": 225
+            "file": "./src/components/home/client-section.component.ts",
+            "offset": 198
+          },
+          "attributes": []
+        },
+        {
+          "name": "code-section",
+          "source": {
+            "file": "./src/components/home/code-section.component.ts",
+            "offset": 147
+          },
+          "attributes": []
+        },
+        {
+          "name": "device-section",
+          "source": {
+            "file": "./src/components/home/device-section.component.ts",
+            "offset": 244
+          },
+          "attributes": []
+        },
+        {
+          "name": "emitter-section",
+          "source": {
+            "file": "./src/components/home/emitter-section.component.ts",
+            "offset": 149
+          },
+          "attributes": []
+        },
+        {
+          "name": "app-feature",
+          "source": {
+            "file": "./src/components/home/feature.component.ts",
+            "offset": 150
+          },
+          "attributes": []
+        },
+        {
+          "name": "app-hero",
+          "source": {
+            "file": "./src/components/home/hero-section.component.ts",
+            "offset": 205
+          },
+          "attributes": []
+        },
+        {
+          "name": "app-offer",
+          "source": {
+            "file": "./src/components/home/offer.component.ts",
+            "offset": 260
           },
           "attributes": [
             {
-              "name": "color",
-              "type": "String",
-              "required": true,
+              "name": "visible",
+              "type": "Boolean",
+              "required": false,
               "source": {
-                "file": "./src/components/community/social-button.component.ts",
-                "offset": 324
-              }
-            },
-            {
-              "name": "text",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/community/social-button.component.ts",
-                "offset": 397
-              }
-            },
-            {
-              "name": "link",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/community/social-button.component.ts",
-                "offset": 469
+                "file": "./src/components/home/offer.component.ts",
+                "offset": 355
               }
             }
           ]
         },
         {
-          "name": "social-section",
+          "name": "our-tools",
           "source": {
-            "file": "./src/components/community/social-section.component.ts",
-            "offset": 142
+            "file": "./src/components/home/our-tools.component.ts",
+            "offset": 235
+          },
+          "attributes": []
+        },
+        {
+          "name": "reactive-dota",
+          "source": {
+            "file": "./src/components/home/reactive-section.component.ts",
+            "offset": 353
+          },
+          "attributes": []
+        },
+        {
+          "name": "navigation-sidebar",
+          "source": {
+            "file": "./src/components/sidebar/navigation-sidebar.component.ts",
+            "offset": 302
+          },
+          "attributes": [
+            {
+              "name": "visible",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/sidebar/navigation-sidebar.component.ts",
+                "offset": 701
+              }
+            }
+          ]
+        },
+        {
+          "name": "resource-content",
+          "source": {
+            "file": "./src/components/resource/resource-content.component.ts",
+            "offset": 319
+          },
+          "attributes": [
+            {
+              "name": "resource-path",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-content.component.ts",
+                "offset": 430
+              }
+            }
+          ]
+        },
+        {
+          "name": "resource-path",
+          "source": {
+            "file": "./src/components/resource/resource-path.component.ts",
+            "offset": 197
+          },
+          "attributes": [
+            {
+              "name": "title",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-path.component.ts",
+                "offset": 294
+              }
+            },
+            {
+              "name": "path",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-path.component.ts",
+                "offset": 363
+              }
+            }
+          ]
+        },
+        {
+          "name": "resource-section",
+          "source": {
+            "file": "./src/components/resource/resource-section.component.ts",
+            "offset": 314
           },
           "attributes": []
         },
@@ -771,6 +789,87 @@
           ]
         },
         {
+          "name": "orb-background",
+          "source": {
+            "file": "./src/components/utils/orb-background.component.ts",
+            "offset": 11401
+          },
+          "attributes": [
+            {
+              "name": "orbit-count",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/orb-background.component.ts",
+                "offset": 3029
+              }
+            },
+            {
+              "name": "orbit-particle-gap",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/orb-background.component.ts",
+                "offset": 2618614789
+              }
+            },
+            {
+              "name": "orbit-spacing",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/orb-background.component.ts",
+                "offset": 2618614889
+              }
+            },
+            {
+              "name": "orbit-speed",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/orb-background.component.ts",
+                "offset": 3172
+              }
+            },
+            {
+              "name": "orbit-direction",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/orb-background.component.ts",
+                "offset": 2618615090
+              }
+            },
+            {
+              "name": "orbit-particle-size",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/orb-background.component.ts",
+                "offset": 2618615199
+              }
+            },
+            {
+              "name": "orbit-size-mode",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/orb-background.component.ts",
+                "offset": 2618615300
+              }
+            },
+            {
+              "name": "orbit-position",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/orb-background.component.ts",
+                "offset": 5779
+              }
+            }
+          ]
+        },
+        {
           "name": "self-end",
           "source": {
             "file": "./src/components/utils/self-end.component.ts",
@@ -779,22 +878,54 @@
           "attributes": []
         },
         {
-          "name": "navigation-sidebar",
+          "name": "ai-button",
           "source": {
-            "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-            "offset": 302
+            "file": "./src/components/utils/buttons/ai-button.component.ts",
+            "offset": 199
+          },
+          "attributes": []
+        },
+        {
+          "name": "dark-mode-button",
+          "source": {
+            "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
+            "offset": 248
           },
           "attributes": [
             {
-              "name": "visible",
-              "type": "Boolean",
+              "name": "color",
+              "type": "String",
               "required": false,
               "source": {
-                "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-                "offset": 701
+                "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
+                "offset": 348
               }
             }
           ]
+        },
+        {
+          "name": "github-button",
+          "source": {
+            "file": "./src/components/utils/buttons/github-button.component.ts",
+            "offset": 142
+          },
+          "attributes": []
+        },
+        {
+          "name": "ham-burger-button",
+          "source": {
+            "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
+            "offset": 228
+          },
+          "attributes": []
+        },
+        {
+          "name": "scroll-bottom-button",
+          "source": {
+            "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
+            "offset": 162
+          },
+          "attributes": []
         },
         {
           "name": "code-snippet",
@@ -919,56 +1050,6 @@
               }
             }
           ]
-        },
-        {
-          "name": "ai-button",
-          "source": {
-            "file": "./src/components/utils/buttons/ai-button.component.ts",
-            "offset": 199
-          },
-          "attributes": []
-        },
-        {
-          "name": "dark-mode-button",
-          "source": {
-            "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-            "offset": 248
-          },
-          "attributes": [
-            {
-              "name": "color",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-                "offset": 348
-              }
-            }
-          ]
-        },
-        {
-          "name": "github-button",
-          "source": {
-            "file": "./src/components/utils/buttons/github-button.component.ts",
-            "offset": 142
-          },
-          "attributes": []
-        },
-        {
-          "name": "ham-burger-button",
-          "source": {
-            "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
-            "offset": 228
-          },
-          "attributes": []
-        },
-        {
-          "name": "scroll-bottom-button",
-          "source": {
-            "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
-            "offset": 162
-          },
-          "attributes": []
         },
         {
           "name": "app-header",
@@ -1218,114 +1299,6 @@
             "offset": 292
           },
           "attributes": []
-        },
-        {
-          "name": "dota-card",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 779
-          },
-          "attributes": [
-            {
-              "name": "className",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 837
-              }
-            }
-          ]
-        },
-        {
-          "name": "card-title",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 1411
-          },
-          "attributes": [
-            {
-              "name": "title",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 1451
-              }
-            },
-            {
-              "name": "className",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 837
-              }
-            }
-          ]
-        },
-        {
-          "name": "card-header",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 2141
-          },
-          "attributes": [
-            {
-              "name": "",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 2182
-              }
-            }
-          ]
-        },
-        {
-          "name": "card-description",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 2833
-          },
-          "attributes": [
-            {
-              "name": "description",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 2879
-              }
-            },
-            {
-              "name": "className",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 837
-              }
-            }
-          ]
-        },
-        {
-          "name": "card-footer",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 3620
-          },
-          "attributes": [
-            {
-              "name": "className",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 837
-              }
-            }
-          ]
         },
         {
           "name": "d-avatar",
@@ -1649,6 +1622,114 @@
             "offset": 137
           },
           "attributes": []
+        },
+        {
+          "name": "dota-card",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 779
+          },
+          "attributes": [
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-title",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 1411
+          },
+          "attributes": [
+            {
+              "name": "title",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 1451
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-header",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 2141
+          },
+          "attributes": [
+            {
+              "name": "",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 2182
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-description",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 2833
+          },
+          "attributes": [
+            {
+              "name": "description",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 2879
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-footer",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 3620
+          },
+          "attributes": [
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
         },
         {
           "name": "dota-placeholder",

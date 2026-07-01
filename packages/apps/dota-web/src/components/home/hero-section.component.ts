@@ -1,5 +1,4 @@
 import {BaseElement, BindEvent, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
-import {CIRCULAR_BLOB_A} from "@ayu-sh-kr/dota-ui";
 
 import {notificationService} from "@dota/main.ts";
 
@@ -52,12 +51,17 @@ export class HeroSectionComponent extends BaseElement {
                 <circle cx="0" cy="340" r="300" stroke="#7c3aed" stroke-width="2"/>
             </svg>
 
-            <!-- Central ambient blob glow -->
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                        w-[580px] h-[580px] opacity-[0.055] dark:opacity-[0.075] blur-[135px] saturate-75
-                        pointer-events-none select-none" aria-hidden="true">
-                ${CIRCULAR_BLOB_A}
-            </div>
+            <!-- Central ambient orb glow with orbiting particles -->
+            <orb-background
+                orbit-position="center"
+                orbit-count="7"
+                orbit-spacing="15"
+                orbit-speed="10"
+                orbit-direction="anticlockwise"
+                orbit-particle-size="0.8"
+                orbit-particle-gap="20"
+                orbit-size-mode="random"
+            ></orb-background>
 
             <div class="relative flex flex-col items-center justify-center pt-28 sm:pt-32 pb-16 sm:pb-24 px-5 text-center">
 
