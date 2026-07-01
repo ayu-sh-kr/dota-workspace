@@ -23,33 +23,7 @@ export class HeroSectionComponent extends BaseElement {
 
   render(): string {
     return HTML`
-        <section class="relative isolate overflow-hidden font-dm min-h-screen flex flex-col justify-center
-                        bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.96),rgba(248,250,252,0.92)_42%,rgba(241,245,249,0.86)_100%)]
-                        dark:bg-[radial-gradient(circle_at_50%_16%,rgba(30,41,59,0.74),rgba(2,6,23,0.96)_54%,rgba(2,6,23,1)_100%)]
-                        before:absolute before:inset-0 before:-z-10
-                        before:bg-[linear-gradient(115deg,rgba(255,255,255,0.68),rgba(255,255,255,0.18)_38%,rgba(148,163,184,0.12))]
-                        dark:before:bg-[linear-gradient(115deg,rgba(255,255,255,0.08),rgba(255,255,255,0.025)_42%,rgba(124,58,237,0.08))]
-                        after:absolute after:inset-0 after:-z-10 after:opacity-[0.28] dark:after:opacity-[0.18]
-                        after:bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.16)_1px,transparent_0)]
-                        after:bg-[length:22px_22px]">
-
-            <!-- Top-right quarter-arc decoration -->
-            <svg class="absolute -top-px -right-px w-[min(520px,70vw)] h-[min(520px,70vw)] pointer-events-none opacity-[0.18] dark:opacity-[0.14]"
-                 viewBox="0 0 520 520" fill="none" aria-hidden="true">
-                <circle cx="520" cy="0" r="100" stroke="#7c3aed" stroke-width="2"/>
-                <circle cx="520" cy="0" r="190" stroke="#7c3aed" stroke-width="2"/>
-                <circle cx="520" cy="0" r="280" stroke="#7c3aed" stroke-width="2"/>
-                <circle cx="520" cy="0" r="370" stroke="#7c3aed" stroke-width="2"/>
-                <circle cx="520" cy="0" r="460" stroke="#7c3aed" stroke-width="2"/>
-            </svg>
-
-            <!-- Bottom-left mirror arc -->
-            <svg class="absolute -bottom-px -left-px w-[min(340px,50vw)] h-[min(340px,50vw)] pointer-events-none opacity-[0.14] dark:opacity-[0.1]"
-                 viewBox="0 0 340 340" fill="none" aria-hidden="true">
-                <circle cx="0" cy="340" r="100" stroke="#7c3aed" stroke-width="2"/>
-                <circle cx="0" cy="340" r="200" stroke="#7c3aed" stroke-width="2"/>
-                <circle cx="0" cy="340" r="300" stroke="#7c3aed" stroke-width="2"/>
-            </svg>
+        <section class="relative isolate overflow-hidden font-dm min-h-screen flex flex-col justify-center bg-white/[0.58] dark:bg-white/[0.045] backdrop-blur-2xl">
 
             <!-- Central ambient orb glow with orbiting particles -->
             <orb-background
@@ -61,6 +35,8 @@ export class HeroSectionComponent extends BaseElement {
                 orbit-particle-size="0.8"
                 orbit-particle-gap="20"
                 orbit-size-mode="random"
+                orbit-size="sm"
+                orbit-color="purple"
             ></orb-background>
 
             <div class="relative flex flex-col items-center justify-center pt-28 sm:pt-32 pb-16 sm:pb-24 px-5 text-center">

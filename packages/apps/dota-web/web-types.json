@@ -249,7 +249,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2618488826
+                "offset": 324204661
               }
             },
             {
@@ -258,7 +258,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2618488898
+                "offset": 324204733
               }
             },
             {
@@ -267,7 +267,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2618488961
+                "offset": 324204796
               }
             },
             {
@@ -276,7 +276,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2618489024
+                "offset": 324204859
               }
             },
             {
@@ -285,7 +285,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2618489100
+                "offset": 324204935
               }
             },
             {
@@ -294,7 +294,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 2618489180
+                "offset": 324205015
               }
             }
           ]
@@ -503,24 +503,6 @@
           ]
         },
         {
-          "name": "counter-component",
-          "source": {
-            "file": "./src/components/example/counter.component.ts",
-            "offset": 175
-          },
-          "attributes": [
-            {
-              "name": "counter",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/example/counter.component.ts",
-                "offset": 271
-              }
-            }
-          ]
-        },
-        {
           "name": "blob-wrapper",
           "source": {
             "file": "./src/components/home/blob-wrapper.component.ts",
@@ -636,24 +618,6 @@
             "offset": 353
           },
           "attributes": []
-        },
-        {
-          "name": "navigation-sidebar",
-          "source": {
-            "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-            "offset": 302
-          },
-          "attributes": [
-            {
-              "name": "visible",
-              "type": "Boolean",
-              "required": false,
-              "source": {
-                "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-                "offset": 701
-              }
-            }
-          ]
         },
         {
           "name": "resource-content",
@@ -789,93 +753,48 @@
           ]
         },
         {
-          "name": "orb-background",
-          "source": {
-            "file": "./src/components/utils/orb-background.component.ts",
-            "offset": 11401
-          },
-          "attributes": [
-            {
-              "name": "orbit-count",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/orb-background.component.ts",
-                "offset": 3029
-              }
-            },
-            {
-              "name": "orbit-particle-gap",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/orb-background.component.ts",
-                "offset": 2618614789
-              }
-            },
-            {
-              "name": "orbit-spacing",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/orb-background.component.ts",
-                "offset": 2618614889
-              }
-            },
-            {
-              "name": "orbit-speed",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/orb-background.component.ts",
-                "offset": 3172
-              }
-            },
-            {
-              "name": "orbit-direction",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/orb-background.component.ts",
-                "offset": 2618615090
-              }
-            },
-            {
-              "name": "orbit-particle-size",
-              "type": "Number",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/orb-background.component.ts",
-                "offset": 2618615199
-              }
-            },
-            {
-              "name": "orbit-size-mode",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/orb-background.component.ts",
-                "offset": 2618615300
-              }
-            },
-            {
-              "name": "orbit-position",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/orb-background.component.ts",
-                "offset": 5779
-              }
-            }
-          ]
-        },
-        {
           "name": "self-end",
           "source": {
             "file": "./src/components/utils/self-end.component.ts",
             "offset": 136
           },
           "attributes": []
+        },
+        {
+          "name": "counter-component",
+          "source": {
+            "file": "./src/components/example/counter.component.ts",
+            "offset": 175
+          },
+          "attributes": [
+            {
+              "name": "counter",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "./src/components/example/counter.component.ts",
+                "offset": 271
+              }
+            }
+          ]
+        },
+        {
+          "name": "navigation-sidebar",
+          "source": {
+            "file": "./src/components/sidebar/navigation-sidebar.component.ts",
+            "offset": 302
+          },
+          "attributes": [
+            {
+              "name": "visible",
+              "type": "Boolean",
+              "required": false,
+              "source": {
+                "file": "./src/components/sidebar/navigation-sidebar.component.ts",
+                "offset": 701
+              }
+            }
+          ]
         },
         {
           "name": "ai-button",
@@ -1068,22 +987,6 @@
           "attributes": []
         },
         {
-          "name": "page-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
-            "offset": 142
-          },
-          "attributes": []
-        },
-        {
-          "name": "section-wrapper",
-          "source": {
-            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
-            "offset": 150
-          },
-          "attributes": []
-        },
-        {
           "name": "loader-section",
           "source": {
             "file": "./src/components/utils/section/loader-section.component.ts",
@@ -1207,6 +1110,22 @@
               }
             }
           ]
+        },
+        {
+          "name": "page-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/page-wrapper.component.ts",
+            "offset": 142
+          },
+          "attributes": []
+        },
+        {
+          "name": "section-wrapper",
+          "source": {
+            "file": "./src/components/utils/wrapper/section-wrapper.component.ts",
+            "offset": 150
+          },
+          "attributes": []
         },
         {
           "name": "blog-content",
@@ -1436,6 +1355,114 @@
           ]
         },
         {
+          "name": "dota-card",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 779
+          },
+          "attributes": [
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-title",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 1411
+          },
+          "attributes": [
+            {
+              "name": "title",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 1451
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-header",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 2141
+          },
+          "attributes": [
+            {
+              "name": "",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 2182
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-description",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 2833
+          },
+          "attributes": [
+            {
+              "name": "description",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 2879
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
+          "name": "card-footer",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+            "offset": 3620
+          },
+          "attributes": [
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
+                "offset": 837
+              }
+            }
+          ]
+        },
+        {
           "name": "dota-carousel",
           "source": {
             "file": "../../ui/dota-ui/src/components/carousel/dota-carousel.component.ts",
@@ -1624,114 +1651,6 @@
           "attributes": []
         },
         {
-          "name": "dota-card",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 779
-          },
-          "attributes": [
-            {
-              "name": "className",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 837
-              }
-            }
-          ]
-        },
-        {
-          "name": "card-title",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 1411
-          },
-          "attributes": [
-            {
-              "name": "title",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 1451
-              }
-            },
-            {
-              "name": "className",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 837
-              }
-            }
-          ]
-        },
-        {
-          "name": "card-header",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 2141
-          },
-          "attributes": [
-            {
-              "name": "",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 2182
-              }
-            }
-          ]
-        },
-        {
-          "name": "card-description",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 2833
-          },
-          "attributes": [
-            {
-              "name": "description",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 2879
-              }
-            },
-            {
-              "name": "className",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 837
-              }
-            }
-          ]
-        },
-        {
-          "name": "card-footer",
-          "source": {
-            "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-            "offset": 3620
-          },
-          "attributes": [
-            {
-              "name": "className",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "../../ui/dota-ui/src/components/card/card.component.ts",
-                "offset": 837
-              }
-            }
-          ]
-        },
-        {
           "name": "dota-placeholder",
           "source": {
             "file": "../../ui/dota-ui/src/components/placeholder/placeholder.component.ts",
@@ -1763,6 +1682,123 @@
               "source": {
                 "file": "../../ui/dota-ui/src/components/utils/scaffold.component.ts",
                 "offset": 583
+              }
+            }
+          ]
+        },
+        {
+          "name": "orb-background",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+            "offset": 22439
+          },
+          "attributes": [
+            {
+              "name": "orbit-count",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 13486
+              }
+            },
+            {
+              "name": "orbit-particle-gap",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324438127
+              }
+            },
+            {
+              "name": "orbit-spacing",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324438214
+              }
+            },
+            {
+              "name": "orbit-speed",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 13619
+              }
+            },
+            {
+              "name": "orbit-direction",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324438367
+              }
+            },
+            {
+              "name": "orbit-particle-size",
+              "type": "Number",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324438466
+              }
+            },
+            {
+              "name": "orbit-size-mode",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324438556
+              }
+            },
+            {
+              "name": "orbit-position",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 16392
+              }
+            },
+            {
+              "name": "orbit-size",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324438746
+              }
+            },
+            {
+              "name": "orbit-color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324438823
+              }
+            },
+            {
+              "name": "orbit-particle-color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324438924
+              }
+            },
+            {
+              "name": "orbit-glow-color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
+                "offset": 324439019
               }
             }
           ]

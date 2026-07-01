@@ -8,6 +8,7 @@ import {
   DotaCarouselComponent,
   DotaSlideComponent,
   IconsComponent,
+  OrbBackgroundComponent,
   PopoverComponent
 } from "@ayu-sh-kr/dota-ui";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap";
@@ -37,7 +38,8 @@ initializeApp({
     DotaCarouselComponent,
     DotaSlideComponent,
     ButtonComponent,
-    BlobSeparatorComponent
+    BlobSeparatorComponent,
+    OrbBackgroundComponent,
   ],
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},

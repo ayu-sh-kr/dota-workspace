@@ -15,4 +15,3 @@ export {SectionHeaderComponent} from "@dota/components/utils/header/section-head
 export {NoContentComponent} from "@dota/components/utils/section/no-content.component.ts";
 export {SectionWrapperComponent} from "@dota/components/utils/wrapper/section-wrapper.component.ts";
 export {MarkdownViewComponent} from "@dota/components/utils/markdown-view.component.ts";
-export {OrbBackgroundComponent} from "@dota/components/utils/orb-background.component.ts";
