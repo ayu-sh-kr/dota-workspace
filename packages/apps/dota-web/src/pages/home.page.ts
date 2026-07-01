@@ -36,8 +36,8 @@ export class HomePage extends DotaPageElement {
     //language=html
     return `
            <app-header></app-header>
-           <main class="min-h-screen overflow-hidden bg-slate-50 text-slate-950
-                        dark:bg-slate-950 dark:text-slate-50">
+           <main class="min-h-screen overflow-hidden bg-[#faf8ff] text-slate-950
+                        dark:bg-[#09080b] dark:text-slate-50">
              <app-hero></app-hero>
              <app-feature></app-feature>
              <code-section></code-section>
