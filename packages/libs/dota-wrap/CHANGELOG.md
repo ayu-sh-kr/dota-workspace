@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.15
+
+### Patch Changes
+
+- 57f0c7c: Updated dota-wrap to support internal build for external packages, added a new component orb-background to dota-ui
+
 ## 0.0.14
 
 ### Patch Changes
