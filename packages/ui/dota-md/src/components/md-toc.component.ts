@@ -62,7 +62,7 @@ export class MdTocComponent extends BaseElement {
   color: ColorName = 'indigo';
 
   /**
-   * Sticky header height in pixels.  Must match your layout's header height so
+   * Sticky header height in pixels.  Must match your layout's header height, so
    * scroll-into-view and the active-heading threshold are calculated correctly.
    * Attribute: `header-height` (string, parsed as integer internally).
    */
@@ -76,29 +76,23 @@ export class MdTocComponent extends BaseElement {
   @Property({ name: 'label', type: String })
   label: string = 'On this page';
 
-  // ── Internal state ─────────────────────────────────────────────────────────
-
   private _toc: TocEntry[] = [];
   private _activeId: string = '';
-
-  // ── Lifecycle ──────────────────────────────────────────────────────────────
 
   constructor() {
     super();
   }
 
-  // ── Event listeners ────────────────────────────────────────────────────────
-
   /**
    * Receives new TOC entries whenever `MDService.render({ publish: true })`
-   * fires a `md:render` event.  Resets the active heading to the first entry
+   * fires an ` md:render` event.  Resets the active heading to the first entry
    * and re-renders the list.
    */
   @OnEvent('md:render')
   onRender(event: ApplicationEvent<'md:render'>) {
     const data = event?.data;
     if (data?.toc) {
-      this._toc      = data.toc;
+      this._toc = data.toc;
       this._activeId = TocUtils.flatIds(this._toc)[0] ?? '';
       this.updateHTML();
     }
@@ -128,11 +122,9 @@ export class MdTocComponent extends BaseElement {
     }
   }
 
-  // ── Scroll tracking ────────────────────────────────────────────────────────
-
   /**
    * On every scroll tick, determine which heading is currently in view and
-   * update the active ID.  Only triggers a re-render when the active heading
+   * update the active ID. Only triggers a re-render when the active heading
    * actually changes (avoids thrashing).
    */
   @WindowListener({ event: 'scroll' })
@@ -147,8 +139,6 @@ export class MdTocComponent extends BaseElement {
       this.updateHTML();
     }
   }
-
-  // ── Click interception ─────────────────────────────────────────────────────
 
   /**
    * Intercepts clicks on TOC anchor links, prevents navigation, smooth-scrolls
@@ -173,14 +163,11 @@ export class MdTocComponent extends BaseElement {
     }
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-
   /** Parse the `headerHeight` string attribute as an integer (pixels). */
   private get _headerHeightPx(): number {
     return parseInt(this.headerHeight, 10) || 64;
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
 
   render(): string {
     if (!this._toc.length) {

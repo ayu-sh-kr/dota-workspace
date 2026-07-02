@@ -6,6 +6,141 @@
     "html": {
       "elements": [
         {
+          "name": "d-avatar",
+          "source": {
+            "file": "./src/components/avatar/avatar.component.ts",
+            "offset": 777
+          },
+          "attributes": [
+            {
+              "name": "img",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 820
+              }
+            },
+            {
+              "name": "img-alt",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 903
+              }
+            },
+            {
+              "name": "label",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 993
+              }
+            },
+            {
+              "name": "icon",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1081
+              }
+            },
+            {
+              "name": "is-chip",
+              "type": "Boolean",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1167
+              }
+            },
+            {
+              "name": "chip-text",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1260
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1355
+              }
+            },
+            {
+              "name": "chip-position",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1447
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1549
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 1641
+              }
+            }
+          ]
+        },
+        {
+          "name": "avatar-wrapper",
+          "source": {
+            "file": "./src/components/avatar/avatar.component.ts",
+            "offset": 5157
+          },
+          "attributes": [
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 5354
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 5524
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/avatar/avatar.component.ts",
+                "offset": 5687
+              }
+            }
+          ]
+        },
+        {
           "name": "dota-card",
           "source": {
             "file": "./src/components/card/card.component.ts",
@@ -302,136 +437,19 @@
           "attributes": []
         },
         {
-          "name": "d-avatar",
+          "name": "dota-placeholder",
           "source": {
-            "file": "./src/components/avatar/avatar.component.ts",
-            "offset": 776
+            "file": "./src/components/placeholder/placeholder.component.ts",
+            "offset": 628
           },
           "attributes": [
             {
-              "name": "img",
+              "name": "classname",
               "type": "String",
               "required": true,
               "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 879
-              }
-            },
-            {
-              "name": "img-alt",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 966
-              }
-            },
-            {
-              "name": "label",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1054
-              }
-            },
-            {
-              "name": "icon",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1141
-              }
-            },
-            {
-              "name": "is-chip",
-              "type": "Boolean",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1231
-              }
-            },
-            {
-              "name": "chip-text",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1325
-              }
-            },
-            {
-              "name": "color",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1416
-              }
-            },
-            {
-              "name": "chip-position",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1516
-              }
-            },
-            {
-              "name": "variant",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1612
-              }
-            },
-            {
-              "name": "size",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1701
-              }
-            }
-          ]
-        },
-        {
-          "name": "avatar-wrapper",
-          "source": {
-            "file": "./src/components/avatar/avatar.component.ts",
-            "offset": 5156
-          },
-          "attributes": [
-            {
-              "name": "color",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5415
-              }
-            },
-            {
-              "name": "variant",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1612
-              }
-            },
-            {
-              "name": "size",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1701
+                "file": "./src/components/placeholder/placeholder.component.ts",
+                "offset": 840
               }
             }
           ]
@@ -450,24 +468,6 @@
               "source": {
                 "file": "./src/components/utils/scaffold.component.ts",
                 "offset": 583
-              }
-            }
-          ]
-        },
-        {
-          "name": "dota-placeholder",
-          "source": {
-            "file": "./src/components/placeholder/placeholder.component.ts",
-            "offset": 628
-          },
-          "attributes": [
-            {
-              "name": "classname",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/placeholder/placeholder.component.ts",
-                "offset": 840
               }
             }
           ]

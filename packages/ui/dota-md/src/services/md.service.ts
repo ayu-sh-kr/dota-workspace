@@ -3,8 +3,8 @@ import highlightjs from 'markdown-it-highlightjs';
 import anchor from 'markdown-it-anchor';
 import toc from 'markdown-it-toc-done-right';
 import { ApplicationEventService } from '@ayu-sh-kr/dota-core';
+import MarkdownIt from "markdown-it";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 /** A single entry in the extracted Table of Contents. */
 export interface TocEntry {
@@ -29,8 +29,6 @@ export interface MarkdownResult {
   toc: TocEntry[];
 }
 
-// ─── Internal helpers ─────────────────────────────────────────────────────────
-
 /** Recursively flatten the AST produced by markdown-it-toc-done-right. */
 function flattenTocAst(node: { l: number; n: string; c: typeof node[] }): TocEntry[] {
   return (node.c ?? []).map(child => {
@@ -39,8 +37,8 @@ function flattenTocAst(node: { l: number; n: string; c: typeof node[] }): TocEnt
       .replace(/\s+/g, '-')
       .replace(/[^\w-]/g, '');
     return {
-      level:    child.l,
-      text:     child.n,
+      level: child.l,
+      text: child.n,
       id,
       children: flattenTocAst(child),
     };
@@ -50,10 +48,10 @@ function flattenTocAst(node: { l: number; n: string; c: typeof node[] }): TocEnt
 /** Build a fresh markdown-it instance wired up with the standard plugin set. */
 function buildMd(options: MarkdownItOptions = {}): ReturnType<typeof markdownit> {
   return markdownit({
-    html:        true,
-    linkify:     true,
+    html: true,
+    linkify: true,
     typographer: true,
-    breaks:      false,
+    breaks: false,
     ...options,
   })
     .use(highlightjs, { auto: true, code: true })
@@ -65,15 +63,13 @@ function buildMd(options: MarkdownItOptions = {}): ReturnType<typeof markdownit>
     });
 }
 
-// ─── MDService ────────────────────────────────────────────────────────────────
-
 /**
  * `MDService` — singleton markdown rendering service for `dota-md`.
  *
  * ### Features
- * - **Default static md instance** — pre-configured with highlight.js, anchors
+ * - **Default static md instance** — pre-configured with highlight.js, anchors,
  *   and TOC; replace it at any time via `MDService.setMd(...)`.
- * - **LRU-style cache** — results are keyed by content string so repeated renders
+ * - **LRU-style cache** — results are keyed by content string, so repeated renders
  *   of the same document are instantaneous.  Call `MDService.clearCache()` or
  *   `MDService.clearCacheFor(content)` to invalidate.
  * - **Flexible return** — use `renderHtml` for HTML only, `renderToc` for TOC
@@ -84,21 +80,19 @@ function buildMd(options: MarkdownItOptions = {}): ReturnType<typeof markdownit>
  *
  * @example
  * ```ts
- * // HTML + TOC, publish to event bus
+ * // HTML + TOC, publish to even bus
  * const result = MDService.render(rawMd, { publish: true });
  *
  * // HTML only (no event, cached)
  * const html = MDService.renderHtml(rawMd);
  *
- * // Replace the underlying md instance (e.g. add a custom plugin)
+ * // Replace the underlying md instance (e.g., add a custom plugin)
  * MDService.setMd(markdownit().use(myPlugin));
  * ```
  */
 export class MDService {
 
-  // ── Private md instance & pending-toc scratch pad ─────────────────────────
-
-  private static _md = buildMd();
+  private static _md: MarkdownIt = buildMd();
 
   /**
    * Scratch-pad written by the toc plugin callback during each `md.render()`.
@@ -106,8 +100,6 @@ export class MDService {
    * @internal
    */
   private static _pendingToc: TocEntry[] = [];
-
-  // ── Cache ──────────────────────────────────────────────────────────────────
 
   /**
    * Content → MarkdownResult cache.
@@ -127,8 +119,6 @@ export class MDService {
     MDService._cache.set(key, value);
   }
 
-  // ── Configuration setters ──────────────────────────────────────────────────
-
   /**
    * Replace the underlying `markdown-it` instance.
    * The new instance **must** already have the toc plugin attached with a
@@ -141,7 +131,7 @@ export class MDService {
    * @param md - A pre-configured `markdown-it` instance.
    */
   static setMd(md: ReturnType<typeof markdownit>): void {
-    MDService._md      = md;
+    MDService._md = md;
     MDService._cache.clear();
   }
 
@@ -156,8 +146,6 @@ export class MDService {
     }
   }
 
-  // ── Cache management ───────────────────────────────────────────────────────
-
   /** Remove all cached results. */
   static clearCache(): void {
     MDService._cache.clear();
@@ -168,8 +156,6 @@ export class MDService {
     MDService._cache.delete(content);
   }
 
-  // ── Core render ───────────────────────────────────────────────────────────
-
   /**
    * Render markdown into HTML and extract TOC entries.
    * Results are cached by content string; pass `{ bust: true }` to force
@@ -179,7 +165,7 @@ export class MDService {
    * @param options
    *   - `publish` — when `true` the result is published to the event bus as
    *                  a single `'md:render'` event so sibling components can react.
-   *   - `bust`    — when `true` the cache entry for this content is discarded
+   *   - `bust` — when `true` the cache entry for this content is discarded
    *                  before rendering.
    */
   static render(
@@ -211,11 +197,9 @@ export class MDService {
     return result;
   }
 
-  // ── Convenience helpers ───────────────────────────────────────────────────
-
   /**
    * Render markdown and return only the HTML string.
-   * The result is still cached so a follow-up `render()` call is free.
+   * The result is still cached, so a follow-up `render()` call is free.
    */
   static renderHtml(content: string, options: { bust?: boolean } = {}): string {
     return MDService.render(content, options).html;
@@ -223,13 +207,12 @@ export class MDService {
 
   /**
    * Extract TOC entries without caring about the HTML.
-   * The result is still cached so a follow-up `render()` call is free.
+   * The result is still cached, so a follow-up `render()` call is free.
    */
   static renderToc(content: string, options: { bust?: boolean } = {}): TocEntry[] {
     return MDService.render(content, options).toc;
   }
 
-  // ── Event publishing ───────────────────────────────────────────────────────
 
   /** Publish the result as a single `'md:render'` event on the shared bus. */
   private static _publish(result: MarkdownResult): void {
@@ -239,7 +222,7 @@ export class MDService {
         .getPublisher()
         .publishAsync({ name: 'md:render', data: result });
     } catch {
-      // Guard: if the event bus is not available (e.g. unit-test environment)
+      // Guard: if the event bus is not available (e.g., unit-test environment),
       // we silently skip publishing rather than crashing the render.
     }
   }

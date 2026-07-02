@@ -36,7 +36,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2668
+                "offset": 2669
               }
             },
             {
@@ -45,7 +45,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2841
+                "offset": 2842
               }
             }
           ]
