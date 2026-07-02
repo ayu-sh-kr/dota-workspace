@@ -56,10 +56,8 @@ export class TocUtils {
     };
   }
 
-  // ── Tree helpers ───────────────────────────────────────────────────────────
-
   /**
-   * Recursively flatten a nested `TocEntry[]` tree into a single ordered
+   * Recursively flatten a nested `TocEntry[]` tree into a single-ordered
    * array of heading IDs (document order, top to bottom).
    */
   static flatIds(entries: TocEntry[]): string[] {
@@ -110,7 +108,6 @@ export class TocUtils {
     }).join('');
   }
 
-  // ── Scroll helpers ─────────────────────────────────────────────────────────
 
   /**
    * Smooth-scroll `el` into view so it appears just below the sticky header.
