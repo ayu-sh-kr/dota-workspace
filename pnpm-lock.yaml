@@ -149,12 +149,15 @@ importers:
 
   packages/libs/dota-wrap:
     dependencies:
-      '@ayu-sh-kr/dota-preloader-plugin':
-        specifier: workspace:*
-        version: link:../../plugins/dota-vite-preloader
-      '@ayu-sh-kr/dota-web-type-json':
-        specifier: workspace:*
-        version: link:../../plugins/web-type-json
+      '@swc/core':
+        specifier: ^1.13.5
+        version: 1.13.5
+      consola:
+        specifier: 3.4.2
+        version: 3.4.2
+      fast-glob:
+        specifier: ^3.3.3
+        version: 3.3.3
       reflect-metadata:
         specifier: '>=0.2.0'
         version: 0.2.2
@@ -165,12 +168,24 @@ importers:
       '@ayu-sh-kr/dota-event':
         specifier: workspace:*
         version: link:../dota-event
+      '@ayu-sh-kr/dota-preloader-plugin':
+        specifier: workspace:*
+        version: link:../../plugins/dota-vite-preloader
       '@ayu-sh-kr/dota-rest':
         specifier: workspace:*
         version: link:../dota-rest
       '@ayu-sh-kr/dota-router':
         specifier: workspace:*
         version: link:../dota-router
+      '@ayu-sh-kr/dota-web-type-json':
+        specifier: workspace:*
+        version: link:../../plugins/web-type-json
+      vite:
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@24.9.0)(jiti@2.6.1)(lightningcss@1.30.2)
+      vite-plugin-dts:
+        specifier: ^4.5.4
+        version: 4.5.4(@types/node@24.9.0)(rollup@4.52.5)(typescript@5.9.3)(vite@7.3.1(@types/node@24.9.0)(jiti@2.6.1)(lightningcss@1.30.2))
 
   packages/plugins/dota-vite-preloader:
     dependencies:
@@ -6765,6 +6780,25 @@ snapshots:
       typescript: 5.9.3
     optionalDependencies:
       vite: 7.1.11(@types/node@24.9.0)(jiti@2.6.1)(lightningcss@1.30.2)
+    transitivePeerDependencies:
+      - '@types/node'
+      - rollup
+      - supports-color
+
+  vite-plugin-dts@4.5.4(@types/node@24.9.0)(rollup@4.52.5)(typescript@5.9.3)(vite@7.3.1(@types/node@24.9.0)(jiti@2.6.1)(lightningcss@1.30.2)):
+    dependencies:
+      '@microsoft/api-extractor': 7.53.1(@types/node@24.9.0)
+      '@rollup/pluginutils': 5.3.0(rollup@4.52.5)
+      '@volar/typescript': 2.4.23
+      '@vue/language-core': 2.2.0(typescript@5.9.3)
+      compare-versions: 6.1.1
+      debug: 4.4.3
+      kolorist: 1.8.0
+      local-pkg: 1.1.2
+      magic-string: 0.30.21
+      typescript: 5.9.3
+    optionalDependencies:
+      vite: 7.3.1(@types/node@24.9.0)(jiti@2.6.1)(lightningcss@1.30.2)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
