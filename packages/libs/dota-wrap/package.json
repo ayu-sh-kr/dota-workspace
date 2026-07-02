@@ -73,7 +73,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && tsc -p tsconfig.build.json",
+    "build": "vite build",
     "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
     "test": "vitest run",
@@ -81,14 +81,16 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ayu-sh-kr/dota-core": "workspace:*",
+    "@ayu-sh-kr/dota-event": "workspace:*",
     "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
+    "@ayu-sh-kr/dota-rest": "workspace:*",
+    "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-web-type-json": "workspace:*"
   },
   "devDependencies": {
-    "@ayu-sh-kr/dota-core": "workspace:*",
-    "@ayu-sh-kr/dota-event": "workspace:*",
-    "@ayu-sh-kr/dota-rest": "workspace:*",
-    "@ayu-sh-kr/dota-router": "workspace:*"
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
     "reflect-metadata": ">=0.2.0"
