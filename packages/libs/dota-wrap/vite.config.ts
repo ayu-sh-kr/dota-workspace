@@ -1,6 +1,13 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import { dependencies } from './package.json';
+
+// Node.js-only Vite plugins (native addons cannot be bundled for browser)
+// reflect-metadata is a global singleton and must not be duplicated
+const EXTERNAL = [
+  '@ayu-sh-kr/dota-preloader-plugin',
+  '@ayu-sh-kr/dota-web-type-json',
+  'reflect-metadata',
+];
 
 export default defineConfig({
   build: {
@@ -20,7 +27,7 @@ export default defineConfig({
     emptyOutDir: true,
     minify: false,
     rollupOptions: {
-      external: dependencies ? Object.keys(dependencies) : []
+      external: EXTERNAL
     }
   },
 

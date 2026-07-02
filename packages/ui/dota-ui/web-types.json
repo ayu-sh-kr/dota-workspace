@@ -9,7 +9,7 @@
           "name": "d-avatar",
           "source": {
             "file": "./src/components/avatar/avatar.component.ts",
-            "offset": 777
+            "offset": 4487
           },
           "attributes": [
             {
@@ -18,7 +18,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 820
+                "offset": 4530
               }
             },
             {
@@ -27,7 +27,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 903
+                "offset": 4613
               }
             },
             {
@@ -36,7 +36,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 993
+                "offset": 4703
               }
             },
             {
@@ -45,7 +45,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1081
+                "offset": 4791
               }
             },
             {
@@ -54,7 +54,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1167
+                "offset": 4877
               }
             },
             {
@@ -63,7 +63,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1260
+                "offset": 4970
               }
             },
             {
@@ -72,7 +72,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1355
+                "offset": 5065
               }
             },
             {
@@ -81,7 +81,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1447
+                "offset": 5157
               }
             },
             {
@@ -90,7 +90,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1549
+                "offset": 5259
               }
             },
             {
@@ -99,7 +99,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 1641
+                "offset": 5351
               }
             }
           ]
@@ -108,7 +108,7 @@
           "name": "avatar-wrapper",
           "source": {
             "file": "./src/components/avatar/avatar.component.ts",
-            "offset": 5157
+            "offset": 5156
           },
           "attributes": [
             {
@@ -117,7 +117,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5354
+                "offset": 5415
               }
             },
             {
@@ -126,7 +126,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5524
+                "offset": 1612
               }
             },
             {
@@ -135,7 +135,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5687
+                "offset": 1701
               }
             }
           ]
@@ -455,24 +455,6 @@
           ]
         },
         {
-          "name": "app-scaffold",
-          "source": {
-            "file": "./src/components/utils/scaffold.component.ts",
-            "offset": 459
-          },
-          "attributes": [
-            {
-              "name": "classname",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/utils/scaffold.component.ts",
-                "offset": 583
-              }
-            }
-          ]
-        },
-        {
           "name": "blob-separator",
           "source": {
             "file": "./src/components/animations/blobs/blob-separator.component.ts",
@@ -530,7 +512,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 80432
+                "offset": 79234
               }
             },
             {
@@ -539,7 +521,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 80519
+                "offset": 79321
               }
             },
             {
@@ -557,7 +539,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 80672
+                "offset": 79474
               }
             },
             {
@@ -566,7 +548,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 80771
+                "offset": 79573
               }
             },
             {
@@ -575,7 +557,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 80861
+                "offset": 79663
               }
             },
             {
@@ -593,7 +575,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 81051
+                "offset": 79853
               }
             },
             {
@@ -602,7 +584,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 81128
+                "offset": 79930
               }
             },
             {
@@ -611,7 +593,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 81229
+                "offset": 80031
               }
             },
             {
@@ -620,7 +602,25 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 81324
+                "offset": 80126
+              }
+            }
+          ]
+        },
+        {
+          "name": "app-scaffold",
+          "source": {
+            "file": "./src/components/utils/scaffold.component.ts",
+            "offset": 459
+          },
+          "attributes": [
+            {
+              "name": "classname",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/utils/scaffold.component.ts",
+                "offset": 583
               }
             }
           ]
