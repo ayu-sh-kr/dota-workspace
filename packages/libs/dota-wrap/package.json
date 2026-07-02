@@ -81,12 +81,17 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
+    "@ayu-sh-kr/dota-web-type-json": "workspace:*"
+  },
+  "devDependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
-    "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
     "@ayu-sh-kr/dota-rest": "workspace:*",
-    "@ayu-sh-kr/dota-router": "workspace:*",
-    "@ayu-sh-kr/dota-web-type-json": "workspace:*"
+    "@ayu-sh-kr/dota-router": "workspace:*"
+  },
+  "peerDependencies": {
+    "reflect-metadata": ">=0.2.0"
   },
   "files": [
     "dist/",
