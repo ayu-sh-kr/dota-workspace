@@ -149,6 +149,19 @@ importers:
 
   packages/libs/dota-wrap:
     dependencies:
+      '@swc/core':
+        specifier: ^1.13.5
+        version: 1.13.5
+      consola:
+        specifier: 3.4.2
+        version: 3.4.2
+      fast-glob:
+        specifier: ^3.3.3
+        version: 3.3.3
+      reflect-metadata:
+        specifier: '>=0.2.0'
+        version: 0.2.2
+    devDependencies:
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../dota-core
@@ -167,10 +180,6 @@ importers:
       '@ayu-sh-kr/dota-web-type-json':
         specifier: workspace:*
         version: link:../../plugins/web-type-json
-      reflect-metadata:
-        specifier: '>=0.2.0'
-        version: 0.2.2
-    devDependencies:
       vite:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@24.9.0)(jiti@2.6.1)(lightningcss@1.30.2)

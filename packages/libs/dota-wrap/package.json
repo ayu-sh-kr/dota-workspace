@@ -18,62 +18,62 @@
   ],
   "type": "module",
   "types": "./dist/index.d.ts",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "module": "./dist/index.mjs",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
     },
     "./core": {
       "types": "./dist/core/index.d.ts",
       "module": "./dist/core/index.mjs",
       "import": "./dist/core/index.mjs",
-      "require": "./dist/core/index.js",
-      "default": "./dist/core/index.js"
+      "require": "./dist/core/index.cjs",
+      "default": "./dist/core/index.mjs"
     },
     "./event": {
       "types": "./dist/event/index.d.ts",
       "module": "./dist/event/index.mjs",
       "import": "./dist/event/index.mjs",
-      "require": "./dist/event/index.js",
-      "default": "./dist/event/index.js"
+      "require": "./dist/event/index.cjs",
+      "default": "./dist/event/index.mjs"
     },
     "./router": {
       "types": "./dist/router/index.d.ts",
       "module": "./dist/router/index.mjs",
       "import": "./dist/router/index.mjs",
-      "require": "./dist/router/index.js",
-      "default": "./dist/router/index.js"
+      "require": "./dist/router/index.cjs",
+      "default": "./dist/router/index.mjs"
     },
     "./rest": {
       "types": "./dist/rest/index.d.ts",
       "module": "./dist/rest/index.mjs",
       "import": "./dist/rest/index.mjs",
-      "require": "./dist/rest/index.js",
-      "default": "./dist/rest/index.js"
+      "require": "./dist/rest/index.cjs",
+      "default": "./dist/rest/index.mjs"
     },
     "./preloader-plugin": {
       "types": "./dist/preloader-plugin/index.d.ts",
       "module": "./dist/preloader-plugin/index.mjs",
       "import": "./dist/preloader-plugin/index.mjs",
-      "require": "./dist/preloader-plugin/index.js",
-      "default": "./dist/preloader-plugin/index.js"
+      "require": "./dist/preloader-plugin/index.cjs",
+      "default": "./dist/preloader-plugin/index.mjs"
     },
     "./web-type-json": {
       "types": "./dist/web-type-json/index.d.ts",
       "module": "./dist/web-type-json/index.mjs",
       "import": "./dist/web-type-json/index.mjs",
-      "require": "./dist/web-type-json/index.js",
-      "default": "./dist/web-type-json/index.js"
+      "require": "./dist/web-type-json/index.cjs",
+      "default": "./dist/web-type-json/index.mjs"
     }
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc --noEmit && node scripts/build.mjs",
     "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
     "test": "vitest run",
@@ -81,14 +81,17 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@swc/core": "^1.13.5",
+    "consola": "3.4.2",
+    "fast-glob": "^3.3.3"
+  },
+  "devDependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
     "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
     "@ayu-sh-kr/dota-rest": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
-    "@ayu-sh-kr/dota-web-type-json": "workspace:*"
-  },
-  "devDependencies": {
+    "@ayu-sh-kr/dota-web-type-json": "workspace:*",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
