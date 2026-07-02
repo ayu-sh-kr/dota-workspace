@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.0.14
+
+### Patch Changes
+
+- be039dd: Fix the dota-wrap for re moduling and export along with declaratin
+
 ## 0.0.13
 
 ### Patch Changes
