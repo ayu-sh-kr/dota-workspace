@@ -2,34 +2,15 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-// Node.js-only Vite plugins (native addons cannot be bundled for browser)
-// reflect-metadata is a global singleton and must not be duplicated
-const EXTERNAL = [
-  '@ayu-sh-kr/dota-preloader-plugin',
-  '@ayu-sh-kr/dota-web-type-json',
-  'reflect-metadata',
-];
-
 export default defineConfig({
   build: {
     lib: {
-      entry: {
-        index: resolve(__dirname, 'src/index.ts'),
-        'core/index': resolve(__dirname, 'src/core/index.ts'),
-        'event/index': resolve(__dirname, 'src/event/index.ts'),
-        'preloader-plugin/index': resolve(__dirname, 'src/preloader-plugin/index.ts'),
-        'router/index': resolve(__dirname, 'src/router/index.ts'),
-        'rest/index': resolve(__dirname, 'src/rest/index.ts'),
-        'web-type-json/index': resolve(__dirname, 'src/web-type-json/index.ts')
-      },
+      entry: resolve(__dirname, 'src/index.ts'),
       formats: ["cjs", "es"],
-      fileName: (format, entryName) => format === 'es' ? `${entryName}.mjs` : `${entryName}.js`
+      fileName: (format) => format === 'es' ? 'index.mjs' : 'index.cjs'
     },
     emptyOutDir: true,
-    minify: false,
-    rollupOptions: {
-      external: EXTERNAL
-    }
+    minify: false
   },
 
   resolve: {
@@ -41,7 +22,12 @@ export default defineConfig({
   plugins: [
     dts({
       insertTypesEntry: true,
-      rollupTypes: true
+      bundledPackages: [
+        '@ayu-sh-kr/dota-core',
+        '@ayu-sh-kr/dota-event',
+        '@ayu-sh-kr/dota-rest',
+        '@ayu-sh-kr/dota-router'
+      ]
     })
   ]
 })
