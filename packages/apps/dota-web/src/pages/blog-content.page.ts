@@ -1,6 +1,7 @@
-import {AfterInit, Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
+import {Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
 import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
+import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 
 @Route({path: '/blogs/content'})
 @Component({
@@ -42,7 +43,7 @@ export class BlogContentPage extends DotaPageElement {
     }
   }
 
-  @AfterInit()
+  @OnEvent("connected")
   afterViewInit() {
     this.updateSEO()
   }
