@@ -2,7 +2,7 @@ import type { Theme, ColorName, TagName, ColorToken } from './Types.ts';
 
 /**
  * Resolves the combined Tailwind class string for a given tag by merging:
- *   - `theme.typography[tag]`   — structural / layout classes
+ *   - `theme.typography[tag]` — structural / layout classes
  *   - `theme.color[color][tag]` — semantic color token classes (text, bg, border, …)
  *
  * Both halves are optional; whichever is defined is included.
@@ -24,13 +24,13 @@ function resolveClasses(theme: Theme, color: ColorName, tag: TagName): string {
 /**
  * `applyMarkdownTheme` — the public renderer exported from `dota-md`.
  *
- * Given raw HTML (from a markdown parser), a `Theme` object and a `ColorName`,
- * stamps the merged typography + color Tailwind classes directly onto every
+ * Given raw HTML (from a Markdown parser), a `Theme` object and a `ColorName`,
+ * stamps the merged typography and color Tailwind classes directly onto every
  * HTML element.  This is the same approach as the app-local `applyThemeClasses`
- * but driven entirely by the structured `Theme` type so no hard-coded strings
+ * but driven entirely by the structured `Theme` type, so no hard-coded strings
  * escape the library.
  *
- * @param html    Raw HTML string produced by a markdown parser (e.g. markdown-it)
+ * @param html    Raw HTML string produced by a Markdown parser (e.g., markdown-it)
  * @param theme   A `Theme` object — e.g. `flatMarkdownTheme` or `materialMarkdownTheme`
  * @param color   A `ColorName` key — e.g. `'indigo'`, `'slate'`, `'rose'`
  * @returns       HTML string with Tailwind classes stamped on every element
