@@ -9,71 +9,9 @@
           "name": "app-root",
           "source": {
             "file": "./src/app.component.ts",
-            "offset": 309
+            "offset": 310
           },
           "attributes": []
-        },
-        {
-          "name": "ai-form",
-          "source": {
-            "file": "./src/components/chat/ai-form.component.ts",
-            "offset": 384
-          },
-          "attributes": [
-            {
-              "name": "is-loading",
-              "type": "Boolean",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/ai-form.component.ts",
-                "offset": 518
-              }
-            }
-          ]
-        },
-        {
-          "name": "message-box",
-          "source": {
-            "file": "./src/components/chat/message-box.component.ts",
-            "offset": 322
-          },
-          "attributes": []
-        },
-        {
-          "name": "message-card",
-          "source": {
-            "file": "./src/components/chat/message-card.component.ts",
-            "offset": 295
-          },
-          "attributes": [
-            {
-              "name": "key",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 392
-              }
-            },
-            {
-              "name": "message-type",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 369
-              }
-            },
-            {
-              "name": "message",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/chat/message-card.component.ts",
-                "offset": 550
-              }
-            }
-          ]
         },
         {
           "name": "blog-icon",
@@ -237,6 +175,68 @@
           ]
         },
         {
+          "name": "ai-form",
+          "source": {
+            "file": "./src/components/chat/ai-form.component.ts",
+            "offset": 384
+          },
+          "attributes": [
+            {
+              "name": "is-loading",
+              "type": "Boolean",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/ai-form.component.ts",
+                "offset": 518
+              }
+            }
+          ]
+        },
+        {
+          "name": "message-box",
+          "source": {
+            "file": "./src/components/chat/message-box.component.ts",
+            "offset": 322
+          },
+          "attributes": []
+        },
+        {
+          "name": "message-card",
+          "source": {
+            "file": "./src/components/chat/message-card.component.ts",
+            "offset": 295
+          },
+          "attributes": [
+            {
+              "name": "key",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 392
+              }
+            },
+            {
+              "name": "message-type",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 369
+              }
+            },
+            {
+              "name": "message",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/chat/message-card.component.ts",
+                "offset": 550
+              }
+            }
+          ]
+        },
+        {
           "name": "community-card",
           "source": {
             "file": "./src/components/community/community-card.component.ts",
@@ -249,7 +249,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 112564344
+                "offset": 30964
               }
             },
             {
@@ -258,7 +258,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 112564416
+                "offset": 31036
               }
             },
             {
@@ -267,7 +267,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 112564479
+                "offset": 31099
               }
             },
             {
@@ -276,7 +276,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 112564542
+                "offset": 31162
               }
             },
             {
@@ -285,7 +285,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 112564618
+                "offset": 31238
               }
             },
             {
@@ -294,7 +294,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 112564698
+                "offset": 31318
               }
             }
           ]
@@ -797,56 +797,6 @@
           "attributes": []
         },
         {
-          "name": "ai-button",
-          "source": {
-            "file": "./src/components/utils/buttons/ai-button.component.ts",
-            "offset": 199
-          },
-          "attributes": []
-        },
-        {
-          "name": "dark-mode-button",
-          "source": {
-            "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-            "offset": 248
-          },
-          "attributes": [
-            {
-              "name": "color",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
-                "offset": 348
-              }
-            }
-          ]
-        },
-        {
-          "name": "github-button",
-          "source": {
-            "file": "./src/components/utils/buttons/github-button.component.ts",
-            "offset": 142
-          },
-          "attributes": []
-        },
-        {
-          "name": "ham-burger-button",
-          "source": {
-            "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
-            "offset": 228
-          },
-          "attributes": []
-        },
-        {
-          "name": "scroll-bottom-button",
-          "source": {
-            "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
-            "offset": 162
-          },
-          "attributes": []
-        },
-        {
           "name": "code-snippet",
           "source": {
             "file": "./src/components/home/utils/code-snippet.component.ts",
@@ -971,6 +921,72 @@
           ]
         },
         {
+          "name": "ai-button",
+          "source": {
+            "file": "./src/components/utils/buttons/ai-button.component.ts",
+            "offset": 199
+          },
+          "attributes": []
+        },
+        {
+          "name": "dark-mode-button",
+          "source": {
+            "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
+            "offset": 248
+          },
+          "attributes": [
+            {
+              "name": "color",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/utils/buttons/dark-mode-button.component.ts",
+                "offset": 348
+              }
+            }
+          ]
+        },
+        {
+          "name": "github-button",
+          "source": {
+            "file": "./src/components/utils/buttons/github-button.component.ts",
+            "offset": 142
+          },
+          "attributes": []
+        },
+        {
+          "name": "ham-burger-button",
+          "source": {
+            "file": "./src/components/utils/buttons/ham-burger-button.component.ts",
+            "offset": 228
+          },
+          "attributes": []
+        },
+        {
+          "name": "scroll-bottom-button",
+          "source": {
+            "file": "./src/components/utils/buttons/scroll-bottom-button.component.ts",
+            "offset": 162
+          },
+          "attributes": []
+        },
+        {
+          "name": "app-header",
+          "source": {
+            "file": "./src/components/utils/header/header.component.ts",
+            "offset": 145
+          },
+          "attributes": []
+        },
+        {
+          "name": "section-header",
+          "source": {
+            "file": "./src/components/utils/header/section-header.component.ts",
+            "offset": 142
+          },
+          "attributes": []
+        },
+        {
           "name": "notification-holder",
           "source": {
             "file": "./src/components/utils/notification/notification-holder.component.ts",
@@ -1050,22 +1066,6 @@
               }
             }
           ]
-        },
-        {
-          "name": "app-header",
-          "source": {
-            "file": "./src/components/utils/header/header.component.ts",
-            "offset": 145
-          },
-          "attributes": []
-        },
-        {
-          "name": "section-header",
-          "source": {
-            "file": "./src/components/utils/header/section-header.component.ts",
-            "offset": 142
-          },
-          "attributes": []
         },
         {
           "name": "loader-section",
@@ -1744,7 +1744,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112805994
+                "offset": 446474
               }
             },
             {
@@ -1753,7 +1753,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112806081
+                "offset": 446561
               }
             },
             {
@@ -1771,7 +1771,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112806234
+                "offset": 446714
               }
             },
             {
@@ -1780,7 +1780,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112806333
+                "offset": 446813
               }
             },
             {
@@ -1789,7 +1789,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112806423
+                "offset": 446903
               }
             },
             {
@@ -1807,7 +1807,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112806613
+                "offset": 447093
               }
             },
             {
@@ -1816,7 +1816,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112806690
+                "offset": 447170
               }
             },
             {
@@ -1825,7 +1825,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112806791
+                "offset": 447271
               }
             },
             {
@@ -1834,7 +1834,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 112806886
+                "offset": 447366
               }
             }
           ]
