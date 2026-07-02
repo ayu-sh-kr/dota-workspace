@@ -184,6 +184,14 @@ export const blogPosts: Blog[] = [
   {
     date: "2025-04-25",
     writer: "Ayush Jaiswal",
+    header: "Advanced Encryption Standard",
+    description: "A short introduction to AES, a widely used symmetric-key encryption standard for securing data at rest and in transit.",
+    category: "Tutorial",
+    path: "AES.md",
+  },
+  {
+    date: "2025-04-25",
+    writer: "Ayush Jaiswal",
     header: "Towards Cryptography",
     description: "An introduction to cryptography, covering its purpose, the basic working model, and a simple example using the Caesar cipher.",
     category: "Tutorial",
