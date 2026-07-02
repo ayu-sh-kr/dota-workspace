@@ -1,5 +1,6 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
 // Node.js-only Vite plugins (native addons cannot be bundled for browser)
 // reflect-metadata is a global singleton and must not be duplicated
@@ -35,5 +36,12 @@ export default defineConfig({
     alias: {
       '@dota': resolve('./src')
     }
-  }
+  },
+
+  plugins: [
+    dts({
+      insertTypesEntry: true,
+      rollupTypes: true
+    })
+  ]
 })
