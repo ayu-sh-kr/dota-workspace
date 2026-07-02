@@ -1,5 +1,6 @@
-import {AfterInit, BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-wrap/core";
-import { Route } from "@ayu-sh-kr/dota-wrap/router";
+import {BaseElement, Component, DotaPageElement, HTML, Property, SEO, String} from "@ayu-sh-kr/dota-wrap/core";
+import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 @Route({path: '/error'})
@@ -7,7 +8,7 @@ import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
   selector: 'app-error',
   shadow: false
 })
-export class ErrorPage extends BaseElement {
+export class ErrorPage extends DotaPageElement {
 
   @Property({name: 'path', type: String})
   path!: string;
@@ -22,7 +23,19 @@ export class ErrorPage extends BaseElement {
     super();
   }
 
-  @AfterInit()
+  get seo(): SEO {
+    return {
+      title: '404 Page Not Found - Dota Web',
+      description: 'The requested page could not be found on Dota Web. Return to the homepage or open the documentation to continue.',
+      keywords: ['Dota Web', '404', 'Page Not Found', 'Error Page', 'Documentation'],
+      og: {
+        title: '404 Page Not Found - Dota Web',
+        description: 'The requested page could not be found on Dota Web. Return to the homepage or open the documentation to continue.',
+      }
+    }
+  }
+
+  @OnEvent("connected")
   afterViewInit() {
     GeneralUtils.scrollToTop('instant');
   }
@@ -40,16 +53,16 @@ export class ErrorPage extends BaseElement {
             <p class="text-center text-2xl sm:text-3xl text-gray-500 dark:text-gray-100 font-medium">Page Not Found</p>
             <p class="max-sm:text-sm lg:text-lg font-medium text-gray-900 dark:text-gray-200 text-center">
                 The document you're looking for doesn't exist or has been
-                moved to another location .
+                moved to another location.
             </p>
             <div class="items-center flex gap-2">
-                <a href="/packages/apps/dota-web/public"
+                <a href="/"
                    class="bg-purple-600 text-white flex items-center gap-1 px-5 py-3 rounded-lg">
                     <dota-icon name="mdi:home" variant="ghost" size="md"></dota-icon>
                     Go Home
                 </a>
 
-                <a href="/docs/Getting-Started.md"
+                <a href="/docs?content=Getting-Started.md"
                    class="bg-gray-200 dark:bg-slate-800 dark:text-white px-5 py-3 rounded-lg flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor"
@@ -63,4 +76,3 @@ export class ErrorPage extends BaseElement {
   }
 
 }
-
