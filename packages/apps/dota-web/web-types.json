@@ -9,7 +9,7 @@
           "name": "app-root",
           "source": {
             "file": "./src/app.component.ts",
-            "offset": 310
+            "offset": 309
           },
           "attributes": []
         },
@@ -249,7 +249,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 30964
+                "offset": 35296
               }
             },
             {
@@ -258,7 +258,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 31036
+                "offset": 35368
               }
             },
             {
@@ -267,7 +267,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 31099
+                "offset": 35431
               }
             },
             {
@@ -276,7 +276,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 31162
+                "offset": 35494
               }
             },
             {
@@ -285,7 +285,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 31238
+                "offset": 35570
               }
             },
             {
@@ -294,7 +294,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 31318
+                "offset": 35650
               }
             }
           ]
@@ -521,6 +521,59 @@
           ]
         },
         {
+          "name": "resource-content",
+          "source": {
+            "file": "./src/components/resource/resource-content.component.ts",
+            "offset": 319
+          },
+          "attributes": [
+            {
+              "name": "resource-path",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-content.component.ts",
+                "offset": 430
+              }
+            }
+          ]
+        },
+        {
+          "name": "resource-path",
+          "source": {
+            "file": "./src/components/resource/resource-path.component.ts",
+            "offset": 197
+          },
+          "attributes": [
+            {
+              "name": "title",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-path.component.ts",
+                "offset": 294
+              }
+            },
+            {
+              "name": "path",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "./src/components/resource/resource-path.component.ts",
+                "offset": 363
+              }
+            }
+          ]
+        },
+        {
+          "name": "resource-section",
+          "source": {
+            "file": "./src/components/resource/resource-section.component.ts",
+            "offset": 314
+          },
+          "attributes": []
+        },
+        {
           "name": "blob-wrapper",
           "source": {
             "file": "./src/components/home/blob-wrapper.component.ts",
@@ -634,59 +687,6 @@
           "source": {
             "file": "./src/components/home/reactive-section.component.ts",
             "offset": 353
-          },
-          "attributes": []
-        },
-        {
-          "name": "resource-content",
-          "source": {
-            "file": "./src/components/resource/resource-content.component.ts",
-            "offset": 319
-          },
-          "attributes": [
-            {
-              "name": "resource-path",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/resource/resource-content.component.ts",
-                "offset": 430
-              }
-            }
-          ]
-        },
-        {
-          "name": "resource-path",
-          "source": {
-            "file": "./src/components/resource/resource-path.component.ts",
-            "offset": 197
-          },
-          "attributes": [
-            {
-              "name": "title",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/resource/resource-path.component.ts",
-                "offset": 294
-              }
-            },
-            {
-              "name": "path",
-              "type": "String",
-              "required": true,
-              "source": {
-                "file": "./src/components/resource/resource-path.component.ts",
-                "offset": 363
-              }
-            }
-          ]
-        },
-        {
-          "name": "resource-section",
-          "source": {
-            "file": "./src/components/resource/resource-section.component.ts",
-            "offset": 314
           },
           "attributes": []
         },
@@ -1220,6 +1220,78 @@
           "attributes": []
         },
         {
+          "name": "dota-accordion",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
+            "offset": 652
+          },
+          "attributes": [
+            {
+              "name": "classname",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
+                "offset": 768
+              }
+            },
+            {
+              "name": "header",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
+                "offset": 900
+              }
+            },
+            {
+              "name": "description",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
+                "offset": 1028
+              }
+            },
+            {
+              "name": "icon",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
+                "offset": 1166
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
+                "offset": 1270
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
+                "offset": 1393
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
+                "offset": 1513
+              }
+            }
+          ]
+        },
+        {
           "name": "d-avatar",
           "source": {
             "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
@@ -1350,6 +1422,186 @@
               "source": {
                 "file": "../../ui/dota-ui/src/components/avatar/avatar.component.ts",
                 "offset": 1701
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-badge",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
+            "offset": 1333
+          },
+          "attributes": [
+            {
+              "name": "classname",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
+                "offset": 1369
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
+                "offset": 1442
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
+                "offset": 1511
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
+                "offset": 1588
+              }
+            },
+            {
+              "name": "rounded",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
+                "offset": 1654
+              }
+            },
+            {
+              "name": "label",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
+                "offset": 1730
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-button",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+            "offset": 858
+          },
+          "attributes": [
+            {
+              "name": "animation",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 984
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1094
+              }
+            },
+            {
+              "name": "label",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1190
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1280
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1372
+              }
+            },
+            {
+              "name": "icon",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1476
+              }
+            },
+            {
+              "name": "loading",
+              "type": "Boolean",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1573
+              }
+            },
+            {
+              "name": "icon-position",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1688
+              }
+            },
+            {
+              "name": "animation-color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1809
+              }
+            },
+            {
+              "name": "type",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 1940
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 2029
+              }
+            },
+            {
+              "name": "round",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/button/button.component.ts",
+                "offset": 2128
               }
             }
           ]
@@ -1651,6 +1903,150 @@
           "attributes": []
         },
         {
+          "name": "dota-chip",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/chip/chip.component.ts",
+            "offset": 999
+          },
+          "attributes": [
+            {
+              "name": "text",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/chip/chip.component.ts",
+                "offset": 1033
+              }
+            },
+            {
+              "name": "position",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/chip/chip.component.ts",
+                "offset": 1097
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/chip/chip.component.ts",
+                "offset": 1175
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-icon",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
+            "offset": 2198
+          },
+          "attributes": [
+            {
+              "name": "name",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
+                "offset": 2306
+              }
+            },
+            {
+              "name": "classname",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
+                "offset": 2419
+              }
+            },
+            {
+              "name": "size",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
+                "offset": 2542
+              }
+            },
+            {
+              "name": "color",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
+                "offset": 2630
+              }
+            },
+            {
+              "name": "variant",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
+                "offset": 2766
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-modal",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/modal/modal.component.ts",
+            "offset": 377
+          },
+          "attributes": [
+            {
+              "name": "open",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/modal/modal.component.ts",
+                "offset": 413
+              }
+            },
+            {
+              "name": "className",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/modal/modal.component.ts",
+                "offset": 503
+              }
+            },
+            {
+              "name": "rounded",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/modal/modal.component.ts",
+                "offset": 576
+              }
+            },
+            {
+              "name": "duration",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/modal/modal.component.ts",
+                "offset": 651
+              }
+            },
+            {
+              "name": "direction",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/modal/modal.component.ts",
+                "offset": 729
+              }
+            }
+          ]
+        },
+        {
           "name": "dota-placeholder",
           "source": {
             "file": "../../ui/dota-ui/src/components/placeholder/placeholder.component.ts",
@@ -1664,6 +2060,42 @@
               "source": {
                 "file": "../../ui/dota-ui/src/components/placeholder/placeholder.component.ts",
                 "offset": 840
+              }
+            }
+          ]
+        },
+        {
+          "name": "dota-popover",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
+            "offset": 943
+          },
+          "attributes": [
+            {
+              "name": "placement",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
+                "offset": 1185
+              }
+            },
+            {
+              "name": "offset",
+              "type": "Number",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
+                "offset": 1345
+              }
+            },
+            {
+              "name": "anchored-selector",
+              "type": "String",
+              "required": true,
+              "source": {
+                "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
+                "offset": 1431
               }
             }
           ]
@@ -1721,6 +2153,14 @@
               }
             }
           ]
+        },
+        {
+          "name": "blob-animation",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/animations/blobs/blobs.component.ts",
+            "offset": 135
+          },
+          "attributes": []
         },
         {
           "name": "orb-background",
