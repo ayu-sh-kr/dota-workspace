@@ -2,19 +2,14 @@ import {ClassView, DeclarationUtils, DecoratorUtils, DecoratorView, ObjectExpres
 import type { Plugin } from 'vite';
 import {ComponentScanPath} from "@dota/Constants.ts";
 import fg from "fast-glob";
-import {mkdir, readFile, writeFile} from "node:fs/promises";
-import {dirname, relative, resolve, sep} from "node:path";
+import {readFile, writeFile} from "node:fs/promises";
+import {relative, resolve, sep} from "node:path";
 import {ClassDeclaration, parse} from "@swc/core";
 import {ConsolaInstance, createConsola, LogLevels} from "consola";
-import type {ResolvedConfig} from "vite";
 import type {PackageJsonWithWebTypes, WebComponentInfo, WebTypeJsonPluginConfig, WebTypesSchema} from "./Types.ts";
 
 
 let log: ConsolaInstance
-let viteConfig: ResolvedConfig | null = null;
-let stagedWebTypesJson: string | null = null;
-let stagedBuildOutputPath: string | null = null;
-let stagedWebComponentInfos: WebComponentInfo[] | null = null;
 
 function toWebTypesSourceFile(root: string, file: string) {
   const relativePath = relative(root, file).split(sep).join('/');
@@ -22,10 +17,7 @@ function toWebTypesSourceFile(root: string, file: string) {
 }
 
 export function resetWebTypeJsonState() {
-  viteConfig = null;
-  stagedWebTypesJson = null;
-  stagedBuildOutputPath = null;
-  stagedWebComponentInfos = null;
+  // no module-level state to reset
 }
 
 export async function scanWebComponents(root: string, scanRoots: string[] = [root]) {
@@ -43,15 +35,16 @@ export async function scanWebComponents(root: string, scanRoots: string[] = [roo
   for (const file of files) {
     const code = await readFile(file, 'utf-8');
     const ast = await parse(code, { syntax: 'typescript', decorators: true })
-    const classDeclarations: ClassDeclaration[] = DeclarationUtils.queryOf(ast)
-      .getExportDeclarations()
-      .getClassDeclarations()
-      .filter(classDeclaration => {
-        return DecoratorUtils.extractDecorators(classDeclaration)
-          .map(decorator => DecoratorUtils.decoratorName(decorator))
-          .some(name => name === 'Component')
-      })
-      .toArray()
+    const hasComponentDecorator = (classDeclaration: ClassDeclaration) =>
+      DecoratorUtils.extractDecorators(classDeclaration)
+        .map(decorator => DecoratorUtils.decoratorName(decorator))
+        .some(name => name === 'Component');
+
+    const query = DeclarationUtils.queryOf(ast);
+    const classDeclarations: ClassDeclaration[] = [
+      ...query.getExportDeclarations().getClassDeclarations().filter(hasComponentDecorator).toArray(),
+      ...query.getClassDeclarations().filter(hasComponentDecorator).toArray(),
+    ]
 
     const webComponentInfos = classDeclarations.flatMap(classDeclaration => {
       const componentDecorator = DecoratorUtils.extractDecorators(classDeclaration)
@@ -141,22 +134,14 @@ export async function writeWebTypesArtifacts({
   root,
   outFile,
   scannedWebComponentInfos,
-  writeBuildCopy = false,
-  buildOutDir = 'dist',
 }: {
   root: string;
   outFile: string;
   scannedWebComponentInfos: WebComponentInfo[];
-  writeBuildCopy?: boolean;
-  buildOutDir?: string;
 }) {
   const outputPath = resolve(root, outFile);
   const webTypesSchema = createWebTypesSchema(scannedWebComponentInfos);
-
   const webTypesJson = JSON.stringify(webTypesSchema, null, 2);
-  stagedWebTypesJson = webTypesJson;
-  stagedBuildOutputPath = resolve(root, buildOutDir, outFile);
-  stagedWebComponentInfos = scannedWebComponentInfos;
 
   await writeFile(outputPath, webTypesJson, "utf-8");
   log.debug(`Wrote web component info JSON to ${outputPath}`);
@@ -171,15 +156,6 @@ export async function writeWebTypesArtifacts({
     log.debug(`Updated package.json with web-types entry: ${webTypesEntry}`);
   } else {
     log.debug(`package.json already has web-types entry: ${webTypesEntry}`);
-  }
-
-  if (writeBuildCopy) {
-    const buildOutputPath = resolve(root, buildOutDir, outFile);
-    if (buildOutputPath !== outputPath) {
-      await mkdir(dirname(buildOutputPath), { recursive: true });
-      await writeFile(buildOutputPath, webTypesJson, "utf-8");
-      log.debug(`Wrote web component info JSON to ${buildOutputPath}`);
-    }
   }
 }
 
@@ -199,18 +175,9 @@ export default function dotaWebTypeJson({
   return {
     name: 'vite-plugin-dota-web-type-json',
 
-    configResolved(config) {
-      viteConfig = config;
-    },
-
     async buildStart() {
       const scannedWebComponentInfos = await scanWebComponents(root, scanRoots);
-      await writeWebTypesArtifacts({
-        root,
-        outFile,
-        scannedWebComponentInfos,
-        buildOutDir: viteConfig?.build.outDir ?? 'dist',
-      });
+      await writeWebTypesArtifacts({ root, outFile, scannedWebComponentInfos });
     },
 
     configureServer(server) {
@@ -223,12 +190,7 @@ export default function dotaWebTypeJson({
 
         pendingRefresh = (async () => {
           const scannedWebComponentInfos = await scanWebComponents(root, scanRoots);
-          await writeWebTypesArtifacts({
-            root,
-            outFile,
-            scannedWebComponentInfos,
-            buildOutDir: viteConfig?.build.outDir ?? 'dist',
-          });
+          await writeWebTypesArtifacts({ root, outFile, scannedWebComponentInfos });
           log.debug('Scanned web components:', scannedWebComponentInfos);
         })().finally(() => {
           pendingRefresh = null;
@@ -250,19 +212,5 @@ export default function dotaWebTypeJson({
         await refresh();
       });
     },
-
-    async closeBundle() {
-      if (!stagedWebTypesJson || !stagedBuildOutputPath) {
-        return;
-      }
-
-      if (stagedBuildOutputPath === resolve(root, outFile)) {
-        return;
-      }
-
-      await mkdir(dirname(stagedBuildOutputPath), { recursive: true });
-      await writeFile(stagedBuildOutputPath, stagedWebTypesJson, "utf-8");
-      log.debug(`Wrote web component info JSON to ${stagedBuildOutputPath}`);
-    }
   };
 }
