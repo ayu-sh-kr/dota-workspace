@@ -28,7 +28,8 @@
     "./dota-ui.css": "./dist/dota-ui.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "web-types.json"
   ],
   "scripts": {
     "dev": "vite",
