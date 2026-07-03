@@ -34,9 +34,10 @@ const fixtureFiles: Record<FixtureName, string[]> = {
     "src/components/beta.component.ts",
     "src/pages/many.page.ts",
   ],
+  "named-export": ["src/components/named-export.component.ts"],
 };
 
-type FixtureName = "none" | "single" | "many";
+type FixtureName = "none" | "single" | "many" | "named-export";
 
 
 const tempRoots: string[] = [];
@@ -280,6 +281,34 @@ describe("scanWebComponents", () => {
     );
   });
 
+  it("discovers a component declared as class + export {} (named-export pattern)", async () => {
+    // Arrange
+    const root = await prepareFixtureRoot("named-export");
+    prepareFastGlobFiles(root, "named-export");
+    createPlugin(root);
+
+    // Act
+    const scannedWebComponents = await scanWebComponents(root);
+
+    // Assert
+    expect(scannedWebComponents).toHaveLength(1);
+    expect(scannedWebComponents[0]).toMatchObject({
+      className: "NamedExportComponent",
+      tagName: "named-export-component",
+      source: {
+        file: "./src/components/named-export.component.ts",
+        offset: expect.any(Number),
+      },
+      properties: [
+        {
+          name: "label",
+          type: "String",
+          required: false,
+        },
+      ],
+    });
+  });
+
   it("discovers every component-like class in the many fixture", async () => {
     // Arrange
     const root = await prepareFixtureRoot("many");
@@ -376,7 +405,7 @@ describe("web-types artifact generation", () => {
     expect(packageJson["web-types"]).toBe(`./${defaultOutFile}`);
   });
 
-  it("writes the root artifact during build and the dist copy during closeBundle", async () => {
+  it("writes web-types.json to root on buildStart and sets package.json web-types entry", async () => {
     // Arrange
     const root = await prepareFixtureRoot("single");
     prepareFastGlobFiles(root, "single");
@@ -384,13 +413,12 @@ describe("web-types artifact generation", () => {
 
     // Act
     await invokePluginHook(plugin.buildStart, plugin);
-    await invokePluginHook(plugin.closeBundle, plugin);
 
     // Assert
     const rootJson = await readJsonFile<Record<string, unknown>>(resolve(root, defaultOutFile));
-    const distJson = await readJsonFile<Record<string, unknown>>(resolve(root, "dist", defaultOutFile));
+    const packageJson = await readJsonFile<{ "web-types"?: string }>(resolve(root, "package.json"));
 
-    expect(rootJson).toEqual(distJson);
+    expect(packageJson["web-types"]).toBe(`./${defaultOutFile}`);
     expect(rootJson).toMatchObject({
       contributions: {
         html: {

@@ -31,7 +31,8 @@
     "./dota-md.css": "./dist/dota-md.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "web-types.json"
   ],
   "scripts": {
     "dev": "vite",
