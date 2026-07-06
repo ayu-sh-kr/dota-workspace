@@ -382,6 +382,27 @@ describe("scanWebComponents", () => {
       ],
     });
   });
+
+  it("returns components in deterministic order even when fast-glob returns unsorted files", async () => {
+    // Arrange
+    const root = await prepareFixtureRoot("many");
+    mockState.files = [
+      resolve(root, "src/pages/many.page.ts"),
+      resolve(root, "src/components/beta.component.ts"),
+      resolve(root, "src/components/alpha.component.ts"),
+    ];
+    createPlugin(root);
+
+    // Act
+    const scannedWebComponents = await scanWebComponents(root);
+
+    // Assert
+    expect(scannedWebComponents.map(component => component.tagName)).toEqual([
+      "alpha-component",
+      "beta-component",
+      "many-page",
+    ]);
+  });
 });
 
 
@@ -481,5 +502,30 @@ describe("watch regeneration", () => {
 
     expect(afterChange.contributions.html.elements[0]?.name).toBe("single-component-renamed");
     expect(watcher.on).toHaveBeenCalledWith("change", expect.any(Function));
+  });
+
+  it("ignores watcher changes for non-component files", async () => {
+    // Arrange
+    const root = await prepareFixtureRoot("single");
+    prepareFastGlobFiles(root, "single");
+    const plugin = createPlugin(root, defaultOutFile, "dist");
+    const {handlers} = createWatcherHarness();
+
+    void invokePluginHook(plugin.configureServer, plugin, {
+      watcher: {
+        on: vi.fn((event: string, callback: (file: string) => Promise<void> | void) => {
+          handlers.set(event, callback);
+        }),
+      },
+    } as never);
+
+    await invokePluginHook(plugin.buildStart, plugin);
+    mockedFg.mockClear();
+
+    // Act
+    await handlers.get("change")?.(resolve(root, "package.json"));
+
+    // Assert
+    expect(mockedFg).not.toHaveBeenCalled();
   });
 });
