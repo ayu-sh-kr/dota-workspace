@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-web-type-json
 
+## 0.0.4
+
+### Patch Changes
+
+- 62f8043: Fix the web-types were named export of components were ignored
+
 ## 0.0.3
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.0.16
+
+### Patch Changes
+
+- 62f8043: Fix the web-types were named export of components were ignored
+- Updated dependencies [62f8043]
+  - @ayu-sh-kr/dota-web-type-json@0.0.4
+
 ## 0.0.15
 
 ### Patch Changes
