@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-web-type-json
 
+## 0.0.5
+
+### Patch Changes
+
+- d6a06c8: New Components, Wrap export fix and Web Types json build fix
+
 ## 0.0.4
 
 ### Patch Changes

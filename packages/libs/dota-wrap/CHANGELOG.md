@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.17
+
+### Patch Changes
+
+- d6a06c8: New Components, Wrap export fix and Web Types json build fix
+
 ## 0.0.16
 
 ### Patch Changes
