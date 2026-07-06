@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "dota-web-type-json is a Vite plugin that generates web-types JSON by scanning Web Component files. It extracts component metadata and produces IDE-friendly web-types for better autocompletion and documentation support.",
   "author": {
     "name": "ayu-sh-kr",
