@@ -55,9 +55,9 @@ export class DocContentComponent extends BaseElement {
   }
 
   /**
-   * Load the markdown file, render via MDService and publish as md:render.
+   * Load the Markdown file, render via MDService, and publish as md:render.
    * <md-view> listens to md:render / md:theme-change / md:color-change directly
-   * and manages its own content + styling — doc-content never needs to track
+   * and manages its own content and styling — doc-content never needs to track
    * or forward theme/color.
    */
   @AfterInit()
