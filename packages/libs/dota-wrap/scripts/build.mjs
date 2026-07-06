@@ -46,6 +46,10 @@ const entries = [
   },
 ];
 
+function getExternal(entry) {
+  return [...internalPackages, ...(entry.external ?? [])];
+}
+
 const declarationSources = {
   core: '../dota-core/dist/index.d.ts',
   event: '../dota-event/dist/index.d.ts',
@@ -73,7 +77,7 @@ for (const entry of entries) {
       minify: false,
       outDir,
       rollupOptions: {
-        external: entry.external ?? [],
+        external: getExternal(entry),
       },
     },
     resolve: {
