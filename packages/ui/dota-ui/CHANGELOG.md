@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.0.17
+
+### Patch Changes
+
+- d6a06c8: New Components, Wrap export fix and Web Types json build fix
+- Updated dependencies [d6a06c8]
+  - @ayu-sh-kr/dota-web-type-json@0.0.5
+
 ## 0.0.16
 
 ### Patch Changes
