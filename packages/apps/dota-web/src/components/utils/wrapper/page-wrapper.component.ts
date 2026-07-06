@@ -5,7 +5,6 @@ import { BaseElement, Component } from "@ayu-sh-kr/dota-wrap/core";
   shadow: false
 })
 export class PageWrapperComponent extends BaseElement {
-
   content!: string
 
   constructor() {

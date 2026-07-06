@@ -16,6 +16,47 @@ function toWebTypesSourceFile(root: string, file: string) {
   return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
 }
 
+function compareOptionalNumber(left?: number, right?: number) {
+  if (left == null && right == null) return 0;
+  if (left == null) return 1;
+  if (right == null) return -1;
+  return left - right;
+}
+
+function compareOptionalString(left?: string, right?: string) {
+  if (left == null && right == null) return 0;
+  if (left == null) return 1;
+  if (right == null) return -1;
+  return left.localeCompare(right);
+}
+
+function sortWebComponentInfos(scannedWebComponentInfos: WebComponentInfo[]): WebComponentInfo[] {
+  return [...scannedWebComponentInfos]
+    .map(component => ({
+      ...component,
+      properties: [...component.properties].sort((left, right) =>
+        left.name.localeCompare(right.name)
+        || compareOptionalNumber(left.source?.offset, right.source?.offset)
+        || compareOptionalString(left.source?.file, right.source?.file)
+        || left.type.localeCompare(right.type),
+      ),
+    }))
+    .sort((left, right) =>
+      left.tagName.localeCompare(right.tagName)
+      || left.className.localeCompare(right.className)
+      || compareOptionalString(left.source?.file, right.source?.file)
+      || compareOptionalNumber(left.source?.offset, right.source?.offset),
+    );
+}
+
+function isScannableComponentFile(file: string, root: string) {
+  const relativePath = relative(root, file).replace(/\\/g, '/');
+  return (
+    (relativePath.startsWith('src/') && relativePath.endsWith('.component.ts'))
+    || (relativePath.startsWith('src/pages/') && relativePath.endsWith('.page.ts'))
+  );
+}
+
 export function resetWebTypeJsonState() {
   // no module-level state to reset
 }
@@ -28,7 +69,7 @@ export async function scanWebComponents(root: string, scanRoots: string[] = [roo
       ComponentScanPath.SOURCE_COMPONENT_DIRECTORY_SCAN_PATH,
       ComponentScanPath.SOURCE_PAGE_DIRECTORY_SCAN_PATH
     ], {cwd: scanRoot, absolute: true});
-  }))).flat();
+  }))).flat().sort((left, right) => left.localeCompare(right));
   log.debug('Scanned files: ', files.length)
 
   const scannedWebComponentInfos: WebComponentInfo[] = [];
@@ -103,7 +144,7 @@ export async function scanWebComponents(root: string, scanRoots: string[] = [roo
     scannedWebComponentInfos.push(...webComponentInfos)
   }
 
-  return scannedWebComponentInfos;
+  return sortWebComponentInfos(scannedWebComponentInfos);
 }
 
 export function createWebTypesSchema(scannedWebComponentInfos: WebComponentInfo[]): WebTypesSchema {
@@ -200,15 +241,15 @@ export default function dotaWebTypeJson({
       };
 
       server.watcher.on('add', async (file) => {
-        if (!file.startsWith(root)) return;
+        if (!isScannableComponentFile(file, root)) return;
         await refresh();
       });
       server.watcher.on('change', async (file) => {
-        if (!file.startsWith(root)) return;
+        if (!isScannableComponentFile(file, root)) return;
         await refresh();
       });
       server.watcher.on('unlink', async (file) => {
-        if (!file.startsWith(root)) return;
+        if (!isScannableComponentFile(file, root)) return;
         await refresh();
       });
     },

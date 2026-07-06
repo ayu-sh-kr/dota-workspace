@@ -13,15 +13,6 @@
           },
           "attributes": [
             {
-              "name": "theme",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/md-toc.component.ts",
-                "offset": 2271
-              }
-            },
-            {
               "name": "color",
               "type": "String",
               "required": false,
@@ -47,6 +38,15 @@
                 "file": "./src/components/md-toc.component.ts",
                 "offset": 2842
               }
+            },
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/md-toc.component.ts",
+                "offset": 2271
+              }
             }
           ]
         },
@@ -58,21 +58,21 @@
           },
           "attributes": [
             {
-              "name": "theme",
-              "type": "String",
-              "required": false,
-              "source": {
-                "file": "./src/components/md-view.component.ts",
-                "offset": 509
-              }
-            },
-            {
               "name": "color",
               "type": "String",
               "required": false,
               "source": {
                 "file": "./src/components/md-view.component.ts",
                 "offset": 582
+              }
+            },
+            {
+              "name": "theme",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/md-view.component.ts",
+                "offset": 509
               }
             }
           ]

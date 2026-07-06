@@ -57,7 +57,7 @@ export class SocialSectionComponent extends BaseElement {
           ${this.data.map((item) => {
             // language=html
             return `
-            <div class="lg:w-1/5 md:w-1/4 sm:w-1/3 rounded-xl dark:bg-slate-800 dark:text-white shadow-lg lg:p-4 md:p-3 p-2 space-y-3">
+            <div class="lg:w-1/5 md:w-1/4 sm:w-1/3 rounded-xl bg-white dark:bg-slate-800 dark:text-white shadow-lg lg:p-4 md:p-3 p-2 space-y-3">
               <dota-icon name="${item.icon}" color="${item.color}" variant="link" size="xl"></dota-icon>
               <div class="space-y-2">
                 <h3 class="font-semibold text-gray-900 dark:text-gray-100">${item.heading}</h3>

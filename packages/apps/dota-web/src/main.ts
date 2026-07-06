@@ -5,6 +5,8 @@ import {ErrorPage, HomePage} from "@dota/pages";
 import {
   BlobSeparatorComponent,
   ButtonComponent,
+  CloudChamberComponent,
+  CursorDisplacementComponent,
   DotaCarouselComponent,
   DotaSlideComponent,
   IconsComponent,
@@ -40,6 +42,8 @@ initializeApp({
     ButtonComponent,
     BlobSeparatorComponent,
     OrbBackgroundComponent,
+    CloudChamberComponent,
+    CursorDisplacementComponent,
   ],
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},
