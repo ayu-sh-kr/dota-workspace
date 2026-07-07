@@ -71,16 +71,16 @@ export class HeaderComponent extends BaseElement {
                       </div>
                       <div class="flex items-center gap-x-1 justify-end rounded-full border border-white/60 bg-white/[0.34] p-1
                                   backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035]">
-                        <span class="inline-flex size-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-white/70 dark:hover:bg-white/[0.07]">
+                        <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <github-button></github-button>
                         </span>
-                        <span class="inline-flex size-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-white/70 dark:hover:bg-white/[0.07]">
+                        <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <dark-mode-button></dark-mode-button>
                         </span>
-                        <span class="inline-flex size-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-white/70 dark:hover:bg-white/[0.07]">
+                        <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <ai-button></ai-button>
                         </span>
-                        <span class="inline-flex size-9 items-center justify-center rounded-full transition-colors duration-200 hover:bg-white/70 dark:hover:bg-white/[0.07]">
+                        <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <ham-burger-button></ham-burger-button>
                         </span>
                       </div>
