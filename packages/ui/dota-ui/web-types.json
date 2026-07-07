@@ -845,7 +845,7 @@
           "name": "dota-icon",
           "source": {
             "file": "./src/components/icon/icons.component.ts",
-            "offset": 2198
+            "offset": 2696
           },
           "attributes": [
             {
@@ -854,7 +854,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2419
+                "offset": 2917
               }
             },
             {
@@ -863,7 +863,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2630
+                "offset": 3128
               }
             },
             {
@@ -872,7 +872,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2306
+                "offset": 2804
               }
             },
             {
@@ -881,7 +881,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2542
+                "offset": 3040
               }
             },
             {
@@ -890,7 +890,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2766
+                "offset": 3264
               }
             }
           ]
