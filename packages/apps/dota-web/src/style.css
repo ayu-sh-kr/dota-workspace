@@ -397,3 +397,47 @@ code-snippet #snippet-body code.hljs {
     .tab-content-enter { animation: none; opacity: 1; transform: none; }
     .tab-content-exit  { transition: none; }
 }
+
+/* ── Wobble press utility ───────────────────────────────────────────────────
+   Use as: active:wobble-400, active:wobble-[350ms]
+   Physics: high-tension damped spring — each bounce is ~30% of the previous.
+   Keyframe %s are animation-progress positions; ease-out timing front-weights
+   them so the press + first rebound happen within a normal click (~80–120ms),
+   while the tail oscillations stretch into the settle window.             */
+@keyframes wobble-press {
+    0%   { transform: translateY(0)        scale(1);      }
+    14%  { transform: translateY(2px)      scale(0.984);  }
+    32%  { transform: translateY(-0.6px)   scale(1.003);  }
+    48%  { transform: translateY(0.22px)   scale(0.999);  }
+    62%  { transform: translateY(-0.06px)  scale(1.0003); }
+    78%  { transform: translateY(0.015px)  scale(1);      }
+    100% { transform: translateY(0)        scale(1);      }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [class*="wobble-"] { animation: none !important; }
+}
+
+/* ── Spring-back press utility ─────────────────────────────────────────────
+   Pair with active:translate-y-[2px] active:scale-[0.984] in Tailwind.
+   Hold = stays pressed; release = spring-back with gentle jelly overshoot.
+   Asymmetric timing cannot be expressed as a single Tailwind class because
+   the press and release need different duration + easing values.          */
+@layer utilities {
+    .spring-back {
+        will-change: transform;
+        /* release: spring with a controlled ~15% overshoot — high-tension jelly */
+        transition: background-color 200ms ease-out,
+                    transform 300ms cubic-bezier(0.34, 1.15, 0.64, 1);
+    }
+    .spring-back:active {
+        /* press: snap down fast so it feels immediately responsive */
+        transition: background-color 200ms ease-out,
+                    transform 75ms ease-in;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spring-back,
+    .spring-back:active { transition: background-color 200ms ease-out; }
+}
