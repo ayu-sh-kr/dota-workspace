@@ -238,7 +238,7 @@
           "name": "app-root",
           "source": {
             "file": "./src/app.component.ts",
-            "offset": 309
+            "offset": 310
           },
           "attributes": []
         },
@@ -1654,7 +1654,7 @@
           "name": "dota-icon",
           "source": {
             "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-            "offset": 2696
+            "offset": 2198
           },
           "attributes": [
             {
@@ -1663,7 +1663,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 2917
+                "offset": 2419
               }
             },
             {
@@ -1672,7 +1672,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 3128
+                "offset": 2630
               }
             },
             {
@@ -1681,7 +1681,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 2804
+                "offset": 2306
               }
             },
             {
@@ -1690,7 +1690,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 3040
+                "offset": 2542
               }
             },
             {
@@ -1699,7 +1699,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 3264
+                "offset": 2766
               }
             }
           ]
