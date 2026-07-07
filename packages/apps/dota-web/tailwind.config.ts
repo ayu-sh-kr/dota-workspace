@@ -69,5 +69,26 @@ export default <Partial<Config>>{
       },
     },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [
+    require("@tailwindcss/typography"),
+    ({ matchUtilities }: { matchUtilities: Function }) => {
+      matchUtilities(
+        {
+          wobble: (value: string) => ({
+            animation: `wobble-press ${value} ease-out both`,
+            willChange: 'transform',
+          }),
+        },
+        {
+          values: {
+            '200': '200ms',
+            '300': '300ms',
+            '400': '400ms',
+            '500': '500ms',
+            '600': '600ms',
+          },
+        }
+      );
+    },
+  ],
 };
