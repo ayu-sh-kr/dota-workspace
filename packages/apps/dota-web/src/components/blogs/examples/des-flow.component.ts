@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
 
 type FlowStage = {
   title: string;
@@ -79,213 +79,75 @@ const CARD_ACCENT_BY_INDEX = [
   shadow: false,
 })
 export class DesFlowComponent extends BaseElement {
-  private dragState = {
-    active: false,
-    pointerId: -1,
-    startX: 0,
-    startScrollLeft: 0,
-    startIndex: 0,
-    deltaX: 0,
-    moved: false,
-  };
-
-  private getScroller(): HTMLElement | null {
-    return this.querySelector<HTMLElement>("#des-flow-scroller");
-  }
-
-  private getSlides(scroller: HTMLElement): HTMLElement[] {
-    return Array.from(scroller.querySelectorAll<HTMLElement>("[data-des-slide]"));
-  }
-
-  private getNearestSlideIndex(scroller: HTMLElement): number {
-    const slides = this.getSlides(scroller);
-    if (!slides.length) return 0;
-
-    const currentLeft = scroller.scrollLeft;
-    let bestIndex = 0;
-    let bestDistance = Number.POSITIVE_INFINITY;
-
-    for (let index = 0; index < slides.length; index += 1) {
-      const distance = Math.abs(slides[index].offsetLeft - currentLeft);
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestIndex = index;
-      }
-    }
-
-    return bestIndex;
-  }
-
-  private scrollToSlide(scroller: HTMLElement, index: number) {
-    const slides = this.getSlides(scroller);
-    const clamped = Math.max(0, Math.min(index, slides.length - 1));
-    const target = slides[clamped];
-    if (!target) return;
-
-    scroller.scrollTo({
-      left: target.offsetLeft,
-      behavior: "smooth",
-    });
-  }
-
-  private stepCarousel(direction: -1 | 1) {
-    const scroller = this.getScroller();
-    if (!scroller) return;
-    const currentIndex = this.getNearestSlideIndex(scroller);
-    this.scrollToSlide(scroller, currentIndex + direction);
-  }
-
-  @AfterInit()
-  afterViewInit() {
-    const scroller = this.getScroller();
-    if (!scroller) return;
-
-    const stopDrag = () => {
-      if (!this.dragState.active) return;
-      const activeIndex = this.getNearestSlideIndex(scroller);
-      const direction = this.dragState.deltaX < 0 ? 1 : -1;
-      const delta = Math.abs(this.dragState.deltaX);
-
-      if (this.dragState.moved && delta >= 18) {
-        this.scrollToSlide(scroller, this.dragState.startIndex + direction);
-      } else {
-        this.scrollToSlide(scroller, activeIndex);
-      }
-
-      this.dragState.active = false;
-      this.dragState.pointerId = -1;
-      this.dragState.deltaX = 0;
-      this.dragState.moved = false;
-      scroller.classList.remove("is-dragging");
-    };
-
-    scroller.addEventListener("pointerdown", (event: PointerEvent) => {
-      if (event.pointerType !== "mouse" || event.button !== 0) return;
-
-      this.dragState.active = true;
-      this.dragState.pointerId = event.pointerId;
-      this.dragState.startX = event.clientX;
-      this.dragState.startScrollLeft = scroller.scrollLeft;
-      this.dragState.startIndex = this.getNearestSlideIndex(scroller);
-      this.dragState.deltaX = 0;
-      this.dragState.moved = false;
-      scroller.classList.add("is-dragging");
-      scroller.setPointerCapture(event.pointerId);
-      scroller.focus?.({preventScroll: true});
-    });
-
-    scroller.addEventListener("pointermove", (event: PointerEvent) => {
-      if (!this.dragState.active || event.pointerId !== this.dragState.pointerId) return;
-
-      const deltaX = event.clientX - this.dragState.startX;
-      this.dragState.deltaX = deltaX;
-      if (!this.dragState.moved && Math.abs(deltaX) < 6) return;
-
-      this.dragState.moved = true;
-      const limit = Math.max(24, scroller.clientWidth * 0.82);
-      const clampedDelta = Math.max(-limit, Math.min(limit, deltaX));
-      scroller.scrollLeft = this.dragState.startScrollLeft - clampedDelta;
-      event.preventDefault();
-    });
-
-    scroller.addEventListener("pointerup", stopDrag);
-    scroller.addEventListener("pointercancel", stopDrag);
-    scroller.addEventListener("lostpointercapture", stopDrag);
-    scroller.addEventListener("mouseleave", stopDrag);
-    scroller.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        this.stepCarousel(-1);
-        return;
-      }
-
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        this.stepCarousel(1);
-      }
-    });
-  }
-
   render(): string {
     const total = DES_FLOW_STAGES.length;
 
     return HTML`
-      <section class="my-8 w-full">
-        <div
-          id="des-flow-scroller"
-          tabindex="0"
-          role="region"
-          aria-label="DES flow carousel"
-          class="cursor-grab overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth select-none custom-scrollbar active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950"
-          style="scrollbar-width: none; -ms-overflow-style: none; touch-action: auto; scroll-snap-stop: always;"
-        >
-          <div class="flex gap-4 pb-2">
-            ${DES_FLOW_STAGES.map((stage, index) => {
-              const accent = ACCENT_BY_INDEX[index % ACCENT_BY_INDEX.length];
-              const cardAccent = CARD_ACCENT_BY_INDEX[index % CARD_ACCENT_BY_INDEX.length];
-              const hasMore = index < total - 1;
+      <scroll-deck aria-label="DES flow carousel">
+        ${DES_FLOW_STAGES.map((stage, index) => {
+          const accent = ACCENT_BY_INDEX[index % ACCENT_BY_INDEX.length];
+          const cardAccent = CARD_ACCENT_BY_INDEX[index % CARD_ACCENT_BY_INDEX.length];
+          const hasMore = index < total - 1;
 
-              return `
-                <article
-                  data-des-slide="true"
-                  class="relative min-w-full snap-start snap-always"
-                  aria-label="DES flow slide ${index + 1} of ${total}"
-                >
-                  <div class="relative h-full min-h-[22rem] rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm
-                              dark:border-slate-800 dark:bg-slate-950 sm:min-h-[24rem] sm:p-5 md:min-h-[26rem] md:p-6">
-                    <div class="absolute left-4 top-4 sm:left-5 sm:top-5">
-                      <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-3 py-1.5 text-xs font-semibold tracking-[0.18em]
-                                  text-slate-500 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-400
-                                  ${hasMore ? "shadow-[0_0_0_1px_rgba(56,189,248,0.18),0_0_24px_rgba(56,189,248,0.22)] animate-pulse" : ""}">
-                        <span class="${accent}">${String(index + 1).padStart(2, "0")}</span>
-                        <span class="text-slate-300 dark:text-slate-700">/</span>
-                        <span>${String(total).padStart(2, "0")}</span>
+          return `
+            <article
+              data-scroll-slide="true"
+              class="relative min-w-full snap-start snap-always"
+              aria-label="DES flow slide ${index + 1} of ${total}"
+            >
+              <div class="relative h-full min-h-[22rem] rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm
+                          dark:border-slate-800 dark:bg-slate-950 sm:min-h-[24rem] sm:p-5 md:min-h-[26rem] md:p-6">
+                <div class="absolute left-4 top-4 sm:left-5 sm:top-5">
+                  <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 px-3 py-1.5 text-xs font-semibold tracking-[0.18em]
+                              text-slate-500 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 dark:text-slate-400
+                              ${hasMore ? "shadow-[0_0_0_1px_rgba(56,189,248,0.18),0_0_24px_rgba(56,189,248,0.22)] animate-pulse" : ""}">
+                    <span class="${accent}">${String(index + 1).padStart(2, "0")}</span>
+                    <span class="text-slate-300 dark:text-slate-700">/</span>
+                    <span>${String(total).padStart(2, "0")}</span>
+                  </div>
+                </div>
+
+                <div class="pt-11 sm:pt-12">
+                  <div class="flex flex-col gap-4">
+                    <div class="max-w-2xl">
+                      <p class="text-xs font-semibold uppercase tracking-[0.22em] ${accent}">
+                        ${stage.title}
+                      </p>
+                      <h4 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-[1.75rem]">
+                        ${stage.summary}
+                      </h4>
+                      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+                        ${stage.note}
+                      </p>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-stretch">
+                      <div class="min-h-[5rem] rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Before</p>
+                        <p class="mt-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">${stage.before}</p>
+                      </div>
+
+                      <div class="flex items-center justify-center py-1 text-slate-400 dark:text-slate-500">
+                        <span class="text-xl leading-none sm:text-2xl">→</span>
+                      </div>
+
+                      <div class="min-h-[5rem] rounded-2xl border ${cardAccent} px-4 py-3">
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.18em] ${accent}">After</p>
+                        <p class="mt-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">${stage.after}</p>
                       </div>
                     </div>
 
-                    <div class="pt-11 sm:pt-12">
-                      <div class="flex flex-col gap-4">
-                        <div class="max-w-2xl">
-                          <p class="text-xs font-semibold uppercase tracking-[0.22em] ${accent}">
-                            ${stage.title}
-                          </p>
-                          <h4 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-[1.75rem]">
-                            ${stage.summary}
-                          </h4>
-                          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-                            ${stage.note}
-                          </p>
-                        </div>
-
-                        <div class="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-stretch">
-                          <div class="min-h-[5rem] rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50">
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Before</p>
-                            <p class="mt-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">${stage.before}</p>
-                          </div>
-
-                          <div class="flex items-center justify-center py-1 text-slate-400 dark:text-slate-500">
-                            <span class="text-xl leading-none sm:text-2xl">→</span>
-                          </div>
-
-                          <div class="min-h-[5rem] rounded-2xl border ${cardAccent} px-4 py-3">
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] ${accent}">After</p>
-                            <p class="mt-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">${stage.after}</p>
-                          </div>
-                        </div>
-
-                        <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300">
-                          <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Formula</p>
-                          <p class="mt-1.5 font-mono text-[13px] leading-6 text-slate-800 dark:text-slate-200">${stage.formula}</p>
-                        </div>
-                      </div>
+                    <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-300">
+                      <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Formula</p>
+                      <p class="mt-1.5 font-mono text-[13px] leading-6 text-slate-800 dark:text-slate-200">${stage.formula}</p>
                     </div>
                   </div>
-                </article>
-              `;
-            }).join("")}
-          </div>
-        </div>
-      </section>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join("")}
+      </scroll-deck>
     `;
   }
 }
