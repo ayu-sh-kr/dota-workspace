@@ -1,7 +1,7 @@
-import {Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
 import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
-import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
+import { GeneralUtils } from "@dota/utils/GeneralUtils.ts";
 
 @Route({path: '/blogs/content'})
 @Component({
@@ -43,9 +43,10 @@ export class BlogContentPage extends DotaPageElement {
     }
   }
 
-  @OnEvent("connected")
+  @AfterInit()
   afterViewInit() {
-    this.updateSEO()
+    GeneralUtils.scrollToTop('instant');
+    this.updateSEO();
   }
 
   render() {
