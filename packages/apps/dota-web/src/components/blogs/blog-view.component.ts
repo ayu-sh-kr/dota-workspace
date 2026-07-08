@@ -51,7 +51,7 @@ export class BlogViewComponent extends BaseElement {
     return `
       <section class="mx-auto w-full max-w-screen-2xl px-3 py-12 sm:px-5 lg:px-8">
         <div class="flex w-full flex-col xl:flex-row xl:items-start xl:gap-8">
-          <div class="min-w-0 flex-1 ${this.maxWidth}">
+          <div class="min-w-0 flex-1 ${this.maxWidth}" style="overflow-anchor: none;">
             <md-view theme="${this.theme}" color="${this.color}"></md-view>
             <blog-suggestion current-blog="${this.currentBlog}" limit="3"></blog-suggestion>
           </div>
