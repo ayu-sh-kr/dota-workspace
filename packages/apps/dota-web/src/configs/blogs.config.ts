@@ -184,6 +184,14 @@ export const blogPosts: Blog[] = [
   {
     date: "2025-04-25",
     writer: "Ayush Jaiswal",
+    header: "Data Encryption Standard",
+    description: "An introduction to DES, a symmetric encryption algorithm that encrypts data in 64-bit blocks using a 56-bit key via the Feistel Network across 16 rounds of substitution and permutation.",
+    category: "Tutorial",
+    path: "DES.md",
+  },
+  {
+    date: "2025-04-25",
+    writer: "Ayush Jaiswal",
     header: "Advanced Encryption Standard",
     description: "A short introduction to AES, a widely used symmetric-key encryption standard for securing data at rest and in transit.",
     category: "Tutorial",
