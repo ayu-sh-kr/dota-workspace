@@ -845,7 +845,7 @@
           "name": "dota-icon",
           "source": {
             "file": "./src/components/icon/icons.component.ts",
-            "offset": 2696
+            "offset": 2198
           },
           "attributes": [
             {
@@ -854,7 +854,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2917
+                "offset": 2419
               }
             },
             {
@@ -863,7 +863,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 3128
+                "offset": 2630
               }
             },
             {
@@ -872,7 +872,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2804
+                "offset": 2306
               }
             },
             {
@@ -881,7 +881,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 3040
+                "offset": 2542
               }
             },
             {
@@ -890,7 +890,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 3264
+                "offset": 2766
               }
             }
           ]
@@ -1124,6 +1124,24 @@
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
                 "offset": 13619
+              }
+            }
+          ]
+        },
+        {
+          "name": "scroll-deck",
+          "source": {
+            "file": "./src/components/carousel/scroll-deck.component.ts",
+            "offset": 164
+          },
+          "attributes": [
+            {
+              "name": "aria-label",
+              "type": "String",
+              "required": false,
+              "source": {
+                "file": "./src/components/carousel/scroll-deck.component.ts",
+                "offset": 205
               }
             }
           ]

@@ -199,6 +199,18 @@ This repeated structure is what gives AES its strength. Each round adds more con
 
 ---
 
+## AES Flow in Motion
+
+The round flow is easier to understand when you watch the block move through the pipeline instead of reading the steps as separate ideas. The first example below shows encryption as a forward pass from plaintext to ciphertext.
+
+<aes-flow mode="encryption"></aes-flow>
+
+Decryption uses the same secret key, but the round keys are applied in reverse order and the transformations are undone in the opposite direction. The second example shows that reverse path from ciphertext back to plaintext.
+
+<aes-flow mode="decryption"></aes-flow>
+
+---
+
 ## Key Size
 
 The key size decides how large the secret value is. AES always works on 128-bit data blocks, but the key can be 128, 192, or 256 bits long. A longer key gives more possible key combinations, which means an attacker has a much larger search space if they try to guess the key.
