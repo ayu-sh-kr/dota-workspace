@@ -1,0 +1,4 @@
+interface:
+  display_name: "Markdown Embeds"
+  short_description: "Embed live components inside markdown/tutorial content."
+  default_prompt: "Use the component-design-markdown-embeds skill to embed a live custom component in markdown, keep it self-contained, and check registration so it upgrades correctly in dota-web."
