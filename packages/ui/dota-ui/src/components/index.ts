@@ -15,5 +15,6 @@ export * from "@dota/components/animations/blobs/blob-shapes.ts";
 export * from "@dota/components/animations/cloud/cloud-chamber.component.ts";
 export * from "@dota/components/carousel/dota-carousel.component.ts";
 export * from "@dota/components/carousel/dota-slide.component.ts";
+export * from "@dota/components/carousel/scroll-deck.component.ts";
 export * from "@dota/components/animations/orb/orb-background.component.ts";
 export * from "@dota/components/animations/cursor/cursor-displacement.component.ts";
