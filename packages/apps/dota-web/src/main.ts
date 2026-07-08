@@ -11,7 +11,8 @@ import {
   DotaSlideComponent,
   IconsComponent,
   OrbBackgroundComponent,
-  PopoverComponent
+  PopoverComponent,
+  ScrollDeckComponent
 } from "@ayu-sh-kr/dota-ui";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap";
 import {Router, RouterService} from "@ayu-sh-kr/dota-wrap/router";
@@ -39,6 +40,7 @@ initializeApp({
     MdTocComponent,
     DotaCarouselComponent,
     DotaSlideComponent,
+    ScrollDeckComponent,
     ButtonComponent,
     BlobSeparatorComponent,
     OrbBackgroundComponent,
