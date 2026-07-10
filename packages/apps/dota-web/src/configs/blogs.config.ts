@@ -204,5 +204,13 @@ export const blogPosts: Blog[] = [
     description: "An introduction to cryptography, covering its purpose, the basic working model, and a simple example using the Caesar cipher.",
     category: "Tutorial",
     path: "Towards-Cryptography.md",
+  },
+  {
+    date: "2026-07-10",
+    writer: "Ayush Jaiswal",
+    header: "Chat Memory",
+    description: "A practical guide to chat memory, covering explicit and implicit memory, persistent information, the write-manage-read loop, and why these memory systems matter.",
+    category: "Tutorial",
+    path: "Chat-Memory.md",
   }
 ];
