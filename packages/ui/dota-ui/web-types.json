@@ -1132,7 +1132,7 @@
           "name": "scroll-deck",
           "source": {
             "file": "./src/components/carousel/scroll-deck.component.ts",
-            "offset": 164
+            "offset": 671
           },
           "attributes": [
             {
@@ -1141,7 +1141,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/carousel/scroll-deck.component.ts",
-                "offset": 205
+                "offset": 712
               }
             }
           ]
