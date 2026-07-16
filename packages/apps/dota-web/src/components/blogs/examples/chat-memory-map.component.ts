@@ -1,4 +1,21 @@
 import {AfterInit, BaseElement, Component, HTML, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {
+  appendRoundedRect,
+  clamp,
+  createDiagramPaletteBase,
+  distance,
+  distanceToSegment,
+  drawGridBackground,
+  getCanvasPoint,
+  listen,
+  midpoint,
+  resizeCanvasForDpr,
+  screenToWorld,
+  withAlpha,
+  worldToScreen,
+  type EventDisposer,
+  type Point,
+} from "./canvas-diagram.utils.ts";
 
 type NodeKind = "session" | "memory" | "process";
 
@@ -52,11 +69,6 @@ const EDGES: GraphEdge[] = [
   {from: "read", to: "reply", label: "context", relevance: 0.86, implicit: false, note: "Relevant memory becomes usable context for the response."},
 ];
 
-type Point = {
-  x: number;
-  y: number;
-};
-
 type Palette = {
   background: string;
   grid: string;
@@ -91,6 +103,7 @@ export class ChatMemoryMapComponent extends BaseElement {
   private animationFrame = 0;
   private anchor: HTMLElement | null = null;
   private popup: HTMLElement | null = null;
+  private disposers: EventDisposer[] = [];
   private nodes: GraphNode[] = BASE_NODES.map(node => ({...node}));
   private scale = 0.88;
   private offset: Point = {x: 0, y: 0};
@@ -110,6 +123,13 @@ export class ChatMemoryMapComponent extends BaseElement {
     super();
   }
 
+  private get viewport() {
+    return {
+      scale: this.scale,
+      offset: this.offset,
+    };
+  }
+
   @AfterInit()
   afterViewInit() {
     this.canvas = this.querySelector<HTMLCanvasElement>("#chat-memory-map-canvas");
@@ -121,32 +141,26 @@ export class ChatMemoryMapComponent extends BaseElement {
       return;
     }
 
-    this.canvas.addEventListener("pointerdown", this.handlePointerDown);
-    this.canvas.addEventListener("pointermove", this.handlePointerMove);
-    this.canvas.addEventListener("pointerup", this.handlePointerUp);
-    this.canvas.addEventListener("pointercancel", this.handlePointerUp);
-    this.canvas.addEventListener("pointerleave", this.handlePointerLeave);
-    this.canvas.addEventListener("wheel", this.handleWheel, {passive: false});
-    this.canvas.addEventListener("click", this.handleCanvasClick);
-    this.canvas.addEventListener("keydown", this.handleKeydown);
-    document.addEventListener("click", this.handleDocumentClick);
+    this.disposers = [
+      listen(this.canvas, "pointerdown", this.handlePointerDown),
+      listen(this.canvas, "pointermove", this.handlePointerMove),
+      listen(this.canvas, "pointerup", this.handlePointerUp),
+      listen(this.canvas, "pointercancel", this.handlePointerUp),
+      listen(this.canvas, "pointerleave", this.handlePointerLeave),
+      listen(this.canvas, "wheel", this.handleWheel, {passive: false}),
+      listen(this.canvas, "click", this.handleCanvasClick),
+      listen(this.canvas, "keydown", this.handleKeydown),
+      listen(document, "click", this.handleDocumentClick),
+    ];
 
     this.resizeObserver = new ResizeObserver(() => this.resetView(false));
     this.resizeObserver.observe(this.canvas);
     this.resetView(true);
-    this.startCanvasLoop();
   }
 
   disconnectedCallback() {
-    this.canvas?.removeEventListener("pointerdown", this.handlePointerDown);
-    this.canvas?.removeEventListener("pointermove", this.handlePointerMove);
-    this.canvas?.removeEventListener("pointerup", this.handlePointerUp);
-    this.canvas?.removeEventListener("pointercancel", this.handlePointerUp);
-    this.canvas?.removeEventListener("pointerleave", this.handlePointerLeave);
-    this.canvas?.removeEventListener("wheel", this.handleWheel);
-    this.canvas?.removeEventListener("click", this.handleCanvasClick);
-    this.canvas?.removeEventListener("keydown", this.handleKeydown);
-    document.removeEventListener("click", this.handleDocumentClick);
+    this.disposers.forEach(dispose => dispose());
+    this.disposers = [];
     this.resizeObserver?.disconnect();
     window.cancelAnimationFrame(this.animationFrame);
     super.disconnectedCallback();
@@ -154,13 +168,13 @@ export class ChatMemoryMapComponent extends BaseElement {
 
   @WindowListener({event: "themeChange"})
   handleThemeChange() {
-    this.renderCanvas();
+    this.requestRender();
   }
 
-  private startCanvasLoop = () => {
-    this.renderCanvas();
-    this.animationFrame = window.requestAnimationFrame(this.startCanvasLoop);
-  };
+  private requestRender() {
+    window.cancelAnimationFrame(this.animationFrame);
+    this.animationFrame = window.requestAnimationFrame(() => this.renderCanvas());
+  }
 
   private handlePointerDown = (event: PointerEvent) => {
     if (!this.canvas) {
@@ -168,17 +182,17 @@ export class ChatMemoryMapComponent extends BaseElement {
     }
 
     this.canvas.setPointerCapture(event.pointerId);
-    const point = this.getCanvasPoint(event);
+    const point = getCanvasPoint(this.canvas, event);
     this.activePointers.set(event.pointerId, point);
 
-    const world = this.screenToWorld(point);
+    const world = screenToWorld(point, this.viewport);
     const node = this.findNodeAtWorld(world);
 
     if (this.activePointers.size === 2) {
       const points = Array.from(this.activePointers.values());
-      this.pinchStartDistance = this.distance(points[0], points[1]);
+      this.pinchStartDistance = distance(points[0], points[1]);
       this.pinchStartScale = this.scale;
-      this.pinchWorldPoint = this.screenToWorld(this.midpoint(points[0], points[1]));
+      this.pinchWorldPoint = screenToWorld(midpoint(points[0], points[1]), this.viewport);
       this.dragNodeId = "";
       this.panning = false;
       return;
@@ -201,21 +215,22 @@ export class ChatMemoryMapComponent extends BaseElement {
       return;
     }
 
-    const point = this.getCanvasPoint(event);
+    const point = getCanvasPoint(this.canvas, event);
     if (this.activePointers.has(event.pointerId)) {
       this.activePointers.set(event.pointerId, point);
     }
 
     if (this.activePointers.size === 2 && this.pinchWorldPoint) {
       const points = Array.from(this.activePointers.values());
-      const distance = this.distance(points[0], points[1]);
-      const center = this.midpoint(points[0], points[1]);
-      const nextScale = this.clamp(this.pinchStartScale * (distance / Math.max(1, this.pinchStartDistance)), 0.35, 2.6);
+      const pointerDistance = distance(points[0], points[1]);
+      const center = midpoint(points[0], points[1]);
+      const nextScale = clamp(this.pinchStartScale * (pointerDistance / Math.max(1, this.pinchStartDistance)), 0.35, 2.6);
       this.scale = nextScale;
       this.offset = {
         x: center.x - this.pinchWorldPoint.x * nextScale,
         y: center.y - this.pinchWorldPoint.y * nextScale,
       };
+      this.requestRender();
       return;
     }
 
@@ -228,6 +243,7 @@ export class ChatMemoryMapComponent extends BaseElement {
         node.y += dy;
       }
       this.lastPointer = point;
+      this.requestRender();
       return;
     }
 
@@ -235,23 +251,27 @@ export class ChatMemoryMapComponent extends BaseElement {
       this.offset.x += point.x - this.lastPointer.x;
       this.offset.y += point.y - this.lastPointer.y;
       this.lastPointer = point;
+      this.requestRender();
       return;
     }
 
-    const hovered = this.findNodeAtWorld(this.screenToWorld(point));
-    const edge = hovered ? null : this.findEdgeAtWorld(this.screenToWorld(point));
+    const world = screenToWorld(point, this.viewport);
+    const hovered = this.findNodeAtWorld(world);
+    const edge = hovered ? null : this.findEdgeAtWorld(world);
     this.hoveredNodeId = hovered?.id ?? "";
     this.hoveredEdgeKey = edge ? this.edgeKey(edge) : "";
     this.canvas.style.cursor = hovered ? "grab" : edge ? "pointer" : "move";
 
     if (!this.lockedTargetKey) {
       const target = hovered
-        ? {kind: "node", node: hovered, point: this.worldToScreen(hovered)} as GraphTarget
+        ? {kind: "node", node: hovered, point: worldToScreen(hovered, this.viewport)} as GraphTarget
         : edge
           ? {kind: "edge", edge, point: this.getEdgeAnchor(edge)} as GraphTarget
           : null;
       this.showTarget(target);
     }
+
+    this.requestRender();
   };
 
   private handlePointerUp = (event: PointerEvent) => {
@@ -276,6 +296,7 @@ export class ChatMemoryMapComponent extends BaseElement {
       if (!this.lockedTargetKey) {
         this.hideMemoryMapPopover();
       }
+      this.requestRender();
     }
   };
 
@@ -286,19 +307,25 @@ export class ChatMemoryMapComponent extends BaseElement {
 
     this.lockedTargetKey = "";
     this.hideMemoryMapPopover();
+    this.requestRender();
   };
 
   private handleWheel = (event: WheelEvent) => {
+    if (!this.canvas) {
+      return;
+    }
+
     event.preventDefault();
-    const point = this.getCanvasPoint(event);
-    const world = this.screenToWorld(point);
-    const nextScale = this.clamp(this.scale * Math.exp(-event.deltaY * 0.001), 0.35, 2.6);
+    const point = getCanvasPoint(this.canvas, event);
+    const world = screenToWorld(point, this.viewport);
+    const nextScale = clamp(this.scale * Math.exp(-event.deltaY * 0.001), 0.35, 2.6);
 
     this.scale = nextScale;
     this.offset = {
       x: point.x - world.x * nextScale,
       y: point.y - world.y * nextScale,
     };
+    this.requestRender();
   };
 
   private handleKeydown = (event: KeyboardEvent) => {
@@ -320,42 +347,53 @@ export class ChatMemoryMapComponent extends BaseElement {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       this.offset.x += panStep;
+      this.requestRender();
     }
     if (event.key === "ArrowRight") {
       event.preventDefault();
       this.offset.x -= panStep;
+      this.requestRender();
     }
     if (event.key === "ArrowUp") {
       event.preventDefault();
       this.offset.y += panStep;
+      this.requestRender();
     }
     if (event.key === "ArrowDown") {
       event.preventDefault();
       this.offset.y -= panStep;
+      this.requestRender();
     }
   };
 
   private handleCanvasClick = (event: MouseEvent) => {
+    if (!this.canvas) {
+      return;
+    }
+
     event.stopPropagation();
-    const point = this.getCanvasPoint(event);
-    const world = this.screenToWorld(point);
+    const point = getCanvasPoint(this.canvas, event);
+    const world = screenToWorld(point, this.viewport);
     const node = this.findNodeAtWorld(world);
     const edge = node ? null : this.findEdgeAtWorld(world);
 
     if (node) {
       this.lockedTargetKey = node.id;
-      this.showTarget({kind: "node", node, point: this.worldToScreen(node)});
+      this.showTarget({kind: "node", node, point: worldToScreen(node, this.viewport)});
+      this.requestRender();
       return;
     }
 
     if (edge) {
       this.lockedTargetKey = this.edgeKey(edge);
       this.showTarget({kind: "edge", edge, point: this.getEdgeAnchor(edge)});
+      this.requestRender();
       return;
     }
 
     this.lockedTargetKey = "";
     this.hideMemoryMapPopover();
+    this.requestRender();
   };
 
   private zoomAtCenter(multiplier: number) {
@@ -365,13 +403,14 @@ export class ChatMemoryMapComponent extends BaseElement {
 
     const rect = this.canvas.getBoundingClientRect();
     const center = {x: rect.width / 2, y: rect.height / 2};
-    const world = this.screenToWorld(center);
-    const nextScale = this.clamp(this.scale * multiplier, 0.35, 2.6);
+    const world = screenToWorld(center, this.viewport);
+    const nextScale = clamp(this.scale * multiplier, 0.35, 2.6);
     this.scale = nextScale;
     this.offset = {
       x: center.x - world.x * nextScale,
       y: center.y - world.y * nextScale,
     };
+    this.requestRender();
   }
 
   private resetView(resetNodes: boolean) {
@@ -389,7 +428,7 @@ export class ChatMemoryMapComponent extends BaseElement {
       x: rect.width / 2 - 35,
       y: rect.height / 2,
     };
-    this.renderCanvas();
+    this.requestRender();
   }
 
   private renderCanvas() {
@@ -397,14 +436,7 @@ export class ChatMemoryMapComponent extends BaseElement {
       return;
     }
 
-    const rect = this.canvas.getBoundingClientRect();
-    const width = Math.max(320, rect.width);
-    const height = Math.max(430, rect.height);
-    const pixelRatio = window.devicePixelRatio || 1;
-
-    this.canvas.width = Math.floor(width * pixelRatio);
-    this.canvas.height = Math.floor(height * pixelRatio);
-    this.context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    const {width, height} = resizeCanvasForDpr(this.canvas, this.context, 320, 430);
     this.draw(width, height);
   }
 
@@ -414,22 +446,17 @@ export class ChatMemoryMapComponent extends BaseElement {
     }
 
     const ctx = this.context;
+    const basePalette = createDiagramPaletteBase();
     const dark = document.documentElement.classList.contains("dark");
     const palette: Palette = {
-      background: dark ? "#020617" : "#fbfaf6",
-      grid: dark ? "rgba(148, 163, 184, 0.12)" : "rgba(15, 23, 42, 0.08)",
+      ...basePalette,
       text: dark ? "#e5e7eb" : "#111827",
       labelText: dark ? "#f8fafc" : "#020617",
       labelFill: dark ? "rgba(2, 6, 23, 0.84)" : "rgba(255, 253, 248, 0.9)",
       labelStroke: dark ? "rgba(226, 232, 240, 0.18)" : "rgba(15, 23, 42, 0.12)",
-      muted: dark ? "#94a3b8" : "#64748b",
-      node: dark ? "#cbd5e1" : "#334155",
       nodeFill: dark ? "#0f172a" : "#fffdf8",
-      nodeFaint: dark ? "rgba(203, 213, 225, 0.18)" : "rgba(51, 65, 85, 0.14)",
-      edge: dark ? "#94a3b8" : "#64748b",
       edgeFaint: dark ? "rgba(148, 163, 184, 0.22)" : "rgba(100, 116, 139, 0.22)",
       edgeStrong: dark ? "#e2e8f0" : "#0f172a",
-      active: dark ? "#f8fafc" : "#0f172a",
     };
 
     ctx.clearRect(0, 0, width, height);
@@ -440,29 +467,7 @@ export class ChatMemoryMapComponent extends BaseElement {
   }
 
   private drawBackground(ctx: CanvasRenderingContext2D, width: number, height: number, palette: Palette) {
-    ctx.fillStyle = palette.background;
-    ctx.fillRect(0, 0, width, height);
-
-    ctx.save();
-    ctx.strokeStyle = palette.grid;
-    ctx.lineWidth = 1;
-    const spacing = 34 * this.scale;
-    const originX = this.offset.x % spacing;
-    const originY = this.offset.y % spacing;
-
-    for (let x = originX; x < width; x += spacing) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
-    }
-    for (let y = originY; y < height; y += spacing) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
-    }
-    ctx.restore();
+    drawGridBackground(ctx, width, height, this.viewport, palette, 34);
   }
 
   private drawClusters(ctx: CanvasRenderingContext2D, palette: Palette) {
@@ -474,7 +479,7 @@ export class ChatMemoryMapComponent extends BaseElement {
 
     ctx.save();
     clusters.forEach(cluster => {
-      const center = this.worldToScreen(cluster);
+      const center = worldToScreen(cluster, this.viewport);
       ctx.beginPath();
       ctx.ellipse(center.x, center.y, cluster.radiusX * this.scale, cluster.radiusY * this.scale, -0.18, 0, Math.PI * 2);
       ctx.fillStyle = "transparent";
@@ -497,8 +502,8 @@ export class ChatMemoryMapComponent extends BaseElement {
         return;
       }
 
-      const start = this.worldToScreen(from);
-      const end = this.worldToScreen(to);
+      const start = worldToScreen(from, this.viewport);
+      const end = worldToScreen(to, this.viewport);
       const active = this.edgeKey(edge) === this.hoveredEdgeKey || this.edgeKey(edge) === this.lockedTargetKey;
       const width = (0.35 + edge.relevance * 1.05) * Math.sqrt(this.scale);
 
@@ -521,12 +526,12 @@ export class ChatMemoryMapComponent extends BaseElement {
 
   private drawNodes(ctx: CanvasRenderingContext2D, palette: Palette) {
     this.nodes.forEach(node => {
-      const point = this.worldToScreen(node);
+      const point = worldToScreen(node, this.viewport);
       const hovered = node.id === this.hoveredNodeId || node.id === this.dragNodeId;
       const radius = node.radius * this.scale;
 
       ctx.save();
-      ctx.shadowColor = this.withAlpha(palette.active, hovered ? 0.28 : 0.08);
+      ctx.shadowColor = withAlpha(palette.active, hovered ? 0.28 : 0.08);
       ctx.shadowBlur = hovered ? 16 : 8;
       ctx.fillStyle = palette.nodeFill;
       ctx.strokeStyle = hovered || node.id === this.lockedTargetKey ? palette.active : palette.node;
@@ -566,7 +571,7 @@ export class ChatMemoryMapComponent extends BaseElement {
         ctx.fillStyle = palette.labelFill;
         ctx.strokeStyle = palette.labelStroke;
         ctx.lineWidth = 1;
-        this.roundRect(ctx, point.x - labelWidth / 2, labelY - labelHeight / 2, labelWidth, labelHeight, 7);
+        appendRoundedRect(ctx, point.x - labelWidth / 2, labelY - labelHeight / 2, labelWidth, labelHeight, 7);
         ctx.fill();
         ctx.stroke();
 
@@ -597,7 +602,7 @@ export class ChatMemoryMapComponent extends BaseElement {
         return false;
       }
 
-      return this.distanceToSegment(point, from, to) < 13 / this.scale;
+      return distanceToSegment(point, from, to) < 13 / this.scale;
     }) ?? null;
   }
 
@@ -610,10 +615,10 @@ export class ChatMemoryMapComponent extends BaseElement {
       return {x: 0, y: 0};
     }
 
-    return this.worldToScreen({
+    return worldToScreen({
       x: from.x * 0.45 + to.x * 0.55,
       y: from.y * 0.45 + to.y * 0.55 - 24,
-    });
+    }, this.viewport);
   }
 
   private showTarget(target: GraphTarget | null) {
@@ -646,82 +651,8 @@ export class ChatMemoryMapComponent extends BaseElement {
     }
   }
 
-  private getCanvasPoint(event: MouseEvent | PointerEvent | WheelEvent): Point {
-    const rect = this.canvas?.getBoundingClientRect();
-    return {
-      x: event.clientX - (rect?.left ?? 0),
-      y: event.clientY - (rect?.top ?? 0),
-    };
-  }
-
-  private screenToWorld(point: Point): Point {
-    return {
-      x: (point.x - this.offset.x) / this.scale,
-      y: (point.y - this.offset.y) / this.scale,
-    };
-  }
-
-  private worldToScreen(point: Point): Point {
-    return {
-      x: point.x * this.scale + this.offset.x,
-      y: point.y * this.scale + this.offset.y,
-    };
-  }
-
-  private midpoint(left: Point, right: Point): Point {
-    return {
-      x: (left.x + right.x) / 2,
-      y: (left.y + right.y) / 2,
-    };
-  }
-
-  private distance(left: Point, right: Point): number {
-    return Math.hypot(left.x - right.x, left.y - right.y);
-  }
-
-  private distanceToSegment(point: Point, start: Point, end: Point): number {
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
-    const lengthSquared = dx * dx + dy * dy;
-    if (lengthSquared === 0) {
-      return this.distance(point, start);
-    }
-
-    const t = this.clamp(((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared, 0, 1);
-    return this.distance(point, {
-      x: start.x + t * dx,
-      y: start.y + t * dy,
-    });
-  }
-
   private edgeKey(edge: GraphEdge): string {
     return `${edge.from}:${edge.to}:${edge.label}`;
-  }
-
-  private clamp(value: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, value));
-  }
-
-  private withAlpha(color: string, alpha: number): string {
-    if (!color.startsWith("#")) {
-      return color;
-    }
-
-    const hex = color.replace("#", "");
-    const red = parseInt(hex.slice(0, 2), 16);
-    const green = parseInt(hex.slice(2, 4), 16);
-    const blue = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-  }
-
-  private roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.arcTo(x + width, y, x + width, y + height, radius);
-    ctx.arcTo(x + width, y + height, x, y + height, radius);
-    ctx.arcTo(x, y + height, x, y, radius);
-    ctx.arcTo(x, y, x + width, y, radius);
-    ctx.closePath();
   }
 
   render(): string {

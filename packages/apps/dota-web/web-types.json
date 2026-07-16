@@ -654,7 +654,7 @@
           "name": "chat-memory-map",
           "source": {
             "file": "./src/components/blogs/examples/chat-memory-map.component.ts",
-            "offset": 4926
+            "offset": 5184
           },
           "attributes": []
         },
@@ -785,7 +785,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3161621
+                "offset": 158629
               }
             },
             {
@@ -794,7 +794,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3161423
+                "offset": 158431
               }
             },
             {
@@ -803,7 +803,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3161697
+                "offset": 158705
               }
             },
             {
@@ -812,7 +812,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3161495
+                "offset": 158503
               }
             },
             {
@@ -821,7 +821,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3161777
+                "offset": 158785
               }
             },
             {
@@ -830,7 +830,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 3161558
+                "offset": 158566
               }
             }
           ]
@@ -1885,6 +1885,14 @@
           "attributes": []
         },
         {
+          "name": "jwt-auth-flow",
+          "source": {
+            "file": "./src/components/blogs/examples/token-auth-flow.component.ts",
+            "offset": 42455
+          },
+          "attributes": []
+        },
+        {
           "name": "loader-section",
           "source": {
             "file": "./src/components/utils/section/loader-section.component.ts",
@@ -2099,6 +2107,14 @@
           ]
         },
         {
+          "name": "opaque-auth-flow",
+          "source": {
+            "file": "./src/components/blogs/examples/token-auth-flow.component.ts",
+            "offset": 42734
+          },
+          "attributes": []
+        },
+        {
           "name": "orb-background",
           "source": {
             "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
@@ -2111,7 +2127,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3389971
+                "offset": 604134
               }
             },
             {
@@ -2129,7 +2145,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3389515
+                "offset": 603678
               }
             },
             {
@@ -2138,7 +2154,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3390167
+                "offset": 604330
               }
             },
             {
@@ -2147,7 +2163,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3390072
+                "offset": 604235
               }
             },
             {
@@ -2156,7 +2172,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3389275
+                "offset": 603438
               }
             },
             {
@@ -2165,7 +2181,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3389614
+                "offset": 603777
               }
             },
             {
@@ -2183,7 +2199,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3389894
+                "offset": 604057
               }
             },
             {
@@ -2192,7 +2208,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3389704
+                "offset": 603867
               }
             },
             {
@@ -2201,7 +2217,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 3389362
+                "offset": 603525
               }
             },
             {
@@ -2312,7 +2328,7 @@
           "name": "scroll-deck",
           "source": {
             "file": "../../ui/dota-ui/src/components/carousel/scroll-deck.component.ts",
-            "offset": 164
+            "offset": 671
           },
           "attributes": [
             {
@@ -2321,7 +2337,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/carousel/scroll-deck.component.ts",
-                "offset": 205
+                "offset": 712
               }
             }
           ]

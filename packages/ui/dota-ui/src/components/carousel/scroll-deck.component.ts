@@ -1,5 +1,21 @@
 import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
 
+type EventDisposer = () => void;
+
+/**
+ * Keeps listener setup and teardown adjacent for pointer-heavy UI components.
+ */
+function listen(
+  target: EventTarget,
+  event: string,
+  handler: EventListenerOrEventListenerObject | ((event: any) => void),
+  options?: AddEventListenerOptions | boolean,
+): EventDisposer {
+  const listener = handler as EventListenerOrEventListenerObject;
+  target.addEventListener(event, listener, options);
+  return () => target.removeEventListener(event, listener, options);
+}
+
 @Component({
   selector: "scroll-deck",
   shadow: false,
@@ -17,8 +33,8 @@ export class ScrollDeckComponent extends BaseElement {
     moved: false,
   };
   private keyboardActive = false;
-  private mouseMoveHandler: ((event: MouseEvent) => void) | null = null;
-  private mouseUpHandler: (() => void) | null = null;
+  private scroller: HTMLElement | null = null;
+  private disposers: EventDisposer[] = [];
   private onWindowKeydown = (event: KeyboardEvent) => {
     if (!this.keyboardActive) return;
 
@@ -84,28 +100,25 @@ export class ScrollDeckComponent extends BaseElement {
   }
 
   private stepCarousel(direction: -1 | 1) {
-    const scroller = this.getScroller();
+    const scroller = this.scroller ?? this.getScroller();
     if (!scroller) return;
     const currentIndex = this.getNearestSlideIndex(scroller);
     this.scrollToSlide(scroller, currentIndex + direction);
   }
 
-  @AfterInit()
-  afterViewInit() {
-    const scroller = this.getScroller();
-    if (!scroller) return;
+  private stopDrag = () => {
+    const scroller = this.scroller;
+    if (!scroller || !this.dragState.active) return;
 
-    const stopDrag = () => {
-      if (!this.dragState.active) return;
-      const activeIndex = this.getNearestSlideIndex(scroller);
-      const direction = this.dragState.deltaX < 0 ? 1 : -1;
-      const delta = Math.abs(this.dragState.deltaX);
+    const activeIndex = this.getNearestSlideIndex(scroller);
+    const direction = this.dragState.deltaX < 0 ? 1 : -1;
+    const delta = Math.abs(this.dragState.deltaX);
 
-      if (this.dragState.moved && delta >= 18) {
-        this.scrollToSlide(scroller, this.dragState.startIndex + direction, "auto");
-      } else {
-        this.scrollToSlide(scroller, activeIndex, "auto");
-      }
+    if (this.dragState.moved && delta >= 18) {
+      this.scrollToSlide(scroller, this.dragState.startIndex + direction, "auto");
+    } else {
+      this.scrollToSlide(scroller, activeIndex, "auto");
+    }
 
     this.dragState.active = false;
     this.dragState.deltaX = 0;
@@ -113,76 +126,85 @@ export class ScrollDeckComponent extends BaseElement {
     scroller.classList.remove("is-dragging");
     scroller.style.scrollSnapType = "";
     scroller.style.scrollBehavior = "";
-    };
+  };
 
-    scroller.addEventListener("mousedown", (event: MouseEvent) => {
-      if (event.button !== 0) return;
-      this.dragState.active = true;
-      this.dragState.startX = event.clientX;
-      this.dragState.startScrollLeft = scroller.scrollLeft;
-      this.dragState.startIndex = this.getNearestSlideIndex(scroller);
-      this.dragState.deltaX = 0;
-      this.dragState.moved = false;
-      scroller.classList.add("is-dragging");
-      scroller.style.scrollSnapType = "none";
-      scroller.style.scrollBehavior = "auto";
-      scroller.focus?.({preventScroll: true});
-      this.keyboardActive = true;
+  private handleMouseDown = (event: MouseEvent) => {
+    const scroller = this.scroller;
+    if (!scroller || event.button !== 0) return;
+
+    this.dragState.active = true;
+    this.dragState.startX = event.clientX;
+    this.dragState.startScrollLeft = scroller.scrollLeft;
+    this.dragState.startIndex = this.getNearestSlideIndex(scroller);
+    this.dragState.deltaX = 0;
+    this.dragState.moved = false;
+    scroller.classList.add("is-dragging");
+    scroller.style.scrollSnapType = "none";
+    scroller.style.scrollBehavior = "auto";
+    scroller.focus?.({preventScroll: true});
+    this.keyboardActive = true;
+    event.preventDefault();
+  };
+
+  private handleMouseMove = (event: MouseEvent) => {
+    const scroller = this.scroller;
+    if (!scroller || !this.dragState.active) return;
+
+    const deltaX = event.clientX - this.dragState.startX;
+    this.dragState.deltaX = deltaX;
+    if (!this.dragState.moved && Math.abs(deltaX) < 6) return;
+
+    this.dragState.moved = true;
+    const limit = Math.max(24, scroller.clientWidth * 0.82);
+    const clampedDelta = Math.max(-limit, Math.min(limit, deltaX));
+    scroller.scrollLeft = this.dragState.startScrollLeft - clampedDelta;
+    event.preventDefault();
+  };
+
+  private handleScrollerKeydown = (event: KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
       event.preventDefault();
-    });
+      this.stepCarousel(-1);
+      return;
+    }
 
-    this.mouseMoveHandler = (event: MouseEvent) => {
-      if (!this.dragState.active) return;
-
-      const deltaX = event.clientX - this.dragState.startX;
-      this.dragState.deltaX = deltaX;
-      if (!this.dragState.moved && Math.abs(deltaX) < 6) return;
-
-      this.dragState.moved = true;
-      const limit = Math.max(24, scroller.clientWidth * 0.82);
-      const clampedDelta = Math.max(-limit, Math.min(limit, deltaX));
-      scroller.scrollLeft = this.dragState.startScrollLeft - clampedDelta;
+    if (event.key === "ArrowRight") {
       event.preventDefault();
-    };
+      this.stepCarousel(1);
+    }
+  };
 
-    this.mouseUpHandler = () => stopDrag();
+  private handleFocusIn = () => {
+    this.keyboardActive = true;
+  };
 
-    window.addEventListener("mousemove", this.mouseMoveHandler);
-    window.addEventListener("mouseup", this.mouseUpHandler);
-    scroller.addEventListener("mouseleave", stopDrag);
-    scroller.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        this.stepCarousel(-1);
-        return;
-      }
+  private handleFocusOut = (event: FocusEvent) => {
+    const nextTarget = event.relatedTarget as Node | null;
+    this.keyboardActive = !!nextTarget && this.contains(nextTarget);
+  };
 
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        this.stepCarousel(1);
-      }
-    });
-    scroller.addEventListener("focusin", () => {
-      this.keyboardActive = true;
-    });
-    scroller.addEventListener("focusout", (event: FocusEvent) => {
-      const nextTarget = event.relatedTarget as Node | null;
-      this.keyboardActive = !!nextTarget && this.contains(nextTarget);
-    });
-    scroller.addEventListener("mouseenter", () => {
-      this.keyboardActive = true;
-    });
-    window.addEventListener("keydown", this.onWindowKeydown);
+  @AfterInit()
+  afterViewInit() {
+    this.scroller = this.getScroller();
+    if (!this.scroller) return;
+
+    this.disposers = [
+      listen(this.scroller, "mousedown", this.handleMouseDown),
+      listen(window, "mousemove", this.handleMouseMove),
+      listen(window, "mouseup", this.stopDrag),
+      listen(this.scroller, "mouseleave", this.stopDrag),
+      listen(this.scroller, "keydown", this.handleScrollerKeydown),
+      listen(this.scroller, "focusin", this.handleFocusIn),
+      listen(this.scroller, "focusout", this.handleFocusOut),
+      listen(this.scroller, "mouseenter", this.handleFocusIn),
+      listen(window, "keydown", this.onWindowKeydown),
+    ];
   }
 
   disconnectedCallback() {
-    window.removeEventListener("keydown", this.onWindowKeydown);
-    if (this.mouseMoveHandler) {
-      window.removeEventListener("mousemove", this.mouseMoveHandler);
-    }
-    if (this.mouseUpHandler) {
-      window.removeEventListener("mouseup", this.mouseUpHandler);
-    }
+    this.disposers.forEach(dispose => dispose());
+    this.disposers = [];
+    this.scroller = null;
     super.disconnectedCallback?.();
   }
 
