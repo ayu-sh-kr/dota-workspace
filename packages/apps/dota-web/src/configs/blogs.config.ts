@@ -212,5 +212,13 @@ export const blogPosts: Blog[] = [
     description: "A practical guide to chat memory, covering explicit and implicit memory, persistent information, the write-manage-read loop, and why these memory systems matter.",
     category: "Tutorial",
     path: "Chat-Memory.md",
+  },
+  {
+    date: "2026-07-11",
+    writer: "Ayush Jaiswal",
+    header: "Multi-Tenant Identity Architecture",
+    description: "A simple, ordered guide to multi-tenant identity architecture, covering AuthN, AuthZ, OAuth 2.0, OIDC, JWTs, opaque tokens, BFF login, IdP brokering, and multi-issuer resource servers.",
+    category: "Tutorial",
+    path: "Multi-Tenant-Identity-Architecture.md",
   }
 ];
