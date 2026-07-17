@@ -1,4 +1,5 @@
 export {BlogIconComponent} from "@dota/components/blogs/blog-icon.component.ts";
+export {BlogPaginationComponent} from "@dota/components/blogs/blog-pagination.component.ts";
 export {BlogPreviewComponent} from "@dota/components/blogs/blog-preview.component.ts";
 export {BlogSuggestionComponent} from "@dota/components/blogs/blog-suggestion.component.ts";
 export {BlogSectionComponent} from "@dota/components/blogs/blog-section.component.ts";

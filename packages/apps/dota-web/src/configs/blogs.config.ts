@@ -129,6 +129,30 @@ export const getSuggestedBlogPosts = (currentPath: string, limit: number = 3): B
 
 export const blogPosts: Blog[] = [
   {
+    date: "2026-07-17",
+    writer: "Ayush Jaiswal",
+    header: "LangChain Foundations: From Model Calls To Useful Agents",
+    description: "The first article in a connected AI application series, explaining LangChain prompts, tools, agents, middleware, state, and the path to RAG and LangGraph.",
+    category: "Tutorial",
+    path: "LangChain-Foundations.md",
+  },
+  {
+    date: "2026-07-17",
+    writer: "Ayush Jaiswal",
+    header: "RAG: Grounding AI Answers In Your Data",
+    description: "A practical guide to retrieval-augmented generation, covering ingestion, chunking, embeddings, authorized retrieval, grounded prompts, evaluation, and when to advance to graph workflows.",
+    category: "Tutorial",
+    path: "RAG-Grounded-Answers.md",
+  },
+  {
+    date: "2026-07-17",
+    writer: "Ayush Jaiswal",
+    header: "LangGraph: Reliable Stateful AI Workflows",
+    description: "The final article in the series, showing how LangGraph uses state, nodes, edges, bounded loops, approvals, persistence, and observability for reliable AI workflows.",
+    category: "Tutorial",
+    path: "LangGraph-Stateful-Workflows.md",
+  },
+  {
     date: '2025-04-21',
     writer: 'Ayush Jaiswal',
     header: 'Head first Web Components',
