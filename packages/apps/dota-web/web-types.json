@@ -246,7 +246,7 @@
           "name": "app-root",
           "source": {
             "file": "./src/app.component.ts",
-            "offset": 309
+            "offset": 310
           },
           "attributes": []
         },
@@ -803,7 +803,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 187336
+                "offset": 190132
               }
             },
             {
@@ -812,7 +812,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 187138
+                "offset": 189934
               }
             },
             {
@@ -821,7 +821,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 187412
+                "offset": 190208
               }
             },
             {
@@ -830,7 +830,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 187210
+                "offset": 190006
               }
             },
             {
@@ -839,7 +839,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 187492
+                "offset": 190288
               }
             },
             {
@@ -848,7 +848,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 187273
+                "offset": 190069
               }
             }
           ]
