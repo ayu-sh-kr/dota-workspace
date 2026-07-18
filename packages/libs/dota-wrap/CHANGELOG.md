@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.18
+
+### Patch Changes
+
+- f2f9b57: Bundle the Dota packages re-exported by `dota-wrap` so consumers only need to install `@ayu-sh-kr/dota-wrap`.
+
 ## 0.0.17
 
 ### Patch Changes
