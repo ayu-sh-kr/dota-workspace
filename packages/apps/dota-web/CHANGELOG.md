@@ -1,5 +1,12 @@
 # doto-web
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [f2f9b57]
+  - @ayu-sh-kr/dota-wrap@0.0.18
+
 ## 0.0.24
 
 ### Patch Changes
