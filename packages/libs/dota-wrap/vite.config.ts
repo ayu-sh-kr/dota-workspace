@@ -2,15 +2,6 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
-const internalPackages = [
-  '@ayu-sh-kr/dota-core',
-  '@ayu-sh-kr/dota-event',
-  '@ayu-sh-kr/dota-preloader-plugin',
-  '@ayu-sh-kr/dota-rest',
-  '@ayu-sh-kr/dota-router',
-  '@ayu-sh-kr/dota-web-type-json',
-];
-
 export default defineConfig({
   build: {
     lib: {
@@ -20,9 +11,6 @@ export default defineConfig({
     },
     emptyOutDir: true,
     minify: false,
-    rollupOptions: {
-      external: internalPackages,
-    }
   },
 
   resolve: {
