@@ -246,7 +246,7 @@
           "name": "app-root",
           "source": {
             "file": "./src/app.component.ts",
-            "offset": 310
+            "offset": 309
           },
           "attributes": []
         },
@@ -413,7 +413,7 @@
           "name": "blog-pagination",
           "source": {
             "file": "./src/components/blogs/blog-pagination.component.ts",
-            "offset": 2559
+            "offset": 5016
           },
           "attributes": [
             {
@@ -422,7 +422,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/blogs/blog-pagination.component.ts",
-                "offset": 2604
+                "offset": 5065
               }
             }
           ]
@@ -803,7 +803,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 190132
+                "offset": 186237
               }
             },
             {
@@ -812,7 +812,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 189934
+                "offset": 186039
               }
             },
             {
@@ -821,7 +821,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 190208
+                "offset": 186313
               }
             },
             {
@@ -830,7 +830,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 190006
+                "offset": 186111
               }
             },
             {
@@ -839,7 +839,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 190288
+                "offset": 186393
               }
             },
             {
@@ -848,7 +848,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 190069
+                "offset": 186174
               }
             }
           ]
