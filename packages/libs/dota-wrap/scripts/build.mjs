@@ -46,6 +46,10 @@ const entries = [
   },
 ];
 
+function getExternal(entry) {
+  return [...internalPackages, ...(entry.external ?? [])];
+}
+
 const declarationSources = {
   core: '../dota-core/dist/index.d.ts',
   event: '../dota-event/dist/index.d.ts',
@@ -73,9 +77,10 @@ for (const entry of entries) {
       minify: false,
       outDir,
       rollupOptions: {
-        // dota-wrap is the all-in-one distribution. Keep Dota packages in the
-        // bundle so consumers only need to install this package.
-        external: entry.external ?? [],
+        // Keep stateful Dota runtimes as package references. They are installed
+        // transitively by dota-wrap, so consumers still install one package while
+        // every subpath resolves the same core and event module instances.
+        external: getExternal(entry),
       },
     },
     resolve: {
