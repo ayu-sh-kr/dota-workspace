@@ -1,111 +1,291 @@
-import { BaseElement, Component, HTML } from "@ayu-sh-kr/dota-wrap/core";
-import { DOTA_TOOLS, type DotaTool } from "@dota/components/home/utils/tools.config.ts";
+import {AfterInit, BaseElement, Component, HostListener, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {DOTA_TOOLS, type DotaTool} from "@dota/components/home/utils/tools.config.ts";
 
-@Component({
-  selector: "our-tools",
-  shadow: false,
-})
+type PackagePresentation = {
+  tint: string;
+  tintEnd: string;
+  x: number;
+  y: number;
+  mobileX: number;
+  mobileY: number;
+};
+
+const PACKAGE_ORDER = [
+  "dota-core",
+  "dota-ui",
+  "dota-router",
+  "dota-rest",
+  "dota-event",
+  "dota-wrap",
+  "dota-md",
+  "dota-vite-preloader",
+] as const;
+
+const PRESENTATION: Record<string, PackagePresentation> = {
+  "dota-core": {tint: "#8b7cf6", tintEnd: "#6d5ce0", x: 50, y: 48, mobileX: 50, mobileY: 48},
+  "dota-ui": {tint: "#e05e9b", tintEnd: "#c04382", x: 76, y: 25, mobileX: 78, mobileY: 24},
+  "dota-router": {tint: "#f2a65e", tintEnd: "#d67f3f", x: 80, y: 56, mobileX: 78, mobileY: 52},
+  "dota-rest": {tint: "#5ea8f2", tintEnd: "#3f7fd6", x: 24, y: 24, mobileX: 22, mobileY: 24},
+  "dota-event": {tint: "#5ed6c8", tintEnd: "#3fb0a4", x: 20, y: 57, mobileX: 22, mobileY: 53},
+  "dota-wrap": {tint: "#b18cf2", tintEnd: "#8f66d9", x: 65, y: 79, mobileX: 70, mobileY: 79},
+  "dota-md": {tint: "#9aa7b8", tintEnd: "#6f7d92", x: 36, y: 80, mobileX: 30, mobileY: 79},
+  "dota-vite-preloader": {tint: "#f2d05e", tintEnd: "#d6ad3f", x: 88, y: 82, mobileX: 83, mobileY: 94},
+};
+
+const CONSTELLATION_EDGES: ReadonlyArray<readonly [string, string]> = [
+  ["dota-core", "dota-ui"],
+  ["dota-core", "dota-router"],
+  ["dota-core", "dota-rest"],
+  ["dota-core", "dota-event"],
+  ["dota-core", "dota-wrap"],
+  ["dota-core", "dota-md"],
+  ["dota-router", "dota-vite-preloader"],
+  ["dota-wrap", "dota-ui"],
+  ["dota-event", "dota-rest"],
+];
+
+@Component({selector: "our-tools", shadow: false})
 export class OurToolsComponent extends BaseElement {
+  private animationFrame?: number;
+  private activeChapter = 0;
+  private readonly hoverQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+  private readonly reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   constructor() {
     super();
   }
 
-  private tagChip(tag: string): string {
-    // language=html
-    return `
-        <span class="px-3 py-1 rounded-full text-xs font-medium
-         bg-white/50 text-purple-600 dark:bg-white/[0.055] dark:text-purple-300
-         border border-purple-300/25 dark:border-purple-300/15 backdrop-blur-xl">
-          ${tag}
-        </span>
+  private get orderedTools(): DotaTool[] {
+    return PACKAGE_ORDER
+      .map((id) => DOTA_TOOLS.find((tool) => tool.id === id))
+      .filter((tool): tool is DotaTool => Boolean(tool));
+  }
+
+  private packageName(tool: DotaTool): string {
+    return tool.name.replace(/^dota-/, "");
+  }
+
+  private chapter(tool: DotaTool, index: number): string {
+    const presentation = PRESENTATION[tool.id];
+    const facts = tool.tags.slice(0, 3);
+
+    return HTML`
+      <section class="dota-package-chapter" data-chapter data-index="${index}"
+               style="--tint:${presentation.tint};--tint-end:${presentation.tintEnd}"
+               aria-labelledby="dota-package-${index}">
+        <div class="dota-package-pin">
+          <div class="dota-package-glow dota-reveal-segment" aria-hidden="true"></div>
+          <article class="dota-package-card">
+            <div class="dota-package-tilt">
+              <div class="dota-package-glyph dota-reveal-segment" aria-hidden="true">
+                <dota-icon name="${tool.icon}" classname="text-white" size="xl"></dota-icon>
+              </div>
+              <p class="dota-package-eyebrow dota-reveal-segment">${tool.role}</p>
+              <h3 id="dota-package-${index}" class="dota-package-name dota-reveal-segment">
+                <span>dota-</span>${this.packageName(tool)}
+              </h3>
+              <p class="dota-package-description dota-reveal-segment">${tool.description}</p>
+              <ul class="dota-package-spec" role="list" aria-label="${tool.name} highlights">
+                ${facts.map((fact, factIndex) => `<li class="dota-reveal-segment" style="--fact-index:${factIndex}">${fact}</li>`).join("")}
+              </ul>
+            </div>
+          </article>
+          <svg class="dota-package-connector" viewBox="0 0 2 400" preserveAspectRatio="none" aria-hidden="true">
+            <line x1="1" y1="0" x2="1" y2="400"></line>
+          </svg>
+        </div>
+      </section>
     `;
   }
 
-  private toolSlide(tool: DotaTool): string {
-    return `
-      <dota-slide>
-        <div class="group flex h-full flex-col gap-5 overflow-hidden rounded-2xl p-4 sm:p-6
-                    border border-white/70 dark:border-white/10
-                    bg-white/[0.58] dark:bg-white/[0.045] backdrop-blur-2xl
-                    shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_18px_60px_-46px_rgba(15,23,42,0.88)]
-                    dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_18px_64px_-48px_rgba(0,0,0,0.92)]
-                    hover:-translate-y-1 hover:border-purple-300/30 dark:hover:border-purple-300/20
-                    hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_24px_74px_-50px_rgba(15,23,42,0.95)]
-                    transition-all duration-300">
+  private constellationLines(): string {
+    return CONSTELLATION_EDGES.map(([fromId, toId]) => {
+      const from = PRESENTATION[fromId];
+      const to = PRESENTATION[toId];
+      const length = Math.hypot(to.x - from.x, to.y - from.y).toFixed(2);
+      return `<line style="--edge-length:${length}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`;
+    }).join("");
+  }
 
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0
-                        bg-white/55 dark:bg-white/[0.055] border border-purple-300/25 dark:border-purple-300/15 backdrop-blur-xl">
-              <dota-icon name="${tool.icon}" color="purple" size="lg" variant="ghost"></dota-icon>
-            </div>
-            <div class="pt-1 min-w-0">
-              <p class="text-xs font-semibold tracking-[0.18em] uppercase mb-1
-                         text-purple-500 dark:text-purple-400">Package</p>
-              <h3 class="text-base sm:text-xl font-bold font-mono leading-none
-                         text-gray-900 dark:text-gray-100 break-all">${tool.name}</h3>
-            </div>
-          </div>
-
-          <p class="text-sm sm:text-base font-medium italic pl-4 leading-relaxed
-                    border-l-2 border-purple-500/50
-                    text-gray-700 dark:text-gray-300">"${tool.tagline}"</p>
-
-          <p class="text-sm leading-relaxed flex-1
-                    text-gray-500 dark:text-gray-400">${tool.description}</p>
-
-          <div class="flex flex-wrap gap-2 pt-2
-                      border-t border-slate-200/70 dark:border-white/10">
-            ${tool.tags.map(t => this.tagChip(t)).join('')}
-          </div>
-        </div>
-      </dota-slide>
+  private constellationNode(tool: DotaTool, index: number): string {
+    const point = PRESENTATION[tool.id];
+    return HTML`
+      <div class="dota-constellation-node" data-constellation-node style="--node-delay:${(index * .035).toFixed(3)};--node-x:${point.x}%;--node-y:${point.y}%;--mobile-x:${point.mobileX}%;--mobile-y:${point.mobileY}%;--tint:${point.tint};--tint-end:${point.tintEnd}">
+        <span class="dota-constellation-glyph" aria-hidden="true">
+          <dota-icon name="${tool.icon}" classname="text-white" size="md"></dota-icon>
+        </span>
+        <span class="dota-constellation-label">${tool.name}</span>
+      </div>
     `;
+  }
+
+  private finale(): string {
+    const tools = this.orderedTools;
+    return HTML`
+      <section class="dota-constellation-finale" data-finale aria-labelledby="dota-constellation-title">
+        <div class="dota-constellation-pin">
+          <div class="dota-constellation-copy">
+            <p>One native system</p>
+            <h3 id="dota-constellation-title">Every piece, in orbit.</h3>
+          </div>
+          <figure class="dota-constellation-map" aria-describedby="dota-constellation-description">
+            <figcaption id="dota-constellation-description" class="sr-only">
+              The Dota package constellation places dota-core at the center, connected to UI, routing, HTTP, events, composition, content, and loading tools.
+            </figcaption>
+            <div class="dota-constellation-orbit dota-constellation-orbit-one" aria-hidden="true"></div>
+            <div class="dota-constellation-orbit dota-constellation-orbit-two" aria-hidden="true"></div>
+            <svg class="dota-constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              ${this.constellationLines()}
+            </svg>
+            ${tools.map((tool, index) => this.constellationNode(tool, index)).join("")}
+          </figure>
+          <p class="dota-constellation-caption">Eight focused packages. One coherent framework.</p>
+        </div>
+      </section>
+    `;
+  }
+
+  private progressRail(): string {
+    return HTML`
+      <nav class="dota-package-rail" data-rail aria-label="Dota packages">
+        <span class="dota-package-rail-track" aria-hidden="true"><i></i></span>
+        ${this.orderedTools.map((tool, index) => HTML`
+          <button type="button" data-rail-index="${index}" aria-label="Jump to ${tool.name}"
+                  aria-current="${index === this.activeChapter ? "step" : "false"}"
+                  style="--dot:${PRESENTATION[tool.id].tint}">
+            <span></span>
+          </button>
+        `).join("")}
+      </nav>
+    `;
+  }
+
+  @AfterInit()
+  afterViewInit() {
+    window.addEventListener("scroll", this.requestUpdate, {passive: true});
+    window.addEventListener("resize", this.requestUpdate, {passive: true});
+    this.updateProgress();
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener("scroll", this.requestUpdate);
+    window.removeEventListener("resize", this.requestUpdate);
+    if (this.animationFrame) window.cancelAnimationFrame(this.animationFrame);
+    super.disconnectedCallback();
+  }
+
+  private clamp(value: number): number {
+    return Math.min(1, Math.max(0, value));
+  }
+
+  private requestUpdate = () => {
+    if (this.animationFrame) return;
+    this.animationFrame = window.requestAnimationFrame(() => {
+      this.animationFrame = undefined;
+      this.updateProgress();
+    });
+  };
+
+  private updateProgress() {
+    const chapters = Array.from(this.querySelectorAll<HTMLElement>("[data-chapter]"));
+    const rail = this.querySelector<HTMLElement>("[data-rail]");
+    const hostRect = this.getBoundingClientRect();
+    let activeIndex = this.activeChapter;
+
+    chapters.forEach((chapter, index) => {
+      const rect = chapter.getBoundingClientRect();
+      const scrollable = Math.max(rect.height - window.innerHeight, 1);
+      const progress = this.clamp(-rect.top / scrollable);
+      chapter.style.setProperty("--p", progress.toFixed(4));
+      const active = rect.top <= 0 && rect.bottom >= window.innerHeight;
+      chapter.toggleAttribute("data-active", active);
+      if (active) activeIndex = index;
+    });
+
+    const finale = this.querySelector<HTMLElement>("[data-finale]");
+    if (finale) {
+      const rect = finale.getBoundingClientRect();
+      const progress = this.clamp(-rect.top / Math.max(rect.height - window.innerHeight, 1));
+      finale.style.setProperty("--p", progress.toFixed(4));
+    }
+
+    this.activeChapter = activeIndex;
+    if (rail) {
+      const visible = hostRect.top < window.innerHeight * .7 && hostRect.bottom > window.innerHeight * .3;
+      rail.toggleAttribute("data-visible", visible);
+      rail.style.setProperty("--overall", this.clamp((-hostRect.top + window.innerHeight * .35) / Math.max(hostRect.height - window.innerHeight * .3, 1)).toFixed(4));
+      rail.querySelectorAll<HTMLButtonElement>("button").forEach((button, index) => {
+        const active = index === activeIndex && visible;
+        button.setAttribute("aria-current", active ? "step" : "false");
+        button.toggleAttribute("data-active", active);
+      });
+    }
+  }
+
+  private jumpToChapter(index: number, focusDot = false) {
+    const chapters = Array.from(this.querySelectorAll<HTMLElement>("[data-chapter]"));
+    const target = chapters[Math.min(Math.max(index, 0), chapters.length - 1)];
+    if (!target) return;
+    target.scrollIntoView({behavior: this.reducedMotionQuery.matches ? "auto" : "smooth", block: "start"});
+    if (focusDot) this.querySelector<HTMLButtonElement>(`[data-rail-index="${index}"]`)?.focus();
+  }
+
+  @HostListener({event: "click"})
+  handleClick(event: MouseEvent) {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-rail-index]");
+    if (button) this.jumpToChapter(Number(button.dataset.railIndex));
+  }
+
+  @HostListener({event: "keydown"})
+  handleKeydown(event: KeyboardEvent) {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-rail-index]");
+    if (!button || (event.key !== "ArrowDown" && event.key !== "ArrowUp")) return;
+    event.preventDefault();
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    this.jumpToChapter(Number(button.dataset.railIndex) + direction, true);
+  }
+
+  @HostListener({event: "pointermove"})
+  handlePointerMove(event: PointerEvent) {
+    if (!this.hoverQuery.matches) return;
+    const card = (event.target as HTMLElement).closest<HTMLElement>(".dota-package-card");
+    const tilt = card?.querySelector<HTMLElement>(".dota-package-tilt");
+    if (!card || !tilt) return;
+    const rect = card.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - .5;
+    const y = (event.clientY - rect.top) / rect.height - .5;
+    tilt.style.setProperty("--tilt-x", `${(-y * 6).toFixed(2)}deg`);
+    tilt.style.setProperty("--tilt-y", `${(x * 8).toFixed(2)}deg`);
+    tilt.style.setProperty("--mx", `${((x + .5) * 100).toFixed(1)}%`);
+    tilt.style.setProperty("--my", `${((y + .5) * 100).toFixed(1)}%`);
+  }
+
+  @HostListener({event: "pointerout"})
+  handlePointerOut(event: PointerEvent) {
+    const card = (event.target as HTMLElement).closest<HTMLElement>(".dota-package-card");
+    if (!card || (event.relatedTarget instanceof Node && card.contains(event.relatedTarget))) return;
+    const tilt = card.querySelector<HTMLElement>(".dota-package-tilt");
+    tilt?.style.removeProperty("--tilt-x");
+    tilt?.style.removeProperty("--tilt-y");
+    tilt?.style.removeProperty("--mx");
+    tilt?.style.removeProperty("--my");
   }
 
   render(): string {
+    const tools = this.orderedTools;
     return HTML`
-        <section role="region" aria-labelledby="tools-heading"
-                 class="hero-fade-up relative isolate font-dm w-full
-                        before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
-                        before:from-transparent before:via-slate-200/70 before:to-transparent
-                        dark:before:via-white/10 before:-z-10">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
-
-                <!-- Section header -->
-                <div class="mb-8">
-                    <span class="text-xs font-semibold tracking-[0.18em] uppercase
-                                 text-purple-500 dark:text-purple-400">
-                        Ecosystem
-                    </span>
-                    <h2 id="tools-heading"
-                        class="mt-2 text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight
-                               text-gray-800 dark:text-gray-100/90 leading-tight">
-                        Built as a suite.</h2>
-                    <p class="mt-3 text-sm sm:text-base text-gray-500 dark:text-gray-500 max-w-xl leading-relaxed">
-                        Eight standalone packages, one cohesive ecosystem.
-                        Use just what you need — or compose them all.
-                    </p>
-                </div>
-
-                <!-- Mobile / md: carousel of tool cards -->
-                <div class="lg:hidden">
-                    <dota-carousel indicator="icon" color="purple" navigation="auto"
-                                   loop="true" autoplay="true" animation="zoom">
-                        ${DOTA_TOOLS.map(t => this.toolSlide(t)).join('')}
-                    </dota-carousel>
-                </div>
-
-                <!-- lg+: two-column layout -->
-                <div class="hidden lg:grid lg:grid-cols-[5fr_7fr] gap-3 lg:gap-8 items-start w-full">
-                    <div class="flex flex-col gap-1 w-full">
-                        ${DOTA_TOOLS.map(t => `<div class="w-full"><tool-list-item tool-id="${t.id}"></tool-list-item></div>`).join('')}
-                    </div>
-                    <tool-detail></tool-detail>
-                </div>
-
-            </div>
-        </section>
+      <section class="dota-ecosystem-reveal" aria-labelledby="dota-ecosystem-title">
+        <header class="dota-ecosystem-intro">
+          <p>Ecosystem / 08 native packages</p>
+          <h2 id="dota-ecosystem-title">Meet the pieces.<br><span>Then watch them connect.</span></h2>
+          <div class="dota-ecosystem-scroll-cue" aria-hidden="true"><i></i><span>Scroll to explore</span></div>
+        </header>
+        ${this.progressRail()}
+        <div class="dota-package-chapters">
+          ${tools.map((tool, index) => this.chapter(tool, index)).join("")}
+        </div>
+        ${this.finale()}
+      </section>
     `;
   }
 }
