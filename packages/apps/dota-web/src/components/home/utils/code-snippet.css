@@ -1,0 +1,17 @@
+code-snippet {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+code-snippet #snippet-body pre,
+code-snippet #snippet-body code.hljs {
+    margin: 0 !important;
+    padding: 1rem 1.25rem !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: 13px;
+    line-height: 1.75rem;
+}
