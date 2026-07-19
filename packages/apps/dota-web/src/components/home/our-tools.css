@@ -13,7 +13,6 @@
     overflow: clip;
     background: var(--dota-reveal-canvas);
     color: var(--dota-reveal-text);
-    font-family: "Poppins", sans-serif;
     -webkit-font-smoothing: antialiased;
 }
 

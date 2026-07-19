@@ -274,7 +274,7 @@ export class OurToolsComponent extends BaseElement {
   render(): string {
     const tools = this.orderedTools;
     return HTML`
-      <section class="dota-ecosystem-reveal" aria-labelledby="dota-ecosystem-title">
+      <section class="dota-ecosystem-reveal font-dm" aria-labelledby="dota-ecosystem-title">
         <header class="dota-ecosystem-intro">
           <p>Ecosystem / 08 native packages</p>
           <h2 id="dota-ecosystem-title">Meet the pieces.<br><span>Then watch them connect.</span></h2>
