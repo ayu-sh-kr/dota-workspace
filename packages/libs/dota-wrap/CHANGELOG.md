@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.19
+
+### Patch Changes
+
+- f3647ff: Install stateful Dota runtimes transitively and keep them external to wrapper bundles so every subpath shares one application event bus and listener registry, while bundling build-time plugins for consistent virtual-module support.
+
 ## 0.0.18
 
 ### Patch Changes
