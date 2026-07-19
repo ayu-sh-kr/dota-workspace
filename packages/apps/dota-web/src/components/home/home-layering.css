@@ -1,0 +1,15 @@
+app-hero,
+app-feature,
+code-section,
+reactive-dota,
+capability-section,
+emitter-section,
+device-section,
+our-tools,
+client-section,
+app-notification,
+notification-holder {
+    display: block;
+    position: relative;
+    z-index: 1;
+}
