@@ -1,0 +1,16 @@
+blob-wrapper {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+.blob-inner {
+    z-index: 0;
+    opacity: 0.4;
+    filter: blur(65px);
+}
+
+.dark .blob-inner {
+    opacity: 0.6;
+    filter: blur(70px) brightness(1) saturate(1.8);
+}
