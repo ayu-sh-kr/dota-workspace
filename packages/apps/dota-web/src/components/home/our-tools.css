@@ -1,0 +1,121 @@
+/* Dota package chapters + constellation */
+.dota-ecosystem-reveal {
+    --dota-reveal-canvas: #f7f5fb;
+    --dota-reveal-card: rgba(255, 255, 255, .58);
+    --dota-reveal-card-border: rgba(51, 30, 82, .12);
+    --dota-reveal-card-top: rgba(255, 255, 255, .92);
+    --dota-reveal-text: #17131d;
+    --dota-reveal-text-mid: rgba(23, 19, 29, .64);
+    --dota-reveal-text-low: rgba(23, 19, 29, .4);
+    --dota-reveal-hairline: rgba(51, 30, 82, .1);
+    position: relative;
+    display: block;
+    overflow: clip;
+    background: var(--dota-reveal-canvas);
+    color: var(--dota-reveal-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+.dark .dota-ecosystem-reveal {
+    --dota-reveal-canvas: #0a090e;
+    --dota-reveal-card: rgba(255, 255, 255, .045);
+    --dota-reveal-card-border: rgba(255, 255, 255, .1);
+    --dota-reveal-card-top: rgba(255, 255, 255, .22);
+    --dota-reveal-text: #f5f5f7;
+    --dota-reveal-text-mid: rgba(245, 245, 247, .62);
+    --dota-reveal-text-low: rgba(245, 245, 247, .38);
+    --dota-reveal-hairline: rgba(255, 255, 255, .08);
+}
+
+.dota-ecosystem-intro { display: grid; min-height: 100svh; place-content: center; padding: 6rem max(1.5rem, calc((100vw - 76rem) / 2)); }
+.dota-ecosystem-intro > p, .dota-constellation-copy > p { color: #7e22ce; font-family: "Fira Code", monospace; font-size: .6875rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.dark .dota-ecosystem-intro > p, .dark .dota-constellation-copy > p { color: #c9a9ff; }
+.dota-ecosystem-intro h2 { max-width: 15ch; margin-top: 1rem; font-size: clamp(3rem, 7vw, 6.75rem); font-weight: 600; letter-spacing: -.055em; line-height: .96; text-wrap: balance; }
+.dota-ecosystem-intro h2 span { color: var(--dota-reveal-text-low); }
+.dota-ecosystem-scroll-cue { display: flex; align-items: center; gap: .75rem; margin-top: 3rem; color: var(--dota-reveal-text-low); font-family: "Fira Code", monospace; font-size: .6875rem; letter-spacing: .1em; text-transform: uppercase; }
+.dota-ecosystem-scroll-cue i { display: block; width: 3rem; height: 1px; background: currentColor; transform-origin: left; animation: dota-scroll-cue 2.2s ease-in-out infinite; }
+
+.dota-package-chapter { --p: 0; --out: clamp(0, calc((var(--p) - .8) / .2), 1); position: relative; height: 280svh; }
+.dota-package-pin { position: sticky; top: 0; display: grid; height: 100svh; place-items: center; overflow: hidden; perspective: 1000px; }
+.dota-reveal-segment { --t: clamp(0, calc((var(--p) - var(--start)) / var(--len)), 1); }
+.dota-package-glow { --start: 0; --len: .25; position: absolute; width: min(42rem, 90vw); aspect-ratio: 1; border-radius: 50%; background: var(--tint); filter: blur(5.625rem); opacity: calc(var(--t) * .16 * (1 - var(--out))); pointer-events: none; transform: scale(calc(.6 + var(--t) * .4)); }
+.dota-package-card { position: relative; width: min(35rem, calc(100vw - 3rem)); overflow: hidden; border: 1px solid var(--dota-reveal-card-border); border-top-color: var(--dota-reveal-card-top); border-radius: 1.75rem; background: var(--dota-reveal-card); padding: 3rem 2.75rem 2.25rem; box-shadow: 0 2rem 6rem -3.5rem rgba(37, 17, 66, .38); backdrop-filter: blur(1.5rem) saturate(140%); -webkit-backdrop-filter: blur(1.5rem) saturate(140%); opacity: calc(1 - var(--out)); transform: translateY(calc(var(--out) * -1.5rem)); will-change: transform, opacity; }
+.dark .dota-package-card { box-shadow: 0 2.5rem 7rem -3.25rem rgba(0, 0, 0, .92); }
+.dota-package-tilt { position: relative; transform: perspective(56.25rem) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transform-style: preserve-3d; transition: transform .35s ease; }
+.dota-package-tilt::after { content: ""; position: absolute; z-index: 3; inset: -3rem -2.75rem -2.25rem; border-radius: 1.75rem; background: radial-gradient(22rem circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, .14), transparent 58%); opacity: .72; pointer-events: none; }
+.dota-package-glyph { --start: 0; --len: .25; display: grid; width: 6rem; aspect-ratio: 1; margin-bottom: 2.25rem; place-items: center; border-radius: 27%; background: linear-gradient(160deg, var(--tint), var(--tint-end)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 .75rem 2rem rgba(34, 16, 54, .34); opacity: var(--t); filter: blur(calc((1 - var(--t)) * 1.5rem)); transform: translateY(calc((1 - var(--t)) * 2.5rem)) scale(calc(.86 + var(--t) * .14)); will-change: transform, filter; }
+.dark .dota-package-glyph { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 .75rem 2rem rgba(0, 0, 0, .45); }
+.dota-package-eyebrow { --start: .15; --len: .2; color: var(--dota-reveal-text-low); font-size: .75rem; font-weight: 600; letter-spacing: calc(.14em + (1 - var(--t)) * .16em); opacity: var(--t); text-transform: uppercase; }
+.dota-package-name { --start: .2; --len: .25; margin-top: .625rem; font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 600; letter-spacing: -.045em; line-height: 1.05; clip-path: inset(0 0 calc((1 - var(--t)) * 100%) 0); transform: translateY(calc((1 - var(--t)) * 1.25rem)); }
+.dota-package-name span { color: var(--dota-reveal-text-low); font-weight: 500; }
+.dota-package-description { --start: .35; --len: .2; max-width: 38ch; margin-top: 1rem; color: var(--dota-reveal-text-mid); font-size: 1rem; line-height: 1.65; opacity: var(--t); transform: translateY(calc((1 - var(--t)) * 1rem)); }
+.dota-package-spec { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--dota-reveal-hairline); color: var(--dota-reveal-text-low); font-family: "Fira Code", monospace; font-size: .6875rem; }
+.dota-package-spec li { --start: calc(.45 + var(--fact-index) * .04); --len: .1; opacity: var(--t); }
+.dota-package-spec li:not(:last-child)::after { content: "·" / ""; margin-left: 1rem; opacity: .5; }
+.dota-package-connector { position: absolute; bottom: 0; left: 50%; width: 2px; height: 30svh; transform: translateX(-50%); pointer-events: none; }
+.dota-package-connector line { stroke: var(--dota-reveal-text-low); stroke-width: 2; stroke-dasharray: 400; stroke-dashoffset: calc(400 - var(--out) * 400); }
+
+.dota-package-rail { --overall: 0; position: fixed; z-index: 30; top: 50%; right: 1.25rem; display: flex; flex-direction: column; align-items: center; gap: .75rem; padding-block: .75rem; opacity: 0; pointer-events: none; transform: translate3d(.75rem, -50%, 0); transition: opacity .25s ease, transform .25s ease; }
+.dota-package-rail[data-visible] { opacity: 1; pointer-events: auto; transform: translate3d(0, -50%, 0); }
+.dota-package-rail-track { position: absolute; z-index: -1; top: .75rem; bottom: .75rem; left: 50%; width: 1px; overflow: hidden; background: var(--dota-reveal-hairline); transform: translateX(-50%); }
+.dota-package-rail-track i { display: block; width: 100%; height: 100%; background: #a66cff; transform: scaleY(var(--overall)); transform-origin: top; }
+.dota-package-rail button { display: grid; min-width: 1.5rem; min-height: 1.5rem; place-items: center; border-radius: 50%; }
+.dota-package-rail button span { display: block; width: .55rem; aspect-ratio: 1; border: 1px solid var(--dota-reveal-text-low); border-radius: 50%; background: var(--dota-reveal-canvas); transition: background-color .2s ease, border-color .2s ease, transform .2s ease; }
+.dota-package-rail button:hover span, .dota-package-rail button[data-active] span { border-color: var(--dot); background: var(--dot); transform: scale(1.55); }
+.dota-package-rail button:focus-visible { outline: 2px solid #a66cff; outline-offset: 2px; }
+
+.dota-constellation-finale { --p: 0; --assemble: clamp(0, calc((var(--p) - .08) / .58), 1); --edges: clamp(0, calc((var(--p) - .48) / .28), 1); --copy-in: clamp(0, calc((var(--p) - .05) / .18), 1); position: relative; height: 320svh; }
+.dota-constellation-pin { position: sticky; top: 0; display: grid; height: 100svh; grid-template-rows: auto minmax(0, 1fr) auto; align-items: center; overflow: hidden; padding: clamp(4.5rem, 8vh, 7rem) clamp(1.25rem, 4vw, 4rem) 2rem; }
+.dota-constellation-copy { position: relative; z-index: 4; text-align: center; opacity: var(--copy-in); transform: translateY(calc((1 - var(--copy-in)) * 1.5rem)); }
+.dota-constellation-copy h3 { margin-top: .5rem; font-size: clamp(2.35rem, 5vw, 4.75rem); font-weight: 600; letter-spacing: -.05em; line-height: 1; }
+.dota-constellation-map { position: relative; width: min(76rem, 94vw); height: min(66svh, 45rem); margin-inline: auto; isolation: isolate; }
+.dota-constellation-map::before { content: ""; position: absolute; inset: 8%; z-index: -2; border-radius: 50%; background: radial-gradient(circle, rgba(139, 124, 246, .15), transparent 66%); filter: blur(2rem); opacity: var(--assemble); transform: scale(calc(.65 + var(--assemble) * .35)); }
+.dota-constellation-orbit { position: absolute; z-index: -1; top: 50%; left: 50%; border: 1px solid var(--dota-reveal-hairline); border-radius: 50%; opacity: calc(var(--edges) * .7); transform: translate(-50%, -50%) scale(calc(.8 + var(--assemble) * .2)); }
+.dota-constellation-orbit-one { width: 38%; aspect-ratio: 1.35; }
+.dota-constellation-orbit-two { width: 76%; aspect-ratio: 1.72; }
+.dota-constellation-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.dota-constellation-lines line { stroke: rgba(126, 34, 206, .42); stroke-width: .22; stroke-dasharray: var(--edge-length); stroke-dashoffset: calc(var(--edge-length) * (1 - var(--edges))); }
+.dark .dota-constellation-lines line { stroke: rgba(201, 169, 255, .42); }
+.dota-constellation-node { --node-t: clamp(0, calc((var(--assemble) - var(--node-delay)) / .72), 1); position: absolute; left: calc(50% + (var(--node-x) - 50%) * var(--node-t)); top: calc(50% + (var(--node-y) - 50%) * var(--node-t)); display: grid; justify-items: center; opacity: var(--node-t); transform: translate(-50%, -50%) scale(calc(.52 + var(--node-t) * .48)); }
+.dota-constellation-glyph { display: grid; width: clamp(2.85rem, 5vw, 4rem); aspect-ratio: 1; place-items: center; border: 1px solid rgba(255, 255, 255, .24); border-radius: 27%; background: linear-gradient(160deg, var(--tint), var(--tint-end)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 .75rem 2rem rgba(45, 23, 72, .28); }
+.dark .dota-constellation-glyph { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 .75rem 2rem rgba(0, 0, 0, .5); }
+.dota-constellation-label { max-width: 9rem; margin-top: .55rem; color: var(--dota-reveal-text-mid); font-family: "Fira Code", monospace; font-size: clamp(.55rem, .8vw, .7rem); font-weight: 600; text-align: center; white-space: nowrap; }
+.dota-constellation-caption { color: var(--dota-reveal-text-low); font-family: "Fira Code", monospace; font-size: .6875rem; letter-spacing: .08em; text-align: center; text-transform: uppercase; opacity: var(--edges); }
+
+@keyframes dota-scroll-cue { 0%, 100% { transform: scaleX(.35); opacity: .45; } 50% { transform: scaleX(1); opacity: 1; } }
+
+@media (max-width: 767px) {
+    .dota-package-chapter { height: 220svh; }
+    .dota-package-card { padding: 2rem 1.5rem 1.75rem; }
+    .dota-package-tilt::after { inset: -2rem -1.5rem -1.75rem; }
+    .dota-package-glyph { width: 4.75rem; margin-bottom: 1.75rem; }
+    .dota-package-description { font-size: .9375rem; }
+    .dota-package-rail { right: .15rem; gap: .45rem; padding-block: .4rem; }
+    .dota-package-rail-track { top: .4rem; bottom: .4rem; }
+    .dota-package-rail button { min-width: 1rem; min-height: 1rem; }
+    .dota-package-rail button span { width: .3rem; }
+    .dota-constellation-finale { height: 260svh; }
+    .dota-constellation-map { width: 100%; height: min(65svh, 38rem); }
+    .dota-constellation-node { left: calc(50% + (var(--mobile-x) - 50%) * var(--node-t)); top: calc(50% + (var(--mobile-y) - 50%) * var(--node-t)); }
+    .dota-constellation-lines { display: none; }
+    .dota-constellation-label { max-width: 6rem; font-size: .52rem; white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dota-ecosystem-scroll-cue i { animation: none; transform: none; }
+    .dota-package-chapter { height: auto; padding-block: 10svh; --p: .65 !important; --out: 0 !important; }
+    .dota-package-pin { position: static; height: auto; min-height: 80svh; }
+    .dota-reveal-segment { --t: 1 !important; }
+    .dota-package-glow { opacity: .1; transform: none; }
+    .dota-package-card { opacity: 1; transform: none; }
+    .dota-package-glyph { filter: none; transform: none; }
+    .dota-package-tilt { transition: none; transform: none; }
+    .dota-package-connector, .dota-package-rail { display: none; }
+    .dota-constellation-finale { height: auto; --p: 1 !important; --assemble: 1 !important; --edges: 1 !important; --copy-in: 1 !important; }
+    .dota-constellation-pin { position: static; height: auto; min-height: 100svh; }
+}
+
+@media (forced-colors: active) {
+    .dota-package-card, .dota-constellation-glyph, .dota-package-glyph { border: 1px solid CanvasText; }
+    .dota-package-rail button[data-active] span { outline: 2px solid Highlight; }
+}

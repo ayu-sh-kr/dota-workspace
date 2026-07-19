@@ -1,0 +1,13 @@
+.toast-animate {
+    --animation-duration: 5000ms;
+    animation: toast-decrease ease-in-out var(--animation-duration);
+}
+
+.paused-animation {
+    animation-play-state: paused;
+}
+
+@keyframes toast-decrease {
+    from { width: 100%; }
+    to { width: 0; }
+}

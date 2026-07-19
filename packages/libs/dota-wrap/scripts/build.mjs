@@ -36,15 +36,22 @@ const entries = [
     name: 'preloader-plugin',
     source: 'src/preloader-plugin/index.ts',
     outDir: 'dist/preloader-plugin',
+    bundleInternal: true,
     external: nodePluginExternal,
   },
   {
     name: 'web-type-json',
     source: 'src/web-type-json/index.ts',
     outDir: 'dist/web-type-json',
+    bundleInternal: true,
     external: nodePluginExternal,
   },
 ];
+
+function getExternal(entry) {
+  if (entry.bundleInternal) return entry.external ?? [];
+  return [...internalPackages, ...(entry.external ?? [])];
+}
 
 const declarationSources = {
   core: '../dota-core/dist/index.d.ts',
@@ -73,9 +80,10 @@ for (const entry of entries) {
       minify: false,
       outDir,
       rollupOptions: {
-        // dota-wrap is the all-in-one distribution. Keep Dota packages in the
-        // bundle so consumers only need to install this package.
-        external: entry.external ?? [],
+        // Keep stateful browser runtimes as package references so every subpath
+        // resolves one core/event instance. Build-time plugins stay bundled so a
+        // packed wrapper contains the exact scanner implementation it was built with.
+        external: getExternal(entry),
       },
     },
     resolve: {

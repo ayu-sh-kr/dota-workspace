@@ -91,10 +91,10 @@ importers:
         version: 11.11.1
       markdown-it:
         specifier: latest
-        version: 14.2.0
+        version: 14.3.0
       markdown-it-anchor:
         specifier: ^9.2.0
-        version: 9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.2.0)
+        version: 9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.3.0)
       markdown-it-highlightjs:
         specifier: ^4.2.0
         version: 4.3.0
@@ -149,6 +149,18 @@ importers:
 
   packages/libs/dota-wrap:
     dependencies:
+      '@ayu-sh-kr/dota-core':
+        specifier: workspace:*
+        version: link:../dota-core
+      '@ayu-sh-kr/dota-event':
+        specifier: workspace:*
+        version: link:../dota-event
+      '@ayu-sh-kr/dota-rest':
+        specifier: workspace:*
+        version: link:../dota-rest
+      '@ayu-sh-kr/dota-router':
+        specifier: workspace:*
+        version: link:../dota-router
       '@swc/core':
         specifier: ^1.13.5
         version: 1.13.5
@@ -162,21 +174,9 @@ importers:
         specifier: '>=0.2.0'
         version: 0.2.2
     devDependencies:
-      '@ayu-sh-kr/dota-core':
-        specifier: workspace:*
-        version: link:../dota-core
-      '@ayu-sh-kr/dota-event':
-        specifier: workspace:*
-        version: link:../dota-event
       '@ayu-sh-kr/dota-preloader-plugin':
         specifier: workspace:*
         version: link:../../plugins/dota-vite-preloader
-      '@ayu-sh-kr/dota-rest':
-        specifier: workspace:*
-        version: link:../dota-rest
-      '@ayu-sh-kr/dota-router':
-        specifier: workspace:*
-        version: link:../dota-router
       '@ayu-sh-kr/dota-web-type-json':
         specifier: workspace:*
         version: link:../../plugins/web-type-json
@@ -242,10 +242,10 @@ importers:
         version: link:../../plugins/web-type-json
       markdown-it:
         specifier: latest
-        version: 14.2.0
+        version: 14.3.0
       markdown-it-anchor:
         specifier: ^9.2.0
-        version: 9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.2.0)
+        version: 9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.3.0)
       markdown-it-highlightjs:
         specifier: ^4.2.0
         version: 4.3.0
@@ -2548,8 +2548,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  linkify-it@5.0.1:
-    resolution: {integrity: sha512-wVoTjP4Q6R0NW5hiZkVJaFZPWgtXfoGF+6LucL3/FtiNjmcHhYjEr5f1Kqjirc1nBW07J/ZuRFumqr2oqccEWg==}
+  linkify-it@5.0.2:
+    resolution: {integrity: sha512-ONTm2jCMAVZjgQa/Fy1kScXsuOoF5NPTsoFBdE1KVIZ2vAh/r9+Bqo+0jINCBYnavTPQZz38QzFTme79ENoN3Q==}
 
   load-tsconfig@0.2.5:
     resolution: {integrity: sha512-IXO6OCs9yg8tMKzfPZ1YmheJbZCiEsnBdcB03l0OcfK9prKnJb96siuHCr5Fl37/yo9DnKU+TLpxzTUspw9shg==}
@@ -2613,8 +2613,8 @@ packages:
   markdown-it-toc-done-right@4.2.0:
     resolution: {integrity: sha512-UB/IbzjWazwTlNAX0pvWNlJS8NKsOQ4syrXZQ/C72j+jirrsjVRT627lCaylrKJFBQWfRsPmIVQie8x38DEhAQ==}
 
-  markdown-it@14.2.0:
-    resolution: {integrity: sha512-1TGiQiJVRQ3NPmZH6sx5Cfnmg6GQm9jvC1ch4TK511NjSJvjzKLzn5pPfZRNZkRPZP0HqCioSndqH8v2nRaWVQ==}
+  markdown-it@14.3.0:
+    resolution: {integrity: sha512-RCEsPjR+sr0x+AuYp601tKTkgFG4YEPLCzHST3cQ/fhlJkqAkz1L2/Qbp1j9qw5SBwQHFBoW8+hoN5xssOF0Tw==}
     hasBin: true
 
   mdurl@2.0.0:
@@ -6047,7 +6047,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  linkify-it@5.0.1:
+  linkify-it@5.0.2:
     dependencies:
       uc.micro: 2.1.0
 
@@ -6101,10 +6101,10 @@ snapshots:
     dependencies:
       tmpl: 1.0.5
 
-  markdown-it-anchor@9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.2.0):
+  markdown-it-anchor@9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.3.0):
     dependencies:
       '@types/markdown-it': 14.1.2
-      markdown-it: 14.2.0
+      markdown-it: 14.3.0
 
   markdown-it-highlightjs@4.3.0:
     dependencies:
@@ -6112,11 +6112,11 @@ snapshots:
 
   markdown-it-toc-done-right@4.2.0: {}
 
-  markdown-it@14.2.0:
+  markdown-it@14.3.0:
     dependencies:
       argparse: 2.0.1
       entities: 4.5.0
-      linkify-it: 5.0.1
+      linkify-it: 5.0.2
       mdurl: 2.0.0
       punycode.js: 2.3.1
       uc.micro: 2.1.0

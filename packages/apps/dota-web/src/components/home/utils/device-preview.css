@@ -1,0 +1,5 @@
+@layer utilities {
+    .framework-logo {
+        @apply size-24 transform drop-shadow-[0px_18px_32px_rgba(15,23,42,0.10)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-105 dark:drop-shadow-[0px_18px_32px_rgba(0,0,0,0.34)] lg:size-36;
+    }
+}
