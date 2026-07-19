@@ -155,18 +155,12 @@ importers:
       '@ayu-sh-kr/dota-event':
         specifier: workspace:*
         version: link:../dota-event
-      '@ayu-sh-kr/dota-preloader-plugin':
-        specifier: workspace:*
-        version: link:../../plugins/dota-vite-preloader
       '@ayu-sh-kr/dota-rest':
         specifier: workspace:*
         version: link:../dota-rest
       '@ayu-sh-kr/dota-router':
         specifier: workspace:*
         version: link:../dota-router
-      '@ayu-sh-kr/dota-web-type-json':
-        specifier: workspace:*
-        version: link:../../plugins/web-type-json
       '@swc/core':
         specifier: ^1.13.5
         version: 1.13.5
@@ -180,6 +174,12 @@ importers:
         specifier: '>=0.2.0'
         version: 0.2.2
     devDependencies:
+      '@ayu-sh-kr/dota-preloader-plugin':
+        specifier: workspace:*
+        version: link:../../plugins/dota-vite-preloader
+      '@ayu-sh-kr/dota-web-type-json':
+        specifier: workspace:*
+        version: link:../../plugins/web-type-json
       vite:
         specifier: ^7.3.1
         version: 7.3.1(@types/node@24.9.0)(jiti@2.6.1)(lightningcss@1.30.2)
