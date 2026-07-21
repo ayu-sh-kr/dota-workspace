@@ -63,7 +63,7 @@ describe('ScrollDeckComponent', () => {
   it('moves to adjacent slides from scroller and active-window arrow keys', () => {
     const el = createDeck();
     const scroller = el.querySelector<HTMLElement>('[data-scroll-deck-scroller]')!;
-    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(() => undefined);
+    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(async () => undefined);
 
     setSlideOffsets(el, [0, 120]);
     scroller.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true, cancelable: true}));
@@ -80,7 +80,7 @@ describe('ScrollDeckComponent', () => {
   it('ignores window arrows after focus leaves the deck and handles empty decks safely', () => {
     const el = createDeck('<div>Not a slide</div>');
     const scroller = el.querySelector<HTMLElement>('[data-scroll-deck-scroller]')!;
-    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(() => undefined);
+    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(async () => undefined);
     const outside = document.createElement('button');
     document.body.append(outside);
 
@@ -94,7 +94,7 @@ describe('ScrollDeckComponent', () => {
   it('snaps a significant drag to the next slide and resets drag styles', () => {
     const el = createDeck();
     const scroller = el.querySelector<HTMLElement>('[data-scroll-deck-scroller]')!;
-    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(() => undefined);
+    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(async () => undefined);
 
     Object.defineProperty(scroller, 'clientWidth', {configurable: true, value: 100});
     Object.defineProperty(scroller, 'scrollLeft', {configurable: true, writable: true, value: 0});
@@ -115,7 +115,7 @@ describe('ScrollDeckComponent', () => {
   it('does not start a drag for non-primary clicks or tiny movement', () => {
     const el = createDeck();
     const scroller = el.querySelector<HTMLElement>('[data-scroll-deck-scroller]')!;
-    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(() => undefined);
+    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(async () => undefined);
 
     scroller.dispatchEvent(new MouseEvent('mousedown', {button: 1, clientX: 100, bubbles: true}));
     window.dispatchEvent(new MouseEvent('mousemove', {clientX: 50, bubbles: true}));
@@ -132,7 +132,7 @@ describe('ScrollDeckComponent', () => {
   it('removes event listeners when disconnected', () => {
     const el = createDeck();
     const scroller = el.querySelector<HTMLElement>('[data-scroll-deck-scroller]')!;
-    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(() => undefined);
+    const scrollTo = vi.spyOn(scroller, 'scrollTo').mockImplementation(async () => undefined);
 
     el.disconnectedCallback();
     scroller.dispatchEvent(new MouseEvent('mouseenter', {bubbles: true}));
