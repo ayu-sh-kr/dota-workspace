@@ -4,9 +4,12 @@ import {AppComponent} from "@dota/app.component.ts";
 import {ErrorPage, HomePage} from "@dota/pages";
 import {
   BlobSeparatorComponent,
+  AvatarComponent,
+  AvatarWrapper,
   ButtonComponent,
   CloudChamberComponent,
   CursorDisplacementComponent,
+  AccordionComponent,
   DotaCarouselComponent,
   DotaSlideComponent,
   IconsComponent,
@@ -46,6 +49,9 @@ initializeApp({
     OrbBackgroundComponent,
     CloudChamberComponent,
     CursorDisplacementComponent,
+    AccordionComponent,
+    AvatarComponent,
+    AvatarWrapper,
   ],
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},
