@@ -1,221 +1,237 @@
-import {ClassView, DeclarationUtils, DecoratorUtils, DecoratorView, ObjectExpressionView, PropertyView} from "@ayu-sh-kr/dota-ast-utils";
-import type { Plugin } from 'vite';
+import {
+  ClassView,
+  DeclarationUtils,
+  DecoratorUtils,
+  DecoratorView,
+  ObjectExpressionView,
+  PropertyView,
+} from "@ayu-sh-kr/dota-ast-utils";
+import type {Plugin} from "vite";
 import {ComponentScanPath} from "@dota/Constants.ts";
 import fg from "fast-glob";
 import {readFile, writeFile} from "node:fs/promises";
-import {relative, resolve, sep} from "node:path";
-import {ClassDeclaration, parse} from "@swc/core";
-import {ConsolaInstance, createConsola, LogLevels} from "consola";
-import type {PackageJsonWithWebTypes, WebComponentInfo, WebTypeJsonPluginConfig, WebTypesSchema} from "./Types.ts";
+import {resolve} from "node:path";
+import {parse} from "@swc/core";
+import type {ClassDeclaration} from "@swc/core";
+import {createConsola, LogLevels} from "consola";
+import type {ConsolaInstance} from "consola";
+import {ComponentMetadataUtils} from "./utils/ComponentMetadataUtils.ts";
+import {ComponentSourceUtils} from "./utils/ComponentSourceUtils.ts";
+import {CustomElementsManifestUtils} from "./utils/CustomElementsManifestUtils.ts";
+import type {
+  ComponentClassScanCandidate,
+  CustomElementsManifestGenerationOptions,
+  CustomElementsManifestModule,
+  CustomElementsManifestSchema,
+  GeneratedArtifactsWriteOptions,
+  PackageJsonWithGeneratedArtifacts,
+  WebComponentInfo,
+  WebTypeJsonPluginConfig,
+  WebTypesArtifactsWriteOptions,
+  WebTypesSchema,
+} from "./Types.ts";
+
+export type {
+  CustomElementsManifestConfig,
+  CustomElementsManifestGenerationOptions,
+  CustomElementsManifestSchema,
+  PropertyInfo,
+  WebComponentInfo,
+  WebTypeJsonPluginConfig,
+  WebTypesArtifactsWriteOptions,
+  WebTypesSchema,
+} from "./Types.ts";
 
 
-let log: ConsolaInstance
-
-/**
- * Converts an absolute source path into the slash-normalized path web-types expects.
- * Keeps the path relative to the package root while preserving an explicit `./` prefix.
- * @param root Package root used as the source-path base.
- * @param file Absolute source file path discovered during scanning.
- */
-function toWebTypesSourceFile(root: string, file: string) {
-  const relativePath = relative(root, file).split(sep).join('/');
-  return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
-}
-
-/**
- * Produces a stable numeric order that places missing values after present ones.
- * Used as a secondary sort key so undefined source offsets sort last without NaN.
- * @param left First value; treated as greater than any present right value when absent.
- * @param right Second value; treated as greater than any present left value when absent.
- * @returns Negative when left comes first, positive when right comes first, zero when equal.
- */
-function compareOptionalNumber(left?: number, right?: number) {
-  if (left == null && right == null) return 0;
-  if (left == null) return 1;
-  if (right == null) return -1;
-  return left - right;
-}
-
-/**
- * Produces a stable lexicographic order that places missing values after present ones.
- * Used as a secondary sort key so undefined source paths sort last consistently.
- * @param left First value; treated as greater than any present right value when absent.
- * @param right Second value; treated as greater than any present left value when absent.
- * @returns Negative when left comes first, positive when right comes first, zero when equal.
- */
-function compareOptionalString(left?: string, right?: string) {
-  if (left == null && right == null) return 0;
-  if (left == null) return 1;
-  if (right == null) return -1;
-  return left.localeCompare(right);
-}
-
-/**
- * Keeps generated web-type entries stable across repeated scans.
- * Sorts components and their properties by identity, then uses source metadata as tie-breakers.
- * Returns copied arrays so callers do not observe mutations to scanned metadata.
- * @param scannedWebComponentInfos Component metadata collected from source files.
- * @returns A deterministically sorted copy of the component metadata.
- */
-function sortWebComponentInfos(scannedWebComponentInfos: WebComponentInfo[]): WebComponentInfo[] {
-  return [...scannedWebComponentInfos]
-    .map(component => ({
-      ...component,
-      properties: [...component.properties].sort((left, right) =>
-        left.name.localeCompare(right.name)
-        || compareOptionalNumber(left.source?.offset, right.source?.offset)
-        || compareOptionalString(left.source?.file, right.source?.file)
-        || left.type.localeCompare(right.type),
-      ),
-    }))
-    .sort((left, right) =>
-      left.tagName.localeCompare(right.tagName)
-      || left.className.localeCompare(right.className)
-      || compareOptionalString(left.source?.file, right.source?.file)
-      || compareOptionalNumber(left.source?.offset, right.source?.offset),
-    );
-}
-
-/**
- * Limits watcher-triggered rescans to source files that can define web components.
- * Supports component files under `src/` and page files under `src/pages/`.
- * @param file Absolute or watcher-provided path to inspect.
- * @param root Package root used to calculate the file's relative path.
- * @returns Whether the file matches a supported component or page naming convention.
- */
-function isScannableComponentFile(file: string, root: string) {
-  const relativePath = relative(root, file).replace(/\\/g, '/');
-  return (
-    (relativePath.startsWith('src/') && relativePath.endsWith('.component.ts'))
-    || (relativePath.startsWith('src/pages/') && relativePath.endsWith('.page.ts'))
-  );
-}
+let log: ConsolaInstance = createConsola();
 
 /**
  * Resets plugin state for test isolation and future stateful implementations.
- * The current scanner has no module-level state that requires cleanup.
+ * The current scanner has no module-level cache that requires cleanup.
  */
-export function resetWebTypeJsonState() {
+export function resetWebTypeJsonState(): void {
   // no module-level state to reset
 }
 
 /**
- * Scans configured source roots for decorated web components and their properties.
- * Reads and parses matching TypeScript files, then sorts results for stable generation.
- * @param root Package root used for source references in the generated schema.
- * @param scanRoots Roots to search; defaults to the package root when omitted.
- * @returns Component metadata extracted from all matching source files.
+ * Scans configured roots once for Dota components and public properties.
+ * Each file is read and parsed once even when scan roots overlap, and the result
+ * retains both HTML attribute and JavaScript field identities for all serializers.
+ * @param root Package root used for Web Types source paths and CEM ownership.
+ * @param scanRoots Roots to search; defaults to the package root.
+ * @returns Deterministically sorted component metadata shared by every output format.
  */
-export async function scanWebComponents(root: string, scanRoots: string[] = [root]) {
-  log.debug('Start scanning web components...')
-  const files = (await Promise.all(scanRoots.map(async (scanRoot) => {
-    return fg([
-      ComponentScanPath.SOURCE_ROOT_DIRECTORY_SCAN_PATH,
-      ComponentScanPath.SOURCE_COMPONENT_DIRECTORY_SCAN_PATH,
-      ComponentScanPath.SOURCE_PAGE_DIRECTORY_SCAN_PATH
-    ], {cwd: scanRoot, absolute: true});
-  }))).flat().sort((left, right) => left.localeCompare(right));
-  log.debug('Scanned files: ', files.length)
+export async function scanWebComponents(
+  root: string,
+  scanRoots: string[] = [root],
+): Promise<WebComponentInfo[]> {
+  log.debug("Start scanning web components...");
+  const discoveredFiles = await Promise.all(scanRoots.map(scanRoot => fg([
+    ComponentScanPath.SOURCE_ROOT_DIRECTORY_SCAN_PATH,
+    ComponentScanPath.SOURCE_COMPONENT_DIRECTORY_SCAN_PATH,
+    ComponentScanPath.SOURCE_PAGE_DIRECTORY_SCAN_PATH,
+  ], {cwd: scanRoot, absolute: true})));
+  const files = [...new Set(discoveredFiles.flat())].sort((left, right) => left.localeCompare(right));
+  log.debug("Scanned files: ", files.length);
 
-  const scannedWebComponentInfos: WebComponentInfo[] = [];
+  const scannedInfos: WebComponentInfo[] = [];
   for (const file of files) {
-    const code = await readFile(file, 'utf-8');
-    const ast = await parse(code, { syntax: 'typescript', decorators: true })
+    const code = await readFile(file, "utf-8");
+    const ast = await parse(code, {syntax: "typescript", decorators: true});
     const hasComponentDecorator = (classDeclaration: ClassDeclaration) =>
       DecoratorUtils.extractDecorators(classDeclaration)
-        .map(decorator => DecoratorUtils.decoratorName(decorator))
-        .some(name => name === 'Component');
+        .some(decorator => DecoratorUtils.decoratorName(decorator) === "Component");
 
     const query = DeclarationUtils.queryOf(ast);
-    const classDeclarations: ClassDeclaration[] = [
-      ...query.getExportDeclarations().getClassDeclarations().filter(hasComponentDecorator).toArray(),
-      ...query.getClassDeclarations().filter(hasComponentDecorator).toArray(),
-    ]
+    const namedExports = new Map(
+      query.getExportNamedDeclarations()
+        .filterLocalExports()
+        .getNamedSpecifiers()
+        .toArray()
+        .filter(specifier => !specifier.isTypeOnly)
+        .map(specifier => [
+          specifier.orig.value,
+          specifier.exported?.value ?? specifier.orig.value,
+        ]),
+    );
+    const classDeclarations: ComponentClassScanCandidate[] = [
+      ...query.getExportDeclarations()
+        .getClassDeclarations()
+        .filter(hasComponentDecorator)
+        .toArray()
+        .map(declaration => ({
+          declaration,
+          exported: true,
+          exportName: declaration.identifier.value,
+        })),
+      ...query.getClassDeclarations()
+        .filter(hasComponentDecorator)
+        .toArray()
+        .map(declaration => ({
+          declaration,
+          exported: namedExports.has(declaration.identifier.value),
+          exportName: namedExports.get(declaration.identifier.value),
+        })),
+    ];
+    const moduleSourceOffset = ComponentSourceUtils.findModuleSourceOffset(code);
 
-    const webComponentInfos = classDeclarations.flatMap(classDeclaration => {
+    for (const {declaration: classDeclaration, exported, exportName} of classDeclarations) {
       const componentDecorator = DecoratorUtils.extractDecorators(classDeclaration)
-        .find(decorator => DecoratorUtils.decoratorName(decorator) === 'Component');
-      if (!componentDecorator) return [];
+        .find(decorator => DecoratorUtils.decoratorName(decorator) === "Component");
+      if (!componentDecorator) continue;
 
-      const componentDecoratorView = DecoratorView.from(componentDecorator);
-      const args = componentDecoratorView.getArguments();
-      if (args.length === 0) return [];
+      const args = DecoratorView.from(componentDecorator).getArguments();
       const firstArgument = args[0];
-      if (firstArgument == null || firstArgument.expression.type !== "ObjectExpression") {
-        return [];
-      }
+      if (firstArgument?.expression.type !== "ObjectExpression") continue;
 
-      const componentObjectExpression = ObjectExpressionView.from(firstArgument.expression);
-      const componentConfig = componentObjectExpression.toObject();
-      const tagValue = componentConfig['selector'];
-      if (tagValue == null || typeof tagValue !== 'string') return [];
+      const componentConfig = ObjectExpressionView.from(firstArgument.expression).toObject();
+      const tagValue = componentConfig["selector"];
+      if (typeof tagValue !== "string") continue;
 
-      return {
+      const properties = PropertyView.extractProperties(classDeclaration)
+        .filter(propertyView => propertyView.hasDecorator("Property"))
+        .flatMap(propertyView => {
+          const propertyDecorator = propertyView.getDecorator("Property");
+          if (!propertyDecorator) return [];
+
+          const propertyConfigArg = DecoratorView.from(propertyDecorator).getArguments()[0];
+          if (propertyConfigArg?.expression.type !== "ObjectExpression") return [];
+
+          const propertyConfig = ObjectExpressionView.from(propertyConfigArg.expression).toObject();
+          const propertyName = propertyView.propertyName();
+          const propertyType = propertyConfig["type"] ?? propertyView.getType();
+          if (propertyName == null || propertyType == null) return [];
+
+          const propertySourceOffset = propertyView.getSourceOffset(
+            code,
+            ast.span.start,
+            moduleSourceOffset,
+          );
+          const configuredDefault = propertyConfig["default"];
+
+          return [{
+            name: String(propertyConfig["name"] ?? propertyName),
+            propertyName,
+            type: String(propertyType),
+            description: typeof propertyConfig["description"] === "string"
+              ? propertyConfig["description"]
+              : undefined,
+            default: configuredDefault == null
+              ? ComponentMetadataUtils.defaultValueFromExpression(propertyView.defaultValue())
+              : String(configuredDefault),
+            required: propertyView.isRequired(),
+            source: propertySourceOffset == null ? undefined : {
+              file: ComponentSourceUtils.toWebTypesSourceFile(root, file),
+              offset: propertySourceOffset,
+            },
+          }];
+        });
+
+      scannedInfos.push({
         className: classDeclaration.identifier.value,
         tagName: tagValue,
+        description: typeof componentConfig["description"] === "string"
+          ? componentConfig["description"]
+          : undefined,
+        exported,
+        exportName,
+        sourceFile: file,
+        superclass: classDeclaration.superClass?.type === "Identifier"
+          ? classDeclaration.superClass.value
+          : undefined,
         source: {
-          file: toWebTypesSourceFile(root, file),
-          offset: ClassView.from(classDeclaration).getSourceOffset(code) ?? classDeclaration.span.start,
+          file: ComponentSourceUtils.toWebTypesSourceFile(root, file),
+          offset: ClassView.from(classDeclaration).getSourceOffset(
+            code,
+            ast.span.start,
+            moduleSourceOffset,
+          ) ?? classDeclaration.span.start,
         },
-        properties: PropertyView.extractProperties(classDeclaration)
-          .filter(propertyView => propertyView.hasDecorator('Property'))
-          .flatMap(propertyView => {
-            const propertyDecorator = propertyView.getDecorator('Property');
-            const propertyDecoratorView = DecoratorView.from(propertyDecorator);
-            const propertyDecoratorArgs = propertyDecoratorView.getArguments();
-            if (propertyDecoratorArgs.length === 0) return []
-            const propertyConfigArg = propertyDecoratorArgs[0]
-            if (propertyConfigArg == null || propertyConfigArg.expression.type !== 'ObjectExpression') return []
-            const propertyConfig = ObjectExpressionView.from(propertyConfigArg.expression)
-              .toObject();
-
-            const propertyName = String(propertyConfig['name'] ?? propertyView.propertyName())
-            const propertyType = propertyConfig['type'] ?? propertyView.getType()
-            const propertySourceOffset = propertyView.getSourceOffset(code);
-
-            if (propertyName == null || propertyType == null) return []
-            return {
-              name: propertyName,
-              type: propertyType,
-              required: propertyView.isRequired(),
-              source: propertySourceOffset == null ? undefined : {
-                file: toWebTypesSourceFile(root, file),
-                offset: propertySourceOffset,
-              },
-            }
-          })
-      }
-    })
-    scannedWebComponentInfos.push(...webComponentInfos)
+        properties,
+      });
+    }
   }
 
-  return sortWebComponentInfos(scannedWebComponentInfos);
+  return ComponentMetadataUtils.sortWebComponentInfos(scannedInfos);
 }
 
 /**
- * Builds the Web Types schema consumed by IDEs for HTML custom-element assistance.
- * Maps scanned components to HTML elements and component properties to attributes.
- * @param scannedWebComponentInfos Component metadata produced by the source scanner.
- * @returns A schema object ready to be serialized as a web-types JSON artifact.
+ * Builds the JetBrains Web Types schema from shared scan metadata.
+ * HTML attributes retain decorator names while JavaScript properties use actual
+ * class-field names, keeping both IDE surfaces accurate when those names differ.
+ * @param scannedInfos Component metadata produced by the source scanner.
+ * @returns A Web Types object ready for deterministic JSON serialization.
  */
-export function createWebTypesSchema(scannedWebComponentInfos: WebComponentInfo[]): WebTypesSchema {
+export function createWebTypesSchema(scannedInfos: WebComponentInfo[]): WebTypesSchema {
   return {
     $schema: "https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json",
     name: "",
     version: "",
     contributions: {
       html: {
-        elements: scannedWebComponentInfos.map(component => ({
+        elements: scannedInfos.map(component => ({
           name: component.tagName,
+          description: component.description,
           source: component.source,
           attributes: component.properties.map(property => ({
             name: property.name,
-            type: property.type,
             description: property.description,
             default: property.default,
             required: property.required,
+            value: {
+              type: ComponentMetadataUtils.normalizePropertyType(property.type),
+            },
             source: property.source,
           })),
+          js: {
+            properties: component.properties.map(property => ({
+              name: property.propertyName ?? property.name,
+              type: ComponentMetadataUtils.normalizePropertyType(property.type),
+              description: property.description,
+              default: property.default,
+              source: property.source,
+            })),
+          },
         })),
       },
     },
@@ -223,137 +239,253 @@ export function createWebTypesSchema(scannedWebComponentInfos: WebComponentInfo[
 }
 
 /**
- * Writes the generated web-types file and registers it in the package manifest.
- * Updates `package.json` only when its `web-types` entry differs from the requested output.
- * @param root Package root where the artifact and manifest are located.
- * @param outFile Output path relative to `root`.
- * @param scannedWebComponentInfos Component metadata to serialize.
+ * Projects package-owned scan metadata into the official CEM 2.1 shape.
+ * Components from external scan roots are intentionally excluded because one
+ * manifest can only advertise importable modules belonging to its package root.
+ * @param scannedInfos Shared component metadata from the single source scan.
+ * @param options Package root and optional published-module path mapper.
+ * @returns A deterministically ordered Custom Elements Manifest 2.1 document.
+ * @throws When a package-owned component lacks an absolute source file or maps outside the package.
  */
-export async function writeWebTypesArtifacts({
-  root,
-  outFile,
-  scannedWebComponentInfos,
-}: {
-  root: string;
-  outFile: string;
-  scannedWebComponentInfos: WebComponentInfo[];
-}) {
-  const outputPath = resolve(root, outFile);
-  const webTypesSchema = createWebTypesSchema(scannedWebComponentInfos);
-  const webTypesJson = JSON.stringify(webTypesSchema, null, 2);
+export function createCustomElementsManifest(
+  scannedInfos: WebComponentInfo[],
+  options: CustomElementsManifestGenerationOptions,
+): CustomElementsManifestSchema {
+  const modulesByPath = new Map<string, WebComponentInfo[]>();
 
-  await writeFile(outputPath, webTypesJson, "utf-8");
-  log.debug(`Wrote web component info JSON to ${outputPath}`);
+  for (const component of scannedInfos) {
+    if (component.sourceFile == null) {
+      throw new Error(`Cannot generate a Custom Elements Manifest for ${component.className}: sourceFile is missing`);
+    }
 
-  const packageJsonPath = resolve(root, "package.json");
+    if (!CustomElementsManifestUtils.isPackageOwnedSource(options.root, component.sourceFile)) {
+      continue;
+    }
+
+    const mappedPath = (options.modulePath ?? CustomElementsManifestUtils.defaultModulePath)(
+      component.sourceFile,
+      options.root,
+    );
+    const modulePath = CustomElementsManifestUtils.normalizeModulePath(mappedPath, component.sourceFile);
+    const moduleComponents = modulesByPath.get(modulePath) ?? [];
+    moduleComponents.push(component);
+    modulesByPath.set(modulePath, moduleComponents);
+  }
+
+  const modules: CustomElementsManifestModule[] = [...modulesByPath.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([modulePath, components]) => {
+      const sortedComponents = [...components].sort((left, right) =>
+        left.className.localeCompare(right.className)
+        || left.tagName.localeCompare(right.tagName),
+      );
+
+      return {
+        kind: "javascript-module",
+        path: modulePath,
+        declarations: sortedComponents.map(component => {
+          const sortedProperties = [...component.properties].sort((left, right) =>
+            (left.propertyName ?? left.name).localeCompare(right.propertyName ?? right.name)
+            || left.name.localeCompare(right.name),
+          );
+
+          return {
+            kind: "class",
+            name: component.className,
+            customElement: true,
+            tagName: component.tagName,
+            description: component.description,
+            superclass: component.superclass == null ? undefined : {name: component.superclass},
+            members: sortedProperties.map(property => ({
+              kind: "field",
+              name: property.propertyName ?? property.name,
+              attribute: property.name,
+              description: property.description,
+              type: {text: ComponentMetadataUtils.normalizePropertyType(property.type)},
+              default: property.default,
+            })),
+            attributes: sortedProperties.map(property => ({
+              name: property.name,
+              fieldName: property.propertyName ?? property.name,
+              description: property.description,
+              type: {text: ComponentMetadataUtils.normalizePropertyType(property.type)},
+              default: property.default,
+            })),
+          };
+        }),
+        exports: sortedComponents.flatMap(component => [
+          ...(component.exported === true ? [{
+            kind: "js" as const,
+            name: component.exportName ?? component.className,
+            declaration: {name: component.className},
+          }] : []),
+          {
+            kind: "custom-element-definition" as const,
+            name: component.tagName,
+            declaration: {name: component.className},
+          },
+        ]),
+      };
+    });
+
+  return {
+    schemaVersion: "2.1.0",
+    modules,
+  };
+}
+
+/**
+ * Writes every enabled generated JSON file in parallel, then updates package metadata once.
+ * The single package read-modify-write prevents concurrent Web Types and CEM writers
+ * from losing one another's discovery fields.
+ * @param options Package root, output paths, scan result, and normalized CEM settings.
+ * @returns A promise that resolves after artifacts and package registration are durable.
+ * @throws When Web Types and CEM resolve to the same output file.
+ */
+async function writeGeneratedArtifacts(options: GeneratedArtifactsWriteOptions): Promise<void> {
+  const webTypesOutputPath = resolve(options.root, options.outFile);
+  const cemConfig = options.customElementsManifest;
+  const customElementsOutputPath = cemConfig?.enabled
+    ? resolve(options.root, cemConfig.outFile)
+    : undefined;
+
+  if (customElementsOutputPath === webTypesOutputPath) {
+    throw new Error("Web Types and Custom Elements Manifest outputs must use different files");
+  }
+
+  const webTypesJson = JSON.stringify(createWebTypesSchema(options.scannedWebComponentInfos), null, 2);
+  const customElementsJson = cemConfig?.enabled
+    ? JSON.stringify(createCustomElementsManifest(options.scannedWebComponentInfos, {
+      root: options.root,
+      modulePath: cemConfig.modulePath,
+    }), null, 2)
+    : undefined;
+  const writes: Array<Promise<void>> = [
+    writeFile(webTypesOutputPath, webTypesJson, "utf-8").then(() => {
+      log.debug(`Wrote Web Types JSON to ${webTypesOutputPath}`);
+    }),
+  ];
+
+  if (customElementsJson != null && customElementsOutputPath) {
+    writes.push(writeFile(customElementsOutputPath, customElementsJson, "utf-8").then(() => {
+      log.debug(`Wrote Custom Elements Manifest to ${customElementsOutputPath}`);
+    }));
+  }
+
+  await Promise.all(writes);
+
+  const packageJsonPath = resolve(options.root, "package.json");
   const packageJsonRaw = await readFile(packageJsonPath, "utf-8");
-  const packageJson = JSON.parse(packageJsonRaw) as PackageJsonWithWebTypes;
-  const webTypesEntry = `./${outFile}`;
+  const packageJson = JSON.parse(packageJsonRaw) as PackageJsonWithGeneratedArtifacts;
+  const webTypesEntry = `./${options.outFile.replace(/^\.\//, "")}`;
+  let packageJsonChanged = false;
+
   if (packageJson["web-types"] !== webTypesEntry) {
     packageJson["web-types"] = webTypesEntry;
+    packageJsonChanged = true;
+  }
+
+  if (cemConfig?.enabled && cemConfig.updatePackageJson) {
+    const customElementsEntry = cemConfig.outFile.replace(/^\.\//, "");
+    if (packageJson.customElements !== customElementsEntry) {
+      packageJson.customElements = customElementsEntry;
+      packageJsonChanged = true;
+    }
+  }
+
+  if (packageJsonChanged) {
     await writeFile(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, "utf-8");
-    log.debug(`Updated package.json with web-types entry: ${webTypesEntry}`);
-  } else {
-    log.debug(`package.json already has web-types entry: ${webTypesEntry}`);
+    log.debug("Updated package.json generated-artifact entries");
   }
 }
 
 /**
- * Vite plugin that scans TypeScript source files for decorated web components and
- * emits a `web-types.json` artifact that IDEs use to provide HTML attribute
- * completions and documentation for custom elements.
- *
- * **Trigger — build mode (`vite build`):** the `buildStart` hook fires once before
- * Vite begins bundling. The plugin performs a full scan of all configured roots and
- * writes the artifact before any module is transformed.
- *
- * **Trigger — dev server (`vite dev`):** `configureServer` registers `add`,
- * `change`, and `unlink` listeners on Vite's file watcher. Only files whose path
- * matches `*.component.ts` under `src/` or `*.page.ts` under `src/pages/`
- * (determined by `isScannableComponentFile`) trigger a rescan. Concurrent file
- * events within one async turn share a single coalesced refresh so rapid saves do
- * not queue duplicate scans.
- *
- * **What it does:** for each triggering event the plugin calls `scanWebComponents`,
- * which uses `fast-glob` to discover matching files and SWC to parse their
- * TypeScript AST. It locates every class decorated with `@Component`, reads the
- * `selector` value from the decorator argument, then extracts all class properties
- * decorated with `@Property`, recording their HTML attribute name, resolved type,
- * and source file position. Results are deterministically sorted so repeated scans
- * produce identical output when source files are unchanged.
- *
- * **How it generates files:** `writeWebTypesArtifacts` serializes the scanned
- * metadata into a JetBrains web-types JSON schema (`$schema` reference included)
- * and writes it to `outFile` under `root`. It then reads `package.json` and sets
- * the `"web-types"` field to `./<outFile>` when that entry is absent or stale, so
- * IDEs can discover the artifact via the package manifest without manual wiring.
- *
- * @param root Package root used as the base for all resolved paths; defaults to
- *   `process.cwd()`.
- * @param outFile Output path for the generated JSON, relative to `root`; defaults
- *   to `"web-types.json"`.
- * @param logType Consola log level for plugin diagnostics; defaults to `"info"`.
- * @param scanRoots Additional source roots to include in each scan; defaults to
- *   `[root]` so the plugin covers the package that owns the Vite config.
- * @returns A named Vite plugin object with `buildStart` and `configureServer` hooks.
+ * Preserves the existing public Web Types-only writer while delegating package updates
+ * to the coordinated artifact path used by the plugin.
+ * @param options Package root, Web Types output path, and shared scan metadata.
+ * @returns A promise that resolves after Web Types and package metadata are written.
  */
-export default function dotaWebTypeJson({
-  root = process.cwd(),
-  outFile = 'web-types.json',
-  logType = 'info',
-  scanRoots = [root],
-}: WebTypeJsonPluginConfig = {}): Plugin {
+export async function writeWebTypesArtifacts(options: WebTypesArtifactsWriteOptions): Promise<void> {
+  await writeGeneratedArtifacts(options);
+}
+
+/**
+ * Creates a Vite plugin that scans Dota components once and always emits Web Types.
+ * CEM 2.1 generation is opt-in and projects the same metadata before both JSON files
+ * are written concurrently; package discovery fields are then registered in one update.
+ * Build scans run in `buildStart`, while dev changes share a coalesced refresh promise.
+ * @param config Root, scan roots, output, logging, and optional CEM generation settings.
+ * @returns A Vite plugin with build and development-watcher integration.
+ */
+export default function dotaWebTypeJson(config: WebTypeJsonPluginConfig = {}): Plugin {
+  const {
+    root = process.cwd(),
+    outFile = "web-types.json",
+    logType = "info",
+    scanRoots = [root],
+  } = config;
+  const customElementsManifest = CustomElementsManifestUtils.normalizeConfig(config.customElementsManifest);
+
   log = createConsola({
     level: LogLevels[logType],
     formatOptions: {
       date: true,
-      colors: true
-    }
+      colors: true,
+    },
   });
+
+  /**
+   * Coordinates one source scan with every enabled serializer and artifact writer.
+   * Keeping this boundary shared by build and dev hooks prevents either lifecycle
+   * from accidentally introducing a second scan for CEM.
+   * @returns The shared metadata for optional watcher diagnostics.
+   */
+  const generateArtifacts = async (): Promise<WebComponentInfo[]> => {
+    const scannedWebComponentInfos = await scanWebComponents(root, scanRoots);
+    await writeGeneratedArtifacts({
+      root,
+      outFile,
+      scannedWebComponentInfos,
+      customElementsManifest,
+    });
+    return scannedWebComponentInfos;
+  };
+
   return {
-    name: 'vite-plugin-dota-web-type-json',
+    name: "vite-plugin-dota-web-type-json",
 
     async buildStart() {
-      const scannedWebComponentInfos = await scanWebComponents(root, scanRoots);
-      await writeWebTypesArtifacts({ root, outFile, scannedWebComponentInfos });
+      await generateArtifacts();
     },
 
     configureServer(server) {
       let pendingRefresh: Promise<void> | null = null;
 
       /**
-       * Rescans all source roots and rewrites the artifact, coalescing concurrent
-       * watcher events so only one scan runs at a time. A second caller while a
-       * scan is in progress receives the same promise rather than starting a new one.
+       * Coalesces rapid watcher events around the shared generation coordinator.
+       * Concurrent callers receive the active promise, preventing queued duplicate
+       * scans while ensuring failures still clear the pending state.
+       * @returns The active or newly started refresh promise.
        */
-      const refresh = async () => {
-        if (pendingRefresh) {
-          return pendingRefresh;
-        }
+      const refresh = async (): Promise<void> => {
+        if (pendingRefresh) return pendingRefresh;
 
-        pendingRefresh = (async () => {
-          const scannedWebComponentInfos = await scanWebComponents(root, scanRoots);
-          await writeWebTypesArtifacts({ root, outFile, scannedWebComponentInfos });
-          log.debug('Scanned web components:', scannedWebComponentInfos);
-        })().finally(() => {
-          pendingRefresh = null;
-        });
-
+        pendingRefresh = generateArtifacts()
+          .then(scannedInfos => {
+            log.debug("Scanned web components:", scannedInfos);
+          })
+          .finally(() => {
+            pendingRefresh = null;
+          });
         return pendingRefresh;
       };
 
-      server.watcher.on('add', async (file) => {
-        if (!isScannableComponentFile(file, root)) return;
-        await refresh();
-      });
-      server.watcher.on('change', async (file) => {
-        if (!isScannableComponentFile(file, root)) return;
-        await refresh();
-      });
-      server.watcher.on('unlink', async (file) => {
-        if (!isScannableComponentFile(file, root)) return;
-        await refresh();
-      });
+      for (const event of ["add", "change", "unlink"] as const) {
+        server.watcher.on(event, async file => {
+          if (!ComponentSourceUtils.isScannableComponentFile(file, scanRoots)) return;
+          await refresh();
+        });
+      }
     },
   };
 }
