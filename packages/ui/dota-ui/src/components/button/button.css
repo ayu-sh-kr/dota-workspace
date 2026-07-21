@@ -1,85 +1,33 @@
-.buttonFill{
-    letter-spacing: 0.15rem;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
+.buttonFill {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.buttonFill::after,
+.buttonFill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .buttonFill::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-    z-index: -2;
+  z-index: -2;
 }
 
 .buttonFill::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 100%;
-    transition: all 0.3s;
-    border-radius: inherit;
-    z-index: -1;
-}
-
-.buttonFill:hover {
-    color: #fff;
+  z-index: -1;
+  width: 0;
+  transition: width 180ms ease-out;
 }
 
 .buttonFill:hover::before {
-    width: 100%;
+  width: 100%;
 }
 
-/*--- Button Fill END ---*/
-
-.btn {
-    width: 180px;
-    height: 60px;
-    cursor: pointer;
-    background: transparent;
-    border: 1px solid #91C9FF;
-    outline: none;
-    transition: 1s ease-in-out;
-}
-
-.btn:hover {
-    transition: 1s ease-in-out;
-    background: #9b5bdc;
-}
-
-.btn:hover svg {
-    stroke-dashoffset: -480;
-}
-
-.btn span {
-    color: white;
-    font-size: 18px;
-    font-weight: 100;
-}
-.center {
-    width: 180px;
-    height: 60px;
-    position: absolute;
-    background: blueviolet;
-}
-
-span.ripple {
-    position: absolute;
-    border-radius: 50%;
-    transform: scale(0);
-    animation: ripple 600ms linear;
-    background-color: rgba(255, 255, 255, 0.7);
-}
-@keyframes ripple {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
+@media (prefers-reduced-motion: reduce) {
+  .buttonFill::before {
+    transition: none;
+  }
 }
