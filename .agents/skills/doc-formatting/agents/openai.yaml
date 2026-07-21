@@ -1,4 +1,0 @@
-interface:
-  display_name: "Doc Formatting"
-  short_description: "Format tutorial docs with readable flow."
-  default_prompt: "Use the doc-formatting skill to rewrite this documentation with descriptive section flow and clean markdown structure."

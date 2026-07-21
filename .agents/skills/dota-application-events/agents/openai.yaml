@@ -1,4 +1,0 @@
-interface:
-  display_name: "Dota Application Events"
-  short_description: "Publish and handle Dota application events"
-  default_prompt: "Use $dota-application-events to wire event-driven state between Dota components."
