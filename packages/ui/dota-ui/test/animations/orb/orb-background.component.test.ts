@@ -1,5 +1,6 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {OrbBackgroundComponent} from '@dota/components/animations/orb/orb-background.component.ts';
+import type {OrbitPosition} from '@dota/components/animations/orb/orb-background.component.ts';
 
 if (!customElements.get('orb-background-test')) customElements.define('orb-background-test', OrbBackgroundComponent);
 
@@ -32,7 +33,7 @@ beforeEach(() => {
 });
 
 describe('OrbBackgroundComponent', () => {
-  it.each([
+  it.each<[OrbitPosition, string, string]>([
     ['corner', 'fixed', 'bottom-[-50rem]'],
     ['center', 'absolute', 'top-1/2'],
   ])('selects the %s position branch', (orbitPosition, positioning, glowPosition) => {
