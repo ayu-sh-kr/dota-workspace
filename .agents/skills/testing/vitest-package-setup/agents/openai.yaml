@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vitest Package Setup"
+  short_description: "Set up consistent Vitest package tests"
+  default_prompt: "Use $vitest-package-setup to add Vitest to this Dota workspace package."
