@@ -27,7 +27,7 @@ function sanitizeSvg(rawSvg: string): string | null {
   if (svg.localName !== 'svg' || document.querySelector('parsererror')) return null;
 
   svg.querySelectorAll('script, style, foreignObject, iframe, object, embed, audio, video').forEach(element => element.remove());
-  svg.querySelectorAll('*').forEach(element => {
+  [svg, ...svg.querySelectorAll('*')].forEach(element => {
     [...element.attributes].forEach(attribute => {
       const name = attribute.name.toLowerCase();
       const value = attribute.value.trim().toLowerCase();
