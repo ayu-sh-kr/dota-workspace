@@ -1,46 +1,58 @@
 import "./placeholder.css"
-import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {PlaceholderStyle} from "@dota/components/placeholder/placeholder.config.ts";
+import type {PlaceholderStyleConfig} from "@dota/components/placeholder/placeholder.config.ts";
 
 /**
- * PlaceholderComponent creates a loading placeholder with customizable styling.
+ * Renders a decorative textured surface while content is loading.
  *
- * @example
- * // Basic usage
- * <dota-placeholder></dota-placeholder>
- *
- * // With custom class
- * <dota-placeholder classname="w-64 h-12"></dota-placeholder>
- *
- * // Multiple placeholders
- * <div>
- *   <dota-placeholder classname="w-32 h-32 mb-2"></dota-placeholder>
- *   <dota-placeholder classname="w-full h-4"></dota-placeholder>
- * </div>
+ * Inputs: `classname` (`classname`, default `""`) adds layout classes to the
+ * outer loading surface. `config` (`config`, default `{}`) accepts a JSON
+ * `PlaceholderStyleConfig` attribute that replaces the container or inner
+ * surface class slot independently; omitted slots retain `PlaceholderStyle`.
+ * Events: none. Lifecycle and integration: the component uses light DOM, keeps
+ * its loading surface hidden from assistive technology, and relies on static
+ * Tailwind class strings so the library build emits its default styling.
  */
-
 @Component({
     selector: 'dota-placeholder',
     shadow: false
 })
 export class PlaceholderComponent extends BaseElement {
 
-    /**
-     * Additional CSS classes to be applied to the placeholder container.
-     * Supports Tailwind CSS classes for customizing dimensions, spacing, etc.
-     */
     @Property({name: 'classname', type: String})
-    className!: string
+    className = '';
 
+    @Property({name: 'config', type: ObjectType})
+    config: PlaceholderStyleConfig = {};
 
     constructor() {
         super();
     }
 
+    /**
+     * Resolves each loading-surface slot separately so partial visual themes
+     * preserve the library defaults. Nullish fallback also permits an explicit
+     * empty class string when a consumer owns a slot completely.
+     * @returns Static container and inner-surface class strings for this instance.
+     */
+    private getStyle() {
+        return {
+            container: this.config?.container ?? PlaceholderStyle.container,
+            content: this.config?.content ?? PlaceholderStyle.content,
+        };
+    }
+
     render(): string {
+        const style = this.getStyle();
+
         return `
-            <div class="bg-slate-400 flex justify-center items-center p-1 rounded-lg overflow-hidden ${this.className}">
-                <div class="placeholder w-full h-full bg-slate-300 rounded-lg"></div>
+            <div class="${style.container} ${this.className}" aria-hidden="true">
+                <div class="${style.content}"></div>
             </div>
         `
     }
 }
+
+export {PlaceholderStyle};
+export type {PlaceholderStyleConfig};
