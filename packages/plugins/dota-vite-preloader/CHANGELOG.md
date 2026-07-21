@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-preloader-plugin
 
+## 0.0.3
+
+### Patch Changes
+
+- Updated dependencies [12ebbe3]
+  - @ayu-sh-kr/dota-core@1.9.6
+  - @ayu-sh-kr/dota-router@0.0.27
+
 ## 0.0.2
 
 ### Patch Changes

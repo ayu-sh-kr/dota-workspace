@@ -1,7 +1,7 @@
 {
   "name": "@ayu-sh-kr/dota-ui",
   "private": false,
-  "version": "0.0.17",
+  "version": "0.0.18",
   "publishConfig": {
     "access": "public"
   },
