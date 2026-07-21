@@ -1,153 +1,168 @@
-import {BaseElement, Component, Property, String, Boolean} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Boolean, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
 import {
-  type ButtonAnimation, type ButtonAnimationColor,
-  type ButtonRound, type ButtonSize,
-  ButtonStyle, type ButtonVariants, type IconPosition
+  ButtonStyle,
+  type ButtonAnimation,
+  type ButtonAnimationColor,
+  type ButtonColor,
+  type ButtonRound,
+  type ButtonSize,
+  type ButtonStyleConfig,
+  type ButtonType,
+  type ButtonVariants,
+  type IconPosition,
 } from "@dota/components/button/button.config.ts";
-import './button.css'
-import {type UIColor} from "@dota/configs/app.config.ts";
-
+import './button.css';
 
 /**
- * ButtonComponent - A customizable button component for web applications.
+ * Renders a native, themeable button with optional icon, fill effect, and busy state.
  *
- * @example
- * // Basic usage
- * <dota-button>Click me</dota-button>
+ * Inputs: `label` supplies the visible label (otherwise the element's initial light-DOM
+ * content is used); `icon` and `icon-position` (`"leading"` by default or `"forward"`)
+ * place a registered `dota-icon` beside it. `color`, `variant`, `size`, and `round`
+ * select the default visual tokens, falling back to `none`, `solid`, `md`, and `md`.
+ * `animation` and `animation-color` opt into the fill treatment. `className` adds classes
+ * to the native button, and `config` accepts a `ButtonStyleConfig` JSON attribute to
+ * replace individual visual slots. `type` accepts `button`, `submit`, or `reset` and
+ * defaults to `button`; other values safely fall back to `button`. `disabled` prevents
+ * interaction, while `loading` also disables the control and exposes `aria-busy`.
+ * `aria-label` provides an accessible name when the visible content is icon-only.
  *
- * @example
- * // With properties
- * <dota-button
- *   label="Submit"
- *   variant="solid"
- *   color="primary"
- *   size="lg"
- *   icon="check"
- *   icon-position="leading"
- *   animation="fill"
- *   animation-color="indigo"
- *   round="full"
- * ></dota-button>
+ * Lifecycle and integration: the component uses light DOM so the consumer's Tailwind
+ * output can style configured classes. Its inner control is a native `<button>`, so
+ * keyboard operation, form submission, and disabled behavior are browser-native;
+ * `dota-icon` must be registered by the consuming application when `icon` is used.
  */
 @Component({
   selector: 'dota-button',
-  shadow: false
+  shadow: false,
 })
 class ButtonComponent extends BaseElement {
-  /** Inner content of the button */
   content!: string;
 
-  /** Button animation type */
   @Property({name: 'animation', type: String})
-  animation!: ButtonAnimation
+  animation?: ButtonAnimation;
 
-  /** Additional CSS classes */
   @Property({name: 'className', type: String})
-  className!: string
+  className = '';
 
-  /** Button label text */
-  @Property({name: "label", type: String})
-  label!: string;
+  @Property({name: 'label', type: String})
+  label?: string;
 
-  /** Button color theme */
   @Property({name: 'color', type: String})
-  color!: UIColor
+  color?: ButtonColor;
 
-  /** Button style variant */
-  @Property({name: "variant", type: String})
-  variant!: ButtonVariants;
+  @Property({name: 'variant', type: String})
+  variant?: ButtonVariants;
 
-  /** Icon name to display */
-  @Property({name: "icon", type: String})
-  icon!: string;
+  @Property({name: 'icon', type: String})
+  icon?: string;
 
-  /** Loading state of the button */
   @Property({name: 'loading', type: Boolean})
-  loading!: boolean
+  loading = false;
 
-  /** Position of the icon relative to label */
+  @Property({name: 'disabled', type: Boolean})
+  disabled = false;
+
   @Property({name: 'icon-position', type: String})
-  iconPosition!: IconPosition
+  iconPosition?: IconPosition;
 
-  /** Color of the button animation */
   @Property({name: 'animation-color', type: String})
-  animationColor!: ButtonAnimationColor;
+  animationColor?: ButtonAnimationColor;
 
-  /** HTML button type attribute */
   @Property({name: 'type', type: String})
-  type!: string;
+  type?: ButtonType;
 
-  /** Button size variant */
   @Property({name: 'size', type: String})
-  size!: ButtonSize
+  size?: ButtonSize;
 
-  /** Button border radius style */
   @Property({name: 'round', type: String})
-  rounded!: ButtonRound
+  rounded?: ButtonRound;
+
+  @Property({name: 'aria-label', type: String})
+  ariaLabel: string | null = null;
+
+  @Property({name: 'config', type: ObjectType})
+  config?: ButtonStyleConfig;
 
   constructor() {
     super();
     this.content = this.innerHTML;
-
   }
 
+  private getStyle() {
+    const override = this.config;
+    const color = this.color && this.color in ButtonStyle.color ? this.color : 'none';
+    const variant = this.variant && this.variant in ButtonStyle.color[color] ? this.variant : 'solid';
+    const size = this.size && this.size in ButtonStyle.size ? this.size : 'md';
+    const round = this.rounded && this.rounded in ButtonStyle.rounded ? this.rounded : 'md';
+    const animation = this.animation && this.animation in ButtonStyle.animation ? this.animation : undefined;
+    const animationColor = this.animationColor && this.animationColor in ButtonStyle.animation.fill.color
+      ? this.animationColor
+      : 'indigo';
 
-  template = (): string => {
+    return {
+      base: override?.base ?? ButtonStyle.base,
+      label: override?.label ?? ButtonStyle.label,
+      icon: override?.icon ?? ButtonStyle.icon,
+      loadingIndicator: override?.loadingIndicator ?? ButtonStyle.loadingIndicator,
+      size: override?.size?.[size] ?? ButtonStyle.size[size],
+      rounded: override?.rounded?.[round] ?? ButtonStyle.rounded[round],
+      color: override?.color?.[color]?.[variant] ?? ButtonStyle.color[color]?.[variant] ?? ButtonStyle.color.none.solid,
+      animation: animation
+        ? {
+            base: override?.animation?.[animation]?.base ?? ButtonStyle.animation[animation].base,
+            color: override?.animation?.[animation]?.color?.[animationColor]
+              ?? ButtonStyle.animation[animation].color[animationColor],
+          }
+        : undefined,
+    };
+  }
 
-    const iconComponent = this.icon ? `<dota-icon class="relative block" name="${this.icon}" size="${this.size || 'md'}"></dota-icon>` : '';
-    const size = ButtonStyle.size?.[this.size ?? "md"] ?? '';
-    const round = ButtonStyle.rounded?.[this.rounded] ?? '';
+  private getButtonType(): ButtonType {
+    return this.type === 'submit' || this.type === 'reset' ? this.type : 'button';
+  }
 
-    let content: string;
-    switch (this.iconPosition) {
-      case "forward": {
-        content = `
-                    <p>${this.label || this.content}</p>
-                   ${iconComponent}
-                `
-        break
-      }
+  private renderIcon(style: ReturnType<ButtonComponent['getStyle']>): string {
+    return this.icon
+      ? `<dota-icon class="${style.icon}" name="${this.icon}" size="${this.size ?? 'md'}"></dota-icon>`
+      : '';
+  }
 
-      case "leading": {
-        content = `
-                    ${iconComponent}
-                    <p>${this.label || this.content}</p>
-                `
-        break
-      }
-
-      default: {
-        content = `
-                    ${iconComponent}
-                    <p>${this.label || this.content}</p>
-                `
-      }
-    }
-
-    if (this.animation) {
-      return `
-                <button class="${ButtonStyle.base} ${ButtonStyle.animation[this.animation || 'fill'].base} ${size} ${round}
-                               ${ButtonStyle.animation[this.animation ?? 'fill'].color[this.animationColor ?? 'indigo']}
-                               
-                ">
-                    ${this.label || this.content}
-                </button>
-            `
-    }
-
-    const color = ButtonStyle.color?.[this.color ?? 'none']?.[this.variant ?? 'solid'] ?? '';
-    return `
-            <button class="${ButtonStyle.base} ${color} ${size} ${round}">
-                ${content}
-            </button>
-        `
+  private renderLoadingIndicator(style: ReturnType<ButtonComponent['getStyle']>): string {
+    return this.loading
+      ? `<svg class="${style.loadingIndicator}" viewBox="0 0 24 24" aria-hidden="true" fill="none"><circle class="opacity-25" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3"></circle><path class="opacity-90" fill="currentColor" d="M21 12a9 9 0 0 0-9-9v3a6 6 0 0 1 6 6h3Z"></path></svg>`
+      : '';
   }
 
   render(): string {
-    return this.template();
-  }
+    const style = this.getStyle();
+    const isDisabled = this.disabled || this.loading;
+    const icon = this.renderIcon(style);
+    const label = this.label || this.content;
+    const content = this.iconPosition === 'forward'
+      ? `<span class="${style.label}">${label}</span>${icon}`
+      : `${icon}<span class="${style.label}">${label}</span>`;
+    const ariaLabel = this.ariaLabel ? ` aria-label="${this.ariaLabel}"` : '';
+    const animation = style.animation ? ` ${style.animation.base} ${style.animation.color}` : '';
 
+    return `
+      <button type="${this.getButtonType()}" class="${style.base} ${style.color} ${style.size} ${style.rounded}${animation} ${this.className ?? ''}"${ariaLabel} aria-busy="${this.loading}" ${isDisabled ? 'disabled' : ''}>
+        ${this.renderLoadingIndicator(style)}
+        ${content}
+      </button>
+    `;
+  }
 }
 
-export {ButtonComponent, ButtonStyle as ButtonConfig}
-export type {ButtonVariants, ButtonRound, ButtonAnimation, ButtonSize, ButtonAnimationColor, IconPosition}
+export {ButtonComponent, ButtonStyle as ButtonConfig};
+export type {
+  ButtonAnimation,
+  ButtonAnimationColor,
+  ButtonColor,
+  ButtonRound,
+  ButtonSize,
+  ButtonStyleConfig,
+  ButtonType,
+  ButtonVariants,
+  IconPosition,
+};
