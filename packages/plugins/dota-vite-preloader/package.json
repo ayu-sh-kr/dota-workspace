@@ -44,6 +44,9 @@
     "consola": "3.4.2",
     "reflect-metadata": "^0.2.2"
   },
+  "peerDependencies": {
+    "vite": "^7.1.0"
+  },
   "files": [
     "dist/",
     "README.md",

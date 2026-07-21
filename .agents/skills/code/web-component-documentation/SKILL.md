@@ -1,6 +1,6 @@
 ---
 name: web-component-documentation
-description: Use when documenting, reconstructing, or reviewing TypeScript web component classes, especially components built with `@ayu-sh-kr/dota-core` or `@ayu-sh-kr/dota-wrap` utilities. Produce factual class-level TSDoc covering component purpose, public properties, internal state, event reactions, outputs, lifecycle behavior, rendering, and integration contracts; use `$code-documentation` for non-trivial member comments.
+description: Use when documenting, reconstructing, or reviewing TypeScript web component classes, especially components built with `@ayu-sh-kr/dota-core` or `@ayu-sh-kr/dota-wrap` utilities. Produce factual class- and property-level TSDoc that can become JetBrains Web Types descriptions, defaults, typed HTML values, JavaScript properties, events, and source-linked IDE help; use `$code-documentation` for non-trivial member comments.
 ---
 
 # Web Component Documentation
@@ -37,6 +37,42 @@ internal state; and listener/lifecycle decorators register framework-managed
 callbacks. Verify the exact behavior against the installed Dota Core source
 when a component relies on it. Do not claim a callback is reactive, cancellable,
 or fired in a particular order unless the source establishes that fact.
+
+## Author for Web Types
+
+Write documentation as source material for the generated `web-types.json`, not
+only as prose for maintainers. JetBrains Web Types uses HTML attributes for
+markup-facing inputs and `js.properties` for the corresponding Web Component
+DOM properties; descriptions, defaults, required state, values, and source
+locations should agree across both representations. See the [JetBrains Web
+Types guidance](https://plugins.jetbrains.com/docs/intellij/polysymbols-web-types.html)
+for the supported Web Component contract.
+
+Use these authoring rules:
+
+- Put the component purpose in the first paragraph of the class TSDoc so it can
+  become the element `description` without extracting internal implementation detail.
+- Put a focused comment immediately above every public `@Property` so it can
+  become the matching attribute and `js.properties` `description`.
+- State the HTML attribute name, primitive type, default, required status, and
+  visible effect in the property comment. Keep decorator metadata authoritative
+  for the machine-readable name, type, default, and required value.
+- Describe finite string unions as allowed values, for example
+  `"flat" | "dark"`; do not call an input merely `string` when the source
+  establishes a smaller set of valid values.
+- Document units and coercion rules for numbers, presence semantics for boolean
+  attributes, and whether a value is reflected between the attribute and DOM property.
+- Mention slots, emitted events, event payloads, and important child-component
+  relationships at class level so they can become Web Types `slots`, `events`,
+  and integration documentation.
+- Keep descriptions consumer-facing and stable. Do not put source offsets,
+  parser details, private fields, or implementation-only helper names in them.
+
+The current scanner already emits types, defaults supplied by decorator metadata,
+required state, and source links. It must explicitly extract TSDoc before class
+and property descriptions can appear in generated Web Types; documenting a
+component does not by itself change the generated JSON until that extraction
+path exists.
 
 ## Satisfy the base-class contract
 
@@ -93,6 +129,22 @@ export class ThemePickerComponent extends BaseElement {
 
 Adapt the example to actual source. Never invent an emitter, a default, an event
 name, or an effect merely to fill a section.
+
+Keep the first paragraph suitable for an IDE description popup. Put detailed
+maintenance context after the consumer-facing summary, and keep property
+descriptions close to their declarations so a source-to-Web-Types extractor can
+associate each comment with the correct `@Property` node.
+
+```ts
+/**
+ * Displays a full-screen loading overlay while the host operation is active.
+ *
+ * @property is-loader - Boolean HTML attribute; presence enables the overlay.
+ * Defaults to `false` and affects the rendered visibility of the section.
+ */
+@Property({name: "is-loader", type: Boolean, default: false})
+isLoading = false;
+```
 
 ## Document members selectively
 

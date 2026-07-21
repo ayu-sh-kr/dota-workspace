@@ -9,46 +9,98 @@
           "name": "md-toc",
           "source": {
             "file": "./src/components/md-toc.component.ts",
-            "offset": 2041
+            "offset": 2034
           },
           "attributes": [
             {
               "name": "color",
-              "type": "String",
+              "default": "indigo",
               "required": false,
+              "value": {
+                "type": "string"
+              },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2346
+                "offset": 2276
               }
             },
             {
               "name": "header-height",
-              "type": "String",
+              "default": "64",
               "required": false,
+              "value": {
+                "type": "string"
+              },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2669
+                "offset": 2607
               }
             },
             {
               "name": "label",
-              "type": "String",
+              "default": "On this page",
               "required": false,
+              "value": {
+                "type": "string"
+              },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2842
+                "offset": 2772
               }
             },
             {
               "name": "theme",
-              "type": "String",
+              "default": "flat",
               "required": false,
+              "value": {
+                "type": "string"
+              },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2271
+                "offset": 2201
               }
             }
-          ]
+          ],
+          "js": {
+            "properties": [
+              {
+                "name": "color",
+                "type": "string",
+                "default": "indigo",
+                "source": {
+                  "file": "./src/components/md-toc.component.ts",
+                  "offset": 2276
+                }
+              },
+              {
+                "name": "headerHeight",
+                "type": "string",
+                "default": "64",
+                "source": {
+                  "file": "./src/components/md-toc.component.ts",
+                  "offset": 2607
+                }
+              },
+              {
+                "name": "label",
+                "type": "string",
+                "default": "On this page",
+                "source": {
+                  "file": "./src/components/md-toc.component.ts",
+                  "offset": 2772
+                }
+              },
+              {
+                "name": "theme",
+                "type": "string",
+                "default": "flat",
+                "source": {
+                  "file": "./src/components/md-toc.component.ts",
+                  "offset": 2201
+                }
+              }
+            ]
+          }
         },
         {
           "name": "md-view",
@@ -59,23 +111,51 @@
           "attributes": [
             {
               "name": "color",
-              "type": "String",
+              "default": "neutral",
               "required": false,
+              "value": {
+                "type": "string"
+              },
               "source": {
                 "file": "./src/components/md-view.component.ts",
-                "offset": 582
+                "offset": 629
               }
             },
             {
               "name": "theme",
-              "type": "String",
+              "default": "flat",
               "required": false,
+              "value": {
+                "type": "string"
+              },
               "source": {
                 "file": "./src/components/md-view.component.ts",
-                "offset": 509
+                "offset": 556
               }
             }
-          ]
+          ],
+          "js": {
+            "properties": [
+              {
+                "name": "color",
+                "type": "string",
+                "default": "neutral",
+                "source": {
+                  "file": "./src/components/md-view.component.ts",
+                  "offset": 629
+                }
+              },
+              {
+                "name": "theme",
+                "type": "string",
+                "default": "flat",
+                "source": {
+                  "file": "./src/components/md-view.component.ts",
+                  "offset": 556
+                }
+              }
+            ]
+          }
         }
       ]
     }

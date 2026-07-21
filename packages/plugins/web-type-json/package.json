@@ -5,7 +5,7 @@
     "access": "public"
   },
   "version": "0.0.6",
-  "description": "dota-web-type-json is a Vite plugin that generates web-types JSON by scanning Web Component files. It extracts component metadata and produces IDE-friendly web-types for better autocompletion and documentation support.",
+  "description": "Vite plugin that scans Dota Web Components once and generates JetBrains Web Types with optional Custom Elements Manifest 2.1 metadata.",
   "author": {
     "name": "ayu-sh-kr",
     "email": "akjaiswal2003@gmail.com",
@@ -16,6 +16,7 @@
     "Dota Core Plugins",
     "Web Components",
     "Web Types",
+    "Custom Elements Manifest",
     "IDE Support"
   ],
   "type": "module",
@@ -37,15 +38,22 @@
     "test": "tsc --noEmit && vitest run"
   },
   "dependencies": {
-    "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-ast-utils": "workspace:*",
+    "@ayu-sh-kr/dota-core": "workspace:*",
     "@swc/core": "^1.13.5",
-    "fast-glob": "^3.3.3",
-    "consola": "3.4.2"
+    "consola": "3.4.2",
+    "fast-glob": "^3.3.3"
+  },
+  "peerDependencies": {
+    "vite": "^7.1.0"
   },
   "files": [
     "dist/",
     "README.md",
     "package.json"
-  ]
+  ],
+  "devDependencies": {
+    "ajv": "^8.13.0",
+    "custom-elements-manifest": "^2.1.0"
+  }
 }

@@ -123,6 +123,7 @@ const NumberType: PropertyType<number> = {
  * @type {PropertyType<boolean>}
  *
  * @property {function(any): boolean} process - A method that takes any value and converts it to a boolean.
+ * Present HTML boolean attributes provide an empty string, which is interpreted as `true`.
  *
  * @throws {Error} If the value cannot be converted to a boolean.
  *
@@ -141,10 +142,10 @@ const NumberType: PropertyType<number> = {
  */
 const BooleanType: PropertyType<boolean> = {
   process: (value: any) => {
-    if (value === "false") {
-      return false;
-    } else if (value === "true") {
+    if (value === "" || value === "true") {
       return true;
+    } else if (value === "false") {
+      return false;
     }
     throw new Error(`Value is not of type boolean: ${value}`);
   }

@@ -36,6 +36,35 @@ function loadProperty(source: string, propertyName: string): ClassProperty {
   return property;
 }
 
+function loadPropertyContext(source: string, propertyName: string): {
+  property: ClassProperty;
+  sourceStart: number;
+  sourceStartOffset: number;
+} {
+  const ast = parseSync(source, {
+    syntax: "typescript",
+    tsx: false,
+    decorators: true,
+  }) as Module;
+
+  const classDecl = ast.body.find((item): item is ClassDeclaration => item.type === "ClassDeclaration");
+  const property = classDecl?.body.find((member): member is ClassProperty =>
+    member.type === "ClassProperty" &&
+    member.key.type === "Identifier" &&
+    member.key.value === propertyName,
+  );
+
+  if (property == null) {
+    throw new Error(`Expected property ${propertyName}`);
+  }
+
+  return {
+    property,
+    sourceStart: ast.span.start,
+    sourceStartOffset: source.search(/\S/),
+  };
+}
+
 
 describe("PropertyView", () => {
   it("wraps the same property node through from()", () => {
@@ -108,16 +137,52 @@ describe("PropertyView", () => {
     expect(view.defaultValue()).toBeNull();
   });
 
-  it("returns the property span start as the source offset", () => {
-    const property = loadProperty(`
+  it("returns the property identifier as the source offset", () => {
+    const source = `
       class Sample {
         @Property({ name: "value" })
         value = 42;
       }
-    `, "value");
+    `;
+    const {property, sourceStart, sourceStartOffset} = loadPropertyContext(source, "value");
     const view = new PropertyView(property);
 
-    expect(view.getSourceOffset()).toBe(property.span.start);
+    expect(view.getSourceOffset(source, sourceStart, sourceStartOffset)).toBe(source.indexOf("value ="));
+  });
+
+  it("keeps the source offset stable across repeated SWC parses", () => {
+    const source = `
+      class Sample {
+        @Property({
+          name: "value",
+        })
+        value!: string;
+      }
+    `;
+    const first = loadPropertyContext(source, "value");
+    const second = loadPropertyContext(source, "value");
+
+    const firstOffset = PropertyView.from(first.property)
+      .getSourceOffset(source, first.sourceStart, first.sourceStartOffset);
+    const secondOffset = PropertyView.from(second.property)
+      .getSourceOffset(source, second.sourceStart, second.sourceStartOffset);
+
+    expect(firstOffset).toBe(source.indexOf("value!:"));
+    expect(secondOffset).toBe(firstOffset);
+  });
+
+  it("converts SWC byte offsets to source character offsets", () => {
+    const source = `const café = "☕";
+class Sample {
+  @Property({ name: "value" })
+  value!: string;
+}`;
+    const {property, sourceStart, sourceStartOffset} = loadPropertyContext(source, "value");
+
+    const offset = PropertyView.from(property)
+      .getSourceOffset(source, sourceStart, sourceStartOffset);
+
+    expect(offset).toBe(source.indexOf("value!:"));
   });
 
   it("detects decorators by name on the real property node", () => {

@@ -1,16 +1,19 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
-import {cp, mkdtemp, readFile, rm, writeFile} from "node:fs/promises";
+import {access, cp, mkdtemp, readFile, rm, writeFile} from "node:fs/promises";
 import {dirname, join, resolve} from "node:path";
 import {tmpdir} from "node:os";
+import {createRequire} from "node:module";
 import {fileURLToPath} from "node:url";
 import fg from "fast-glob";
+import Ajv from "ajv";
 import type {ResolvedConfig} from "vite";
 import dotaWebTypeJson, {
+  createCustomElementsManifest,
   createWebTypesSchema,
   resetWebTypeJsonState,
   scanWebComponents,
 } from "@dota/main.ts";
-import type {WebComponentInfo} from "@dota/Types.ts";
+import type {CustomElementsManifestConfig, CustomElementsManifestSchema, WebComponentInfo} from "@dota/Types.ts";
 
 
 const mockState = vi.hoisted(() => ({
@@ -24,6 +27,7 @@ vi.mock("fast-glob", () => ({
 
 
 const mockedFg = vi.mocked(fg);
+const customElementsManifestJsonSchema = createRequire(import.meta.url)("custom-elements-manifest") as object;
 const fixturesDir = resolve(dirname(fileURLToPath(import.meta.url)), "fixtures");
 const defaultOutFile = "web-types.json";
 const fixtureFiles: Record<FixtureName, string[]> = {
@@ -99,11 +103,17 @@ async function invokePluginHook<TArgs extends unknown[]>(
 }
 
 
-function createPlugin(root: string, outFile = defaultOutFile, outDir = "dist") {
+function createPlugin(
+  root: string,
+  outFile = defaultOutFile,
+  outDir = "dist",
+  customElementsManifest?: boolean | CustomElementsManifestConfig,
+) {
   const plugin = dotaWebTypeJson({
     root,
     outFile,
     logType: "info",
+    customElementsManifest,
   });
 
   void invokePluginHook(plugin.configResolved, plugin, createResolvedConfig(outDir));
@@ -220,16 +230,32 @@ describe("createWebTypesSchema", () => {
               attributes: [
                 {
                   name: "label",
-                  type: "String",
                   description: undefined,
                   default: "hello",
                   required: false,
+                  value: {
+                    type: "string",
+                  },
                   source: {
                     file: "/tmp/single.component.ts",
                     offset: 42,
                   },
                 },
               ],
+              js: {
+                properties: [
+                  {
+                    name: "label",
+                    type: "string",
+                    description: undefined,
+                    default: "hello",
+                    source: {
+                      file: "/tmp/single.component.ts",
+                      offset: 42,
+                    },
+                  },
+                ],
+              },
             },
             {
               name: "many-page",
@@ -240,18 +266,191 @@ describe("createWebTypesSchema", () => {
               attributes: [
                 {
                   name: "heading",
-                  type: "String",
                   description: undefined,
                   default: undefined,
                   required: true,
+                  value: {
+                    type: "string",
+                  },
                   source: undefined,
                 },
               ],
+              js: {
+                properties: [
+                  {
+                    name: "heading",
+                    type: "string",
+                    description: undefined,
+                    default: undefined,
+                    source: undefined,
+                  },
+                ],
+              },
             },
           ],
         },
       },
     });
+  });
+
+  it("emits typed HTML values and JavaScript properties", () => {
+    const schema = createWebTypesSchema([
+      {
+        className: "TypedComponent",
+        tagName: "typed-component",
+        properties: [
+          {name: "enabled", type: "Boolean"},
+          {name: "count", type: "Number"},
+        ],
+      },
+    ]);
+
+    const element = schema.contributions.html.elements[0];
+
+    expect(element?.attributes).toEqual([
+      {
+        name: "enabled",
+        description: undefined,
+        default: undefined,
+        required: undefined,
+        value: {type: "boolean"},
+        source: undefined,
+      },
+      {
+        name: "count",
+        description: undefined,
+        default: undefined,
+        required: undefined,
+        value: {type: "number"},
+        source: undefined,
+      },
+    ]);
+    expect(element?.js).toEqual({
+      properties: [
+        {name: "enabled", type: "boolean", description: undefined, default: undefined, source: undefined},
+        {name: "count", type: "number", description: undefined, default: undefined, source: undefined},
+      ],
+    });
+  });
+
+  it("keeps the HTML attribute name separate from the JavaScript property name", () => {
+    const schema = createWebTypesSchema([{
+      className: "LoaderSectionComponent",
+      tagName: "loader-section",
+      properties: [{
+        name: "is-loader",
+        propertyName: "isLoading",
+        type: "Boolean",
+      }],
+    }]);
+
+    const element = schema.contributions.html.elements[0];
+
+    expect(element?.attributes[0]?.name).toBe("is-loader");
+    expect(element?.js?.properties[0]?.name).toBe("isLoading");
+  });
+});
+
+
+describe("createCustomElementsManifest", () => {
+  it("maps component fields, attributes, exports, defaults, and module paths", () => {
+    const root = "/workspace/package";
+    const manifest = createCustomElementsManifest([{
+      className: "LoaderSectionComponent",
+      tagName: "loader-section",
+      description: "Displays a full-screen loading state.",
+      exported: true,
+      sourceFile: `${root}/src/components/loader-section.component.ts`,
+      superclass: "BaseElement",
+      properties: [{
+        name: "is-loader",
+        propertyName: "isLoading",
+        type: "Boolean",
+        default: "false",
+        required: false,
+      }],
+    }], {root});
+
+    expect(manifest).toEqual({
+      schemaVersion: "2.1.0",
+      modules: [{
+        kind: "javascript-module",
+        path: "src/components/loader-section.component.js",
+        declarations: [{
+          kind: "class",
+          name: "LoaderSectionComponent",
+          customElement: true,
+          tagName: "loader-section",
+          description: "Displays a full-screen loading state.",
+          superclass: {name: "BaseElement"},
+          members: [{
+            kind: "field",
+            name: "isLoading",
+            attribute: "is-loader",
+            description: undefined,
+            type: {text: "boolean"},
+            default: "false",
+          }],
+          attributes: [{
+            name: "is-loader",
+            fieldName: "isLoading",
+            description: undefined,
+            type: {text: "boolean"},
+            default: "false",
+          }],
+        }],
+        exports: [{
+          kind: "js",
+          name: "LoaderSectionComponent",
+          declaration: {name: "LoaderSectionComponent"},
+        }, {
+          kind: "custom-element-definition",
+          name: "loader-section",
+          declaration: {name: "LoaderSectionComponent"},
+        }],
+      }],
+    });
+  });
+
+  it("excludes components owned by external scan roots", () => {
+    const manifest = createCustomElementsManifest([{
+      className: "ExternalComponent",
+      tagName: "external-component",
+      sourceFile: "/workspace/external/src/external.component.ts",
+      exported: true,
+      properties: [],
+    }], {root: "/workspace/package"});
+
+    expect(manifest.modules).toEqual([]);
+  });
+
+  it("uses a package-provided published module path mapper", () => {
+    const root = "/workspace/package";
+    const manifest = createCustomElementsManifest([{
+      className: "MappedComponent",
+      tagName: "mapped-component",
+      sourceFile: `${root}/src/mapped.component.ts`,
+      properties: [],
+    }], {
+      root,
+      modulePath: sourceFile => `dist/${sourceFile.split("/").at(-1)?.replace(/\.ts$/, ".mjs")}`,
+    });
+
+    expect(manifest.modules[0]?.path).toBe("dist/mapped.component.mjs");
+  });
+
+  it("rejects a module path that escapes the owning package", () => {
+    const root = "/workspace/package";
+
+    expect(() => createCustomElementsManifest([{
+      className: "EscapingComponent",
+      tagName: "escaping-component",
+      sourceFile: `${root}/src/escaping.component.ts`,
+      properties: [],
+    }], {
+      root,
+      modulePath: () => "../external/escaping.component.js",
+    })).toThrow("Invalid Custom Elements Manifest module path");
   });
 });
 
@@ -295,6 +494,9 @@ describe("scanWebComponents", () => {
     expect(scannedWebComponents[0]).toMatchObject({
       className: "NamedExportComponent",
       tagName: "named-export-component",
+      exported: true,
+      exportName: "NamedExportComponent",
+      sourceFile: resolve(root, "src/components/named-export.component.ts"),
       source: {
         file: "./src/components/named-export.component.ts",
         offset: expect.any(Number),
@@ -302,7 +504,9 @@ describe("scanWebComponents", () => {
       properties: [
         {
           name: "label",
+          propertyName: "label",
           type: "String",
+          default: "",
           required: false,
         },
       ],
@@ -338,7 +542,9 @@ describe("scanWebComponents", () => {
       properties: [
         {
           name: "title",
+          propertyName: "title",
           type: "String",
+          default: "alpha",
           required: false,
           source: {
             file: "./src/components/alpha.component.ts",
@@ -355,7 +561,9 @@ describe("scanWebComponents", () => {
       properties: [
         {
           name: "enabled",
+          propertyName: "enabled",
           type: "Boolean",
+          default: "true",
           required: false,
           source: {
             file: "./src/components/beta.component.ts",
@@ -372,7 +580,9 @@ describe("scanWebComponents", () => {
       properties: [
         {
           name: "heading",
+          propertyName: "heading",
           type: "String",
+          default: "many",
           required: false,
           source: {
             file: "./src/pages/many.page.ts",
@@ -453,29 +663,148 @@ describe("web-types artifact generation", () => {
               attributes: [
                 {
                   name: "label",
-                  type: "String",
                   required: false,
+                  value: {
+                    type: "string",
+                  },
                   source: {
                     file: "./src/components/single.component.ts",
                     offset: expect.any(Number),
                   },
                 },
               ],
+              js: {
+                properties: [
+                  {
+                    name: "label",
+                    type: "string",
+                    source: {
+                      file: "./src/components/single.component.ts",
+                      offset: expect.any(Number),
+                    },
+                  },
+                ],
+              },
             },
           ],
         },
       },
     });
   });
+
+  it("does not create or register a Custom Elements Manifest by default", async () => {
+    const root = await prepareFixtureRoot("single");
+    prepareFastGlobFiles(root, "single");
+    const plugin = createPlugin(root);
+
+    await invokePluginHook(plugin.buildStart, plugin);
+
+    await expect(access(resolve(root, "custom-elements.json"))).rejects.toThrow();
+    const packageJson = await readJsonFile<{customElements?: string}>(resolve(root, "package.json"));
+    expect(packageJson.customElements).toBeUndefined();
+  });
+
+  it("generates schema-valid Web Types and CEM artifacts from one scan", async () => {
+    const root = await prepareFixtureRoot("single");
+    prepareFastGlobFiles(root, "single");
+    const plugin = createPlugin(root, defaultOutFile, "dist", true);
+    mockedFg.mockClear();
+
+    await invokePluginHook(plugin.buildStart, plugin);
+
+    const customElementsManifest = await readJsonFile<CustomElementsManifestSchema>(
+      resolve(root, "custom-elements.json"),
+    );
+    const packageJson = await readJsonFile<{
+      "web-types"?: string;
+      customElements?: string;
+    }>(resolve(root, "package.json"));
+    const validate = new Ajv({strict: false}).compile(customElementsManifestJsonSchema);
+
+    expect(mockedFg).toHaveBeenCalledTimes(1);
+    expect(validate(customElementsManifest), validate.errors?.map(error => error.message).join("\n")).toBe(true);
+    expect(packageJson).toMatchObject({
+      "web-types": "./web-types.json",
+      customElements: "custom-elements.json",
+    });
+    expect(customElementsManifest).toMatchObject({
+      schemaVersion: "2.1.0",
+      modules: [{
+        kind: "javascript-module",
+        path: "src/components/single.component.js",
+        declarations: [{
+          kind: "class",
+          name: "SingleComponent",
+          customElement: true,
+          tagName: "single-component",
+          members: [{
+            kind: "field",
+            name: "label",
+            attribute: "label",
+            type: {text: "string"},
+            default: "hello",
+          }],
+          attributes: [{
+            name: "label",
+            fieldName: "label",
+            type: {text: "string"},
+            default: "hello",
+          }],
+        }],
+        exports: [{
+          kind: "js",
+          name: "SingleComponent",
+        }, {
+          kind: "custom-element-definition",
+          name: "single-component",
+        }],
+      }],
+    });
+  });
+
+  it("supports detailed CEM output config without registering package.json", async () => {
+    const root = await prepareFixtureRoot("single");
+    prepareFastGlobFiles(root, "single");
+    const plugin = createPlugin(root, defaultOutFile, "dist", {
+      enabled: true,
+      outFile: "component-manifest.json",
+      updatePackageJson: false,
+      modulePath: sourceFile => `dist/${sourceFile.split("/").at(-1)?.replace(/\.ts$/, ".js")}`,
+    });
+
+    await invokePluginHook(plugin.buildStart, plugin);
+
+    const manifest = await readJsonFile<CustomElementsManifestSchema>(resolve(root, "component-manifest.json"));
+    const packageJson = await readJsonFile<{customElements?: string}>(resolve(root, "package.json"));
+    expect(manifest.modules[0]?.path).toBe("dist/single.component.js");
+    expect(packageJson.customElements).toBeUndefined();
+  });
+
+  it("produces byte-for-byte stable artifacts across unchanged builds", async () => {
+    const root = await prepareFixtureRoot("many");
+    prepareFastGlobFiles(root, "many");
+    const plugin = createPlugin(root, defaultOutFile, "dist", true);
+
+    await invokePluginHook(plugin.buildStart, plugin);
+    const firstWebTypes = await readFile(resolve(root, defaultOutFile), "utf-8");
+    const firstManifest = await readFile(resolve(root, "custom-elements.json"), "utf-8");
+
+    await invokePluginHook(plugin.buildStart, plugin);
+    const secondWebTypes = await readFile(resolve(root, defaultOutFile), "utf-8");
+    const secondManifest = await readFile(resolve(root, "custom-elements.json"), "utf-8");
+
+    expect(secondWebTypes).toBe(firstWebTypes);
+    expect(secondManifest).toBe(firstManifest);
+  });
 });
 
 
 describe("watch regeneration", () => {
-  it("rebuilds web-types.json when a source file changes", async () => {
+  it("rebuilds every enabled artifact when a source file changes", async () => {
     // Arrange
     const root = await prepareFixtureRoot("single");
     prepareFastGlobFiles(root, "single");
-    const plugin = createPlugin(root, defaultOutFile, "dist");
+    const plugin = createPlugin(root, defaultOutFile, "dist", true);
     const {handlers, watcher} = createWatcherHarness();
 
     void invokePluginHook(plugin.configureServer, plugin, {
@@ -499,8 +828,12 @@ describe("watch regeneration", () => {
     const afterChange = await readJsonFile<{
       contributions: { html: { elements: Array<{ name: string }> } };
     }>(resolve(root, defaultOutFile));
+    const customElementsManifest = await readJsonFile<CustomElementsManifestSchema>(
+      resolve(root, "custom-elements.json"),
+    );
 
     expect(afterChange.contributions.html.elements[0]?.name).toBe("single-component-renamed");
+    expect(customElementsManifest.modules[0]?.declarations[0]?.tagName).toBe("single-component-renamed");
     expect(watcher.on).toHaveBeenCalledWith("change", expect.any(Function));
   });
 

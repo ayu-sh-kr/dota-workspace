@@ -1,0 +1,4 @@
+interface:
+  display_name: "Type Documentation"
+  short_description: "Explain TypeScript type purpose and relevance"
+  default_prompt: "Use $type-documentation to document these TypeScript contracts clearly."
