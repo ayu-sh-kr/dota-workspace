@@ -1,6 +1,13 @@
 import {BaseElement, Component} from "@ayu-sh-kr/dota-core";
 
-
+/**
+ * Wraps consumer content in a centered decorative field of softly animated blobs.
+ *
+ * Inputs: none; the component preserves its initial light-DOM children as content.
+ * Events: none; the animation is CSS-driven and does not emit component events.
+ * Lifecycle and integration: renders light DOM so the host Tailwind build can
+ * provide the animation utilities and the wrapped content remains addressable.
+ */
 @Component({
     selector: 'blob-animation',
     shadow: false
