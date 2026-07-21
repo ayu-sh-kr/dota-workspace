@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1420" width="1600" height="1420">
+  <title>web-type-json Plugin Flow</title>
+  <desc>
+    Flow diagram for the dota-web-type-json Vite plugin. Dev watcher events move down
+    through the file filter and pending-refresh guard before joining the shared scanner.
+    Outcomes labeled no leave decisions from the right. Build-start joins the same scanner.
+    The pipeline writes web-types.json and patches package.json only when required.
+  </desc>
+
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap');
+      svg { text-rendering: geometricPrecision; }
+      .bg { fill: #ffffff; }
+      .group-line { stroke: #d7dee7; stroke-width: 3; }
+      .group-rule { stroke: #e7ecf2; stroke-width: 2; }
+      .entry { fill: #dce7fb; }
+      .step { fill: #d9f0ef; }
+      .decision { fill: #fce7cf; }
+      .artifact { fill: #ddefdf; }
+      .card { rx: 10; }
+      .title { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; fill: #212529; }
+      .subtitle { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 16px; fill: #495057; }
+      .lane-label { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.6px; fill: #868e96; text-anchor: middle; }
+      .label { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 600; fill: #243b53; text-anchor: middle; dominant-baseline: middle; }
+      .annotation { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 15px; fill: #495057; text-anchor: middle; dominant-baseline: middle; }
+      .annotation-side { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 15px; fill: #495057; text-anchor: end; dominant-baseline: middle; }
+      .branch { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; fill: #495057; }
+      .marker-text { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #ffffff; text-anchor: middle; dominant-baseline: middle; }
+      .legend { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #343a40; dominant-baseline: middle; }
+      .connector { stroke: #495057; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .async { stroke: #7048e8; stroke-width: 2; fill: none; stroke-dasharray: 7 5; marker-end: url(#arrow-async); }
+      .skip { stroke: #868e96; stroke-width: 2; fill: none; stroke-dasharray: 7 5; marker-end: url(#arrow-skip); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#495057"/>
+    </marker>
+    <marker id="arrow-async" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7048e8"/>
+    </marker>
+    <marker id="arrow-skip" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#868e96"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1600" height="1420"/>
+  <text class="title" x="60" y="55">dota-web-type-json · plugin flow</text>
+  <text class="subtitle" x="60" y="83">Build and dev triggers converge on the same scan-and-write pipeline.</text>
+
+  <!-- Grouping lines -->
+  <line class="group-line" x1="580" y1="130" x2="580" y2="1310"/>
+  <line class="group-line" x1="1120" y1="130" x2="1120" y2="1310"/>
+  <line class="group-rule" x1="60" y1="160" x2="540" y2="160"/>
+  <line class="group-rule" x1="620" y1="160" x2="1080" y2="160"/>
+  <line class="group-rule" x1="1160" y1="160" x2="1540" y2="160"/>
+  <text class="lane-label" x="290" y="145">DEV SERVER</text>
+  <text class="lane-label" x="850" y="145">SHARED PIPELINE</text>
+  <text class="lane-label" x="1350" y="145">BUILD</text>
+
+  <!-- Dev entry and watcher -->
+  <rect class="card entry" x="100" y="180" width="310" height="58"/>
+  <text class="label" x="255" y="209">configureServer()</text>
+  <rect class="card step" x="100" y="340" width="310" height="58"/>
+  <text class="label" x="255" y="369">watcher events</text>
+  <text class="annotation-side" x="400" y="419">add · change · unlink</text>
+  <path class="connector" d="M255,238 V340"/>
+
+  <!-- Decision 1: yes continues down; no exits right -->
+  <rect class="card decision" x="100" y="500" width="310" height="58"/>
+  <text class="label" x="255" y="529">scannable file?</text>
+  <text class="annotation-side" x="230" y="579">component.ts · page.ts</text>
+  <circle cx="120" cy="476" r="14" fill="#343a40"/>
+  <text class="marker-text" x="120" y="476">1</text>
+  <path class="connector" d="M255,398 V500"/>
+  <path class="skip" d="M410,529 H535"/>
+  <text class="branch" x="430" y="519">no</text>
+  <text class="annotation" x="500" y="559">ignore file</text>
+
+  <!-- Decision 2 below decision 1 -->
+  <rect class="card decision" x="100" y="660" width="310" height="58"/>
+  <text class="label" x="255" y="689">refresh pending?</text>
+  <text class="annotation-side" x="400" y="739">coalescing guard</text>
+  <circle cx="120" cy="636" r="14" fill="#343a40"/>
+  <text class="marker-text" x="120" y="636">2</text>
+  <path class="connector" d="M255,558 V660"/>
+  <text class="branch" x="273" y="605">yes</text>
+
+  <!-- Pending guard: no exits right to scan; yes returns existing promise -->
+  <path class="connector" d="M410,689 H650"/>
+  <text class="branch" x="455" y="679">no</text>
+  <path class="async" d="M255,718 V795"/>
+  <text class="branch" x="227" y="760">yes</text>
+  <text class="annotation" x="255" y="820">return same promise</text>
+
+  <!-- Build entry -->
+  <rect class="card entry" x="1195" y="180" width="310" height="58"/>
+  <text class="label" x="1350" y="209">vite build · buildStart</text>
+  <text class="annotation" x="1350" y="259">one full scan</text>
+  <path class="connector" d="M1350,238 V245 H1510 V590 H800 V660"/>
+
+  <!-- Shared pipeline -->
+  <rect class="card step" x="650" y="660" width="300" height="58"/>
+  <text class="label" x="800" y="689">scanWebComponents()</text>
+  <text class="annotation-side" x="780" y="739">glob · SWC · decorators · sort</text>
+
+  <rect class="card step" x="650" y="860" width="300" height="58"/>
+  <text class="label" x="800" y="889">writeWebTypesArtifacts()</text>
+  <text class="annotation-side" x="780" y="939">schema → JSON → manifest check</text>
+  <path class="connector" d="M800,718 V860"/>
+
+  <!-- Artifact generation -->
+  <rect class="card artifact" x="590" y="1060" width="210" height="58"/>
+  <text class="label" x="695" y="1089">write web-types.json</text>
+  <rect class="card decision" x="880" y="1060" width="210" height="58"/>
+  <text class="label" x="985" y="1089">manifest entry stale?</text>
+  <circle cx="900" cy="1036" r="14" fill="#343a40"/>
+  <text class="marker-text" x="900" y="1036">3</text>
+  <path class="connector" d="M800,918 V1000 H695 V1060"/>
+  <path class="connector" d="M800,1000 H985 V1060"/>
+
+  <!-- Manifest guard: no exits right; yes continues down -->
+  <path class="skip" d="M1090,1089 H1160"/>
+  <text class="branch" x="1100" y="1079">no</text>
+  <text class="annotation" x="1240" y="1083">entry already correct</text>
+  <rect class="card artifact" x="880" y="1220" width="210" height="58"/>
+  <text class="label" x="985" y="1249">patch package.json</text>
+  <path class="connector" d="M985,1118 V1220"/>
+  <text class="branch" x="1005" y="1165">yes</text>
+
+  <!-- Legend -->
+  <line class="group-line" x1="60" y1="1340" x2="1540" y2="1340"/>
+  <rect x="85" y="1363" width="22" height="15" rx="4" fill="#dce7fb"/>
+  <text class="legend" x="118" y="1371">entry</text>
+  <rect x="195" y="1363" width="22" height="15" rx="4" fill="#d9f0ef"/>
+  <text class="legend" x="228" y="1371">processing</text>
+  <rect x="330" y="1363" width="22" height="15" rx="4" fill="#fce7cf"/>
+  <text class="legend" x="363" y="1371">decision</text>
+  <rect x="440" y="1363" width="22" height="15" rx="4" fill="#ddefdf"/>
+  <text class="legend" x="473" y="1371">artifact</text>
+  <circle cx="570" cy="1371" r="12" fill="#343a40"/>
+  <text class="marker-text" x="570" y="1371">1</text>
+  <text class="legend" x="595" y="1371">decision key</text>
+  <line x1="735" y1="1371" x2="785" y2="1371" class="connector"/>
+  <text class="legend" x="805" y="1371">sync flow</text>
+  <line x1="910" y1="1371" x2="960" y2="1371" class="async"/>
+  <text class="legend" x="980" y="1371">coalesced async</text>
+  <line x1="1125" y1="1371" x2="1175" y2="1371" class="skip"/>
+  <text class="legend" x="1195" y="1371">skipped / ignored</text>
+</svg>
