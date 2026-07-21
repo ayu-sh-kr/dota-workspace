@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blog Formating"
+  short_description: "Format technical blog posts for clear learning."
+  default_prompt: "Use $blog-formating to rewrite this blog post with a clear learning flow, descriptive sections, concise examples, and publication-ready Markdown."
