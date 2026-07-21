@@ -2,14 +2,16 @@ import {UIConfig} from "@dota/configs/app.config.ts";
 
 
 /**
- * Configuration object for Accordion component styling
- * @property {object} button - Button styling configuration
- * @property {string} button.base - Base classes for button styling
- * @property {object} button.size - Size variants for button
- * @property {object} button.color - Color variants for button
- * @property {string} paragraph - Classes for paragraph styling
+ * Default visual contract for `dota-accordion`.
+ *
+ * The component resolves its container, button base, size, color/variant, and
+ * paragraph classes from this object unless a per-instance `AccordionStyleConfig`
+ * provides a replacement for the corresponding slot. Paragraph spacing belongs
+ * here so it remains clipped inside the collapsed animation wrapper.
  */
 export const AccordionStyle = {
+
+    container: '',
 
     button: {
         base: 'focus:outline-none focus-visible:outline-0 disabled:cursor-not-allowed disabled:opacity-75 flex-shrink-0 font-medium rounded-md inline-flex justify-between items-center mb-1.5 w-full',
@@ -25,7 +27,7 @@ export const AccordionStyle = {
             ...UIConfig.color
         },
     },
-    paragraph: 'text-sm text-gray-500 dark:text-gray-400 pt-1.5 pb-3'
+    paragraph: 'px-2 pt-1.5 pb-3 text-sm text-gray-500 dark:text-gray-400'
 
 }
 
@@ -35,5 +37,22 @@ type AccordionColor = keyof typeof AccordionStyle.button.color;
 type AccordionSize = keyof typeof AccordionStyle.button.size;
 /** Type representing available variant options for the Accordion component */
 type AccordionVariant = keyof ColorVariants;
+
+/**
+ * Per-instance replacements for selected `dota-accordion` style slots.
+ *
+ * Supply this value as JSON through the component's `config` attribute. Omitted
+ * fields retain their `AccordionStyle` default; an override can therefore theme
+ * only the container, button base, a selected size/color/variant, or paragraph.
+ */
+export interface AccordionStyleConfig {
+    container?: string;
+    button?: {
+        base?: string;
+        size?: Partial<Record<AccordionSize, string>>;
+        color?: Partial<Record<AccordionColor, Partial<Record<AccordionVariant, string>>>>;
+    };
+    paragraph?: string;
+}
 
 export type {AccordionSize, AccordionColor, AccordionVariant}
