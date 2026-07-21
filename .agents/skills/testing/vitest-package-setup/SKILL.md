@@ -12,6 +12,7 @@ Set up Vitest per package. Follow the existing `dota-router`, `dota-ast-utils`, 
 1. Read the target package's `package.json`, `tsconfig.json`, existing tests, and any `vitest.config.ts`.
 2. Match the package's test file naming. Prefer `test/**/*.ts`; use `test/**/*.test.ts` only when the package already uses that convention.
 3. Keep explicit imports from `vitest` when a test already has them. `globals: true` permits the existing global-style `describe`, `it`, `expect`, and `vi` usage.
+4. Verify every runtime alias used by tests also resolves in TypeScript: set `compilerOptions.baseUrl` to the package root and mirror each Vitest `resolve.alias` entry in `compilerOptions.paths`. Include `test` in `tsconfig.json` and use `rootDir: "."` when package tests import source aliases; otherwise the editor may report TS2307 even though Vitest runs successfully.
 
 ## Add the package configuration
 
@@ -48,7 +49,7 @@ Adapt only what the package needs:
 - Add `**/*.d.ts` to `exclude` when declaration files are under the test glob.
 - Use a narrower test glob when that package consistently names test files, as `web-type-json` does with `test/**/*.test.ts`.
 - Keep `happy-dom` for the current workspace baseline, including non-DOM packages, unless the package demonstrably needs another environment.
-- Mirror `@dota/*` and `@test/*` aliases in `tsconfig.json` when tests or source use them. Do not add unused aliases.
+- Mirror `@dota/*` and `@test/*` aliases in `tsconfig.json` when tests or source use them. Set `baseUrl: "."` alongside `paths`, include `test`, and set `rootDir: "."` when tests are part of the project. A Vite/Vitest alias alone does not fix IDE or `tsc` TS2307 errors. Do not add unused aliases.
 
 ## Add scripts
 
