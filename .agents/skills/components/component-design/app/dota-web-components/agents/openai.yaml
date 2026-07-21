@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dota Web Components"
+  short_description: "Build app-owned Dota Web pages and components."
+  default_prompt: "Use $dota-web-components to build or review an app-owned component or page in packages/apps/dota-web."
