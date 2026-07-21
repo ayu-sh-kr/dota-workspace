@@ -90,7 +90,7 @@
           "name": "blob-animation",
           "source": {
             "file": "./src/components/animations/blobs/blobs.component.ts",
-            "offset": 135
+            "offset": 552
           },
           "attributes": []
         },
@@ -98,7 +98,7 @@
           "name": "blob-separator",
           "source": {
             "file": "./src/components/animations/blobs/blob-separator.component.ts",
-            "offset": 1897
+            "offset": 2448
           },
           "attributes": [
             {
@@ -107,7 +107,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/blobs/blob-separator.component.ts",
-                "offset": 2074
+                "offset": 2625
               }
             },
             {
@@ -116,7 +116,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/blobs/blob-separator.component.ts",
-                "offset": 1941
+                "offset": 2492
               }
             },
             {
@@ -125,7 +125,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/blobs/blob-separator.component.ts",
-                "offset": 2009
+                "offset": 2560
               }
             }
           ]
@@ -224,7 +224,7 @@
           "name": "cloud-chamber",
           "source": {
             "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-            "offset": 13087
+            "offset": 13639
           },
           "attributes": [
             {
@@ -269,7 +269,7 @@
           "name": "cursor-displacement",
           "source": {
             "file": "./src/components/animations/cursor/cursor-displacement.component.ts",
-            "offset": 7403
+            "offset": 9020
           },
           "attributes": [
             {
@@ -278,7 +278,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/cursor/cursor-displacement.component.ts",
-                "offset": 7452
+                "offset": 9069
               }
             }
           ]
@@ -944,7 +944,7 @@
           "name": "dota-icon",
           "source": {
             "file": "./src/components/icon/icons.component.ts",
-            "offset": 4009
+            "offset": 4019
           },
           "attributes": [
             {
@@ -953,7 +953,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 4365
+                "offset": 4375
               }
             },
             {
@@ -962,7 +962,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 4101
+                "offset": 4111
               }
             },
             {
@@ -971,7 +971,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 4229
+                "offset": 4239
               }
             },
             {
@@ -980,7 +980,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 4449
+                "offset": 4459
               }
             },
             {
@@ -989,7 +989,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 4045
+                "offset": 4055
               }
             },
             {
@@ -998,7 +998,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 4167
+                "offset": 4177
               }
             },
             {
@@ -1007,7 +1007,7 @@
               "required": true,
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 4294
+                "offset": 4304
               }
             }
           ]
@@ -1178,7 +1178,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 60174
+                "offset": 63314
               }
             },
             {
@@ -1196,7 +1196,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 59718
+                "offset": 62858
               }
             },
             {
@@ -1205,7 +1205,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 60370
+                "offset": 63510
               }
             },
             {
@@ -1214,7 +1214,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 60275
+                "offset": 63415
               }
             },
             {
@@ -1223,7 +1223,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 59478
+                "offset": 62618
               }
             },
             {
@@ -1232,7 +1232,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 59817
+                "offset": 62957
               }
             },
             {
@@ -1250,7 +1250,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 60097
+                "offset": 63237
               }
             },
             {
@@ -1259,7 +1259,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 59907
+                "offset": 63047
               }
             },
             {
@@ -1268,7 +1268,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 59565
+                "offset": 62705
               }
             },
             {
