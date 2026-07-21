@@ -1,50 +1,21 @@
-:root {
-    --start-opacity: 0;
-    --end-opacity: 1;
-    --start-x: -50%;
-    --start-y: -150%;
-    --end-x: -50%;
-    --end-y: -50%;
-    --animation-duration: 0.5s;
-    --animation-delay: 0.5s;
-    --animation-ease-open: ease-out;
-    --animation-ease-close: ease-in;
-}
-
-@keyframes modal-open {
-    0% {
-        display: none;
-        opacity: var(--start-opacity);
-        transform: translate(var(--start-x), var(--start-y));
+@keyframes dota-modal-enter {
+    from {
+        opacity: 0;
+        transform: translate(var(--dota-modal-start-x), var(--dota-modal-start-y));
     }
 
-    100% {
-        opacity: var(--end-opacity);
-        transform: translate(var(--end-x), var(--end-y));
+    to {
+        opacity: 1;
+        transform: translate(0, 0);
     }
 }
 
-@keyframes modal-close {
-    0% {
-        opacity: var(--end-opacity);
-        transform: translate(var(--end-x), var(--end-y));
-    }
-
-    100% {
-        display: none;
-        opacity: var(--start-opacity);
-        transform: translate(var(--start-x), var(--start-y));
-    }
+.dota-modal-panel {
+    animation: dota-modal-enter var(--dota-modal-duration) ease-out both;
 }
 
-
-.modelOpen {
-    animation-timing-function:  cubic-bezier(0.215, 0.610, 0.355, 1);
-    animation: modal-open var(--animation-duration) forwards;
-}
-
-.modelClose {
-    animation-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
-    animation: modal-close var(--animation-duration)  forwards;
-    /*    todo : have to delete element on close */
+@media (prefers-reduced-motion: reduce) {
+    .dota-modal-panel {
+        animation: none;
+    }
 }

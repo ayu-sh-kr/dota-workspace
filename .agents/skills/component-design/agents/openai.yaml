@@ -1,4 +1,0 @@
-interface:
-  display_name: "Component Design"
-  short_description: "Choose and design reusable UI component patterns."
-  default_prompt: "Use the component-design skill to choose the right reusable UI pattern, then load the relevant nested skill for the component family you are implementing."

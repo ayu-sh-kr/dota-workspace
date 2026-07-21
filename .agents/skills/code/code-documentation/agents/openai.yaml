@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Documentation"
+  short_description: "Write concise developer-focused TSDoc."
+  default_prompt: "Use the code-documentation skill to add concise TSDoc that explains purpose, behavior, rationale, parameters, and relevant side effects."

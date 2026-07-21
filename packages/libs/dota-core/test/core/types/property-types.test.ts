@@ -86,6 +86,15 @@ describe('ObjectType', () => {
         expect(result).toEqual({ key: "example", value: 42 });
     });
 
+    it('should retain an object value provided through JavaScript', () => {
+        const value = { key: "example", value: 42 };
+        expect(Object.process(value)).toBe(value);
+    });
+
+    it('should serialize an object for an HTML attribute', () => {
+        expect(Object.serialize?.({ key: "example" })).toBe('{"key":"example"}');
+    });
+
     it('should throw an error for an invalid JSON string', () => {
         const value = 'invalid JSON string';
         expect(() => Object.process(value)).toThrow('Value is not of given type: invalid JSON string');

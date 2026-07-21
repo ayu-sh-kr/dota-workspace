@@ -11,9 +11,14 @@
 }
 
 .description {
-    @apply h-0 transform duration-300 ease-in overflow-hidden transition-[height]
+    @apply grid min-h-0 grid-rows-[0fr] overflow-hidden transition-[grid-template-rows] duration-300 ease-in-out
 }
 
 .description-active {
-    @apply h-fit duration-300 transform ease-in text-lg transition-[height]
+    @apply grid-rows-[1fr]
+}
+
+.description > .accordion-content {
+    min-height: 0;
+    overflow: hidden;
 }

@@ -6,7 +6,8 @@
  *
  * @template T - The type to which the value will be processed.
  *
- * @property {function(any): T} process - A method that takes any value and converts it to the type `T`.
+ * @property {function(any): T} process - A method that takes an attribute or property value and converts it to `T`.
+ * @property {function(T): string} [serialize] - Converts a property value into its attribute representation.
  *
  * @example
  * // Example of a PropertyType that converts values to strings
@@ -38,6 +39,7 @@
  */
 export type PropertyType<T> = {
   process: (value: any) => T;
+  serialize?: (value: T) => string;
 }
 
 
@@ -151,9 +153,9 @@ const BooleanType: PropertyType<boolean> = {
 /**
  * A `PropertyType` that processes a value into an object of type `T`.
  *
- * This constant defines a `PropertyType` for objects, which includes a `process` method
- * that takes any value and converts it to an object of type `T`. If the conversion fails,
- * an error is thrown.
+ * This constant defines a `PropertyType` for objects. It accepts JSON attribute strings and
+ * already-materialized JavaScript objects, then serializes property values as JSON when they
+ * are reflected back to an HTML attribute.
  *
  * @template T - The type of the object to which the value will be processed.
  *
@@ -183,11 +185,22 @@ const BooleanType: PropertyType<boolean> = {
  */
 const ObjectType: PropertyType<object> = {
   process: (value: any) => {
+    if (value !== null && typeof value === 'object') {
+      return value;
+    }
+
     if (typeof value !== 'string') {
       throw new Error(`Value is not of given type: ${value}`);
     }
     try {
       return JSON.parse(value);
+    } catch (e) {
+      throw new Error(`Value is not of given type: ${value}`);
+    }
+  },
+  serialize: (value: object) => {
+    try {
+      return JSON.stringify(value);
     } catch (e) {
       throw new Error(`Value is not of given type: ${value}`);
     }

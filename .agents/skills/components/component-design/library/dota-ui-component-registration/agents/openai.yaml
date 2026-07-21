@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dota UI Registration"
+  short_description: "Wire Dota UI elements into the Dota Web app."
+  default_prompt: "Use $dota-ui-component-registration to export, register, and verify a dota-ui component in dota-web."

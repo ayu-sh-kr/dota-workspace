@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reusable Web Component Design"
+  short_description: "Design themeable, accessible web components."
+  default_prompt: "Use $reusable-web-component-design to design or refactor a reusable Dota web component with stable behavior and configurable styling."

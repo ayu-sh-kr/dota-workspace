@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scroll Component Design"
+  short_description: "Design horizontal snap-scroll components and slide decks."
+  default_prompt: "Use $component-design-scroll to build an accessible horizontal snap-scroll component that preserves vertical page scrolling."

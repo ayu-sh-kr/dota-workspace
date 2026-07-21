@@ -1,251 +1,198 @@
-import {BaseElement, Component, Property, Boolean, String} from "@ayu-sh-kr/dota-core";
-import {type IconColor, IconStyle, type IconVariant} from "@dota/components";
-
+import {BaseElement, Boolean as BooleanType, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import type {ChipColor, ChipPosition} from "@dota/components/chip/chip.config.ts";
+import {AvatarStyle} from "@dota/components/avatar/avatar.config.ts";
+import type {AvatarColor, AvatarSize, AvatarStyleConfig, AvatarVariant} from "@dota/components/avatar/avatar.config.ts";
 
 /**
- * Avatar Component
+ * Escapes text before it is placed in the component's HTML-string template.
+ * Attribute and text values come from the element's public API, so encoding
+ * them here prevents a consumer value from changing the generated markup.
+ * @param value - Public attribute or property value to render.
+ * @returns The value encoded for safe insertion into HTML text or attributes.
+ */
+function escapeHtml(value: string | number | undefined): string {
+  const text = value === undefined ? "" : `${value}`;
+
+  return text.replace(/[&<>"']/g, (character: string) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;",
+  })[character]!);
+}
+
+/**
+ * Produces the one- or two-letter fallback shown when an avatar has a label.
+ * Taking the first two non-empty words preserves recognisable initials without
+ * turning names with extra words into an unreadable string.
+ * @param label - Person or entity label supplied to `d-avatar`.
+ * @returns Uppercase initials, or an empty string when no label is available.
+ */
+function getInitials(label: string | undefined): string {
+  return (label ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("");
+}
+
+/**
+ * Renders a person or entity as an image, label-derived initials, or a fallback icon.
  *
- * A versatile avatar component that can display images, labels, or icons with optional chip wrapper.
- *
- * @example
- * // Image Avatar
- * <d-avatar img="/path/to/image.jpg" img-alt="User avatar" size="md"></d-avatar>
- *
- * @example
- * // Label Avatar
- * <d-avatar label="John Doe" variant="solid" size="lg"></d-avatar>
- *
- * @example
- * // Icon Avatar with Chip
- * <d-avatar
- *   icon="user"
- *   is-chip="true"
- *   chip-color="primary"
- *   chip-position="bottom-right"
- *   size="sm">
- * </d-avatar>
+ * Inputs: `img` and `img-alt` render an image; otherwise `label` produces initials,
+ * then `icon` is used as a fallback. `color` (`"gray"`) and `variant` (`"solid"`)
+ * select the default visual token, while `size` (`"md"`) selects its dimensions.
+ * `config` is a JSON `AvatarStyleConfig` attribute that replaces individual visual slots.
+ * `is-chip`, `chip-text`, `chip-color`, and `chip-position` optionally wrap the avatar in
+ * `dota-chip`; omitted chip color inherits `color`. No events are emitted.
+ * Lifecycle and integration: light DOM keeps Tailwind classes available. The component
+ * renders `avatar-wrapper` and, when enabled, `dota-chip`, so both must be registered by the host.
  */
 @Component({
-    selector: 'd-avatar',
-    shadow: false
+  selector: "d-avatar",
+  shadow: false,
 })
 export class AvatarComponent extends BaseElement {
+  @Property({name: "img", type: String})
+  img: string = "";
 
-    @Property({
-        name: 'img',
-        type: String
-    })
-    img!: string
+  @Property({name: "img-alt", type: String})
+  imgAlt: string = "";
 
-    @Property({
-        name: 'img-alt',
-        type: String
-    })
-    imgAlt!: string
+  @Property({name: "label", type: String})
+  label: string = "";
 
-    @Property({
-        name: 'label',
-        type: String
-    })
-    label!: string;
+  @Property({name: "icon", type: String})
+  icon: string = "";
 
-    @Property({
-        name: 'icon',
-        type: String
-    })
-    icon!: string;
+  @Property({name: "is-chip", type: BooleanType, default: "false"})
+  isChip: boolean = false;
 
-    @Property({
-        name: 'is-chip',
-        type: Boolean
-    })
-    isChip!: boolean;
+  @Property({name: "chip-text", type: String, default: ""})
+  chipText: string = "";
 
-    @Property({
-        name: 'chip-text',
-        type: String
-    })
-    chipText!: string;
+  @Property({name: "color", type: String, default: "gray"})
+  color: AvatarColor = "gray";
 
-    @Property({
-        name: 'color',
-        type: String
-    })
-    chipColor!: string;
+  @Property({name: "chip-color", type: String})
+  chipColor: ChipColor | "" = "";
 
-    @Property({
-        name: 'chip-position',
-        type: String
-    })
-    chipPosition!: string
+  @Property({name: "chip-position", type: String, default: "top-right"})
+  chipPosition: ChipPosition = "top-right";
 
-    @Property({
-        name: 'variant',
-        type: String
-    })
-    variant!: string;
+  @Property({name: "variant", type: String, default: "solid"})
+  variant: AvatarVariant = "solid";
 
-    @Property({
-        name: 'size',
-        type: String
-    })
-    size!: string
+  @Property({name: "size", type: String, default: "md"})
+  size: AvatarSize = "md";
 
-    constructor() {
-        super();
+  @Property({name: "config", type: ObjectType})
+  config: AvatarStyleConfig = {};
+
+  constructor() {
+    super();
+  }
+
+  /** Builds the content branch while keeping image, initials, and icon precedence explicit. */
+  private renderContent(): string {
+    if (this.img) {
+      return `<img src="${escapeHtml(this.img)}" alt="${escapeHtml(this.imgAlt)}" class="${escapeHtml(this.config?.image ?? AvatarStyle.image)}">`;
     }
 
-    template = (): string => {
-
-        const size = this.size || 'md';
-
-        if(this.img) {
-            return this.isChip ?
-                `
-                    <dota-chip color="${this.chipColor}" size="sm" position="${this.chipPosition}">
-                        <avatar-wrapper color="${this.chipColor}" variant="${this.variant}" size="${size}">
-                            <img src="${this.img}" alt="${this.imgAlt}" class="w-full h-full rounded-full">
-                        </avatar-wrapper>
-                    </dota-chip>
-                    
-                ` :
-                `
-                    <avatar-wrapper color="${this.chipColor}" variant="${this.variant}" size="${size}">
-                        <img src="${this.img}" alt="${this.imgAlt}" class="w-full h-full rounded-full">
-                    </avatar-wrapper>
-                `;
-        } else if(this.label) {
-            return this.isChip ?
-                `
-                    <dota-chip color="${this.chipColor}" size="sm" position="${this.chipPosition}">
-                        <avatar-wrapper color="${this.chipColor}" variant="${this.variant}" size="${size}">
-                            ${this.label.split(" ").map((value: string, index: number) => {
-                                if(index < 2) {
-                                    return value.toUpperCase().at(0);
-                                }
-                            }).join("")}
-                        </avatar-wrapper>
-                    </dota-chip>
-                `
-                :
-                `
-                    <avatar-wrapper color="${this.chipColor}" variant="${this.variant}" size="${size}">
-                        <span>
-                            ${this.label.split(" ").map((value: string, index: number) => {
-                                if(index < 2) {
-                                    return value.toUpperCase().at(0);
-                                }
-                            }).join("")}
-                        </span>
-                    </avatar-wrapper>
-                `;
-        } else {
-
-            return this.isChip ?
-                `
-                    <dota-chip color="${this.chipColor}" size="sm" position="${this.chipPosition}">
-                        <avatar-wrapper color="${this.chipColor}" variant="${this.variant}" size="${size}">
-                            <dota-icon name="${this.icon}" color="${this.chipColor}" size="${size}" variant="${this.variant}"></dota-icon>
-                        </avatar-wrapper>
-                    </dota-chip>
-                `
-                :
-                `
-                    <avatar-wrapper color="${this.chipColor}" variant="${this.variant}" size="${size}">
-                        <dota-icon name="${this.icon}" color="${this.chipColor}" size="${size}" variant="${this.variant}"></dota-icon>
-                    </avatar-wrapper>
-                `;
-        }
+    if (this.label) {
+      return `<span class="${escapeHtml(this.config?.initials ?? AvatarStyle.initials)}">${escapeHtml(getInitials(this.label))}</span>`;
     }
 
-    render(): string {
-        return this.template();
+    return `<dota-icon aria-hidden="true" name="${escapeHtml(this.icon)}" color="${escapeHtml(this.color)}" size="${escapeHtml(this.size)}" variant="${escapeHtml(this.variant)}" classname="${escapeHtml(this.config?.icon ?? AvatarStyle.icon)}"></dota-icon>`;
+  }
+
+  render(): string {
+    const config = escapeHtml(JSON.stringify(this.config ?? {}));
+    const avatar = `
+      <avatar-wrapper
+        color="${escapeHtml(this.color)}"
+        variant="${escapeHtml(this.variant)}"
+        size="${escapeHtml(this.size)}"
+        aria-label="${escapeHtml(this.img ? "" : this.label)}"
+        config="${config}">
+        ${this.renderContent()}
+      </avatar-wrapper>
+    `;
+
+    if (!this.isChip) {
+      return avatar;
     }
 
+    return `
+      <dota-chip
+        text="${escapeHtml(this.chipText)}"
+        color="${escapeHtml(this.chipColor || this.color)}"
+        position="${escapeHtml(this.chipPosition)}">
+        ${avatar}
+      </dota-chip>
+    `;
+  }
 }
-
 
 /**
- * Avatar Wrapper Component
+ * Provides the visual container used by `d-avatar` and remains available for direct composition.
  *
- * A container component that provides styling and layout for avatar content.
- * Supports different colors, variants, and sizes.
- *
- * @example
- * <avatar-wrapper color="primary" variant="solid" size="md">
- *   <img src="avatar.jpg" alt="User avatar">
- * </avatar-wrapper>
+ * Inputs: `color` (`"gray"`), `variant` (`"solid"`), and `size` (`"md"`) resolve a
+ * default token from `AvatarStyle`; `config` may replace the container, selected size, or
+ * color/variant slot. `aria-label` makes non-image fallback content available to assistive tech.
+ * Lifecycle and integration: captures its initial light-DOM content and reuses it when attributes
+ * update, allowing `d-avatar` to supply an image, initials, or `dota-icon` child.
  */
 @Component({
-    selector: 'avatar-wrapper',
-    shadow: false
+  selector: "avatar-wrapper",
+  shadow: false,
 })
 export class AvatarWrapper extends BaseElement {
+  content: string;
 
-    /** Content to be rendered inside the avatar wrapper */
-    content!: string
+  @Property({name: "color", type: String, default: "gray"})
+  color: AvatarColor = "gray";
 
-    /**
-     * Color theme of the avatar
-     * @type {IconColor}
-     */
-    @Property({
-        name: 'color',
-        type: String
-    })
-    color!: IconColor;
+  @Property({name: "variant", type: String, default: "solid"})
+  variant: AvatarVariant = "solid";
 
-    /**
-     * Visual variant of the avatar
-     * @type {IconVariant}
-     */
-    @Property({
-        name: 'variant',
-        type: String
-    })
-    variant!: IconVariant;
+  @Property({name: "size", type: String, default: "md"})
+  size: AvatarSize = "md";
 
-    /**
-     * Size of the avatar
-     * @type {IconSize}
-     */
-    @Property({
-        name: 'size',
-        type: String
-    })
-    size!: AvatarSize
+  @Property({name: "aria-label", type: String})
+  ariaLabel: string = "";
 
-    constructor() {
-        super();
-        this.content = this.innerHTML;
-    }
+  @Property({name: "config", type: ObjectType})
+  config: AvatarStyleConfig = {};
 
-    render(): string {
+  constructor() {
+    super();
+    this.content = this.innerHTML;
+  }
 
-        const color = AvatarConfig.color[this.color] || AvatarConfig.color.gray;
-        const variant = color[this.variant] || color.solid
+  /** Resolves each visual slot independently so a config cannot erase sibling defaults. */
+  private getStyle() {
+    const color = this.color ?? "gray";
+    const variant = this.variant ?? "solid";
+    const size = this.size ?? "md";
 
-        const size = AvatarConfig.size[this.size] || AvatarConfig.size.lg;
+    return {
+      container: this.config?.container ?? AvatarStyle.container,
+      size: this.config?.size?.[size] ?? AvatarStyle.size[size] ?? AvatarStyle.size.md,
+      color: this.config?.color?.[color]?.[variant] ?? AvatarStyle.color[color]?.[variant] ?? AvatarStyle.color.gray.solid,
+    };
+  }
 
-        return `
-            <div class="rounded-full content-center ${variant} ${size} flex items-center justify-center font-semibold overflow-hidden">
-                ${this.content}
-            </div>
-        `;
-    }
+  render(): string {
+    const style = this.getStyle();
+    const accessibleLabel = this.ariaLabel ? ` role="img" aria-label="${escapeHtml(this.ariaLabel)}"` : "";
 
+    return `<span class="${escapeHtml(`${style.container} ${style.size} ${style.color}`)}"${accessibleLabel}>${this.content}</span>`;
+  }
 }
 
-const AvatarConfig = {
-    color: IconStyle.color,
-    size: {
-        xs: 'w-5 h-5',
-        sm: 'w-6 h-6',
-        md: 'w-8 h-8',
-        lg: 'w-10 h-10',
-        xl: 'w-12 h-12',
-        '2xl': 'w-16 h-16'
-    }
-}
-
-export type AvatarSize = keyof typeof AvatarConfig.size;
+export {AvatarStyle as AvatarConfig};
+export type {AvatarColor, AvatarSize, AvatarStyleConfig, AvatarVariant};

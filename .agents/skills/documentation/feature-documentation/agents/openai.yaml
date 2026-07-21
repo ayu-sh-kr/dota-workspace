@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature Documentation"
+  short_description: "Document project features clearly and coherently."
+  default_prompt: "Use $feature-documentation to create or update Markdown documentation for this project feature."

@@ -1,7 +1,39 @@
-import {BaseElement, HelperUtils, PropertyDetails, Sanitizer, WatcherOptionMeta} from "@dota/core";
+import {BaseElement, HelperUtils, PropertyDetails, PropertyType, Sanitizer, WatcherOptionMeta} from "@dota/core";
 
 
 export class PropertyUtils {
+  /**
+   * Converts a reactive property value to the string required by the DOM attribute API.
+   * Object-like property types provide JSON serialization so field initializers and JavaScript
+   * assignments do not degrade to `"[object Object]"` before attribute observers read them.
+ * @param value - Current public property value selected during binding or assignment.
+ * @param type - Property contract that may define its own attribute serialization.
+ * @returns The string representation stored in the matching HTML attribute.
+   */
+  private static serializeAttributeValue(value: any, type: PropertyType<any>): string {
+    return type.serialize ? type.serialize(value) : String(value);
+  }
+
+  /**
+   * Compares values using their reflected form when a property type has custom serialization.
+   * This prevents an attribute callback's parsed object from replacing an equivalent object and
+   * re-entering the reactive setter after a JavaScript assignment.
+ * @param current - Value currently stored in the reactive backing field.
+ * @param next - Candidate value supplied by an attribute callback or caller.
+ * @param type - Property contract that may supply stable serialization.
+ * @returns Whether both values are already equivalent for attribute reflection.
+   */
+  private static isEquivalentValue(current: any, next: any, type: PropertyType<any>): boolean {
+    if (current === next) return true;
+    if (!type.serialize) return false;
+
+    try {
+      return type.serialize(current) === type.serialize(next);
+    } catch {
+      return false;
+    }
+  }
+
   /**
    * Establishes reactive property bindings on an element instance by installing getter/setter pairs
    * that maintain bidirectional synchronization between JavaScript properties and DOM attributes.
@@ -117,9 +149,9 @@ export class PropertyUtils {
         },
 
         set(v: any) {
-          if (element[backingKey] !== v) {
+          if (!PropertyUtils.isEquivalentValue(element[backingKey], v, meta.type)) {
             element[backingKey] = v;
-            element.setAttribute(attrName, v);
+            element.setAttribute(attrName, PropertyUtils.serializeAttributeValue(v, meta.type));
             PropertyUtils.bindWatchers(element, publicKey);
           }
         },
@@ -132,7 +164,11 @@ export class PropertyUtils {
       // Use HTMLElement.prototype.setAttribute directly so the observed-attribute callback is
       // NOT triggered — this is an internal setup step, not a user-driven change.
       if (!hasAttr && initial !== undefined) {
-        HTMLElement.prototype.setAttribute.call(element, attrName, initial);
+        HTMLElement.prototype.setAttribute.call(
+          element,
+          attrName,
+          PropertyUtils.serializeAttributeValue(initial, meta.type),
+        );
       }
     });
 
