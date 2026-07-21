@@ -96,13 +96,15 @@ name, or an effect merely to fill a section.
 
 ## Document members selectively
 
-For individual class members, follow the `$code-documentation` skill. Read its
+For individual class members and module-level support functions, follow the `$code-documentation` skill. Read its
 `SKILL.md` before writing member TSDoc and use its concise purpose, rationale,
 parameter, return-value, and failure-mode standard. Add member comments only for
 non-trivial public APIs, lifecycle handlers, event handlers whose policy is not
-clear from their name, and helpers with a maintenance hazard. Do not duplicate
-the class contract on every decorated field or method, and do not comment simple
-fields, constructors, or obvious render methods.
+clear from their name, and helpers with a maintenance hazard. For animation
+components, this includes helpers that normalize inputs, resolve palettes or
+styles, manage canvas/frame loops, attach global listeners, or return cleanup
+functions. Do not duplicate the class contract on every decorated field or
+method, and do not comment simple fields, constructors, or obvious render methods.
 
 ## Final review
 
