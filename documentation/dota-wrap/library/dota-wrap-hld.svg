@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" width="1600" height="1100">
+  <title>dota-wrap High-Level Design</title>
+  <desc>
+    Light-mode high-level design for dota-wrap. The diagram shows public entry points,
+    build dependency resolution, and runtime application initialization. All connectors
+    use horizontal and vertical segments; numbered markers identify dense branch points.
+  </desc>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#495057"/>
+    </marker>
+    <marker id="arrow-async" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7048e8"/>
+    </marker>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap');
+      svg { text-rendering: geometricPrecision; }
+      .bg { fill: #ffffff; }
+      .lane { fill: #f8f9fa; stroke: #dee2e6; stroke-width: 1; }
+      .entry { fill: #3b5bdb; }
+      .runtime { fill: #0c8599; }
+      .build { fill: #7048e8; }
+      .decision { fill: #e67700; }
+      .artifact { fill: #2f9e44; }
+      .ready { fill: #2b8a3e; }
+      .card { rx: 10; }
+      .title { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; fill: #212529; }
+      .subtitle { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; fill: #495057; }
+      .lane-label { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #868e96; letter-spacing: 1.6px; text-anchor: middle; }
+      .label { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 600; fill: #ffffff; text-anchor: middle; dominant-baseline: middle; }
+      .annotation { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 400; fill: #495057; text-anchor: middle; dominant-baseline: middle; }
+      .branch { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; fill: #495057; text-anchor: middle; dominant-baseline: middle; }
+      .connector { stroke: #495057; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .async { stroke: #7048e8; stroke-width: 2; fill: none; stroke-dasharray: 7 5; marker-end: url(#arrow-async); }
+      .marker-text { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #ffffff; text-anchor: middle; dominant-baseline: middle; }
+      .legend { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; fill: #343a40; dominant-baseline: middle; }
+      .legend-note { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; fill: #495057; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="1100"/>
+  <text class="title" x="60" y="55">@ayu-sh-kr/dota-wrap · high-level design</text>
+  <text class="subtitle" x="60" y="82">Public surface · dependency policy · application startup</text>
+
+  <!-- PUBLIC SURFACE -->
+  <rect class="lane" x="40" y="110" width="1520" height="270" rx="16"/>
+  <text class="lane-label" x="800" y="138">PUBLIC PACKAGE SURFACE</text>
+
+  <rect class="card entry" x="650" y="165" width="300" height="52"/>
+  <text class="label" x="800" y="191">dota-wrap</text>
+
+  <rect class="card runtime" x="80" y="285" width="190" height="46"/>
+  <text class="label" x="175" y="308">./core</text>
+  <rect class="card runtime" x="315" y="285" width="190" height="46"/>
+  <text class="label" x="410" y="308">./event</text>
+  <rect class="card runtime" x="550" y="285" width="190" height="46"/>
+  <text class="label" x="645" y="308">./router</text>
+  <rect class="card runtime" x="785" y="285" width="190" height="46"/>
+  <text class="label" x="880" y="308">./rest</text>
+  <rect class="card build" x="1020" y="285" width="220" height="46"/>
+  <text class="label" x="1130" y="308">./preloader-plugin</text>
+  <rect class="card build" x="1275" y="285" width="220" height="46"/>
+  <text class="label" x="1385" y="308">./web-type-json</text>
+
+  <!-- symmetric orthogonal fan-out -->
+  <path class="connector" d="M800,217 V245 H175 V285"/>
+  <path class="connector" d="M800,245 H410 V285"/>
+  <path class="connector" d="M800,245 H645 V285"/>
+  <path class="connector" d="M800,245 H880 V285"/>
+  <path class="connector" d="M800,245 H1130 V285"/>
+  <path class="connector" d="M800,245 H1385 V285"/>
+
+  <!-- DEPENDENCY RESOLUTION -->
+  <rect class="lane" x="40" y="410" width="1520" height="255" rx="16"/>
+  <text class="lane-label" x="800" y="438">DEPENDENCY RESOLUTION</text>
+
+  <rect class="card build" x="100" y="490" width="260" height="52"/>
+  <text class="label" x="230" y="516">build entries</text>
+  <text class="annotation" x="230" y="563">root + subpaths</text>
+
+  <rect class="card decision" x="500" y="490" width="270" height="52"/>
+  <text class="label" x="635" y="516">classify dependency</text>
+  <circle cx="635" cy="466" r="14" fill="#343a40"/>
+  <text class="marker-text" x="635" y="466">1</text>
+
+  <rect class="card runtime" x="930" y="450" width="260" height="52"/>
+  <text class="label" x="1060" y="476">keep runtime external</text>
+  <text class="annotation" x="1060" y="523">shared instances</text>
+  <rect class="card build" x="930" y="570" width="260" height="52"/>
+  <text class="label" x="1060" y="596">bundle plugin code</text>
+  <text class="annotation" x="1060" y="643">node + Vite stay external</text>
+
+  <rect class="card artifact" x="1300" y="450" width="200" height="52"/>
+  <text class="label" x="1400" y="476">package exports</text>
+  <rect class="card artifact" x="1300" y="570" width="200" height="52"/>
+  <text class="label" x="1400" y="596">packed plugins</text>
+
+  <path class="connector" d="M360,516 H500"/>
+  <path class="connector" d="M770,516 H840 V476 H930"/>
+  <path class="connector" d="M770,516 H840 V596 H930"/>
+  <path class="connector" d="M1190,476 H1300"/>
+  <path class="connector" d="M1190,596 H1300"/>
+  <circle cx="950" cy="430" r="14" fill="#343a40"/>
+  <text class="marker-text" x="950" y="430">2</text>
+  <circle cx="950" cy="550" r="14" fill="#343a40"/>
+  <text class="marker-text" x="950" y="550">3</text>
+
+  <!-- RUNTIME INITIALIZATION -->
+  <rect class="lane" x="40" y="700" width="1520" height="285" rx="16"/>
+  <text class="lane-label" x="800" y="728">RUNTIME INITIALIZATION</text>
+
+  <rect class="card entry" x="100" y="805" width="260" height="52"/>
+  <text class="label" x="230" y="831">initializeApp</text>
+  <text class="annotation" x="230" y="878">config in</text>
+
+  <rect class="card decision" x="500" y="805" width="270" height="52"/>
+  <text class="label" x="635" y="831">modules: array?</text>
+  <circle cx="635" cy="781" r="14" fill="#343a40"/>
+  <text class="marker-text" x="635" y="781">4</text>
+
+  <rect class="card runtime" x="930" y="765" width="260" height="52"/>
+  <text class="label" x="1060" y="791">use constructors</text>
+  <rect class="card runtime" x="930" y="900" width="260" height="52"/>
+  <text class="label" x="1060" y="926">load + extract</text>
+  <text class="annotation" x="1060" y="973">async module map</text>
+
+  <rect class="card ready" x="1300" y="815" width="200" height="52"/>
+  <text class="label" x="1400" y="841">append + bootstrap</text>
+  <rect class="card ready" x="1300" y="920" width="200" height="52"/>
+  <text class="label" x="1400" y="946">routes + ready</text>
+
+  <path class="connector" d="M360,831 H500"/>
+  <path class="connector" d="M770,831 H840 V791 H930"/>
+  <path class="async" d="M770,831 H840 V926 H930"/>
+  <path class="connector" d="M1190,791 H1230 V841 H1300"/>
+  <path class="connector" d="M1190,926 H1230 V841 H1300"/>
+  <path class="connector" d="M1400,867 V920"/>
+  <circle cx="950" cy="745" r="14" fill="#343a40"/>
+  <text class="marker-text" x="950" y="745">5</text>
+  <circle cx="950" cy="880" r="14" fill="#343a40"/>
+  <text class="marker-text" x="950" y="880">6</text>
+
+  <!-- LEGEND -->
+  <rect x="60" y="1015" width="1480" height="65" rx="10" fill="#f1f3f5" stroke="#dee2e6"/>
+  <rect x="85" y="1038" width="22" height="15" rx="4" fill="#3b5bdb"/>
+  <text class="legend" x="118" y="1046">entry</text>
+  <rect x="190" y="1038" width="22" height="15" rx="4" fill="#0c8599"/>
+  <text class="legend" x="223" y="1046">runtime</text>
+  <rect x="310" y="1038" width="22" height="15" rx="4" fill="#7048e8"/>
+  <text class="legend" x="343" y="1046">build / async</text>
+  <rect x="465" y="1038" width="22" height="15" rx="4" fill="#e67700"/>
+  <text class="legend" x="498" y="1046">decision</text>
+  <rect x="600" y="1038" width="22" height="15" rx="4" fill="#2f9e44"/>
+  <text class="legend" x="633" y="1046">resolved output</text>
+  <line x1="770" y1="1046" x2="820" y2="1046" class="connector"/>
+  <text class="legend" x="840" y="1046">orthogonal flow</text>
+  <circle cx="1010" cy="1046" r="12" fill="#343a40"/>
+  <text class="marker-text" x="1010" y="1046">1</text>
+  <text class="legend" x="1035" y="1046">branch key</text>
+  <text class="legend-note" x="1180" y="1046">1 class · 4 shape · 2/3, 5/6 paths</text>
+</svg>
