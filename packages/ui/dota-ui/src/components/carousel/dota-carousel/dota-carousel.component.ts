@@ -1,5 +1,6 @@
-import {AfterInit, BaseElement, BindEvent, Component, Property, String, Boolean, Number} from "@ayu-sh-kr/dota-core";
-import {CarouselConfig} from "@dota/components/carousel/carousel.config.ts";
+import {AfterInit, BaseElement, BindEvent, Boolean, Component, Number, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {DotaCarouselStyle} from "@dota/components/carousel/dota-carousel/dota-carousel.config.ts";
+import type {DotaCarouselStyleConfig} from "@dota/components/carousel/dota-carousel/dota-carousel.config.ts";
 import {
   type CarouselAnimation,
   type CarouselColor,
@@ -8,6 +9,23 @@ import {
   type CarouselNavigation
 } from "@dota/components/carousel/CarouselTypes.ts";
 
+/**
+ * Presents `dota-slide` content as a selected slide track or a stacked animated view.
+ *
+ * Inputs: `name` labels the region. `indicator` (`"icon"`), its active/regular icon inputs,
+ * `prev-icon`, `next-icon`, and `navigation` (`"auto"`) choose the available controls.
+ * `index` (`0`), `loop` (`false`), `slides-per-view` (`1`), and `animation` (`"slide"`)
+ * select the visible slide and rendering mode. `autoplay` (`false`), `interval` (`3000`),
+ * `pause-on-hover` (`true`), `keyboard-navigation` (`true`), and `draggable` (`false`)
+ * control movement. `gap-per-slide` (`"none"`) and `color` (`"purple"`) select tokens;
+ * `snap` (`false`) is observed but does not currently change rendering. `config` is a JSON
+ * `DotaCarouselStyleConfig` attribute that replaces visual slots without changing behavior.
+ * Events: previous/next buttons, indicator buttons, optional arrow keys, drag gestures, and
+ * autoplay update `index`; the component emits no custom events.
+ * Lifecycle and integration: the light-DOM component captures its initial `dota-slide`
+ * children and renders their content with `dota-icon` controls, which must be registered by
+ * the host application.
+ */
 @Component({
   selector: "dota-carousel",
   shadow: false
@@ -70,6 +88,9 @@ export class DotaCarouselComponent extends BaseElement {
 
   @Property({name: 'color', type: String})
   color: CarouselColor = 'purple';
+
+  @Property({name: 'config', type: ObjectType})
+  config: DotaCarouselStyleConfig = {};
 
   dotaSlides: string[] = [];
 
@@ -205,6 +226,9 @@ export class DotaCarouselComponent extends BaseElement {
           from { opacity: 0; transform: perspective(600px) rotateY(-20deg); }
           to   { opacity: 1; transform: perspective(600px) rotateY(0deg); }
         }
+        @media (prefers-reduced-motion: reduce) {
+          dota-carousel .carousel-stacked [style*="animation:"] { animation: none !important; }
+        }
       </style>
     `;
   }
@@ -218,11 +242,44 @@ export class DotaCarouselComponent extends BaseElement {
     return map[this.animation as Exclude<CarouselAnimation, 'slide'>] ?? '';
   }
 
+  /** Resolves each visual slot independently so a config cannot erase sibling defaults. */
+  private getStyle() {
+    const config = this.config;
+    const color = this.color ?? 'purple';
+    const gap = this.gapPerSlide ?? 'none';
+
+    return {
+      container: config?.container ?? DotaCarouselStyle.container,
+      viewport: config?.viewport ?? DotaCarouselStyle.viewport,
+      track: config?.track ?? DotaCarouselStyle.track,
+      slide: config?.slide ?? DotaCarouselStyle.slide,
+      stacked: config?.stacked ?? DotaCarouselStyle.stacked,
+      drag: config?.drag ?? DotaCarouselStyle.drag,
+      gap: config?.gap?.[gap] ?? DotaCarouselStyle.gap[gap] ?? DotaCarouselStyle.gap.none,
+      indicators: {
+        container: config?.indicators?.container ?? DotaCarouselStyle.indicators.container,
+        number: config?.indicators?.number ?? DotaCarouselStyle.indicators.number,
+        button: config?.indicators?.button ?? DotaCarouselStyle.indicators.button,
+        active: config?.indicators?.active ?? DotaCarouselStyle.indicators.active,
+        inactive: config?.indicators?.inactive ?? DotaCarouselStyle.indicators.inactive,
+        color: config?.indicators?.color?.[color] ?? DotaCarouselStyle.indicators.color[color] ?? DotaCarouselStyle.indicators.color.purple,
+      },
+      navigation: {
+        base: config?.navigation?.base ?? DotaCarouselStyle.navigation.base,
+        prev: config?.navigation?.prev ?? DotaCarouselStyle.navigation.prev,
+        next: config?.navigation?.next ?? DotaCarouselStyle.navigation.next,
+        disabled: config?.navigation?.disabled ?? DotaCarouselStyle.navigation.disabled,
+        color: config?.navigation?.color?.[color] ?? DotaCarouselStyle.navigation.color[color] ?? DotaCarouselStyle.navigation.color.purple,
+      },
+    };
+  }
+
   private _renderStacked(): string {
     const anim = this._animValue();
-    const dragClass = this.draggable ? 'cursor-grab active:cursor-grabbing select-none' : '';
+    const style = this.getStyle();
+    const dragClass = this.draggable ? style.drag : '';
     return `
-      <div class="carousel-stacked relative ${dragClass}">
+      <div class="carousel-stacked ${style.stacked} ${dragClass}">
         ${this.dotaSlides.map((content, i) => {
           const isActive = i === this.index;
           return `
@@ -241,9 +298,9 @@ export class DotaCarouselComponent extends BaseElement {
     // Width relative to the track: each slide must equal (1/N) of the track
     // so it displays as (1/slidesPerView) of the visible container.
     const slideWidthInTrack = 100 / this.dotaSlides.length;
-    const gapClass = CarouselConfig.gap[this.gapPerSlide];
+    const style = this.getStyle();
     return this.dotaSlides.map(content => `
-            <div class="carousel-slide flex-shrink-0 overflow-hidden ${gapClass}" style="width: ${slideWidthInTrack}%">
+            <div class="${style.slide} ${style.gap}" style="width: ${slideWidthInTrack}%">
                 ${content}
             </div>
         `).join('');
@@ -252,10 +309,11 @@ export class DotaCarouselComponent extends BaseElement {
   private _renderIndicators(): string {
     if (this.indicator === 'none' || this.dotaSlides.length <= 1) return '';
 
+    const style = this.getStyle();
     if (this.indicator === 'number') {
       return `
-                <div class="flex items-center justify-center mt-3">
-                    <span class="text-sm font-medium text-${this.color}-500 dark:text-${this.color}-400">
+                <div class="${style.indicators.container}">
+                    <span class="${style.indicators.number} ${style.indicators.color}">
                         ${this.index + 1} / ${this.dotaSlides.length}
                     </span>
                 </div>
@@ -266,14 +324,14 @@ export class DotaCarouselComponent extends BaseElement {
       const isActive = i === this.index;
       return `
                 <button onclick="this.closest('dota-carousel').toSlide(${i})"
-                        class="border-0 p-0 cursor-pointer transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-40 hover:opacity-70'}"
+                        class="${style.indicators.button} ${isActive ? style.indicators.active : style.indicators.inactive}"
                         aria-label="Go to slide ${i + 1}">
                     <dota-icon name="${isActive ? this.indicatorActiveIcon : this.indicatorRegularIcon}" size="md" color="${this.color}" variant="ghost"></dota-icon>
                 </button>
             `;
     }).join('');
 
-    return `<div id="indicators" class="flex items-center justify-center gap-2 mt-3">${dots}</div>`;
+    return `<div id="indicators" class="${style.indicators.container}">${dots}</div>`;
   }
 
   private _renderNavigation(): string {
@@ -282,21 +340,21 @@ export class DotaCarouselComponent extends BaseElement {
     const max = this.dotaSlides.length - this.slidesPerView;
     const canPrev = this.loop || this.index > 0;
     const canNext = this.loop || this.index < max;
-    const colorClass = `text-${this.color}-600 dark:text-${this.color}-400`;
-    const disabledPrev = !canPrev ? 'opacity-40 cursor-not-allowed pointer-events-none' : '';
-    const disabledNext = !canNext ? 'opacity-40 cursor-not-allowed pointer-events-none' : '';
+    const style = this.getStyle();
+    const disabledPrev = !canPrev ? style.navigation.disabled : '';
+    const disabledNext = !canNext ? style.navigation.disabled : '';
 
     const prevIcon = `<dota-icon name="${this.prevIcon}" size="md"></dota-icon>`;
     const nextIcon = `<dota-icon name="${this.nextIcon}" size="md"></dota-icon>`;
 
     return `
             <button id="prev-btn"
-                    class="${CarouselConfig.navigation.base} ${CarouselConfig.navigation.prev} ${colorClass} ${disabledPrev}"
+                    class="${style.navigation.base} ${style.navigation.prev} ${style.navigation.color} ${disabledPrev}"
                     aria-label="Previous slide">
                 ${prevIcon}
             </button>
             <button id="next-btn"
-                    class="${CarouselConfig.navigation.base} ${CarouselConfig.navigation.next} ${colorClass} ${disabledNext}"
+                    class="${style.navigation.base} ${style.navigation.next} ${style.navigation.color} ${disabledNext}"
                     aria-label="Next slide">
                 ${nextIcon}
             </button>
@@ -306,8 +364,10 @@ export class DotaCarouselComponent extends BaseElement {
   render(): string {
     if (this.dotaSlides.length === 0) return '<div></div>';
 
+    const style = this.getStyle();
+
     const wrapper = (inner: string) => `
-      <div class="dota-carousel w-full"
+      <div class="${style.container}"
            role="region"
            aria-label="${this.name || 'carousel'}"
            aria-roledescription="carousel">
@@ -326,11 +386,11 @@ export class DotaCarouselComponent extends BaseElement {
     const N = this.dotaSlides.length;
     const totalWidth = (N / this.slidesPerView) * 100;
     const translateX = this.index * (100 / N);
-    const dragClass = this.draggable ? 'cursor-grab active:cursor-grabbing select-none' : '';
+    const dragClass = this.draggable ? style.drag : '';
 
     return wrapper(`
-      <div class="relative overflow-hidden">
-        <div class="carousel-track flex transition-transform duration-500 ease-in-out ${dragClass}"
+      <div class="${style.viewport}">
+        <div class="carousel-track ${style.track} ${dragClass}"
              style="width: ${totalWidth}%; transform: translateX(-${translateX}%);">
           ${this._renderSlides()}
         </div>
@@ -339,3 +399,6 @@ export class DotaCarouselComponent extends BaseElement {
     `);
   }
 }
+
+export {DotaCarouselStyle as CarouselConfig};
+export type {DotaCarouselStyleConfig};
