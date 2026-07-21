@@ -1,205 +1,210 @@
-import {BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HTML, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
 import {LifecycleEventConstants} from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 import type {ApplicationEvent} from "@ayu-sh-kr/dota-event";
-import type {IconSize, IconVariant, IconColor} from "@dota/components/icon/icons.config.ts";
-import {IconStyle} from "@dota/components/icon/icons.config.ts";
+import {
+  IconStyle,
+  type IconColor,
+  type IconSize,
+  type IconStyleConfig,
+  type IconVariant,
+} from "@dota/components/icon/icons.config.ts";
 
-/** Module-level cache: icon name → raw SVG string */
 const SVG_CACHE = new Map<string, string>();
-
-/** In-flight dedup: icon name → pending fetch Promise */
 const SVG_INFLIGHT = new Map<string, Promise<string | null>>();
+const ICON_NAME_PATTERN = /^[a-z0-9-]+:[a-z0-9-]+$/i;
 
 /**
- * Fetch (or return cached) raw SVG markup for the given icon name.
- * Concurrent requests for the same name share a single in-flight fetch.
+ * Removes executable and externally-loading content from Iconify SVG markup.
+ * The component injects the resulting SVG into light DOM, so this keeps the
+ * cached asset limited to presentational SVG elements and attributes.
+ * @param rawSvg Markup returned by Iconify for one validated icon name.
+ * @returns Safe serialized SVG markup, or `null` when the response is not an SVG.
+ */
+function sanitizeSvg(rawSvg: string): string | null {
+  const document = new DOMParser().parseFromString(rawSvg, 'image/svg+xml');
+  const svg = document.documentElement;
+  if (svg.localName !== 'svg' || document.querySelector('parsererror')) return null;
+
+  svg.querySelectorAll('script, style, foreignObject, iframe, object, embed, audio, video').forEach(element => element.remove());
+  svg.querySelectorAll('*').forEach(element => {
+    [...element.attributes].forEach(attribute => {
+      const name = attribute.name.toLowerCase();
+      const value = attribute.value.trim().toLowerCase();
+      if (name.startsWith('on') || (name === 'href' || name === 'xlink:href') && !value.startsWith('#')) {
+        element.removeAttribute(attribute.name);
+      }
+    });
+  });
+
+  svg.removeAttribute('style');
+  svg.removeAttribute('class');
+  return new XMLSerializer().serializeToString(svg);
+}
+
+/**
+ * Fetches one Iconify SVG and shares its sanitized result across all instances.
+ * Keeping in-flight work by name prevents duplicate requests while preserving a
+ * failed request as a retryable miss instead of permanently caching the failure.
+ * @param name A validated `collection:icon` identifier.
+ * @returns Sanitized SVG markup, or `null` if the icon cannot be loaded safely.
  */
 function fetchSvg(name: string): Promise<string | null> {
-  if (SVG_CACHE.has(name)) {
-    return Promise.resolve(SVG_CACHE.get(name)!);
-  }
+  const cached = SVG_CACHE.get(name);
+  if (cached) return Promise.resolve(cached);
 
-  if (SVG_INFLIGHT.has(name)) {
-    return SVG_INFLIGHT.get(name)!;
-  }
+  const inFlight = SVG_INFLIGHT.get(name);
+  if (inFlight) return inFlight;
 
-  const url = `https://api.iconify.design/${name}.svg?color=%23888888`;
-  const promise = fetch(url)
-    .then(res => {
-      if (res.status !== 200) {
-        console.warn(`[IconsComponent] HTTP ${res.status} for icon: ${name}`);
-        return null;
-      }
-      return res.text();
+  const promise = fetch(`https://api.iconify.design/${name}.svg`)
+    .then(response => response.ok ? response.text() : null)
+    .then(rawSvg => rawSvg ? sanitizeSvg(rawSvg) : null)
+    .then(svg => {
+      if (svg) SVG_CACHE.set(name, svg);
+      return svg;
     })
-    .then(text => {
-      if (!text || text === '404') {
-        console.warn(`[IconsComponent] Icon not found: ${name}`);
-        return null;
-      }
-      SVG_CACHE.set(name, text);
-      return text;
-    })
-    .catch(err => {
-      console.warn('[IconsComponent] Fetch error:', err);
+    .catch(error => {
+      console.warn(`[dota-icon] Could not load "${name}".`, error);
       return null;
     })
-    .finally(() => {
-      SVG_INFLIGHT.delete(name);
-    });
+    .finally(() => SVG_INFLIGHT.delete(name));
 
   SVG_INFLIGHT.set(name, promise);
   return promise;
 }
 
 /**
- * IconsComponent - A web component for displaying SVG icons with customizable size, color, and variants.
+ * Displays a cached Iconify SVG with a typed, per-instance visual theme.
  *
- * Icons are fetched once and cached globally; subsequent uses of the same icon name
- * resolve instantly from cache. Color/variant changes are applied without re-fetching.
+ * Inputs: `name` is a required `collection:icon` identifier and selects the remote SVG.
+ * `size`, `color`, and `variant` select default style tokens, falling back to `md`, the
+ * current text color, and `solid`. `classname` adds classes to the SVG itself; `config`
+ * accepts an `IconStyleConfig` JSON attribute that replaces individual visual slots.
+ * `aria-label` gives the icon an accessible image name; without it, the SVG is hidden as
+ * decorative content. Unsupported style values fall back safely to their defaults.
  *
- * @example
- * ```html
- * <dota-icon name="mdi:home" size="sm" color="primary" variant="solid"></dota-icon>
- * ```
+ * State: a module-level cache retains sanitized SVG markup and shares in-flight fetches.
+ * Events: connection and reactive attribute changes load the current icon; a name change
+ * cannot overwrite a later selection after its request resolves. No custom events emit.
+ * Lifecycle and integration: light DOM lets consumer Tailwind classes apply to the SVG.
  */
 @Component({
   selector: 'dota-icon',
-  shadow: false
+  shadow: false,
 })
 class IconsComponent extends BaseElement {
 
-  /** Icon name in format 'collection:icon-name' (e.g., 'mdi:home') */
   @Property({name: 'name', type: String})
-  name!: string;
+  name = '';
 
-  /** Additional CSS classes to apply to the icon */
   @Property({name: 'classname', type: String})
-  className!: string;
+  className = '';
 
-  /** Icon size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' */
   @Property({name: 'size', type: String})
-  size!: IconSize;
+  size?: IconSize;
 
-  /** Icon color theme */
   @Property({name: 'color', type: String})
-  color!: IconColor;
+  color?: IconColor;
 
-  /** Icon variant: 'solid' | 'outline' | 'soft' | 'ghost' | 'link' */
   @Property({name: 'variant', type: String})
-  variant!: IconVariant;
+  variant?: IconVariant;
 
-  /** Tracks the last successfully injected icon name to avoid redundant DOM re-injection. */
-  private _loadedName: string | null = null;
+  @Property({name: 'aria-label', type: String})
+  ariaLabel: string | null = null;
+
+  @Property({name: 'config', type: ObjectType})
+  config?: IconStyleConfig;
+
+  /** Applies a newly loaded SVG only when it still represents the active `name`. */
+  private loadedName: string | null = null;
 
   constructor() {
     super();
   }
 
-  /**
-   * Triggered by the CONNECTED lifecycle event via the component's scoped EventChannel.
-   * The scoped manager binds this during connectedCallback and unbinds on disconnectedCallback,
-   * so it fires exactly once per connect — equivalent to @AfterInit but fully declarative.
-   */
   @OnEvent(LifecycleEventConstants.CONNECTED, true)
   onConnected() {
-    this.loadIcon()
-      .catch(err => console.warn('[IconsComponent] load error on connect:', err));
+    void this.loadIcon();
   }
 
-  /**
-   * Triggered by the ATTRIBUTE_CHANGED lifecycle event via the component's scoped EventChannel.
-   * Fires after BaseElement has already applied the new value to the property and re-rendered.
-   *
-   * Re-render wipes the inner HTML back to the empty container returned by render(), so for
-   * any attribute change we must always re-inject the SVG from cache before styling.
-   *
-   * Uses event.data.name (the exact attribute that changed) to route with zero guesswork:
-   *   - 'name'      → reset loaded guard so the new icon is fetched/injected
-   *   - anything else → re-inject SVG from cache (instant) then re-style
-   */
   @OnEvent(LifecycleEventConstants.ATTRIBUTE_CHANGED, true)
   onAttributeChanged(event: ApplicationEvent) {
-    const { name } = event.data as { name: string; oldValue: string; newValue: string };
-    if (name === 'name') {
-      this._loadedName = null; // force re-injection for the new icon name
-    }
-    // Always reload: re-render has wiped the container, so we need to re-inject the SVG.
-    this.loadIcon()
-      .catch(err => console.warn('[IconsComponent] load error on attribute change:', err));
+    const attributeName = (event.data as { name: string }).name;
+    if (attributeName === 'name') this.loadedName = null;
+    void this.loadIcon();
+  }
+
+  private getStyle() {
+    const override = this.config;
+    const size = this.size && this.size in IconStyle.size ? this.size : 'md';
+    const color = this.color && this.color in IconStyle.color ? this.color : undefined;
+    const variant = color && this.variant && this.variant in IconStyle.color[color] ? this.variant : 'solid';
+
+    return {
+      container: override?.container ?? IconStyle.container,
+      base: override?.base ?? IconStyle.base,
+      size: override?.size?.[size] ?? IconStyle.size[size],
+      color: color
+        ? override?.color?.[color]?.[variant] ?? IconStyle.color[color][variant]
+        : '',
+    };
   }
 
   /**
-   * Loads the SVG from the module-level cache (instant) or fetches from the network
-   * (first request only; concurrent callers share the same in-flight Promise).
-   * The raw SVG string is then injected into the container and styled.
+   * Inserts the current icon only after its request resolves for the still-active name.
+   * This guard prevents a slow prior request from replacing SVG markup selected by a
+   * later reactive attribute update.
    */
-  async loadIcon() {
+  private async loadIcon() {
     const name = this.name;
-    if (!name) return;
-
-    const svgText = await fetchSvg(name);
-    if (!svgText) {
-      this.innerHTML = '';
+    const container = this.querySelector<HTMLElement>('[data-icon-root]');
+    if (!container || !ICON_NAME_PATTERN.test(name)) {
+      if (container) container.replaceChildren();
       return;
     }
 
-    const container = this.querySelector('#svg');
-    if (!container) return;
-
-    // Re-inject if the name changed OR if the container was wiped by a re-render
-    if (this._loadedName !== name || !container.innerHTML.trim()) {
-      container.innerHTML = svgText;
-      this._loadedName = name;
+    const svgText = await fetchSvg(name);
+    if (name !== this.name || !svgText) {
+      if (name === this.name) container.replaceChildren();
+      return;
     }
 
+    if (this.loadedName !== name || !container.innerHTML.trim()) {
+      container.innerHTML = svgText;
+      this.loadedName = name;
+    }
     this.applyStyles(container);
   }
 
   /**
-   * Applies size, base, and color/variant styles to the already-injected SVG.
-   * Can be called independently whenever color, variant, size, or classname changes
-   * without re-fetching or re-injecting the SVG markup.
+   * Applies visual tokens and SVG accessibility semantics after markup injection.
+   * Replacing the class list on every render prevents stale color and size tokens
+   * when reactive attributes change without needing another network request.
+   * @param container The current component-owned SVG wrapper.
    */
-  applyStyles(container: Element | null = this.querySelector('#svg')) {
-    if (!container) return;
-
-    const svg = container.querySelector('svg');
+  private applyStyles(container: Element) {
+    const svg = container.querySelector<SVGElement>('svg');
     if (!svg) return;
 
-    // Reset class and re-apply so repeated calls don't accumulate stale classes
-    svg.setAttribute('class', '');
-    svg.classList.add(...(IconStyle.size[this.size] || IconStyle.size.sm).split(' '));
-    svg.classList.add(...IconStyle.base.split(' '));
-
-    if (this.color) {
-      const colorVariants = IconStyle.color[this.color];
-      if (colorVariants) {
-        const variantClass = colorVariants[this.variant] ?? colorVariants.solid;
-        svg.classList.add(...variantClass.split(' '));
-      }
+    const style = this.getStyle();
+    svg.setAttribute('class', [style.base, style.size, style.color, this.className].filter(Boolean).join(' '));
+    if (this.ariaLabel) {
+      svg.setAttribute('role', 'img');
+      svg.setAttribute('aria-label', this.ariaLabel);
+      svg.removeAttribute('aria-hidden');
+    } else {
+      svg.setAttribute('aria-hidden', 'true');
+      svg.removeAttribute('role');
+      svg.removeAttribute('aria-label');
     }
-
-    if (this.className) {
-      svg.classList.add(...this.className.split(' '));
-    }
-
-    const path = container.querySelector('svg path');
-    if (path) {
-      path.setAttribute('fill', 'currentColor');
-    }
+    svg.setAttribute('focusable', 'false');
   }
 
   render(): string {
-    return HTML`
-      <div id="svg" class="flex items-center justify-center"></div>
-    `;
+    const style = this.getStyle();
+    return HTML`<span data-icon-root class="${style.container}" aria-hidden="${this.ariaLabel ? 'false' : 'true'}"></span>`;
   }
 }
 
-export {IconsComponent, IconStyle}
-export type {IconVariant, IconColor, IconSize}
-
-
-
+export {IconsComponent, IconStyle};
+export type {IconColor, IconSize, IconStyleConfig, IconVariant};
