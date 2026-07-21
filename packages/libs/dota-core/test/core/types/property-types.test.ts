@@ -61,6 +61,12 @@ describe('BooleanType', () => {
         expect(result).toBe(true);
     });
 
+    it('should convert a present valueless HTML attribute to true', () => {
+        const value = "";
+        const result = Boolean.process(value);
+        expect(result).toBe(true);
+    });
+
     it('should convert "false" to false', () => {
         const value = "false";
         const result = Boolean.process(value);
