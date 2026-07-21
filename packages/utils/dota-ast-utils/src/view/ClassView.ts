@@ -1,4 +1,5 @@
 import type {ClassDeclaration} from "@swc/core";
+import {utf8ByteOffsetToSourceOffset} from "./SourceOffsetUtils.ts";
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -24,20 +25,32 @@ export class ClassView {
   }
 
   /**
-   * Returns a stable source offset for editor navigation.
-   *
-   * Prefer the class identifier position because it is the narrowest anchor
-   * for go-to-declaration. Fall back to the raw source text when the span is
-   * clearly not file-local, then fall back to the declaration span.
+   * Returns the class identifier offset for editor and generated-metadata navigation.
+   * Normalizes SWC's process-global UTF-8 span against the parsed module when context is given,
+   * then falls back to source matching or the raw span for AST-only callers.
+   * @param sourceText Optional original source used to convert byte positions and recover offsets.
+   * @param sourceStart Optional SWC module span start for global-position normalization.
+   * @param sourceStartOffset Local source index represented by `sourceStart`; defaults to zero.
+   * @returns A file-relative class identifier offset, or `null` when no location is available.
    */
-  getSourceOffset(sourceText?: string): number | null {
-    return this.determineSourceOffset(sourceText);
-  }
-
-  private determineSourceOffset(sourceText?: string): number | null {
+  getSourceOffset(sourceText?: string, sourceStart?: number, sourceStartOffset = 0): number | null {
     const identifierSpan = this.classDeclaration.identifier?.span;
     if (identifierSpan && typeof identifierSpan.start === "number") {
-      if (sourceText == null || identifierSpan.start <= sourceText.length) {
+      if (typeof sourceStart === "number") {
+        const relativeByteOffset = identifierSpan.start - sourceStart;
+        if (sourceText != null) {
+          const sourceOffset = utf8ByteOffsetToSourceOffset(
+            sourceText,
+            sourceStartOffset,
+            relativeByteOffset,
+          );
+          if (sourceOffset != null && sourceOffset < sourceText.length) {
+            return sourceOffset;
+          }
+        } else if (relativeByteOffset >= 0) {
+          return sourceStartOffset + relativeByteOffset;
+        }
+      } else if (sourceText == null || identifierSpan.start <= sourceText.length) {
         return identifierSpan.start;
       }
     }
@@ -54,7 +67,7 @@ export class ClassView {
     }
 
     const classSpan = this.classDeclaration.span;
-    if (classSpan && typeof classSpan.start === "number") {
+    if (sourceText == null && classSpan && typeof classSpan.start === "number") {
       return classSpan.start;
     }
 
