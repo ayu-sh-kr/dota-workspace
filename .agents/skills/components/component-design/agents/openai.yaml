@@ -1,0 +1,4 @@
+interface:
+  display_name: "Component Design"
+  short_description: "Route web-component work by scope and use case."
+  default_prompt: "Use $component-design to choose the relevant app, library, integration, content, or interaction component skill."
