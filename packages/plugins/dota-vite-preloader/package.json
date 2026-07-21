@@ -33,7 +33,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "release": "pnpm run build && changeset publish",
-    "test": "vitest run"
+    "test": "tsc --noEmit && vitest run"
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",

@@ -37,7 +37,7 @@
     "build": "tsup src/index.ts --format esm, cjs --dts",
     "build-pack": "pnpm build && pnpm pack",
     "lint": "tsc",
-    "test": "jest",
+    "test": "tsc --noEmit && jest",
     "test:coverage": "jest --coverage",
     "release": "pnpm run build && changeset publish"
   },

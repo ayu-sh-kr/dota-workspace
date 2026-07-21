@@ -38,7 +38,7 @@
     "build-pack": "pnpm build && pnpm pack",
     "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
-    "test": "vitest run",
+    "test": "tsc --noEmit && vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },

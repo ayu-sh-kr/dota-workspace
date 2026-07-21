@@ -30,7 +30,7 @@
     "lint": "tsc",
     "build": "tsup src/index.ts --format esm, cjs --dts",
     "release": "pnpm run build && changeset publish",
-    "test": "jest --detectOpenHandles",
+    "test": "tsc --noEmit && jest --detectOpenHandles",
     "test:coverage": "jest --coverage"
   },
   "files": [
