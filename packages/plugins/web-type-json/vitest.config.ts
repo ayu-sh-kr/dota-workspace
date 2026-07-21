@@ -11,7 +11,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
-    include: ['test/**/*.test.ts'],
+    include: ['test/**/*.test.ts', 'test/**/*Tests.ts'],
     exclude: ['test/setup/**', 'node_modules/**'],
     coverage: {
       reporter: ['text', 'json', 'html'],
