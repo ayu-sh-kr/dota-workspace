@@ -37,7 +37,10 @@
     "build": "tsc && vite build",
     "build-pack": "pnpm build && pnpm pack",
     "preview": "vite preview",
-    "release": "pnpm run build && changeset publish"
+    "release": "pnpm run build && changeset publish",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
