@@ -10,7 +10,7 @@ import {
   BeforeInit,
   Emitter,
 } from '@dota/core';
-import { String, Number } from '@dota/core';
+import { String, Number, Object } from '@dota/core';
 import { LifecycleEventConstants } from '@dota/core/constants';
 import { ApplicationEventService } from '@dota/core/services/application-event.service.ts';
 import { DefaultApplicationEventBus } from '@ayu-sh-kr/dota-event';
@@ -72,13 +72,13 @@ describe('BaseElement – construction', () => {
 
     // Since we can't know the uid ahead of time, subscribe to ALL constructed events via bus
     svc.getListener().on = ((orig) => (event: string, cb: any) => {
-      orig.call(svc.getListener(), event, cb);
+      return orig.call(svc.getListener(), event, cb);
     })(svc.getListener().on);
 
     // subscribe broadly — any event containing 'constructed'
     const originalOn = svc.getListener().on.bind(svc.getListener());
     svc.getListener().on = (event: string, cb: any) => {
-      originalOn(event, cb);
+      return originalOn(event, cb);
     };
 
     // Use the event bus directly to capture any published event
@@ -513,6 +513,31 @@ describe('BaseElement – attributeChangedCallback', () => {
     // reactive is set by connectedCallback's bindProperties, not attributeChangedCallback
     expect((el as any).reactive).toBe(true);
     expect((el as any).phase).toBe('init');
+  });
+
+  it('reflects object property initializers as JSON and accepts later object assignments', async () => {
+    @Component({ selector: 'object-property-reflection', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @Property({ name: 'config', type: Object })
+      config = { container: 'initial' };
+
+      render() { return `<span>${this.config.container}</span>`; }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    expect((el as any).config).toEqual({ container: 'initial' });
+    expect(el.getAttribute('config')).toBe('{"container":"initial"}');
+
+    (el as any).config = { container: 'updated' };
+    await microtask();
+
+    expect(el.getAttribute('config')).toBe('{"container":"updated"}');
+    expect((el as any).config).toEqual({ container: 'updated' });
   });
 
   it('updates the DOM to reflect the new attribute value', async () => {
@@ -1190,8 +1215,5 @@ describe('BaseElement – updateHTML', () => {
     expect(renders).toBe(0);
   });
 });
-
-
-
 
 
