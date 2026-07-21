@@ -11,6 +11,12 @@ import type {PackageJsonWithWebTypes, WebComponentInfo, WebTypeJsonPluginConfig,
 
 let log: ConsolaInstance
 
+/**
+ * Converts an absolute source path into the slash-normalized path web-types expects.
+ * Keeps the path relative to the package root while preserving an explicit `./` prefix.
+ * @param root Package root used as the source-path base.
+ * @param file Absolute source file path discovered during scanning.
+ */
 function toWebTypesSourceFile(root: string, file: string) {
   const relativePath = relative(root, file).split(sep).join('/');
   return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
@@ -30,6 +36,13 @@ function compareOptionalString(left?: string, right?: string) {
   return left.localeCompare(right);
 }
 
+/**
+ * Keeps generated web-type entries stable across repeated scans.
+ * Sorts components and their properties by identity, then uses source metadata as tie-breakers.
+ * Returns copied arrays so callers do not observe mutations to scanned metadata.
+ * @param scannedWebComponentInfos Component metadata collected from source files.
+ * @returns A deterministically sorted copy of the component metadata.
+ */
 function sortWebComponentInfos(scannedWebComponentInfos: WebComponentInfo[]): WebComponentInfo[] {
   return [...scannedWebComponentInfos]
     .map(component => ({
@@ -49,6 +62,13 @@ function sortWebComponentInfos(scannedWebComponentInfos: WebComponentInfo[]): We
     );
 }
 
+/**
+ * Limits watcher-triggered rescans to source files that can define web components.
+ * Supports component files under `src/` and page files under `src/pages/`.
+ * @param file Absolute or watcher-provided path to inspect.
+ * @param root Package root used to calculate the file's relative path.
+ * @returns Whether the file matches a supported component or page naming convention.
+ */
 function isScannableComponentFile(file: string, root: string) {
   const relativePath = relative(root, file).replace(/\\/g, '/');
   return (
@@ -57,10 +77,21 @@ function isScannableComponentFile(file: string, root: string) {
   );
 }
 
+/**
+ * Resets plugin state for test isolation and future stateful implementations.
+ * The current scanner has no module-level state that requires cleanup.
+ */
 export function resetWebTypeJsonState() {
   // no module-level state to reset
 }
 
+/**
+ * Scans configured source roots for decorated web components and their properties.
+ * Reads and parses matching TypeScript files, then sorts results for stable generation.
+ * @param root Package root used for source references in the generated schema.
+ * @param scanRoots Roots to search; defaults to the package root when omitted.
+ * @returns Component metadata extracted from all matching source files.
+ */
 export async function scanWebComponents(root: string, scanRoots: string[] = [root]) {
   log.debug('Start scanning web components...')
   const files = (await Promise.all(scanRoots.map(async (scanRoot) => {
@@ -147,6 +178,12 @@ export async function scanWebComponents(root: string, scanRoots: string[] = [roo
   return sortWebComponentInfos(scannedWebComponentInfos);
 }
 
+/**
+ * Builds the Web Types schema consumed by IDEs for HTML custom-element assistance.
+ * Maps scanned components to HTML elements and component properties to attributes.
+ * @param scannedWebComponentInfos Component metadata produced by the source scanner.
+ * @returns A schema object ready to be serialized as a web-types JSON artifact.
+ */
 export function createWebTypesSchema(scannedWebComponentInfos: WebComponentInfo[]): WebTypesSchema {
   return {
     $schema: "https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json",
@@ -171,6 +208,13 @@ export function createWebTypesSchema(scannedWebComponentInfos: WebComponentInfo[
   };
 }
 
+/**
+ * Writes the generated web-types file and registers it in the package manifest.
+ * Updates `package.json` only when its `web-types` entry differs from the requested output.
+ * @param root Package root where the artifact and manifest are located.
+ * @param outFile Output path relative to `root`.
+ * @param scannedWebComponentInfos Component metadata to serialize.
+ */
 export async function writeWebTypesArtifacts({
   root,
   outFile,
@@ -200,6 +244,15 @@ export async function writeWebTypesArtifacts({
   }
 }
 
+/**
+ * Creates a Vite plugin that generates web-types during builds and source changes.
+ * Watcher refreshes are coalesced so overlapping file events produce one artifact update.
+ * @param root Package root; defaults to the current working directory.
+ * @param outFile Output path relative to `root`; defaults to `web-types.json`.
+ * @param logType Consola log level; defaults to `info`.
+ * @param scanRoots Roots to scan; defaults to `[root]`.
+ * @returns A Vite plugin with build-time generation and development-server refresh hooks.
+ */
 export default function dotaWebTypeJson({
   root = process.cwd(),
   outFile = 'web-types.json',
