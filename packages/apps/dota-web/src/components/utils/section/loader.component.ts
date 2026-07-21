@@ -9,11 +9,6 @@ export class LoaderComponent extends BaseElement{
   constructor() {
     super();
   }
-  @Property({
-    name:"size",
-    type:Number
-  })
-  size!:number
 
 
   render(): string {
