@@ -106,7 +106,7 @@ export interface BindConfig {
  * @property {string} name - The name of the attribute.
  * This property specifies the name of the attribute that will be bound to the component property.
  *
- * @property {string} [default] - The default value for the attribute (optional).
+ * @property {any} [default] - The default value for the attribute (optional).
  * This property allows specifying a default value for the attribute if none is provided.
  *
  * @property {PropertyType<any>} type - The type of the property.
@@ -123,7 +123,7 @@ export interface BindConfig {
  */
 export interface PropertyConfig {
   name: string;
-  default?: string;
+  default?: any;
   type: PropertyType<any>
 }
 
