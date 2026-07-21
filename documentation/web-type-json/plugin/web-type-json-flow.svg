@@ -1,149 +1,230 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1420" width="1600" height="1420">
-  <title>web-type-json Plugin Flow</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 2550" width="1800" height="2550">
+  <title>Dota web-type-json plugin lifecycle and artifact generation flow</title>
   <desc>
-    Flow diagram for the dota-web-type-json Vite plugin. Dev watcher events move down
-    through the file filter and pending-refresh guard before joining the shared scanner.
-    Outcomes labeled no leave decisions from the right. Build-start joins the same scanner.
-    The pipeline writes web-types.json and patches package.json only when required.
+    Current flow of the Dota Web Types Vite plugin. The plugin factory normalizes
+    configuration and exposes build and development hooks. Build-start and coalesced
+    watcher events converge on one source scan. Shared metadata always creates Web
+    Types and optionally creates a package-scoped Custom Elements Manifest. Enabled
+    JSON files are written in parallel before package.json is read and conditionally
+    updated once.
   </desc>
 
   <defs>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap');
       svg { text-rendering: geometricPrecision; }
-      .bg { fill: #ffffff; }
-      .group-line { stroke: #d7dee7; stroke-width: 3; }
-      .group-rule { stroke: #e7ecf2; stroke-width: 2; }
-      .entry { fill: #dce7fb; }
-      .step { fill: #d9f0ef; }
-      .decision { fill: #fce7cf; }
-      .artifact { fill: #ddefdf; }
-      .card { rx: 10; }
-      .title { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 28px; font-weight: 700; fill: #212529; }
-      .subtitle { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 16px; fill: #495057; }
-      .lane-label { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1.6px; fill: #868e96; text-anchor: middle; }
-      .label { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 600; fill: #243b53; text-anchor: middle; dominant-baseline: middle; }
-      .annotation { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 15px; fill: #495057; text-anchor: middle; dominant-baseline: middle; }
-      .annotation-side { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 15px; fill: #495057; text-anchor: end; dominant-baseline: middle; }
-      .branch { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; fill: #495057; }
-      .marker-text { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #ffffff; text-anchor: middle; dominant-baseline: middle; }
-      .legend { font-family: "DM Sans", "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #343a40; dominant-baseline: middle; }
-      .connector { stroke: #495057; stroke-width: 2; fill: none; marker-end: url(#arrow); }
-      .async { stroke: #7048e8; stroke-width: 2; fill: none; stroke-dasharray: 7 5; marker-end: url(#arrow-async); }
-      .skip { stroke: #868e96; stroke-width: 2; fill: none; stroke-dasharray: 7 5; marker-end: url(#arrow-skip); }
+      .canvas { fill: #ffffff; }
+      .lane { fill: #f8f9fa; stroke: #dee2e6; stroke-width: 2; }
+      .phase { fill: #fbfcfd; stroke: #e9ecef; stroke-width: 2; }
+      .rule { stroke: #ced4da; stroke-width: 2; }
+      .entry { fill: #3b5bdb; }
+      .process { fill: #0c8599; }
+      .decision { fill: #e67700; }
+      .artifact { fill: #2f9e44; }
+      .terminal { fill: #868e96; }
+      .card { rx: 12; ry: 12; }
+      .page-title { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 30px; font-weight: 700; fill: #212529; }
+      .page-subtitle { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 17px; fill: #495057; }
+      .lane-title { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1.7px; fill: #6c757d; text-anchor: middle; }
+      .phase-title { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1.7px; fill: #6c757d; }
+      .card-title { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; fill: #ffffff; text-anchor: middle; dominant-baseline: middle; }
+      .card-note { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 500; fill: #ffffff; fill-opacity: .92; text-anchor: middle; dominant-baseline: middle; }
+      .branch { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; fill: #495057; }
+      .side-note { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 600; fill: #6c757d; }
+      .legend { font-family: "DM Sans", Poppins, Helvetica, Arial, sans-serif; font-size: 14px; fill: #343a40; dominant-baseline: middle; }
+      .sync { stroke: #495057; stroke-width: 3; fill: none; marker-end: url(#arrow-sync); }
+      .async { stroke: #7048e8; stroke-width: 3; fill: none; stroke-dasharray: 9 7; marker-end: url(#arrow-async); }
+      .skip { stroke: #868e96; stroke-width: 3; fill: none; stroke-dasharray: 8 7; marker-end: url(#arrow-skip); }
     </style>
-    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#495057"/>
+    <marker id="arrow-sync" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#495057"/>
     </marker>
-    <marker id="arrow-async" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#7048e8"/>
+    <marker id="arrow-async" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#7048e8"/>
     </marker>
-    <marker id="arrow-skip" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#868e96"/>
+    <marker id="arrow-skip" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#868e96"/>
     </marker>
   </defs>
 
-  <rect class="bg" width="1600" height="1420"/>
-  <text class="title" x="60" y="55">dota-web-type-json · plugin flow</text>
-  <text class="subtitle" x="60" y="83">Build and dev triggers converge on the same scan-and-write pipeline.</text>
+  <rect class="canvas" width="1800" height="2550"/>
+  <text class="page-title" x="60" y="58">dota-web-type-json · current generation flow</text>
+  <text class="page-subtitle" x="60" y="88">One Dota-aware scan feeds JetBrains Web Types and optional Custom Elements Manifest 2.1 output.</text>
 
-  <!-- Grouping lines -->
-  <line class="group-line" x1="580" y1="130" x2="580" y2="1310"/>
-  <line class="group-line" x1="1120" y1="130" x2="1120" y2="1310"/>
-  <line class="group-rule" x1="60" y1="160" x2="540" y2="160"/>
-  <line class="group-rule" x1="620" y1="160" x2="1080" y2="160"/>
-  <line class="group-rule" x1="1160" y1="160" x2="1540" y2="160"/>
-  <text class="lane-label" x="290" y="145">DEV SERVER</text>
-  <text class="lane-label" x="850" y="145">SHARED PIPELINE</text>
-  <text class="lane-label" x="1350" y="145">BUILD</text>
+  <!-- Lifecycle lanes -->
+  <rect class="lane" x="60" y="230" width="500" height="760" rx="18"/>
+  <rect class="lane" x="650" y="230" width="500" height="760" rx="18"/>
+  <rect class="lane" x="1240" y="230" width="500" height="760" rx="18"/>
+  <text class="lane-title" x="310" y="265">DEV SERVER</text>
+  <text class="lane-title" x="900" y="265">SHARED COORDINATOR</text>
+  <text class="lane-title" x="1490" y="265">VITE BUILD</text>
 
-  <!-- Dev entry and watcher -->
-  <rect class="card entry" x="100" y="180" width="310" height="58"/>
-  <text class="label" x="255" y="209">configureServer()</text>
-  <rect class="card step" x="100" y="340" width="310" height="58"/>
-  <text class="label" x="255" y="369">watcher events</text>
-  <text class="annotation-side" x="400" y="419">add · change · unlink</text>
-  <path class="connector" d="M255,238 V340"/>
+  <!-- Shared generation phases -->
+  <rect class="phase" x="60" y="1010" width="1680" height="280" rx="18"/>
+  <rect class="phase" x="60" y="1310" width="1680" height="500" rx="18"/>
+  <rect class="phase" x="60" y="1830" width="1680" height="610" rx="18"/>
+  <text class="phase-title" x="85" y="1043">1 · SHARED SOURCE SCAN</text>
+  <text class="phase-title" x="85" y="1343">2 · SCHEMA PROJECTION</text>
+  <text class="phase-title" x="85" y="1863">3 · DISK + PACKAGE REGISTRATION</text>
 
-  <!-- Decision 1: yes continues down; no exits right -->
-  <rect class="card decision" x="100" y="500" width="310" height="58"/>
-  <text class="label" x="255" y="529">scannable file?</text>
-  <text class="annotation-side" x="230" y="579">component.ts · page.ts</text>
-  <circle cx="120" cy="476" r="14" fill="#343a40"/>
-  <text class="marker-text" x="120" y="476">1</text>
-  <path class="connector" d="M255,398 V500"/>
-  <path class="skip" d="M410,529 H535"/>
-  <text class="branch" x="430" y="519">no</text>
-  <text class="annotation" x="500" y="559">ignore file</text>
+  <!-- Cards: factory and lifecycle -->
+  <rect class="card entry" x="700" y="120" width="400" height="70"/>
+  <text class="card-title" x="900" y="145">dotaWebTypeJson(config)</text>
+  <text class="card-note" x="900" y="171">apply defaults · normalize CEM opt-in</text>
 
-  <!-- Decision 2 below decision 1 -->
-  <rect class="card decision" x="100" y="660" width="310" height="58"/>
-  <text class="label" x="255" y="689">refresh pending?</text>
-  <text class="annotation-side" x="400" y="739">coalescing guard</text>
-  <circle cx="120" cy="636" r="14" fill="#343a40"/>
-  <text class="marker-text" x="120" y="636">2</text>
-  <path class="connector" d="M255,558 V660"/>
-  <text class="branch" x="273" y="605">yes</text>
+  <rect class="card entry" x="100" y="300" width="380" height="70"/>
+  <text class="card-title" x="290" y="335">configureServer()</text>
 
-  <!-- Pending guard: no exits right to scan; yes returns existing promise -->
-  <path class="connector" d="M410,689 H650"/>
-  <text class="branch" x="455" y="679">no</text>
-  <path class="async" d="M255,718 V795"/>
-  <text class="branch" x="227" y="760">yes</text>
-  <text class="annotation" x="255" y="820">return same promise</text>
+  <rect class="card entry" x="1320" y="300" width="380" height="70"/>
+  <text class="card-title" x="1510" y="326">buildStart()</text>
+  <text class="card-note" x="1510" y="351">await one generation run</text>
 
-  <!-- Build entry -->
-  <rect class="card entry" x="1195" y="180" width="310" height="58"/>
-  <text class="label" x="1350" y="209">vite build · buildStart</text>
-  <text class="annotation" x="1350" y="259">one full scan</text>
-  <path class="connector" d="M1350,238 V245 H1510 V590 H800 V660"/>
+  <rect class="card process" x="100" y="450" width="380" height="76"/>
+  <text class="card-title" x="290" y="478">watcher event</text>
+  <text class="card-note" x="290" y="506">add · change · unlink across scanRoots</text>
 
-  <!-- Shared pipeline -->
-  <rect class="card step" x="650" y="660" width="300" height="58"/>
-  <text class="label" x="800" y="689">scanWebComponents()</text>
-  <text class="annotation-side" x="780" y="739">glob · SWC · decorators · sort</text>
+  <rect class="card decision" x="100" y="610" width="380" height="76"/>
+  <text class="card-title" x="290" y="638">isScannableComponentFile?</text>
+  <text class="card-note" x="290" y="666">src/*.component.ts or src/pages/*.page.ts</text>
 
-  <rect class="card step" x="650" y="860" width="300" height="58"/>
-  <text class="label" x="800" y="889">writeWebTypesArtifacts()</text>
-  <text class="annotation-side" x="780" y="939">schema → JSON → manifest check</text>
-  <path class="connector" d="M800,718 V860"/>
+  <rect class="card decision" x="100" y="770" width="380" height="76"/>
+  <text class="card-title" x="290" y="798">pendingRefresh exists?</text>
+  <text class="card-note" x="290" y="826">coalesce concurrent watcher callbacks</text>
 
-  <!-- Artifact generation -->
-  <rect class="card artifact" x="590" y="1060" width="210" height="58"/>
-  <text class="label" x="695" y="1089">write web-types.json</text>
-  <rect class="card decision" x="880" y="1060" width="210" height="58"/>
-  <text class="label" x="985" y="1089">manifest entry stale?</text>
-  <circle cx="900" cy="1036" r="14" fill="#343a40"/>
-  <text class="marker-text" x="900" y="1036">3</text>
-  <path class="connector" d="M800,918 V1000 H695 V1060"/>
-  <path class="connector" d="M800,1000 H985 V1060"/>
+  <rect class="card terminal" x="100" y="900" width="380" height="60"/>
+  <text class="card-title" x="290" y="930">reuse active refresh promise</text>
 
-  <!-- Manifest guard: no exits right; yes continues down -->
-  <path class="skip" d="M1090,1089 H1160"/>
-  <text class="branch" x="1100" y="1079">no</text>
-  <text class="annotation" x="1240" y="1083">entry already correct</text>
-  <rect class="card artifact" x="880" y="1220" width="210" height="58"/>
-  <text class="label" x="985" y="1249">patch package.json</text>
-  <path class="connector" d="M985,1118 V1220"/>
-  <text class="branch" x="1005" y="1165">yes</text>
+  <rect class="card process" x="710" y="900" width="380" height="70"/>
+  <text class="card-title" x="900" y="926">generateArtifacts()</text>
+  <text class="card-note" x="900" y="951">single entry for build and dev refresh</text>
+
+  <!-- Cards: shared scan and writers -->
+  <rect class="card process" x="710" y="1040" width="380" height="84"/>
+  <text class="card-title" x="900" y="1068">scanWebComponents()</text>
+  <text class="card-note" x="900" y="1093">glob all roots · dedupe · read + SWC parse once</text>
+  <text class="card-note" x="900" y="1113">extract decorators, exports, defaults, offsets · stable sort</text>
+
+  <rect class="card process" x="710" y="1190" width="380" height="76"/>
+  <text class="card-title" x="900" y="1218">writeGeneratedArtifacts()</text>
+  <text class="card-note" x="900" y="1246">resolve paths · build enabled JSON in memory</text>
+
+  <rect class="card decision" x="710" y="1340" width="380" height="76"/>
+  <text class="card-title" x="900" y="1368">output paths collide?</text>
+  <text class="card-note" x="900" y="1396">same resolved file cannot hold both schemas</text>
+
+  <rect class="card terminal" x="1210" y="1340" width="340" height="76"/>
+  <text class="card-title" x="1380" y="1368">throw before writes</text>
+  <text class="card-note" x="1380" y="1396">no artifact starts writing</text>
+
+  <rect class="card process" x="190" y="1510" width="400" height="84"/>
+  <text class="card-title" x="390" y="1538">createWebTypesSchema()</text>
+  <text class="card-note" x="390" y="1563">HTML attributes + JavaScript properties</text>
+  <text class="card-note" x="390" y="1583">local source paths and offsets retained</text>
+
+  <rect class="card decision" x="700" y="1510" width="400" height="84"/>
+  <text class="card-title" x="900" y="1538">CEM enabled?</text>
+  <text class="card-note" x="900" y="1563">true or object with enabled: true</text>
+  <text class="card-note" x="900" y="1583">false → no CEM JSON or registration</text>
+
+  <rect class="card process" x="1210" y="1510" width="400" height="84"/>
+  <text class="card-title" x="1410" y="1538">createCustomElementsManifest()</text>
+  <text class="card-note" x="1410" y="1563">package-owned modules · mapped JS paths · stable exports</text>
+  <text class="card-note" x="1410" y="1583">external roots skip · missing/invalid source throws</text>
+
+  <rect class="card process" x="710" y="1710" width="380" height="76"/>
+  <text class="card-title" x="900" y="1738">Promise.all(enabled writes)</text>
+  <text class="card-note" x="900" y="1766">Web Types always · CEM only when enabled</text>
+
+  <!-- Cards: output and package manifest -->
+  <rect class="card artifact" x="120" y="1900" width="380" height="76"/>
+  <text class="card-title" x="310" y="1928">web-types.json</text>
+  <text class="card-note" x="310" y="1956">always written to root/outFile</text>
+
+  <rect class="card artifact" x="1300" y="1900" width="380" height="76"/>
+  <text class="card-title" x="1490" y="1928">custom-elements.json</text>
+  <text class="card-note" x="1490" y="1956">optional configured CEM output</text>
+
+  <rect class="card process" x="710" y="2040" width="380" height="84"/>
+  <text class="card-title" x="900" y="2068">read package.json once</text>
+  <text class="card-note" x="900" y="2093">patch web-types always</text>
+  <text class="card-note" x="900" y="2113">patch customElements only when registration is enabled</text>
+
+  <rect class="card decision" x="710" y="2210" width="380" height="76"/>
+  <text class="card-title" x="900" y="2238">discovery fields changed?</text>
+  <text class="card-note" x="900" y="2266">avoid redundant package writes</text>
+
+  <rect class="card terminal" x="1210" y="2210" width="340" height="76"/>
+  <text class="card-title" x="1380" y="2238">skip package write</text>
+  <text class="card-note" x="1380" y="2266">existing fields already match</text>
+
+  <rect class="card artifact" x="710" y="2360" width="380" height="70"/>
+  <text class="card-title" x="900" y="2386">write package.json once</text>
+  <text class="card-note" x="900" y="2411">preserve unrelated package metadata</text>
+
+  <!-- Connectors: factory and lifecycle -->
+  <path class="sync" d="M900,190 V235 H290 V300"/>
+  <path class="sync" d="M900,235 H1510 V300"/>
+  <path class="sync" d="M290,370 V450"/>
+  <path class="sync" d="M290,526 V610"/>
+  <path class="sync" d="M290,686 V770"/>
+  <path class="skip" d="M480,648 H600"/>
+  <path class="async" d="M290,846 V900"/>
+  <path class="async" d="M480,808 H620 V935 H710"/>
+  <path class="sync" d="M1510,370 V935 H1090"/>
+
+  <!-- Connectors: shared scan and schema branching -->
+  <path class="sync" d="M900,970 V1040"/>
+  <path class="sync" d="M900,1124 V1190"/>
+  <path class="sync" d="M900,1266 V1340"/>
+  <path class="skip" d="M1090,1378 H1210"/>
+  <path class="sync" d="M900,1416 V1460 H390 V1510"/>
+  <path class="sync" d="M590,1552 H700"/>
+  <path class="sync" d="M1100,1552 H1210"/>
+  <path class="sync" d="M900,1594 V1645 H820 V1710"/>
+  <path class="sync" d="M1410,1594 V1645 H990 V1710"/>
+  <path class="skip" d="M1610,1552 H1720"/>
+
+  <!-- Connectors: async files and serialized package update -->
+  <path class="async" d="M710,1748 H310 V1900"/>
+  <path class="async" d="M1090,1748 H1490 V1900"/>
+  <path class="sync" d="M900,1786 V2040"/>
+  <path class="sync" d="M900,2124 V2210"/>
+  <path class="skip" d="M1090,2248 H1210"/>
+  <path class="sync" d="M900,2286 V2360"/>
+
+  <!-- Branch labels and terminal annotations -->
+  <text class="branch" x="500" y="637">no</text>
+  <text class="side-note" x="615" y="676">ignore unrelated file</text>
+  <text class="branch" x="305" y="731">yes</text>
+  <text class="branch" x="305" y="874">yes</text>
+  <text class="branch" x="500" y="797">no · start refresh</text>
+  <text class="branch" x="1110" y="1366">yes</text>
+  <text class="branch" x="915" y="1450">no</text>
+  <text class="branch" x="1120" y="1540">yes</text>
+  <text class="branch" x="915" y="1625">no</text>
+  <text class="branch" x="1425" y="1625">valid</text>
+  <text class="branch" x="1625" y="1540">invalid</text>
+  <text class="side-note" x="1585" y="1620">throw · no files written</text>
+  <text class="branch" x="1120" y="1737">if enabled</text>
+  <text class="branch" x="1110" y="2236">no</text>
+  <text class="branch" x="915" y="2318">yes</text>
 
   <!-- Legend -->
-  <line class="group-line" x1="60" y1="1340" x2="1540" y2="1340"/>
-  <rect x="85" y="1363" width="22" height="15" rx="4" fill="#dce7fb"/>
-  <text class="legend" x="118" y="1371">entry</text>
-  <rect x="195" y="1363" width="22" height="15" rx="4" fill="#d9f0ef"/>
-  <text class="legend" x="228" y="1371">processing</text>
-  <rect x="330" y="1363" width="22" height="15" rx="4" fill="#fce7cf"/>
-  <text class="legend" x="363" y="1371">decision</text>
-  <rect x="440" y="1363" width="22" height="15" rx="4" fill="#ddefdf"/>
-  <text class="legend" x="473" y="1371">artifact</text>
-  <circle cx="570" cy="1371" r="12" fill="#343a40"/>
-  <text class="marker-text" x="570" y="1371">1</text>
-  <text class="legend" x="595" y="1371">decision key</text>
-  <line x1="735" y1="1371" x2="785" y2="1371" class="connector"/>
-  <text class="legend" x="805" y="1371">sync flow</text>
-  <line x1="910" y1="1371" x2="960" y2="1371" class="async"/>
-  <text class="legend" x="980" y="1371">coalesced async</text>
-  <line x1="1125" y1="1371" x2="1175" y2="1371" class="skip"/>
-  <text class="legend" x="1195" y="1371">skipped / ignored</text>
+  <line class="rule" x1="60" y1="2460" x2="1740" y2="2460"/>
+  <rect class="entry" x="80" y="2490" width="24" height="18" rx="4"/>
+  <text class="legend" x="116" y="2499">hook / entry</text>
+  <rect class="process" x="245" y="2490" width="24" height="18" rx="4"/>
+  <text class="legend" x="281" y="2499">processing</text>
+  <rect class="decision" x="400" y="2490" width="24" height="18" rx="4"/>
+  <text class="legend" x="436" y="2499">guard</text>
+  <rect class="artifact" x="535" y="2490" width="24" height="18" rx="4"/>
+  <text class="legend" x="571" y="2499">disk artifact</text>
+  <rect class="terminal" x="715" y="2490" width="24" height="18" rx="4"/>
+  <text class="legend" x="751" y="2499">skip / terminal</text>
+  <path class="sync" d="M925,2499 H985"/>
+  <text class="legend" x="1005" y="2499">ordered flow</text>
+  <path class="async" d="M1160,2499 H1220"/>
+  <text class="legend" x="1240" y="2499">async / coalesced</text>
+  <path class="skip" d="M1445,2499 H1505"/>
+  <text class="legend" x="1525" y="2499">ignored / failure exit</text>
 </svg>
