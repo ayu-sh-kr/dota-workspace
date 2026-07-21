@@ -22,6 +22,13 @@ function toWebTypesSourceFile(root: string, file: string) {
   return relativePath.startsWith('.') ? relativePath : `./${relativePath}`;
 }
 
+/**
+ * Produces a stable numeric order that places missing values after present ones.
+ * Used as a secondary sort key so undefined source offsets sort last without NaN.
+ * @param left First value; treated as greater than any present right value when absent.
+ * @param right Second value; treated as greater than any present left value when absent.
+ * @returns Negative when left comes first, positive when right comes first, zero when equal.
+ */
 function compareOptionalNumber(left?: number, right?: number) {
   if (left == null && right == null) return 0;
   if (left == null) return 1;
@@ -29,6 +36,13 @@ function compareOptionalNumber(left?: number, right?: number) {
   return left - right;
 }
 
+/**
+ * Produces a stable lexicographic order that places missing values after present ones.
+ * Used as a secondary sort key so undefined source paths sort last consistently.
+ * @param left First value; treated as greater than any present right value when absent.
+ * @param right Second value; treated as greater than any present left value when absent.
+ * @returns Negative when left comes first, positive when right comes first, zero when equal.
+ */
 function compareOptionalString(left?: string, right?: string) {
   if (left == null && right == null) return 0;
   if (left == null) return 1;
@@ -245,13 +259,43 @@ export async function writeWebTypesArtifacts({
 }
 
 /**
- * Creates a Vite plugin that generates web-types during builds and source changes.
- * Watcher refreshes are coalesced so overlapping file events produce one artifact update.
- * @param root Package root; defaults to the current working directory.
- * @param outFile Output path relative to `root`; defaults to `web-types.json`.
- * @param logType Consola log level; defaults to `info`.
- * @param scanRoots Roots to scan; defaults to `[root]`.
- * @returns A Vite plugin with build-time generation and development-server refresh hooks.
+ * Vite plugin that scans TypeScript source files for decorated web components and
+ * emits a `web-types.json` artifact that IDEs use to provide HTML attribute
+ * completions and documentation for custom elements.
+ *
+ * **Trigger — build mode (`vite build`):** the `buildStart` hook fires once before
+ * Vite begins bundling. The plugin performs a full scan of all configured roots and
+ * writes the artifact before any module is transformed.
+ *
+ * **Trigger — dev server (`vite dev`):** `configureServer` registers `add`,
+ * `change`, and `unlink` listeners on Vite's file watcher. Only files whose path
+ * matches `*.component.ts` under `src/` or `*.page.ts` under `src/pages/`
+ * (determined by `isScannableComponentFile`) trigger a rescan. Concurrent file
+ * events within one async turn share a single coalesced refresh so rapid saves do
+ * not queue duplicate scans.
+ *
+ * **What it does:** for each triggering event the plugin calls `scanWebComponents`,
+ * which uses `fast-glob` to discover matching files and SWC to parse their
+ * TypeScript AST. It locates every class decorated with `@Component`, reads the
+ * `selector` value from the decorator argument, then extracts all class properties
+ * decorated with `@Property`, recording their HTML attribute name, resolved type,
+ * and source file position. Results are deterministically sorted so repeated scans
+ * produce identical output when source files are unchanged.
+ *
+ * **How it generates files:** `writeWebTypesArtifacts` serializes the scanned
+ * metadata into a JetBrains web-types JSON schema (`$schema` reference included)
+ * and writes it to `outFile` under `root`. It then reads `package.json` and sets
+ * the `"web-types"` field to `./<outFile>` when that entry is absent or stale, so
+ * IDEs can discover the artifact via the package manifest without manual wiring.
+ *
+ * @param root Package root used as the base for all resolved paths; defaults to
+ *   `process.cwd()`.
+ * @param outFile Output path for the generated JSON, relative to `root`; defaults
+ *   to `"web-types.json"`.
+ * @param logType Consola log level for plugin diagnostics; defaults to `"info"`.
+ * @param scanRoots Additional source roots to include in each scan; defaults to
+ *   `[root]` so the plugin covers the package that owns the Vite config.
+ * @returns A named Vite plugin object with `buildStart` and `configureServer` hooks.
  */
 export default function dotaWebTypeJson({
   root = process.cwd(),
@@ -277,6 +321,11 @@ export default function dotaWebTypeJson({
     configureServer(server) {
       let pendingRefresh: Promise<void> | null = null;
 
+      /**
+       * Rescans all source roots and rewrites the artifact, coalescing concurrent
+       * watcher events so only one scan runs at a time. A second caller while a
+       * scan is in progress receives the same promise rather than starting a new one.
+       */
       const refresh = async () => {
         if (pendingRefresh) {
           return pendingRefresh;
