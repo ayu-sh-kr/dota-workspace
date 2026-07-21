@@ -1,23 +1,31 @@
 import {defineConfig} from "vite";
-import {resolve} from "path";
+import {resolve} from "node:path";
+import {fileURLToPath} from "node:url";
 import dotaVitePreloader from "@ayu-sh-kr/dota-wrap/preloader-plugin";
 import dotaWebTypeJson from "@ayu-sh-kr/dota-wrap/web-type-json";
+
+const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig({
   plugins: [
     dotaVitePreloader({
-      root: resolve(__dirname),
+      root: projectRoot,
       logType: 'info'
     }),
     dotaWebTypeJson({
-      root: resolve(__dirname),
+      root: projectRoot,
       scanRoots: [
-        resolve(__dirname),
-        resolve(__dirname, '../../ui/dota-ui'),
-        resolve(__dirname, '../../ui/dota-md'),
+        projectRoot,
+        resolve(projectRoot, '../../ui/dota-ui'),
+        resolve(projectRoot, '../../ui/dota-md'),
       ],
       outFile: 'web-types.json',
-      logType: 'info'
+      logType: 'info',
+      customElementsManifest: {
+        enabled: true,
+        outFile: 'custom-elements.json',
+        updatePackageJson: true,
+      },
     }),
   ],
   css: {
