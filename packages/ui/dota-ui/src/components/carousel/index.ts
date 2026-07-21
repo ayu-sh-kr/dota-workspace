@@ -1,5 +1,10 @@
-export {DotaCarouselComponent} from "@dota/components/carousel/dota-carousel.component.ts";
-export {DotaSlideComponent} from "@dota/components/carousel/dota-slide.component.ts";
-export {ScrollDeckComponent} from "@dota/components/carousel/scroll-deck.component.ts";
-export {CarouselConfig} from "@dota/components/carousel/carousel.config.ts";
+export {DotaCarouselComponent} from "@dota/components/carousel/dota-carousel/dota-carousel.component.ts";
+export {DotaSlideComponent} from "@dota/components/carousel/dota-slide/dota-slide.component.ts";
+export {ScrollDeckComponent} from "@dota/components/carousel/scroll-deck/scroll-deck.component.ts";
+export {CarouselConfig, DotaCarouselStyle} from "@dota/components/carousel/dota-carousel/dota-carousel.config.ts";
+export type {DotaCarouselStyleConfig} from "@dota/components/carousel/dota-carousel/dota-carousel.config.ts";
+export {DotaSlideStyle} from "@dota/components/carousel/dota-slide/dota-slide.config.ts";
+export type {DotaSlideStyleConfig} from "@dota/components/carousel/dota-slide/dota-slide.config.ts";
+export {ScrollDeckStyle} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
+export type {ScrollDeckStyleConfig} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
 export type {CarouselAnimation, CarouselColor, CarouselIndicator, CarouselNavigation, CarouselGap, CarouselVariant} from "@dota/components/carousel/CarouselTypes.ts";
