@@ -13,8 +13,10 @@
     "@tailwindcss/typography": "^0.5.16",
     "@types/markdown-it": "^14.1.2",
     "autoprefixer": "^10.4.19",
+    "jiti": "2.6.1",
     "postcss": "8.5.10",
-    "tailwindcss": "^3.4.4"
+    "tailwindcss": "^3.4.4",
+    "vite": "7.3.1"
   },
   "dependencies": {
     "@ayu-sh-kr/dota-ui": "workspace:*",
@@ -28,5 +30,6 @@
     "markdown-it-toc-done-right": "^4.2.0",
     "reflect-metadata": "^0.2.2"
   },
-  "web-types": "./web-types.json"
+  "web-types": "./web-types.json",
+  "customElements": "custom-elements.json"
 }
