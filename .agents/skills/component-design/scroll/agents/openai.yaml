@@ -1,4 +1,0 @@
-interface:
-  display_name: "Scroll Component Design"
-  short_description: "Design horizontal snap-scroll components and slide decks."
-  default_prompt: "Use the component-design-scroll skill to build or refactor a horizontal snap-scroll component with mobile-first slides, one-slide-per-gesture behavior, mouse drag, keyboard arrows, and visible slide progress."
