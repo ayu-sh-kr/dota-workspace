@@ -36,10 +36,23 @@ interface CursorPalette {
   edge: RGB;
 }
 
+/**
+ * Keeps animation intensity values inside the range supported by the renderer.
+ * @param value Candidate numeric value from animation state or input.
+ * @param min Lowest permitted value.
+ * @param max Highest permitted value.
+ * @returns The candidate bounded inclusively by `min` and `max`.
+ */
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
+/**
+ * Selects theme-aware RGB stops for cursor effects.
+ * Falls back to cyan when the requested color is not present in the shared map.
+ * @param color Requested orbit color used by the cursor animation.
+ * @returns Core, mid, and edge colors for the active document theme.
+ */
 function resolvePalette(color: OrbitColor): CursorPalette {
   const dark = document.documentElement.classList.contains("dark");
   const palette = ORB_COLOR_MAP[color] ?? ORB_COLOR_MAP.cyan;
@@ -52,6 +65,14 @@ function resolvePalette(color: OrbitColor): CursorPalette {
   };
 }
 
+/**
+ * Owns the cursor animation loop and its global pointer/theme subscriptions.
+ * It initializes the canvas, renders pulses and tracers per frame, and returns
+ * cleanup so a disconnected component cannot retain listeners or animation work.
+ * @param canvas Canvas receiving the transparent cursor displacement effect.
+ * @param color Palette key used for generated gradients and particles.
+ * @returns A teardown function that cancels the frame and removes all listeners.
+ */
 function startLoop(canvas: HTMLCanvasElement, color: OrbitColor): () => void {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
@@ -251,7 +272,16 @@ function startLoop(canvas: HTMLCanvasElement, color: OrbitColor): () => void {
     window.removeEventListener("mouseleave", onLeave);
   };
 }
-
+/**
+ * Adds a pointer-responsive canvas glow, pulses, and orbiting tracer particles.
+ *
+ * Inputs: `color` (`color`, default `cyan`) selects the light/dark palette used
+ * for cursor effects and follows the document theme through the animation loop.
+ * Events: connection starts global pointer and animation listeners; disconnection
+ * cancels the frame loop and removes those listeners.
+ * Lifecycle and integration: renders a light-DOM, fixed, pointer-inert canvas and
+ * marks the visual effect `aria-hidden` so it does not enter the reading order.
+ */
 @Component({
   selector: "cursor-displacement",
   shadow: false,

@@ -352,7 +352,16 @@ function startLoop(
     window.removeEventListener("resize", resize);
   };
 }
-
+/**
+ * Provides a full-viewport canvas effect that combines drifting motes and vapor.
+ *
+ * Inputs: `color` (`color`, default `violet`) selects the palette; `vapor-intensity`,
+ * `vapor-density`, and `vapor-glow` are numeric strings defaulting to `1` and are
+ * clamped by the animation loop to safe visual ranges.
+ * Events: connection starts the canvas loop; disconnection tears it down.
+ * Lifecycle and integration: uses light DOM, is fixed and pointer-inert, observes
+ * the document theme class, and marks the decorative canvas `aria-hidden`.
+ */
 @Component({
   selector: "cloud-chamber",
   shadow: false,

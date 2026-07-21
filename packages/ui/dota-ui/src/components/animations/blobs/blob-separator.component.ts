@@ -70,7 +70,16 @@ function prepareBlob(blob: string): string {
     .replace("<svg ", '<svg class="blob-separator-svg" ')
     .replace(/fill="[^"]*"/g, 'fill="currentColor"');
 }
-
+/**
+ * Renders an accessible decorative stack of softly animated SVG blobs at one edge.
+ *
+ * Inputs: `side` (`side`, default `left`) chooses the edge; `speed` (`speed`,
+ * default `4`) is clamped to 1–10; `color-placement` (`color-placement`, default
+ * `0`) selects a cyclic Tailwind color palette entry.
+ * Events: none; generated layers animate through CSS custom properties.
+ * Lifecycle and integration: uses light DOM, marks the visual output hidden from
+ * assistive technology, and regenerates layers only when placement or speed changes.
+ */
 @Component({
   selector: "blob-separator",
   shadow: false

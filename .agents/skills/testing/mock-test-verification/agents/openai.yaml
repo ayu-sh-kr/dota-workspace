@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mock Test Verification"
+  short_description: "Verify mocked dependencies, arguments, return values, and errors"
+  default_prompt: "Use $mock-test-verification to write or review TypeScript/web tests that mock collaborators and verify calls, arguments, results, and errors."

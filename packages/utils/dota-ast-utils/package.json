@@ -36,7 +36,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
-    "test": "vitest run",
+    "test": "tsc --noEmit && vitest run",
     "test:verbose": "vitest run --reporter=verbose",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

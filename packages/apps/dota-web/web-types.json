@@ -335,7 +335,7 @@
           "name": "blob-animation",
           "source": {
             "file": "../../ui/dota-ui/src/components/animations/blobs/blobs.component.ts",
-            "offset": 135
+            "offset": 552
           },
           "attributes": []
         },
@@ -343,7 +343,7 @@
           "name": "blob-separator",
           "source": {
             "file": "../../ui/dota-ui/src/components/animations/blobs/blob-separator.component.ts",
-            "offset": 1897
+            "offset": 2448
           },
           "attributes": [
             {
@@ -352,7 +352,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/blobs/blob-separator.component.ts",
-                "offset": 2074
+                "offset": 2625
               }
             },
             {
@@ -361,7 +361,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/blobs/blob-separator.component.ts",
-                "offset": 1941
+                "offset": 2492
               }
             },
             {
@@ -370,7 +370,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/blobs/blob-separator.component.ts",
-                "offset": 2009
+                "offset": 2560
               }
             }
           ]
@@ -723,7 +723,7 @@
           "name": "cloud-chamber",
           "source": {
             "file": "../../ui/dota-ui/src/components/animations/cloud/cloud-chamber.component.ts",
-            "offset": 13087
+            "offset": 13639
           },
           "attributes": [
             {
@@ -830,7 +830,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 166391
+                "offset": 190132
               }
             },
             {
@@ -839,7 +839,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 166193
+                "offset": 189934
               }
             },
             {
@@ -848,7 +848,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 166467
+                "offset": 190208
               }
             },
             {
@@ -857,7 +857,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 166265
+                "offset": 190006
               }
             },
             {
@@ -866,7 +866,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 166547
+                "offset": 190288
               }
             },
             {
@@ -875,7 +875,7 @@
               "required": false,
               "source": {
                 "file": "./src/components/community/community-card.component.ts",
-                "offset": 166328
+                "offset": 190069
               }
             }
           ]
@@ -918,7 +918,7 @@
           "name": "cursor-displacement",
           "source": {
             "file": "../../ui/dota-ui/src/components/animations/cursor/cursor-displacement.component.ts",
-            "offset": 7403
+            "offset": 9020
           },
           "attributes": [
             {
@@ -927,7 +927,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/cursor/cursor-displacement.component.ts",
-                "offset": 7452
+                "offset": 9069
               }
             }
           ]
@@ -1795,7 +1795,7 @@
           "name": "dota-icon",
           "source": {
             "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-            "offset": 4009
+            "offset": 4019
           },
           "attributes": [
             {
@@ -1804,7 +1804,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4365
+                "offset": 4375
               }
             },
             {
@@ -1813,7 +1813,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4101
+                "offset": 4111
               }
             },
             {
@@ -1822,7 +1822,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4229
+                "offset": 4239
               }
             },
             {
@@ -1831,7 +1831,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4449
+                "offset": 4459
               }
             },
             {
@@ -1840,7 +1840,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4045
+                "offset": 4055
               }
             },
             {
@@ -1849,7 +1849,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4167
+                "offset": 4177
               }
             },
             {
@@ -1858,7 +1858,7 @@
               "required": true,
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4294
+                "offset": 4304
               }
             }
           ]
@@ -2307,7 +2307,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 662203
+                "offset": 665343
               }
             },
             {
@@ -2325,7 +2325,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 661747
+                "offset": 664887
               }
             },
             {
@@ -2334,7 +2334,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 662399
+                "offset": 665539
               }
             },
             {
@@ -2343,7 +2343,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 662304
+                "offset": 665444
               }
             },
             {
@@ -2352,7 +2352,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 661507
+                "offset": 664647
               }
             },
             {
@@ -2361,7 +2361,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 661846
+                "offset": 664986
               }
             },
             {
@@ -2379,7 +2379,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 662126
+                "offset": 665266
               }
             },
             {
@@ -2388,7 +2388,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 661936
+                "offset": 665076
               }
             },
             {
@@ -2397,7 +2397,7 @@
               "required": false,
               "source": {
                 "file": "../../ui/dota-ui/src/components/animations/orb/orb-background.component.ts",
-                "offset": 661594
+                "offset": 664734
               }
             },
             {

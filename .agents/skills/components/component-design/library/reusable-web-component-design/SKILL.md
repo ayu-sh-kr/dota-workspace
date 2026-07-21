@@ -104,4 +104,4 @@ When changing a component that is consumed from `@ayu-sh-kr/dota-ui`:
 3. Build `dota-ui` before building the consuming app.
 4. Verify a default instance and a fully themed instance, including keyboard focus, dark mode, and repeated instances.
 
-Use `$web-component-documentation` for the component contract and `$code-documentation` only for non-obvious helpers or event policies.
+Use `$web-component-documentation` for the component contract and `$code-documentation` for non-trivial support functions as well as event policies. Helpers that normalize inputs, select visual tokens, render animation frames, register listeners, or return cleanup functions are part of the reusable component's maintenance contract. Trivial one-line accessors and direct arithmetic helpers may remain undocumented.

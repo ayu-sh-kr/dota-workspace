@@ -76,7 +76,7 @@
     "build": "tsc --noEmit && node scripts/build.mjs",
     "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
-    "test": "vitest run",
+    "test": "tsc --noEmit && vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
