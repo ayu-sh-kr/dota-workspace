@@ -117,11 +117,19 @@ Use `#495057` for synchronous connectors, `#7048e8` dashed for coalesced/async p
 
 **Spacing rhythm:** use a shared spacing token for related text and elements. Support text below cards should use the same baseline offset throughout the diagram (normally 18–22 px below the card bottom), with equal left/right alignment to its card. Keep lane padding, card gaps, branch-marker offsets, and legend item spacing on the same small spacing grid; do not position each annotation by eye.
 
+For a vertical stack with no exceptional branch occupying a gap, use one repeated top-to-top pitch across all cards. Do not leave a visibly larger empty interval merely because the canvas has space. Break the rhythm only when a branch, annotation block, or connector corridor has measured bounds that require it.
+
+**Anti-clutter rule:** whitespace is part of the flow grammar. Do not place consecutive decisions side by side merely to shorten connectors. Keep at least 80 px of clear edge-to-edge space between neighboring cards; increase this to at least 100 px when the gap also contains branch labels, markers, support text, or connector turns. If a lane cannot provide that clearance, stack the cards vertically or enlarge the canvas. No label, marker, or annotation may visually bridge two unrelated cards.
+
 **Render-scale legibility:** design for the diagram's expected preview size, not only its native `viewBox`. Use at least 15 px for card labels, 14 px for support text and branch labels, and 13 px for legend text at the source canvas size. Do not depend on 10–12 px text to carry meaning; shorten or move secondary content into a separate note when it cannot remain readable after downscaling. Use `text-rendering: geometricPrecision` where supported, but treat sufficient font size and contrast as the primary fix for blur.
 
 **Card simplification:** when a flow has more than six steps on the primary spine, collapse internal sub-steps into a single card with an annotation note rather than adding individual cards for each substep. For example, `scanWebComponents()` covers glob, parse, decorator extraction, and sort — show one card with a short annotation, not four cards.
 
 **Connector geometry:** connectors must be orthogonal. Use only horizontal and vertical segments with explicit 90-degree turns; never connect two cards with a diagonal segment. Route each turn through an empty corridor and keep the arrowhead endpoint on the destination boundary.
+
+**Connector ports take priority over support text:** choose card entry and exit boundaries from flow direction before placing annotations. A vertical primary path should enter through the top and leave through the bottom. A cross-lane path should enter the side facing its source. Do not leave a card and loop back into the next card through the same side merely to protect support text. If an annotation conflicts with the natural connector, move the annotation beside the spine; never detour the primary connector around secondary text.
+
+**Decision branch origins:** visually distinct outcomes must leave a decision from distinct card boundaries. Prefer the continuing branch from the side facing its next step and a terminal/reuse branch from another boundary. Do not originate `yes` and `no` from the same side unless they first reach a clearly visible fork outside the card. Default consecutive decisions to a vertical stack when a horizontal arrangement would compress their labels, markers, support text, or terminal branches. When the code's `no` outcome leaves the main spine, route it outward from the right edge and continue the primary path downward.
 
 **Numeric branch markers:** when a decision has several branches or branch labels would make the chart dense, place a small numbered marker near the split and explain the number in the legend or a nearby annotation. Align each marker to the center of the card or outcome it identifies, using reserved space directly above or below that element so the association is unambiguous. Use one neutral marker style by default (`#343a40` with white text); do not reuse multiple card colors for markers unless color itself represents a required domain distinction. A circular marker must never overlap a card, connector segment, bend, arrowhead, or another marker.
 
@@ -173,6 +181,10 @@ Then check:
 10. **Typography and spacing audit.** Verify the preferred font stack is declared, labels remain legible at the rendered size, and every support annotation uses the same measured offset from its related element.
 11. **Preview audit.** Inspect the SVG at its intended embedded or screenshot width. If support text blurs or disappears, enlarge it or remove it; do not solve the problem with a more decorative font or tighter layout.
 12. **Marker clearance audit.** Check each marker's full circle bounding box against every card and connector corridor. Keep a visible gap around it and place it above or below the branch path, never on the path itself.
+13. **Branch-origin audit.** For every decision, verify each labeled outcome leaves from a different boundary or from an explicit external fork. The branch label must sit immediately after its own exit and the continuation must point toward its next card without reversing direction.
+14. **Clutter audit.** Measure edge-to-edge card gaps in both axes. Reject any layout with less than 80 px clearance, or less than 100 px where labels, markers, annotations, or turns occupy the gap. Enlarge the canvas or stack cards instead of shrinking or crowding elements.
+15. **Port audit.** Verify each card's incoming arrow uses the boundary facing its source and each outgoing arrow uses the boundary facing its destination. For a vertical spine, require top-in and bottom-out unless the code actually branches sideways.
+16. **Rhythm audit.** Compare top-to-top distances in each unbroken card stack. Use one consistent pitch unless a measured branch corridor requires a larger gap; document that exception in the geometry plan.
 
 If the flow cannot pass this table at a readable font size, enlarge the canvas or split the diagram into two files. Do not shrink text to make it fit.
 
