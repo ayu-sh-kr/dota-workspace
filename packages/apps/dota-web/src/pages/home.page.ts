@@ -47,6 +47,7 @@ export class HomePage extends DotaPageElement {
              <device-section></device-section>
              <our-tools></our-tools>
              <client-section></client-section>
+             <faq-section></faq-section>
              <app-footer></app-footer>
            </main>
         `
