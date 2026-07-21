@@ -1,55 +1,53 @@
-import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {ScaffoldStyle} from "@dota/components/utils/scaffold.config.ts";
+import type {ScaffoldStyleConfig} from "@dota/components/utils/scaffold.config.ts";
 
 /**
- * ScaffoldComponent provides a basic layout wrapper for content.
+ * Provides a neutral light-DOM layout wrapper for consumer-composed content.
  *
- * @example
- * // Basic usage
- * <app-scaffold>
- *   <div>Your content here</div>
- * </app-scaffold>
- *
- * // With custom class
- * <app-scaffold classname="bg-blue-500 p-4">
- *   <div>Styled content</div>
- * </app-scaffold>
+ * Inputs: `classname` (`classname`, default `""`) adds instance-specific
+ * classes to the wrapper. `config` (`config`, default `{}`) accepts a JSON
+ * `ScaffoldStyleConfig` attribute that replaces the default container class.
+ * Events: none. Lifecycle and integration: initial child markup is retained
+ * and rendered in light DOM, so consumers own its semantics and Tailwind styles.
  */
-
 @Component({
     selector: 'app-scaffold',
     shadow: false
 })
 export class ScaffoldComponent extends BaseElement {
 
-    /**
-     * Additional CSS classes to be applied to the scaffold section
-     */
     @Property({name: 'classname', type: String})
-    className!: string;
+    className = '';
 
-    /**
-     * Inner HTML content of the component
-     */
-    content!: string
+    @Property({name: 'config', type: ObjectType})
+    config: ScaffoldStyleConfig = {};
 
-    /**
-     * Initializes the component and captures inner content
-     */
+    private content: string;
+
     constructor() {
         super();
         this.content = this.innerHTML;
     }
 
     /**
-     * Renders the component with the stored content and applied classes
-     * @returns Rendered HTML string
+     * Resolves the wrapper class with a nullish fallback so an empty configured
+     * value can intentionally remove the library's default spacing.
+     * @returns The static container class for the current instance.
      */
+    private getStyle() {
+        return this.config?.container ?? ScaffoldStyle.container;
+    }
+
     render(): string {
         return `
-             <section class="p-2 ${this.className ?? ''}">
+             <div class="${this.getStyle()} ${this.className}">
                 ${this.content}
-            </section>
+            </div>
         `;
     }
 
 }
+
+export {ScaffoldStyle};
+export type {ScaffoldStyleConfig};
