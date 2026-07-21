@@ -1,0 +1,4 @@
+interface:
+  display_name: "Web Component Documentation"
+  short_description: "Document web components"
+  default_prompt: "Use $web-component-documentation to document this web component."
