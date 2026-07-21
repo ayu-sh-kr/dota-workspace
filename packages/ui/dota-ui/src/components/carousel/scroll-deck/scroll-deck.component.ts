@@ -1,4 +1,6 @@
-import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {ScrollDeckStyle} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
+import type {ScrollDeckStyleConfig} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
 
 type EventDisposer = () => void;
 
@@ -16,6 +18,19 @@ function listen(
   return () => target.removeEventListener(event, listener, options);
 }
 
+/**
+ * Provides a native horizontally scrolling, snap-aligned deck for light-DOM slide content.
+ *
+ * Inputs: `aria-label` (`"Scroll deck"`) names the focusable scrolling region. `config` is
+ * a JSON `ScrollDeckStyleConfig` attribute that independently replaces container, scroller,
+ * content, or drag-state classes without changing scroll, snap, keyboard, or ARIA structure.
+ * State: private drag state tracks a mouse gesture; focus state limits window arrow-key
+ * handling to an active deck.
+ * Events: mouse drag updates `scrollLeft` and settles on a nearby slide; native touch scrolling
+ * remains available. Arrow keys on the scroller, or while the deck is active, move one slide.
+ * Lifecycle and integration: light DOM preserves consumer-provided elements marked
+ * `data-scroll-slide`; listeners are installed after render and removed on disconnection.
+ */
 @Component({
   selector: "scroll-deck",
   shadow: false,
@@ -23,6 +38,9 @@ function listen(
 export class ScrollDeckComponent extends BaseElement {
   @Property({name: "aria-label", type: String})
   ariaLabel: string = "Scroll deck";
+
+  @Property({name: "config", type: ObjectType})
+  config: ScrollDeckStyleConfig = {};
 
   private dragState = {
     active: false,
@@ -123,7 +141,8 @@ export class ScrollDeckComponent extends BaseElement {
     this.dragState.active = false;
     this.dragState.deltaX = 0;
     this.dragState.moved = false;
-    scroller.classList.remove("is-dragging");
+    const draggingClass = this.config?.dragging ?? ScrollDeckStyle.dragging;
+    if (draggingClass) scroller.classList.remove(draggingClass);
     scroller.style.scrollSnapType = "";
     scroller.style.scrollBehavior = "";
   };
@@ -138,7 +157,8 @@ export class ScrollDeckComponent extends BaseElement {
     this.dragState.startIndex = this.getNearestSlideIndex(scroller);
     this.dragState.deltaX = 0;
     this.dragState.moved = false;
-    scroller.classList.add("is-dragging");
+    const draggingClass = this.config?.dragging ?? ScrollDeckStyle.dragging;
+    if (draggingClass) scroller.classList.add(draggingClass);
     scroller.style.scrollSnapType = "none";
     scroller.style.scrollBehavior = "auto";
     scroller.focus?.({preventScroll: true});
@@ -209,17 +229,22 @@ export class ScrollDeckComponent extends BaseElement {
   }
 
   render(): string {
+    const config = this.config;
+    const container = config?.container ?? ScrollDeckStyle.container;
+    const scroller = config?.scroller ?? ScrollDeckStyle.scroller;
+    const content = config?.content ?? ScrollDeckStyle.content;
+
     return `
-      <section class="my-8 w-full">
+      <section class="${container}">
         <div
           data-scroll-deck-scroller
           tabindex="0"
           role="region"
           aria-label="${this.ariaLabel}"
-          class="cursor-grab overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth select-none custom-scrollbar active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950"
-          style="scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-x; scroll-snap-stop: always;"
+          class="${scroller}"
+          style="scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-y; scroll-snap-stop: always;"
         >
-          <div class="flex gap-4 pb-2">
+          <div class="${content}">
             ${this.content}
           </div>
         </div>
@@ -227,3 +252,6 @@ export class ScrollDeckComponent extends BaseElement {
     `;
   }
 }
+
+export {ScrollDeckStyle as ScrollDeckConfig};
+export type {ScrollDeckStyleConfig};
