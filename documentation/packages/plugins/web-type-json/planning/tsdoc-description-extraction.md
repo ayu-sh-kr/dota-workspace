@@ -192,13 +192,13 @@ Finally generate `dota-web/web-types.json` and inspect at least `dota-button`, `
 
 ## Related files and documentation
 
-- [`web-type-json/src/main.ts`](../../../packages/plugins/web-type-json/src/main.ts)
-- [`web-type-json/src/Types.ts`](../../../packages/plugins/web-type-json/src/Types.ts)
-- [`dota-ast-utils/ClassView.ts`](../../../packages/utils/dota-ast-utils/src/view/ClassView.ts)
-- [`dota-ast-utils/PropertyView.ts`](../../../packages/utils/dota-ast-utils/src/view/PropertyView.ts)
-- [`dota-ast-utils/SourceOffsetUtils.ts`](../../../packages/utils/dota-ast-utils/src/view/SourceOffsetUtils.ts)
-- [`dota-ui/button.component.ts`](../../../packages/ui/dota-ui/src/components/button/button.component.ts)
-- [`dota-ui/accordion.component.ts`](../../../packages/ui/dota-ui/src/components/accordian/accordion.component.ts)
-- [Property type IntelliSense](property-type-intellisense.md)
-- [Source offset drift](source-offset-drift.md)
-- [Custom Elements Manifest integration](custom-elements-manifest-integration.md)
+- [`web-type-json/src/main.ts`](../../../../../packages/plugins/web-type-json/src/main.ts)
+- [`web-type-json/src/Types.ts`](../../../../../packages/plugins/web-type-json/src/Types.ts)
+- [`dota-ast-utils/ClassView.ts`](../../../../../packages/utils/dota-ast-utils/src/view/ClassView.ts)
+- [`dota-ast-utils/PropertyView.ts`](../../../../../packages/utils/dota-ast-utils/src/view/PropertyView.ts)
+- [`dota-ast-utils/SourceOffsetUtils.ts`](../../../../../packages/utils/dota-ast-utils/src/view/SourceOffsetUtils.ts)
+- [`dota-ui/button.component.ts`](../../../../../packages/ui/dota-ui/src/components/button/button.component.ts)
+- [`dota-ui/accordion.component.ts`](../../../../../packages/ui/dota-ui/src/components/accordian/accordion.component.ts)
+- [Property type IntelliSense](../diagnostics/property-type-intellisense.md)
+- [Source offset drift](../diagnostics/source-offset-drift.md)
+- [Custom Elements Manifest integration](../custom-elements/custom-elements-manifest-integration.md)

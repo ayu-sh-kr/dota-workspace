@@ -13,10 +13,11 @@ Determine the project shape before creating files. Treat a repository as a works
 
 | Project shape | Documentation location |
 | --- | --- |
-| Workspace | `<workspace-root>/documentation/<project-slug>/<domain>/<feature-or-concern>.md` |
+| Workspace package | `<workspace-root>/documentation/packages/<package-scope>/<package-slug>/<domain>/<feature-or-concern>.md` |
+| Workspace-wide standard or convention | `<workspace-root>/documentation/standards/<domain>/<feature-or-concern>.md` |
 | Individual project | `<project-root>/documentation/<domain>/<feature-or-concern>.md` |
 
-Use a stable, lowercase kebab-case project slug, normally the package or project name. Group related documents by domain first, then feature, service, or concern. For a feature requiring several documents, use a feature directory with an `overview.md` entry point, for example `documentation/web-type-json/scanning/component-discovery/overview.md`.
+For a workspace package, mirror its source ownership beneath `documentation/packages`: use the package scope from `packages/` (`apps`, `libs`, `plugins`, `ui`, or `utils`) and a stable lowercase kebab-case package slug. Group related documents by domain first, then feature, service, or concern. Place workspace-wide conventions, such as diagram grammar, under `documentation/standards` rather than under a package. For a feature requiring several documents, use a feature directory with an `overview.md` entry point, for example `documentation/packages/plugins/web-type-json/scanning/component-discovery/overview.md`.
 
 Do not create feature documentation beside source files, inside generated directories, or under a different root merely because a package has its own `src` directory.
 
@@ -46,4 +47,4 @@ Use only headings that add information. Omit sections that do not apply instead 
 
 ## Quality checks
 
-Before finishing, verify that the file is under the correct documentation root; its path reflects project, domain, and feature ownership; its claims match the source; the narrative progresses from context to behavior to detail; and every link resolves to a relevant document. Remove stale, duplicate, speculative, and implementation-only content.
+Before finishing, verify that the file is under the correct documentation root; its path reflects package scope, package, domain, and feature ownership; its claims match the source; the narrative progresses from context to behavior to detail; and every link resolves to a relevant document. Remove stale, duplicate, speculative, and implementation-only content.

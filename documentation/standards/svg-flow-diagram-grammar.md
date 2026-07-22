@@ -1,6 +1,6 @@
 # SVG flow diagram vocabulary and design grammar
 
-This is a reusable visual language for technical SVG flow diagrams. It defines how behavior becomes readable nodes, branches, lanes, connectors, annotations, and legends. The [Dota Router HLD](../dota-router/router/dota-router-hld.svg) is one application of this grammar, not the scope of the grammar itself.
+This is a reusable visual language for technical SVG flow diagrams. It defines how behavior becomes readable nodes, branches, lanes, connectors, annotations, and legends. The [Dota Router HLD](../packages/libs/dota-router/architecture/dota-router-hld.svg) is one application of this grammar, not the scope of the grammar itself.
 
 ## Vocabulary
 
@@ -156,4 +156,4 @@ intentionally required, for example `chromium` or `msedge-dev`.
 
 The Dota Router chart applies the grammar by using configuration assembly as its first section, History and Navigation API implementations as alternative lanes, and `RouterUtils.render()` as the shared convergence and spine. Its exact route checks, prefix recursion, error handling, custom render branch, component metadata branch, and terminal logs are included because each changes the observable result.
 
-The chart itself remains the behavior source for the example: [dota-router-hld.svg](../dota-router/router/dota-router-hld.svg). Its implementation claims are grounded in [`DotaRouterService.ts`](../../packages/libs/dota-router/src/DotaRouterService.ts), [`RouterUtils.ts`](../../packages/libs/dota-router/src/RouterUtils.ts), [`dom-history.router.ts`](../../packages/libs/dota-router/src/dom-history.router.ts), [`dom-navigation.router.ts`](../../packages/libs/dota-router/src/dom-navigation.router.ts), and [`Types.ts`](../../packages/libs/dota-router/src/Types.ts).
+The chart itself remains the behavior source for the example: [dota-router-hld.svg](../packages/libs/dota-router/architecture/dota-router-hld.svg). Its implementation claims are grounded in [`DotaRouterService.ts`](../../packages/libs/dota-router/src/DotaRouterService.ts), [`RouterUtils.ts`](../../packages/libs/dota-router/src/RouterUtils.ts), [`dom-history.router.ts`](../../packages/libs/dota-router/src/router/dom-history.router.ts), [`dom-navigation.router.ts`](../../packages/libs/dota-router/src/router/dom-navigation.router.ts), and [`Types.ts`](../../packages/libs/dota-router/src/Types.ts).

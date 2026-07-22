@@ -3,7 +3,7 @@
 This document records a source-backed plan for making `@ayu-sh-kr/dota-router` more predictable, more portable, and capable of handling application-scale navigation. It is a proposal: the features below are not implemented unless explicitly stated as current behavior.
 
 The staged implementation and compatibility strategy is documented in the
-[backward-compatible router integration plan](./backward-compatible-router-integration-plan.md).
+[backward-compatible router integration plan](../migration/backward-compatible-router-integration-plan.md).
 
 ## Current design and boundaries
 
@@ -209,9 +209,9 @@ Each step should preserve the existing `DomHistoryRouter` and `DomNavigationRout
 
 ## Source references
 
-- [`DotaRouterService.ts`](../../packages/libs/dota-router/src/DotaRouterService.ts) configures router instances from components or routes.
-- [`RouterUtils.ts`](../../packages/libs/dota-router/src/RouterUtils.ts) currently matches routes, builds nested configurations, and writes route markup.
-- [`dom-history.router.ts`](../../packages/libs/dota-router/src/dom-history.router.ts) implements the history adapter.
-- [`dom-navigation.router.ts`](../../packages/libs/dota-router/src/dom-navigation.router.ts) implements the Navigation API adapter.
-- [`Types.ts`](../../packages/libs/dota-router/src/Types.ts) defines the present public contracts.
-- [`README.md`](../../packages/libs/dota-router/README.md) contains usage examples that should be aligned with the implementation.
+- [`DotaRouterService.ts`](../../../../../packages/libs/dota-router/src/DotaRouterService.ts) configures router instances from components or routes.
+- [`RouterUtils.ts`](../../../../../packages/libs/dota-router/src/RouterUtils.ts) currently matches routes, builds nested configurations, and writes route markup.
+- [`dom-history.router.ts`](../../../../../packages/libs/dota-router/src/router/dom-history.router.ts) implements the history adapter.
+- [`dom-navigation.router.ts`](../../../../../packages/libs/dota-router/src/router/dom-navigation.router.ts) implements the Navigation API adapter.
+- [`Types.ts`](../../../../../packages/libs/dota-router/src/Types.ts) defines the present public contracts.
+- [`README.md`](../../../../../packages/libs/dota-router/README.md) contains usage examples that should be aligned with the implementation.

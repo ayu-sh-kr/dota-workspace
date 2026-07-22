@@ -12,13 +12,13 @@ Create diagrams from the behavior enforced by the current code. Treat an SVG flo
 Follow the `feature-documentation` skill placement rule. For a workspace project the output path is:
 
 ```
-<workspace-root>/documentation/<project-slug>/<domain>/<diagram-name>.svg
+<workspace-root>/documentation/packages/<package-scope>/<package-slug>/<domain>/<diagram-name>.svg
 ```
 
 For example, a flow for the `web-type-json` plugin placed under the `plugin` domain becomes:
 
 ```
-documentation/web-type-json/plugin/web-type-json-flow.svg
+documentation/packages/plugins/web-type-json/architecture/web-type-json-flow.svg
 ```
 
 Never place diagrams beside source files, inside `src/`, inside generated directories, or under legacy `docs/flows/` paths. Create the directory tree when it does not exist.
@@ -103,7 +103,7 @@ Include only behavior that changes the output artifact, persisted state, rendere
 
 ## Visual Style
 
-**Color palette (minimalist light mode — default):** use the pale-fill, dark-text, colored-border treatment used by `documentation/dota-router/router/dota-router-hld.svg`. The canvas and lane panels should remain white, and semantic roles should be distinguished primarily by a restrained fill/border pair rather than saturated card backgrounds.
+**Color palette (minimalist light mode — default):** use the pale-fill, dark-text, colored-border treatment used by `documentation/packages/libs/dota-router/architecture/dota-router-hld.svg`. The canvas and lane panels should remain white, and semantic roles should be distinguished primarily by a restrained fill/border pair rather than saturated card backgrounds.
 
 | Role | Fill | Border | Text |
 | --- | --- | --- |

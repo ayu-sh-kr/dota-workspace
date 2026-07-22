@@ -97,7 +97,6 @@ backward-compatibility gate.
 
 ## Related documentation
 
-- [Backward-compatible router integration plan](./backward-compatible-router-integration-plan.md)
-- [Route matcher flow](./route-matcher-flow.svg)
-- [Current RouterUtils matching flow](./router-utils-find-route-flow.svg)
-
+- [Backward-compatible router integration plan](backward-compatible-router-integration-plan.md)
+- [Route matcher flow](../matching/route-matcher-flow.svg)
+- [Current RouterUtils matching flow](../matching/router-utils-find-route-flow.svg)

@@ -356,20 +356,20 @@ Do not switch an adapter to the coordinator until these groups pass:
 
 ## Related documentation
 
-- [Dota Router improvement roadmap](./improvement-roadmap.md)
-- [Route configurer flow](./route-configurer-flow.svg)
-- [Route matcher flow](./route-matcher-flow.svg)
-- [Current RouterUtils matching flow](./router-utils-find-route-flow.svg)
-- [Route configuration producers](./route-config-producers.svg)
-- [Route resolution: flat configuration and configured tree](./route-resolution-flat-vs-tree.svg)
+- [Dota Router improvement roadmap](../planning/improvement-roadmap.md)
+- [Route configurer flow](../configuration/route-configurer-flow.svg)
+- [Route matcher flow](../matching/route-matcher-flow.svg)
+- [Current RouterUtils matching flow](../matching/router-utils-find-route-flow.svg)
+- [Route configuration producers](../configuration/route-config-producers.svg)
+- [Route resolution: flat configuration and configured tree](../matching/route-resolution-flat-vs-tree.svg)
 - [RouterUtils integration steps](./router-utils-integration-steps.md)
 
 ## Source references
 
-- [`route-configurer.ts`](../../../packages/libs/dota-router/src/route-configurer.ts)
-- [`route-matcher.ts`](../../../packages/libs/dota-router/src/route-matcher.ts)
-- [`Types.ts`](../../../packages/libs/dota-router/src/Types.ts)
-- [`RouterUtils.ts`](../../../packages/libs/dota-router/src/RouterUtils.ts)
-- [`DotaRouterService.ts`](../../../packages/libs/dota-router/src/DotaRouterService.ts)
-- [`dom-history.router.ts`](../../../packages/libs/dota-router/src/dom-history.router.ts)
-- [`dom-navigation.router.ts`](../../../packages/libs/dota-router/src/dom-navigation.router.ts)
+- [`route-configurer.ts`](../../../../../packages/libs/dota-router/src/route/route-configurer.ts)
+- [`route-matcher.ts`](../../../../../packages/libs/dota-router/src/route/route-matcher.ts)
+- [`Types.ts`](../../../../../packages/libs/dota-router/src/Types.ts)
+- [`RouterUtils.ts`](../../../../../packages/libs/dota-router/src/RouterUtils.ts)
+- [`DotaRouterService.ts`](../../../../../packages/libs/dota-router/src/DotaRouterService.ts)
+- [`dom-history.router.ts`](../../../../../packages/libs/dota-router/src/router/dom-history.router.ts)
+- [`dom-navigation.router.ts`](../../../../../packages/libs/dota-router/src/router/dom-navigation.router.ts)

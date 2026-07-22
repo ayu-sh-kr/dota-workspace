@@ -4,9 +4,9 @@ Web Types should make the local source code discoverable and understandable befo
 
 ## Current example
 
-[`loader-section.component.ts`](../../../packages/apps/dota-web/src/components/utils/section/loader-section.component.ts) defines the `is-loader` property as a Boolean with a default of `false`.
+[`loader-section.component.ts`](../../../../../packages/apps/dota-web/src/components/utils/section/loader-section.component.ts) defines the `is-loader` property as a Boolean with a default of `false`.
 
-The generated [`loader-section` metadata](../../../packages/apps/dota-web/web-types.json) already exposes the primitive type in both supported locations:
+The generated [`loader-section` metadata](../../../../../packages/apps/dota-web/web-types.json) already exposes the primitive type in both supported locations:
 
 ```json
 {
@@ -78,6 +78,6 @@ JetBrains’ current Web Types guidance covers HTML attributes, JavaScript prope
 
 ## Related documentation
 
-- [Property type intellisense](property-type-intellisense.md)
-- [Web-types source offset drift](source-offset-drift.md)
-- [Web-types plugin flow](web-type-json-flow.svg)
+- [Property type intellisense](../diagnostics/property-type-intellisense.md)
+- [Web-types source offset drift](../diagnostics/source-offset-drift.md)
+- [Web-types plugin flow](../architecture/web-type-json-flow.svg)
