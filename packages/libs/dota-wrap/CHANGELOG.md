@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.22
+
+### Patch Changes
+
+- Updated dependencies [cd53e12]
+  - @ayu-sh-kr/dota-router@0.0.29
+
 ## 0.0.21
 
 ### Patch Changes
