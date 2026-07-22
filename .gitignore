@@ -27,3 +27,4 @@ dist-ssr
 **/dist/
 /.pnpm-store/
 /output/playwright/
+/tool-scripts/
