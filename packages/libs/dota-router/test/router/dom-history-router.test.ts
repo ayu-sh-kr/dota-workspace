@@ -1,14 +1,11 @@
 import {RouterUtils} from "@dota/RouterUtils";
 import {components, defaultRoute, errorRoute} from "@test/setup/RouteConfig";
-import {DomHistoryRouter} from "@dota/dom-history.router";
+import {DomHistoryRouter} from "@dota/router/dom-history.router";
 import {afterAll, beforeEach, vi} from "vitest";
 import { BaseElement } from "@ayu-sh-kr/dota-core";
 import {AppComponent} from "@test/setup/Components";
 
 describe('DomHistoryRouter', () => {
-
-  // Mock RouterUtils.render to prevent Dom manipulation during test
-  const renderSpy = vi.spyOn(RouterUtils, 'render').mockImplementation(() => {});
 
   // Mock window.addEventListener to prevent actual event binding for the init method
   const addEventListenerSpy = vi.spyOn(window, 'addEventListener').mockImplementation(() => {});
@@ -36,14 +33,17 @@ describe('DomHistoryRouter', () => {
     vi.restoreAllMocks();
   })
 
-  it('should create a instance of DomHistoryRouter', () => {
+  it('should create a instance of DomHistoryRouter and render the initial route through its coordinator', async () => {
     const routes = RouterUtils.prepareConfig(components);
+    const renderer = vi.fn();
     const router = new DomHistoryRouter<BaseElement>(
       routes,
       errorRoute,
       defaultRoute,
-      AppComponent
+      AppComponent,
+      renderer
     );
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
 
     // Verify the instance was created successfully
     expect(router).toBeInstanceOf(DomHistoryRouter);
@@ -51,13 +51,10 @@ describe('DomHistoryRouter', () => {
     expect(router.errorRoute).toBe(errorRoute);
     expect(router.defaultRoute).toBe(defaultRoute);
 
-    // Verify RouterUtils.render was called during construction
-    expect(renderSpy).toHaveBeenCalledWith({
-      router: router,
-      routes: routes,
-      options: {},
-      path: '/'
-    });
+    expect(renderer).toHaveBeenCalledWith(
+      expect.objectContaining({pathname: "/", matched: true}),
+      expect.objectContaining({url: expect.any(URL)})
+    );
 
     // Verify event listener was added during init
     expect(addEventListenerSpy).toHaveBeenCalledWith('popstate', expect.any(Function));
@@ -143,6 +140,28 @@ describe('DomHistoryRouter', () => {
       null,
       '',
       expectedUrl
+    );
+  });
+
+  it('should route instance calls through the history coordinator', async () => {
+    const renderer = vi.fn();
+    const router = new DomHistoryRouter<BaseElement>(
+      RouterUtils.prepareConfig(components),
+      errorRoute,
+      defaultRoute,
+      AppComponent,
+      renderer
+    );
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
+    vi.clearAllMocks();
+
+    router.route('/resource');
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
+
+    expect(pushStateSpy).toHaveBeenCalledWith(null, '', 'http://localhost/resource');
+    expect(renderer).toHaveBeenCalledWith(
+      expect.objectContaining({pathname: '/resource', matched: true}),
+      expect.objectContaining({url: expect.any(URL)})
     );
   });
 
