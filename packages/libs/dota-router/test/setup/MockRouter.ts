@@ -12,8 +12,8 @@ export class MockRouter implements Router<HTMLElement> {
 
   constructor(
     routes: RouteConfig<HTMLElement>[],
-    defaultRoute: RouteConfig<HTMLElement>,
     errorRoute: RouteConfig<HTMLElement>,
+    defaultRoute: RouteConfig<HTMLElement>,
     root: ComponentClass,
     mockInit: () => void = vi.fn(),
     mockRoute: (path: string) => void = vi.fn()
