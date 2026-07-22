@@ -15,6 +15,13 @@ Use this skill when reviewing or refactoring TypeScript code for clarity, focuse
 - Do not optimize for the fewest methods at the expense of readable control flow. A longer method is not automatically better than a well-named abstraction.
 - Treat public API boundaries separately from implementation helpers; removing a private wrapper must not change the public signature or behavior.
 
+## Readable formatting
+
+- Keep a method declaration on one line by default. Use multiline formatting only when the declaration is genuinely large, such as five or more parameters or multiple complex return types.
+- Keep a method call on one line by default. Use multiline formatting only when it has more than six arguments or the call becomes materially harder to scan.
+- When a joined or complex type makes a declaration difficult to read, create a named `type` contract and document it with the type-documentation guidance.
+- Prefer compact, named contracts and direct calls so reduced verbosity improves readability without hiding domain behavior.
+
 ## Domain utility extraction
 
 - Keep entry modules, factories, and plugin hooks focused on orchestration and lifecycle behavior.
@@ -23,6 +30,15 @@ Use this skill when reviewing or refactoring TypeScript code for clarity, focuse
 - Group methods only when they share domain vocabulary, inputs, or invariants. Avoid both one class per tiny helper and unrelated methods collected merely to shorten a file.
 - Keep one-off trivial expressions inline, and keep core workflows in their domain service or entry module when extraction would only hide control flow.
 - Preserve public exports and observable behavior unless the requested change explicitly includes an API revision.
+
+## Logical grouping
+
+- Group files by the domain boundary they implement, not merely by file type or similar suffixes.
+- Put collaborating implementations, their shared contracts, and a small domain barrel in one directory when they share vocabulary, inputs, invariants, or lifecycle ownership.
+- Keep browser adapters, coordinators, route configuration, and rendering utilities in separate groups when their runtime responsibilities differ, even if they are used by the same entry service.
+- Mirror the source grouping in the test tree so each domain's tests make ownership and coverage obvious.
+- Do not create a folder for a single unrelated file, and do not combine unrelated modules only to reduce the number of directories.
+- Keep the top-level entry module focused on orchestration; it may re-export grouped public APIs without owning their implementation.
 
 ## Named type contracts
 
