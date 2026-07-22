@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1800" viewBox="0 0 1800 1800" role="img" aria-labelledby="title desc">
+  <title id="title">configure() converts flat route paths into a route tree</title>
+  <desc id="desc">The configure function splits every flat route path into segments, creates missing parent nodes with the error component, assigns real route components to leaf nodes, flags dynamic segments as slugs, and nests non-leaf nodes through children arrays.</desc>
+
+  <style>
+    svg { background: #ffffff; text-rendering: geometricPrecision; }
+    text { font-family: "DM Sans", "Poppins", Helvetica, Arial, sans-serif; fill: #1f2937; }
+    .title { font-size: 34px; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { font-size: 18px; fill: #526174; }
+    .lane-title { font-size: 19px; font-weight: 700; fill: #334155; }
+    .card-label { font-size: 17px; font-weight: 700; }
+    .detail { font-size: 14px; fill: #526174; }
+    .branch { font-size: 14px; font-weight: 700; fill: #334155; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; fill: #526174; }
+    .lane { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; }
+    .card { stroke-width: 2; rx: 10; }
+    .entry { fill: #eef2ff; stroke: #3157c9; }
+    .process { fill: #ffffff; stroke: #cbd5e1; }
+    .decision { fill: #fffaf0; stroke: #d6a24e; }
+    .effect { fill: #f0fdf4; stroke: #9ac7a3; }
+    .skip { fill: #f8fafc; stroke: #94a3b8; }
+    .connector { fill: none; stroke: #64748b; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+    .plain { fill: none; stroke: #94a3b8; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .rule { stroke: #dbe4ee; stroke-width: 1.5; }
+  </style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="1800" height="1740" fill="#ffffff"/>
+  <text x="80" y="70" class="title">Dota Router · configure() turns flat paths into a segment tree</text>
+  <text x="80" y="106" class="subtitle">Example input: <tspan class="code">/blogs/content</tspan> becomes <tspan class="code">/blogs → children: [/content]</tspan>.</text>
+  <rect x="80" y="132" width="1640" height="6" rx="3" fill="#dbe4ee"/>
+
+  <rect x="60" y="180" width="1680" height="250" rx="24" class="lane"/>
+  <text x="100" y="226" class="lane-title">01 / INPUT</text>
+  <rect x="160" y="280" width="550" height="72" class="card entry"/>
+  <text x="435" y="324" text-anchor="middle" class="card-label">flatRoutes: RouteConfig[]</text>
+  <text x="160" y="380" class="code">[{ path: '/blogs/content', component: ContentPage }]</text>
+  <rect x="1090" y="280" width="550" height="72" class="card entry"/>
+  <text x="1365" y="324" text-anchor="middle" class="card-label">errorRoute</text>
+  <text x="1090" y="380" class="code">{ component: ErrorPage }</text>
+
+  <rect x="60" y="480" width="1680" height="1040" rx="24" class="lane"/>
+  <text x="100" y="526" class="lane-title">02 / FOR EACH FLAT ROUTE</text>
+  <rect x="630" y="570" width="540" height="72" class="card process"/>
+  <text x="900" y="614" text-anchor="middle" class="card-label">split route.path into segments</text>
+  <text x="630" y="670" class="code">'/blogs/content' → ['blogs', 'content']</text>
+
+  <rect x="630" y="740" width="540" height="72" class="card decision"/>
+  <text x="900" y="784" text-anchor="middle" class="card-label">path has no segments?</text>
+  <text x="630" y="840" class="detail">Only '/' reaches this branch.</text>
+  <rect x="1290" y="740" width="330" height="72" class="card effect"/>
+  <text x="1455" y="784" text-anchor="middle" class="card-label">add root route</text>
+
+  <rect x="630" y="910" width="540" height="72" class="card process"/>
+  <text x="900" y="954" text-anchor="middle" class="card-label">visit one segment at a time</text>
+  <text x="630" y="1010" class="detail">Start with top-level routes; move to children after every parent.</text>
+
+  <rect x="630" y="1080" width="540" height="72" class="card decision"/>
+  <text x="900" y="1124" text-anchor="middle" class="card-label">node for '/segment' already exists?</text>
+
+  <rect x="1300" y="1030" width="330" height="72" class="card decision"/>
+  <text x="1465" y="1074" text-anchor="middle" class="card-label">leaf segment?</text>
+  <rect x="1300" y="1170" width="330" height="72" class="card effect"/>
+  <text x="1465" y="1214" text-anchor="middle" class="card-label">replace existing route</text>
+  <text x="1300" y="1270" class="detail">Keeps children while applying the later route.</text>
+
+  <rect x="170" y="1030" width="330" height="72" class="card decision"/>
+  <text x="335" y="1074" text-anchor="middle" class="card-label">leaf segment?</text>
+  <rect x="170" y="1170" width="330" height="72" class="card effect"/>
+  <text x="335" y="1214" text-anchor="middle" class="card-label">copy leaf route</text>
+  <text x="170" y="1270" class="code">copyRoute(route, '/content')</text>
+  <rect x="170" y="1330" width="330" height="72" class="card effect"/>
+  <text x="335" y="1374" text-anchor="middle" class="card-label">create error parent</text>
+  <text x="170" y="1430" class="code">{ path: '/blogs', component: ErrorPage }</text>
+
+  <rect x="630" y="1320" width="540" height="72" class="card decision"/>
+  <text x="900" y="1364" text-anchor="middle" class="card-label">dynamic segment?</text>
+  <text x="630" y="1420" class="detail">Recognizes <tspan class="code">:id</tspan>, <tspan class="code">[id]</tspan>, and <tspan class="code">[...id]</tspan>.</text>
+
+  <rect x="630" y="1450" width="540" height="72" class="card process"/>
+  <text x="900" y="1494" text-anchor="middle" class="card-label">mark slug and descend when not leaf</text>
+
+  <rect x="60" y="1570" width="1680" height="130" rx="24" class="lane"/>
+  <text x="100" y="1614" class="lane-title">03 / RESULT</text>
+  <rect x="630" y="1600" width="540" height="56" class="card effect"/>
+  <text x="900" y="1635" text-anchor="middle" class="card-label">return configured route tree</text>
+  <text x="100" y="1682" class="code">[{ path: '/blogs', component: ErrorPage, children: [{ path: '/content', component: ContentPage }] }]</text>
+
+  <path d="M 435 352 V 520 H 700 V 570" class="connector"/>
+  <path d="M 900 642 V 740" class="connector"/>
+  <path d="M 1170 776 H 1290" class="connector"/>
+  <text x="1200" y="760" class="branch">yes</text>
+  <path d="M 900 812 V 910" class="connector"/>
+  <text x="920" y="875" class="branch">no</text>
+  <path d="M 900 982 V 1080" class="connector"/>
+  <path d="M 630 1116 H 560 V 1066 H 500" class="connector"/>
+  <text x="530" y="1100" class="branch">no</text>
+  <path d="M 1170 1116 H 1210 V 1066 H 1300" class="connector"/>
+  <text x="1200" y="1100" class="branch">yes</text>
+  <path d="M 335 1102 V 1170" class="connector"/>
+  <text x="355" y="1145" class="branch">yes</text>
+  <path d="M 170 1066 H 90 V 1366 H 170" class="connector"/>
+  <text x="105" y="1050" class="branch">no</text>
+  <path d="M 1465 1102 V 1170" class="connector"/>
+  <text x="1485" y="1145" class="branch">yes</text>
+  <path d="M 1300 1066 H 1210 V 1295 H 1170 V 1320" class="connector"/>
+  <text x="1230" y="1050" class="branch">no</text>
+  <path d="M 335 1242 V 1295 H 900 V 1320" class="connector"/>
+  <path d="M 335 1402 V 1435 H 900 V 1450" class="connector"/>
+  <path d="M 1465 1242 V 1295 H 900 V 1320" class="connector"/>
+  <path d="M 900 1392 V 1450" class="connector"/>
+  <text x="920" y="1430" class="branch">yes / no</text>
+  <path d="M 900 1522 V 1600" class="connector"/>
+
+  <line x1="80" y1="1730" x2="1720" y2="1730" class="rule"/>
+  <text x="80" y="1755" class="detail">Source: packages/libs/dota-router/src/route-configurer.ts · solid arrows show synchronous control flow.</text>
+</svg>
