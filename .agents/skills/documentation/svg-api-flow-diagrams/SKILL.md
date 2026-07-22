@@ -23,6 +23,10 @@ documentation/web-type-json/plugin/web-type-json-flow.svg
 
 Never place diagrams beside source files, inside `src/`, inside generated directories, or under legacy `docs/flows/` paths. Create the directory tree when it does not exist.
 
+## Repository scripting policy
+
+Use standalone Kotlin Script (`*.main.kts`) for task and diagram utility scripts whenever Kotlin Script can perform the work. The `main.kts` suffix selects Kotlin’s built-in executable script definition and improves IntelliJ diagnostics. Store repository-level utilities in `<workspace-root>/tool-scripts/` and run them from the workspace root with `kotlinc -script tool-scripts/<name>.main.kts` or an equivalent Kotlin Script runner. Use Python or Bash only when Kotlin Script cannot provide the required integration or would make the task materially less reliable; record that reason beside the script or in the relevant documentation. Keep `.agents/` focused on skills and their direct resources, not repository task utilities.
+
 ## Establish the Behavior First
 
 Trace the named flow before editing the SVG. The vocabulary below covers both backend services and frontend/build-tool code; use whichever terms match the codebase under review.
@@ -99,17 +103,17 @@ Include only behavior that changes the output artifact, persisted state, rendere
 
 ## Visual Style
 
-**Color palette (light mode — default):** use a white or transparent canvas; colored cards carry the semantic meaning.
+**Color palette (minimalist light mode — default):** use the pale-fill, dark-text, colored-border treatment used by `documentation/dota-router/router/dota-router-hld.svg`. The canvas and lane panels should remain white, and semantic roles should be distinguished primarily by a restrained fill/border pair rather than saturated card backgrounds.
 
-| Role | Fill | Text |
+| Role | Fill | Border | Text |
 | --- | --- | --- |
-| Entry / trigger | `#3b5bdb` (blue) | white |
-| Processing step | `#0c8599` (teal) | white |
-| Decision / guard | `#e67700` (amber) | white |
-| Artifact write | `#2f9e44` (green) | white |
-| Skip / terminal no-op | `#868e96` (gray) | white |
+| Entry / trigger | `#eef2ff` | `#3157c9` | `#1f2937` |
+| Processing step | `#ffffff` | `#cbd5e1` | `#1f2937` |
+| Decision / guard | `#fffaf0` | `#d6a24e` | `#1f2937` |
+| Artifact / effect | `#f0fdf4` | `#9ac7a3` | `#1f2937` |
+| Skip / terminal no-op | `#f8fafc` | `#94a3b8` | `#1f2937` |
 
-Use `#495057` for synchronous connectors, `#7048e8` dashed for coalesced/async paths. Do not use a solid dark background fill for the whole canvas — it flattens contrast and makes the diagram hard to embed. Lane backgrounds, if used, should be `#f8f9fa` or left transparent.
+Use `#64748b` for synchronous connectors, `#7c3aed` dashed for genuinely asynchronous paths, and `#94a3b8` for plain non-arrow fan-in segments. Use `#526174` for annotations and `#334155` for lane titles and branch labels. Do not use saturated card fills or a solid dark background by default; they flatten contrast and diverge from the repository’s minimalist diagram language. Lane panels, if used, should be white with a thin `#e2e8f0` border.
 
 **Text placement:** card labels do not need to fit entirely inside the card. Put the primary identifier (function name, hook name) on one short line inside the card. Place secondary detail — parameter hints, glob patterns, sub-step annotations — as a small `font-size="11"` text element immediately below or beside the card, outside its boundary. Never wrap two full sentences inside a 44 px-tall card.
 
@@ -197,7 +201,7 @@ If the flow cannot pass this table at a readable font size, enlarge the canvas o
 - Use the same card width and height within a lane. Align card centers on the spine and side-lane grid.
 - Label a branch close to its connector, not inside either card. Use concise `yes`/`no` labels.
 - Use dashed connectors only for genuinely asynchronous/post-commit work; explain that meaning in the legend.
-- Keep colors semantic and stable: API/response, processing, saved state/event, and error/stop.
+- Keep the minimalist role colors semantic and stable: indigo entry, white processing, warm decision, pale green effect, and pale gray skip/stop. Use the repository reference palette by default; introduce a different palette only when the domain requires a documented distinction that this palette cannot express.
 - When the diagram uses semantic line styles or colors, include a visual legend with a rendered sample of every style that affects interpretation: for example a solid arrow, dashed async arrow, normal card swatch, and suspect/error card swatch. Text alone is not a legend.
 
 ## Repair an Existing Diagram
