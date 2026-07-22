@@ -1,12 +1,14 @@
-import {ComponentClass, DefaultRouterConfig, RouteConfig, Router, RouterConstructor, RouterService} from "@dota/Types";
+import {ComponentClass, DefaultRouterConfig, RouteConfig, RouteRenderer, Router, RouterConstructor, RouterService} from "@dota/Types";
 import {RouterUtils} from "@dota/RouterUtils";
+import {configure} from "@dota/route/route-configurer";
+import {createRouteRenderer} from "@dota/coordinator";
 
 
 /**
- * DotaRouterService is a class that implements the RouterService interface.
- * It provides methods to initialize and manage routing in a web application.
- *
- * @template T - The type of the router instance.
+ * Owns the shared router configuration until a concrete router is initialized.
+ * Keeping construction here gives applications one consistent entry point for
+ * metadata-derived routes and directly supplied flat route configurations.
+ * @template T - Router implementation created by this service.
  */
 export class DotaRouterService<T extends Router<HTMLElement>> implements RouterService<T> {
 
@@ -15,6 +17,7 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
   _errorRoute: RouteConfig<HTMLElement>;
   _defaultRoute: RouteConfig<HTMLElement>;
   _root: ComponentClass
+  readonly renderer: RouteRenderer;
   instance!: T;
 
 
@@ -29,19 +32,19 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
     this._errorRoute = errorRoute;
     this._defaultRoute = defaultRoute;
     this._root = root;
+    this.renderer = createRouteRenderer(root);
   }
 
   /**
-   * Requires a router instance and a list of components to create a RouterService instance.
-   * The components are processed to generate the routing configuration.
-   *
-   * This method is a factory method that helps create a RouterService instance.
-   * @param config - The configuration object containing the router instance and its components.
-   * @throws Error if components are not provided in the configuration.
-   * @returns A RouterService instance.
+   * Creates a service from flat routes or component route metadata.
+   * Explicit routes take precedence; both route sources are compiled through the
+   * same configurer, so router implementations always receive a segment tree.
+   * @param config - Router constructor, flat route source, and fallback components.
+   * @throws Error when neither a non-empty route list nor components are supplied.
+   * @returns A service ready to initialize the configured router.
    */
   static fromComponents<T extends Router<HTMLElement>>(config: DefaultRouterConfig<T>): RouterService<T> {
-    const routes = config.routes && config.routes.length > 0
+    const flatRoutes = config.routes && config.routes.length > 0
       ? config.routes
       : (() => {
           if (!config.components || config.components.length === 0) {
@@ -51,29 +54,29 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
         })();
     return new DotaRouterService(
       config.router,
-      routes,
+      configure(flatRoutes, config.errorRoute),
       config.errorRoute,
       config.defaultRoute,
       config.root
     )
   }
 
+  /**
+   * Creates the configured router and retains it for subsequent navigation.
+   * Construction is deferred so applications can finish registering elements
+   * before the router receives its route tree and fallback routes.
+   * @returns This service with its router instance initialized.
+   */
   init(): RouterService<T> {
-    this.instance = new this._router(
-      this._routes,
-      this._errorRoute,
-      this._defaultRoute,
-      this._root
-    );
+    this.instance = new this._router(this._routes, this._errorRoute, this._defaultRoute, this._root, this.renderer);
     return this;
   }
 
   /**
-   * For the given path uses the router instance to navigate to the specified path.
-   * Resolve the router type internally and calls the appropriate routing method.
-   *
-   * @param path - The path to navigate to.
-   * @returns void
+   * Delegates navigation to the initialized router implementation.
+   * The service deliberately leaves path normalization to that implementation
+   * so browser-specific routers retain control over their navigation behavior.
+   * @param path - Application path requested by the caller.
    */
   route(path: string): void {
     this.instance.route(path)

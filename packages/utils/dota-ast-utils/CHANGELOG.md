@@ -6,7 +6,7 @@
 
 - cfe30aa: Document the patch release for source documentation support in generated Web Types and Custom Elements Manifest metadata.
 
-  The implementation described in `documentation/web-type-json/plugin/tsdoc-description-extraction.md` will:
+  The implementation described in `documentation/packages/plugins/web-type-json/planning/tsdoc-description-extraction.md` will:
 
   - Use existing component TSDoc as the fallback description for Web Types elements.
   - Use adjacent property TSDoc and structured class-level `@property` tags for property descriptions.

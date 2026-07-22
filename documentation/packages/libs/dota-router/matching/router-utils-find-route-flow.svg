@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1480" viewBox="0 0 1700 1480" role="img" aria-labelledby="title desc">
+  <title id="title">RouterUtils.findRoute current resolution flow</title>
+  <desc id="desc">RouterUtils.findRoute first returns an exact path match. Otherwise it searches the current route list for the first route whose path prefixes the request and which has children. A custom render returns that parent. Otherwise the function recursively searches children and returns either the child result or the matching parent. No candidate returns undefined.</desc>
+  <style>
+    svg { background: #ffffff; text-rendering: geometricPrecision; }
+    text { font-family: "DM Sans", "Poppins", Helvetica, Arial, sans-serif; fill: #1f2937; }
+    .title { font-size: 34px; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { font-size: 18px; fill: #526174; }
+    .lane-title { font-size: 19px; font-weight: 700; fill: #334155; }
+    .card-label { font-size: 17px; font-weight: 700; }
+    .detail { font-size: 14px; fill: #526174; }
+    .branch { font-size: 14px; font-weight: 700; fill: #334155; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; fill: #526174; }
+    .lane { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; }
+    .card { stroke-width: 2; rx: 10; }
+    .entry { fill: #eef2ff; stroke: #3157c9; }
+    .process { fill: #ffffff; stroke: #cbd5e1; }
+    .decision { fill: #fffaf0; stroke: #d6a24e; }
+    .effect { fill: #f0fdf4; stroke: #9ac7a3; }
+    .skip { fill: #f8fafc; stroke: #94a3b8; }
+    .connector { fill: none; stroke: #64748b; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+    .rule { stroke: #dbe4ee; stroke-width: 1.5; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="1700" height="1480" fill="#ffffff"/>
+  <text x="80" y="70" class="title">Dota Router · RouterUtils.findRoute() current matching behavior</text>
+  <text x="80" y="106" class="subtitle">This documents the existing recursive prefix matcher, not the new standalone route matcher.</text>
+  <rect x="80" y="132" width="1540" height="6" rx="3" fill="#dbe4ee"/>
+
+  <rect x="60" y="180" width="1580" height="190" rx="24" class="lane"/>
+  <text x="100" y="226" class="lane-title">01 / INPUT</text>
+  <rect x="190" y="270" width="520" height="72" class="card entry"/>
+  <text x="450" y="314" text-anchor="middle" class="card-label">findRoute(path, routes)</text>
+  <text x="190" y="365" class="code">'/users/profile' · current sibling routes</text>
+  <rect x="990" y="270" width="480" height="72" class="card entry"/>
+  <text x="1230" y="314" text-anchor="middle" class="card-label">hierarchical RouteConfig[]</text>
+  <text x="990" y="365" class="code">'/users' → children: ['/profile']</text>
+
+  <rect x="60" y="420" width="1580" height="890" rx="24" class="lane"/>
+  <text x="100" y="466" class="lane-title">02 / CURRENT ALGORITHM</text>
+  <rect x="580" y="510" width="540" height="72" class="card decision"/>
+  <text x="850" y="554" text-anchor="middle" class="card-label">exact route.path equals request path?</text>
+  <rect x="1260" y="510" width="280" height="72" class="card effect"/>
+  <text x="1400" y="554" text-anchor="middle" class="card-label">return exact route</text>
+
+  <rect x="580" y="670" width="540" height="72" class="card decision"/>
+  <text x="850" y="714" text-anchor="middle" class="card-label">first prefix route with children found?</text>
+  <text x="580" y="770" class="detail">The loop only considers routes where path.startsWith(route.path) and children are non-empty.</text>
+  <rect x="1260" y="670" width="280" height="72" class="card skip"/>
+  <text x="1400" y="714" text-anchor="middle" class="card-label">return undefined</text>
+
+  <rect x="580" y="840" width="540" height="72" class="card decision"/>
+  <text x="850" y="884" text-anchor="middle" class="card-label">parent route has render?</text>
+  <rect x="1260" y="840" width="280" height="72" class="card effect"/>
+  <text x="1400" y="884" text-anchor="middle" class="card-label">return parent route</text>
+
+  <rect x="580" y="1000" width="540" height="72" class="card process"/>
+  <text x="850" y="1044" text-anchor="middle" class="card-label">remove parent path and recurse into children</text>
+  <text x="580" y="1100" class="code">childPath = getChildPath(path, parent)</text>
+  <rect x="580" y="1170" width="540" height="72" class="card decision"/>
+  <text x="850" y="1214" text-anchor="middle" class="card-label">recursive child route found?</text>
+  <rect x="1260" y="1170" width="280" height="72" class="card effect"/>
+  <text x="1400" y="1214" text-anchor="middle" class="card-label">return child route</text>
+  <rect x="580" y="1330" width="540" height="72" class="card effect"/>
+  <text x="850" y="1374" text-anchor="middle" class="card-label">return matching parent route</text>
+
+  <path d="M 450 342 V 460 H 650 V 510" class="connector"/>
+  <path d="M 1120 546 H 1260" class="connector"/>
+  <text x="1150" y="530" class="branch">yes</text>
+  <path d="M 850 582 V 670" class="connector"/>
+  <text x="870" y="630" class="branch">no</text>
+  <path d="M 1120 706 H 1260" class="connector"/>
+  <text x="1150" y="690" class="branch">no</text>
+  <path d="M 850 742 V 840" class="connector"/>
+  <text x="870" y="790" class="branch">yes</text>
+  <path d="M 1120 876 H 1260" class="connector"/>
+  <text x="1150" y="860" class="branch">yes</text>
+  <path d="M 850 912 V 1000" class="connector"/>
+  <text x="870" y="960" class="branch">no</text>
+  <path d="M 850 1072 V 1170" class="connector"/>
+  <path d="M 1120 1206 H 1260" class="connector"/>
+  <text x="1150" y="1190" class="branch">yes</text>
+  <path d="M 850 1242 V 1330" class="connector"/>
+  <text x="870" y="1290" class="branch">no</text>
+
+  <line x1="80" y1="1425" x2="1620" y2="1425" class="rule"/>
+  <text x="80" y="1450" class="detail">Source: RouterUtils.ts · solid arrows are synchronous. Parent fallback is intentional in this implementation when recursive child lookup has no result.</text>
+</svg>

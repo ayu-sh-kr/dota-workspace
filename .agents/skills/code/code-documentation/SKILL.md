@@ -21,7 +21,7 @@ Use TSDoc block comments (`/** ... */`) immediately above the declaration. Keep 
 ## What good documentation covers
 
 - Document exported functions, public methods, lifecycle hooks with non-obvious behavior, and helpers whose name does not explain their policy.
-- Document non-trivial private methods and helpers when they encode a maintenance-sensitive policy, coordinate multiple representations, perform recovery, or would be difficult to safely change without context.
+- Document private methods and helpers when they encode a maintenance-sensitive policy, coordinate multiple representations, perform recovery, or would be difficult to safely change without context. Private visibility does not remove the need for documentation when the method affects observable behavior or a domain invariant.
 - Describe inputs in domain terms: what a path, root, scan list, AST node, or configuration option represents and how it affects the result.
 - Call out side effects such as filesystem writes, logging, mutation, caching, event registration, or updating generated artifacts.
 - Explain decisions that are easy to break, such as sorting for deterministic output, filtering supported file shapes, normalizing path separators, or coalescing concurrent refreshes.
@@ -30,7 +30,7 @@ Use TSDoc block comments (`/** ... */`) immediately above the declaration. Keep 
 ## What to avoid
 
 - Do not repeat the method name, parameter type, return type, or the next line of implementation in prose.
-- Do not document trivial private methods whose behavior is obvious from their implementation. Private methods and helpers with maintenance-sensitive behavior should be documented using the same standard as public APIs.
+- Avoid comments for truly trivial private methods whose behavior is obvious from their implementation; document every private method that carries policy, side effects, recovery, or a maintenance-sensitive invariant using the same standard as public APIs.
 - Do not add speculative guarantees, implementation details that are likely to change, or comments that become false when the code changes.
 - Do not use comments to justify unclear code; refactor confusing code when a comment would need to explain too much.
 

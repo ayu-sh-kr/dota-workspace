@@ -28,6 +28,6 @@ The regression test parses the same source repeatedly and verifies that both par
 
 ## Related source
 
-- [`PropertyView.getSourceOffset`](../../../packages/utils/dota-ast-utils/src/view/PropertyView.ts)
-- [`scanWebComponents`](../../../packages/plugins/web-type-json/src/main.ts)
-- [`PropertyViewTests`](../../../packages/utils/dota-ast-utils/test/view/PropertyViewTests.ts)
+- [`PropertyView.getSourceOffset`](../../../../../packages/utils/dota-ast-utils/src/view/PropertyView.ts)
+- [`scanWebComponents`](../../../../../packages/plugins/web-type-json/src/main.ts)
+- [`PropertyViewTests`](../../../../../packages/utils/dota-ast-utils/test/view/PropertyViewTests.ts)

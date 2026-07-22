@@ -42,7 +42,7 @@ and:
 }
 ```
 
-Primitive decorator types are normalized to lowercase values such as `string`, `number`, and `boolean`. The generated [dota-web web-types artifact](../../../packages/apps/dota-web/web-types.json) now contains these forms for `orb-background`.
+Primitive decorator types are normalized to lowercase values such as `string`, `number`, and `boolean`. The generated [dota-web web-types artifact](../../../../../packages/apps/dota-web/web-types.json) now contains these forms for `orb-background`.
 
 ## Verification
 
@@ -51,5 +51,5 @@ The web-types plugin tests cover HTML value metadata and JavaScript property met
 ## Related documentation
 
 - [Web-types source offset drift](source-offset-drift.md)
-- [Web-types plugin implementation](../../../packages/plugins/web-type-json/src/main.ts)
-- [Web-types plugin tests](../../../packages/plugins/web-type-json/test/web-types.test.ts)
+- [Web-types plugin implementation](../../../../../packages/plugins/web-type-json/src/main.ts)
+- [Web-types plugin tests](../../../../../packages/plugins/web-type-json/test/web-types.test.ts)

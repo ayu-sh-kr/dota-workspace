@@ -16,6 +16,25 @@ Test the unit’s observable behavior, not the mock framework itself. Mock depen
 - the method under test returned the expected value
 - failures were surfaced with the expected error
 
+## Public method coverage
+
+Every public method in the unit under test must have a predictable, behavior-focused test.
+
+- Do not limit coverage to only the major method; test every public method, including explicit browser or adapter operations.
+- No public method should be left untested. Exercise each method directly when its contract is public, or through another public method when the behavior is only observable there.
+- Make method behavior predictable by covering its documented success path, defaults, failure or cancellation path, and contract-significant side effects.
+- Keep private implementation details behind public behavior; do not expose a private helper only to make it directly testable.
+
+## Test filename conventions
+
+Match the test filename to the source filename's naming style:
+
+- A PascalCase source such as `FileName.ts` uses `FileNameTest.ts`.
+- A lowercase source such as `filename.ts` uses `filename.test.ts`.
+- A kebab-case source such as `file-name.ts` uses `file-name.test.ts`.
+
+Do not rename a test into a different style unless the source file is renamed to the same style or the test intentionally covers multiple source units.
+
 ## Default workflow
 
 1. Identify the unit under test and its external dependencies.

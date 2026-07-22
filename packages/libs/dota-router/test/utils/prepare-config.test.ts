@@ -9,20 +9,21 @@ import {
 import {RouterUtils} from '@dota/RouterUtils'
 
 describe('RouteUtils.prepareConfig', () => {
-  it('should collect route when elements with route info given', () => {
+  it('should collect flat routes when elements with route info given', () => {
     const elements = [
       HomeComponent, AboutComponent, ContactComponent,
       ResourceComponent, ProductsComponent, DocComponent
     ];
     const routes = RouterUtils.prepareConfig(elements);
 
-    const homeRoute = RouterUtils.findRoute('/', routes);
-    expect(homeRoute).toBeDefined
-
-    const resourceRoute = RouterUtils.findRoute('/resource', routes);
-    expect(resourceRoute).toBeDefined;
-    expect(resourceRoute?.children).toBeDefined;
-    expect(resourceRoute?.children?.length).toBe(2);
+    expect(routes.map(route => route.path)).toEqual([
+      '/',
+      '/resource/about',
+      '/resource/contact',
+      '/resource',
+      '/shop/product',
+      '/doc'
+    ]);
   });
 
   it('should return empty array when no components are given', () => {
@@ -39,10 +40,18 @@ describe('RouteUtils.prepareConfig', () => {
 
     const elements = [HomeComponent, DummyComponent, DocComponent];
     const routes = RouterUtils.prepareConfig(elements);
-    console.log(routes)
-    // Only valid components should be present
+
     expect(routes.some(r => r.component === HomeComponent)).toBe(true);
     expect(routes.some(r => r.component === DummyComponent)).toBe(false);
     expect(routes.some(r => r.component === DocComponent)).toBe(true);
+  });
+
+  it('should ignore missing component entries while retaining valid metadata', () => {
+    const elements = [undefined, HomeComponent, null] as unknown as typeof HomeComponent[];
+
+    const routes = RouterUtils.prepareConfig(elements);
+
+    expect(routes).toHaveLength(1);
+    expect(routes[0].component).toBe(HomeComponent);
   });
 });

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Changeset"
+  short_description: "Generate validated workspace release changesets"
+  default_prompt: "Use $create-changeset to generate a package changeset with the correct release level and changelog."

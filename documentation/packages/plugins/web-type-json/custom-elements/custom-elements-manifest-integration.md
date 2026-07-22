@@ -111,7 +111,7 @@ collision before writing either representation to the same path.
 
 ## Shared scan architecture
 
-[`scanWebComponents`](../../../packages/plugins/web-type-json/src/main.ts) remains
+[`scanWebComponents`](../../../../../packages/plugins/web-type-json/src/main.ts) remains
 the expensive phase:
 
 1. Discover component and page files across all `scanRoots`.
@@ -130,8 +130,8 @@ The shared metadata preserves:
 - normalized property type, required state, description when configured, and
   primitive default value.
 
-[`createWebTypesSchema`](../../../packages/plugins/web-type-json/src/main.ts) and
-[`createCustomElementsManifest`](../../../packages/plugins/web-type-json/src/main.ts)
+[`createWebTypesSchema`](../../../../../packages/plugins/web-type-json/src/main.ts) and
+[`createCustomElementsManifest`](../../../../../packages/plugins/web-type-json/src/main.ts)
 project that same metadata independently. Neither generated JSON file is translated
 into the other.
 
@@ -276,7 +276,7 @@ pnpm --filter @ayu-sh-kr/dota-web-type-json build
 
 ## Related documentation
 
-- [Local-first Web Types DX guidance](local-first-dx-guidance.md)
-- [Property type intellisense](property-type-intellisense.md)
-- [Web-types source offset drift](source-offset-drift.md)
-- [Web-types plugin flow](web-type-json-flow.svg)
+- [Local-first Web Types DX guidance](../developer-experience/local-first-dx-guidance.md)
+- [Property type intellisense](../diagnostics/property-type-intellisense.md)
+- [Web-types source offset drift](../diagnostics/source-offset-drift.md)
+- [Web-types plugin flow](../architecture/web-type-json-flow.svg)

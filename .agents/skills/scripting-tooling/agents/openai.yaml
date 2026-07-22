@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scripting and Tooling"
+  short_description: "Typed, structured, fast repository utility scripts"
+  default_prompt: "Use $scripting-tooling to create or refactor a typed, structured, parallel repository utility script."

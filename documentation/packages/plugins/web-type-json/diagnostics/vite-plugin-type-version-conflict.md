@@ -46,9 +46,9 @@ pnpm --filter dota-web build
 
 ## Related files
 
-- [`dota-web/vite.config.ts`](../../../packages/apps/dota-web/vite.config.ts)
-- [`dota-web/package.json`](../../../packages/apps/dota-web/package.json)
-- [`dota-wrap/package.json`](../../../packages/libs/dota-wrap/package.json)
-- [`dota-preloader-plugin/package.json`](../../../packages/plugins/dota-vite-preloader/package.json)
-- [`dota-web-type-json/package.json`](../../../packages/plugins/web-type-json/package.json)
-- [Custom Elements Manifest integration](custom-elements-manifest-integration.md)
+- [`dota-web/vite.config.ts`](../../../../../packages/apps/dota-web/vite.config.ts)
+- [`dota-web/package.json`](../../../../../packages/apps/dota-web/package.json)
+- [`dota-wrap/package.json`](../../../../../packages/libs/dota-wrap/package.json)
+- [`dota-preloader-plugin/package.json`](../../../../../packages/plugins/dota-vite-preloader/package.json)
+- [`dota-web-type-json/package.json`](../../../../../packages/plugins/web-type-json/package.json)
+- [Custom Elements Manifest integration](../custom-elements/custom-elements-manifest-integration.md)
