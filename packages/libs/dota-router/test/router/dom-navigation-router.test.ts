@@ -1,14 +1,11 @@
 import { RouterUtils } from "@dota/RouterUtils";
 import { components, defaultRoute, errorRoute } from "@test/setup/RouteConfig";
-import { DomNavigationRouter } from "@dota/dom-navigation.router";
+import { DomNavigationRouter } from "@dota/router/dom-navigation.router";
 import {afterAll, expect, vi} from "vitest";
 import { BaseElement } from "@ayu-sh-kr/dota-core";
 import {AppComponent} from "@test/setup/Components";
 
 describe('DomNavigationRouter', () => {
-
-  // Mock RouterUtils.render to prevent DOM manipulation during test
-  const renderSpy = vi.spyOn(RouterUtils, 'render').mockImplementation(() => {});
 
   // Mock window.navigation for Navigation API
   const mockNavigation = {
@@ -22,6 +19,7 @@ describe('DomNavigationRouter', () => {
     hashChange,
     downloadRequest: null,
     destination: { url },
+    signal: new AbortController().signal,
     intercept: vi.fn()
   });
 
@@ -43,21 +41,24 @@ describe('DomNavigationRouter', () => {
   });
 
   afterAll(() => {
-    renderSpy.mockRestore();
+    vi.restoreAllMocks();
   });
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should create an instance of DomNavigationRouter', () => {
+  it('should create an instance of DomNavigationRouter and render through its coordinator', async () => {
     const routes = RouterUtils.prepareConfig(components);
+    const renderer = vi.fn();
     const router = new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
       defaultRoute,
-      AppComponent
+      AppComponent,
+      renderer
     );
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
 
     // Verify the instance was created successfully
     expect(router).toBeInstanceOf(DomNavigationRouter);
@@ -65,13 +66,10 @@ describe('DomNavigationRouter', () => {
     expect(router.errorRoute).toBe(errorRoute);
     expect(router.defaultRoute).toBe(defaultRoute);
 
-    // Verify RouterUtils.render was called during construction
-    expect(renderSpy).toHaveBeenCalledWith({
-      router: router,
-      routes: routes,
-      options: {},
-      path: '/'
-    });
+    expect(renderer).toHaveBeenCalledWith(
+      expect.objectContaining({pathname: "/", matched: true}),
+      expect.objectContaining({url: expect.any(URL)})
+    );
 
     // Verify navigation event listener was added during init
     expect(mockNavigation.addEventListener).toHaveBeenCalledWith('navigate', expect.any(Function));
@@ -164,9 +162,10 @@ describe('DomNavigationRouter', () => {
     navigateHandler(mockEvent);
 
     // Verify event.intercept was called
-    expect(mockEvent.intercept).toHaveBeenCalledWith({
-      handler: expect.any(Function)
-    });
+    expect(mockEvent.intercept).toHaveBeenCalledWith(expect.objectContaining({
+      handler: expect.any(Function),
+      precommitHandler: expect.any(Function)
+    }));
   });
 
   it('should not intercept navigate events when canIntercept is false', () => {
@@ -232,13 +231,15 @@ describe('DomNavigationRouter', () => {
     expect(mockEvent.intercept).not.toHaveBeenCalled();
   });
 
-  it('should call RouterUtils.render in intercept handler', async () => {
+  it('should render an intercepted route after precommit approval', async () => {
     const routes = RouterUtils.prepareConfig(components);
+    const renderer = vi.fn();
     const router = new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
       defaultRoute,
-      AppComponent
+      AppComponent,
+      renderer
     );
 
     const navigateHandler = mockNavigation.addEventListener.mock.calls
@@ -250,17 +251,16 @@ describe('DomNavigationRouter', () => {
 
     // Get the handler function from intercept call
     const interceptCall = mockEvent.intercept.mock.calls[0][0];
+    await interceptCall.precommitHandler({redirect: vi.fn()});
     const handler = interceptCall.handler;
 
     // Execute the async handler
     await handler();
 
-    // Verify RouterUtils.render was called with correct parameters
-    expect(renderSpy).toHaveBeenCalledWith({
-      path: '/test-route',
-      routes: routes,
-      router: router
-    });
+    expect(renderer).toHaveBeenCalledWith(
+      expect.objectContaining({pathname: "/test-route", matched: false}),
+      expect.objectContaining({url: expect.any(URL)})
+    );
   });
 
   it('should handle complex nested paths', () => {
@@ -290,5 +290,20 @@ describe('DomNavigationRouter', () => {
     }).not.toThrow();
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith('http://localhost/test');
+  });
+
+  it('should route instance calls through the navigation coordinator', () => {
+    const router = new DomNavigationRouter<BaseElement>(
+      RouterUtils.prepareConfig(components),
+      errorRoute,
+      defaultRoute,
+      AppComponent,
+      vi.fn()
+    );
+
+    vi.clearAllMocks();
+    router.route('/products');
+
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('http://localhost/products');
   });
 });
