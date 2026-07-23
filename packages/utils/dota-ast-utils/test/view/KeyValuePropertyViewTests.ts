@@ -110,7 +110,7 @@ describe("KeyValuePropertyView", () => {
     expect(new KeyValuePropertyView(getProperty(objectExpression, 6)).getIdentifier()).toBe("sampleValue");
   });
 
-  it("throws when a typed getter is used on the wrong value type", () => {
+  it("returns null when a typed getter is used on the wrong value type", () => {
     const objectExpression = loadObjectExpression(`
       const value = {
         str: "hello",
@@ -124,5 +124,23 @@ describe("KeyValuePropertyView", () => {
     expect(view.getArray()).toBeNull();
     expect(view.getNull()).toBeNull();
     expect(view.getIdentifier()).toBeNull();
+  });
+
+  it('reads false boolean values and preserves the nested raw nodes', () => {
+    const objectExpression = loadObjectExpression(`
+      const value = {
+        enabled: false,
+        nested: { item: 1 },
+        items: [1, 2],
+      };
+    `);
+
+    const booleanView = KeyValuePropertyView.from(getProperty(objectExpression, 0));
+    const objectView = KeyValuePropertyView.from(getProperty(objectExpression, 1));
+    const arrayView = KeyValuePropertyView.from(getProperty(objectExpression, 2));
+
+    expect(booleanView.getBoolean()).toBe(false);
+    expect(objectView.getObject()?.type).toBe('ObjectExpression');
+    expect(arrayView.getArray()?.type).toBe('ArrayExpression');
   });
 });
