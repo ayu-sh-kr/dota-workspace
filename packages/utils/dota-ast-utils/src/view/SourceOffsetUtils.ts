@@ -34,3 +34,37 @@ export function utf8ByteOffsetToSourceOffset(
 
   return bytesConsumed === relativeByteOffset ? sourceOffset : null;
 }
+
+/**
+ * Finds the source index represented by SWC's module-span start.
+ * SWC anchors a module at its first parsed token, so leading whitespace and
+ * comments must be skipped before converting module-relative byte spans.
+ * @param sourceText - Original source buffer whose first token is located.
+ * @returns The first parsed-token index, or zero for an empty/comment-only file.
+ */
+export function findModuleSourceOffset(sourceText: string): number {
+  let offset = 0;
+
+  while (offset < sourceText.length) {
+    if (/\s/.test(sourceText[offset] ?? '')) {
+      offset += 1;
+      continue;
+    }
+
+    if (sourceText.startsWith('//', offset)) {
+      const lineEnd = sourceText.indexOf('\n', offset + 2);
+      offset = lineEnd === -1 ? sourceText.length : lineEnd + 1;
+      continue;
+    }
+
+    if (sourceText.startsWith('/*', offset)) {
+      const commentEnd = sourceText.indexOf('*/', offset + 2);
+      offset = commentEnd === -1 ? sourceText.length : commentEnd + 2;
+      continue;
+    }
+
+    return offset;
+  }
+
+  return 0;
+}
