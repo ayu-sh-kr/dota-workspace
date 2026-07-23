@@ -1,4 +1,5 @@
 import {isAbsolute, relative, sep} from "node:path";
+import {findModuleSourceOffset} from "@ayu-sh-kr/dota-ast-utils";
 
 /**
  * Provides source-path and source-text policies shared by component scanning.
@@ -26,30 +27,7 @@ export class ComponentSourceUtils {
    * @returns The first token index, or zero when the source has no token.
    */
   static findModuleSourceOffset(sourceText: string): number {
-    let offset = 0;
-
-    while (offset < sourceText.length) {
-      if (/\s/.test(sourceText[offset] ?? "")) {
-        offset += 1;
-        continue;
-      }
-
-      if (sourceText.startsWith("//", offset)) {
-        const lineEnd = sourceText.indexOf("\n", offset + 2);
-        offset = lineEnd === -1 ? sourceText.length : lineEnd + 1;
-        continue;
-      }
-
-      if (sourceText.startsWith("/*", offset)) {
-        const commentEnd = sourceText.indexOf("*/", offset + 2);
-        offset = commentEnd === -1 ? sourceText.length : commentEnd + 2;
-        continue;
-      }
-
-      return offset;
-    }
-
-    return 0;
+    return findModuleSourceOffset(sourceText);
   }
 
   /**
