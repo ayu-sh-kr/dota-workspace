@@ -2,6 +2,7 @@ import {defineConfig} from "vite";
 import {resolve} from "node:path";
 import {fileURLToPath} from "node:url";
 import dotaVitePreloader from "@ayu-sh-kr/dota-wrap/preloader-plugin";
+import eventMapGenerator from "@ayu-sh-kr/dota-wrap/event-map-generator";
 import dotaWebTypeJson from "@ayu-sh-kr/dota-wrap/web-type-json";
 
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
@@ -11,6 +12,17 @@ export default defineConfig({
     dotaVitePreloader({
       root: projectRoot,
       logType: 'info'
+    }),
+    eventMapGenerator({
+      root: projectRoot,
+      scanRoots: [
+        projectRoot,
+        resolve(projectRoot, '../../ui/dota-ui'),
+        resolve(projectRoot, '../../ui/dota-md'),
+      ],
+      outFile: 'src/event-map.d.ts',
+      moduleSpecifier: '@ayu-sh-kr/dota-wrap/event',
+      logType: 'info',
     }),
     dotaWebTypeJson({
       root: projectRoot,
