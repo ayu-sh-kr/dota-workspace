@@ -288,12 +288,14 @@ class Feature {
 
   publish() {
     publisher.publish({ name: "shared:event", data: null });
+    publisher.publish({ name: "shared:event", data: null });
   }
 }
 publisher.emit({ name: "module:event" });`;
     const classOffset = source.indexOf('Feature');
     const listenedEventOffset = source.indexOf('"shared:event"');
     const publishedEventOffset = source.indexOf('"shared:event"', listenedEventOffset + 1);
+    const repeatedPublishedEventOffset = source.indexOf('"shared:event"', publishedEventOffset + 1);
     const moduleEventOffset = source.indexOf('"module:event"');
 
     fgMock.mockResolvedValueOnce([sourceFile]);
@@ -334,6 +336,11 @@ publisher.emit({ name: "module:event" });`;
         locations: [{
           sourceFile,
           offset: publishedEventOffset,
+          className: 'Feature',
+          classOffset,
+        }, {
+          sourceFile,
+          offset: repeatedPublishedEventOffset,
           className: 'Feature',
           classOffset,
         }],
