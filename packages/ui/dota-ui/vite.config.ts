@@ -2,6 +2,7 @@ import {defineConfig} from "vite";
 import {resolve} from "path";
 import dts from 'vite-plugin-dts'
 import dotaWebTypeJson from "@ayu-sh-kr/dota-web-type-json";
+import eventMapGenerator from "@ayu-sh-kr/dota-event-map-generator";
 
 export default defineConfig({
   build: {
@@ -47,6 +48,12 @@ export default defineConfig({
       root: resolve(__dirname),
       outFile: 'web-types.json',
       logType: 'info'
-    })
+    }),
+    eventMapGenerator({
+      root: resolve(__dirname),
+      outFile: 'src/event-map.d.ts',
+      moduleSpecifier: '@ayu-sh-kr/dota-event',
+      logType: 'info',
+    }),
   ]
 })
