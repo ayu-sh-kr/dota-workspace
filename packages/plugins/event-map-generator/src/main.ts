@@ -25,23 +25,25 @@ async function writeGeneratedArtifacts(
 ): Promise<void> {
   const scanRoots = options.scanRoots ?? [root];
   const locationOutput = resolveLocationOutput(root, options.eventLocations);
-  const scannedCandidates = await scanEventMapSources(root, scanRoots, {
-    includeLocations: locationOutput != null,
-  });
-  const artifact = EventMapDeclarationUtils.createDeclaration(scannedCandidates, {
-    moduleSpecifier: options.moduleSpecifier ?? EventMapModuleConstants.DEFAULT_MODULE_SPECIFIER,
-    outFile: resolve(root, options.outFile ?? EventMapModuleConstants.DEFAULT_OUTPUT_PATH),
-  });
-
   const outFile = resolve(root, options.outFile ?? EventMapModuleConstants.DEFAULT_OUTPUT_PATH);
   if (locationOutput === outFile) {
     throw new Error('Event declaration and location outputs must use different files');
   }
 
+  const scannedCandidates = await scanEventMapSources(root, scanRoots, {
+    includeLocations: locationOutput != null,
+  });
+  const artifact = EventMapDeclarationUtils.createDeclaration(scannedCandidates, {
+    moduleSpecifier: options.moduleSpecifier ?? EventMapModuleConstants.DEFAULT_MODULE_SPECIFIER,
+    outFile,
+  });
+
+  const locationContents = locationOutput == null
+    ? null
+    : `${JSON.stringify(EventMapLocationUtils.createArtifact(scannedCandidates, {root}), null, 2)}\n`;
   const writes: Array<Promise<void>> = [writeGeneratedFile(outFile, artifact.declaration)];
   if (locationOutput != null) {
-    const locationArtifact = EventMapLocationUtils.createArtifact(scannedCandidates, {root});
-    writes.push(writeGeneratedFile(locationOutput, `${JSON.stringify(locationArtifact, null, 2)}\n`));
+    writes.push(writeGeneratedFile(locationOutput, locationContents ?? ''));
   }
 
   await Promise.all(writes);
@@ -81,10 +83,24 @@ async function writeGeneratedFile(file: string, contents: string): Promise<void>
   await writeFile(file, contents, 'utf8');
 }
 
+/**
+ * Limits watcher regeneration to source files that can contribute event metadata.
+ * Declaration files are excluded because the plugin owns their output and would
+ * otherwise trigger a feedback loop during development.
+ * @param file Absolute or watcher-provided path to inspect.
+ * @returns Whether the file is a supported source input.
+ */
 function shouldRebuild(file: string): boolean {
   return file.endsWith('.ts') && !file.endsWith('.d.ts');
 }
 
+/**
+ * Creates the Vite plugin that generates the event declaration and optional locations.
+ * Build and watcher hooks share one scan so enabling source navigation does not duplicate
+ * filesystem work; location JSON remains disabled unless `eventLocations` is configured.
+ * @param options Root, outputs, scan roots, logging, and optional location settings.
+ * @returns A Vite plugin with build-time and source-change generation hooks.
+ */
 export default function eventMapGenerator(options: EventMapGeneratorPluginConfig = {}): Plugin {
   const { logType = 'info' } = options;
   let root = options.root ?? process.cwd();
@@ -126,6 +142,15 @@ export default function eventMapGenerator(options: EventMapGeneratorPluginConfig
 }
 
 export type { EventMapGeneratorPluginConfig } from '@dota/Types.ts';
+export type {
+  EventMapLocationArtifact,
+  EventMapLocationEntry,
+  EventMapLocationGenerationOptions,
+  EventMapLocationGeneratorConfig,
+  EventMapScanCandidate,
+  EventMapScanOptions,
+  EventMapSourceLocation,
+} from '@dota/Types.ts';
 export { EventMapDeclarationUtils } from '@dota/generate/EventMapDeclarationUtils.ts';
 export { EventMapLocationUtils } from '@dota/generate/EventMapLocationUtils.ts';
 export { scanEventMapSources } from '@dota/scan/EventMapScanner.ts';
