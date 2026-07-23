@@ -1,18 +1,30 @@
-import type { SoftNotification } from '@dota/components/utils/notification/notification.service.ts';
+export {};
+
+import type { MarkdownResult } from "../../../ui/dota-md/src/services/md.service.ts";
+import type { NotificationColor } from "./components/utils/notification/notification.component.ts";
+import type { SoftNotification } from "./components/utils/notification/notification.service.ts";
+import type { ColorName, ThemeName } from "@ayu-sh-kr/dota-md";
+
+// Auto-generated application event map. Do not edit by hand.
+// Payload types are recovered syntactically from publish, publishAsync, and emit calls.
+// Unsupported publisher expressions become unknown; handler-only events remain any for compatibility.
 
 declare module "@ayu-sh-kr/dota-wrap/event" {
   interface ApplicationEventMap {
     "app:initialized": null;
-    "notification:info": SoftNotification;
-    "notification:success": SoftNotification;
+    "connected": any;
+    "disconnected": any;
+    "docs:color-change": { color: ColorName };
+    "docs:theme-change": { theme: ThemeName };
+    "docs:toc-update": any;
+    "md:color-change": { color: ColorName };
+    "md:render": MarkdownResult;
+    "md:theme-change": { theme: ThemeName };
     "notification:danger": SoftNotification;
+    "notification:info": SoftNotification;
+    "notification:removed": { type: string; message: string; color: NotificationColor; icon: string; title: string };
+    "notification:success": SoftNotification;
     "notification:warning": SoftNotification;
-    /** Fired when the user picks a different theme variant (flat / material). */
-    "docs:theme-change": { theme: string };
-    /** Fired when the user picks a different color (indigo / teal / rose …). */
-    "docs:color-change": { color: string };
-    /** Fired when a tool-list-item is selected in the our-tools section. */
     "tools:select": { toolId: string };
   }
 }
-

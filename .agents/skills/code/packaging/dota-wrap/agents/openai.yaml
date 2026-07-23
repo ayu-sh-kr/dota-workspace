@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dota Wrap Packaging"
+  short_description: "Package and publish dota-wrap so consumers only install the wrapper."
+  default_prompt: "Use $dota-wrap-packaging to review or change @ayu-sh-kr/dota-wrap packaging, exports, dependency boundaries, or build output."

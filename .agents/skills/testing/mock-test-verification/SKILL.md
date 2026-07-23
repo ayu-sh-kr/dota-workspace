@@ -23,7 +23,17 @@ Every public method in the unit under test must have a predictable, behavior-foc
 - Do not limit coverage to only the major method; test every public method, including explicit browser or adapter operations.
 - No public method should be left untested. Exercise each method directly when its contract is public, or through another public method when the behavior is only observable there.
 - Make method behavior predictable by covering its documented success path, defaults, failure or cancellation path, and contract-significant side effects.
-- Keep private implementation details behind public behavior; do not expose a private helper only to make it directly testable.
+- Keep trivial implementation details behind public behavior; expose a non-trivial helper only when it has a stable contract or direct unit coverage is explicitly requested, as described below.
+
+## Unit-first test layering
+
+Scope tests to one method before testing the methods that compose it.
+
+- Inventory the public methods and non-trivial module-level support functions in the unit.
+- Add direct, behavior-focused tests for each support function before adding or expanding tests for the public orchestration method.
+- For a helper with a stable contract, or when direct unit coverage is explicitly requested, expose the helper intentionally and test its inputs, return value, defaults, and failure or fallback branches. Keep trivial implementation details private.
+- After the individual methods are covered, add composition tests through the public method. These tests should verify that the already-tested units are connected with the right inputs and that the overall result, ordering, and side effects are correct; do not duplicate every helper case in the composition suite.
+- Keep the same failure-first ordering at each layer: helper failures and edge branches first, helper success next, then orchestration failures in incremental order, and orchestration success last.
 
 ## Test filename conventions
 
@@ -43,15 +53,37 @@ Do not rename a test into a different style unless the source file is renamed to
 4. Exercise the unit.
 5. Assert the outcome first.
 6. Assert interactions that are part of the contract.
-7. Cover the relevant success, failure, and edge-case branches.
+7. Cover the relevant failure branches first, using the incremental failure pattern below, then cover the successful case and edge cases.
 8. Assert the error path when the unit is expected to fail.
 9. Before finalizing, type-check the test import graph. If a test uses a package alias, confirm the alias is configured in both the test runner and the package `tsconfig.json` (`baseUrl` plus `paths`); otherwise use a stable relative import.
 10. Group tests by the source ownership boundary: create a top-level test directory matching the source domain, then one test file per source unit. Mirror source subdirectories and preserve the source domain's naming style instead of forcing every test into kebab case. For example, `src/components/animations/orb/orb-background.component.ts` maps to `test/animations/orb/orb-background.component.test.ts`, while `src/utils/ComponentMetadataUtils.ts` maps to `test/utils/ComponentMetadataUtilsTests.ts`. Confirm the test runner includes the selected filename pattern; extend its existing patterns when necessary without dropping prior conventions.
-11. Test non-trivial module-level support functions through their public effects where possible. Cover normalization, fallback, branching, random/cache signatures, rendering helpers, lifecycle setup, and teardown across valid, invalid, boundary, repeated, and missing-browser-API scenarios. Export a helper only when indirect testing cannot observe a stable contract and exposing it is appropriate for the library API.
+11. Test non-trivial module-level support functions directly before composition when they have a stable contract or direct unit coverage is explicitly requested. Cover normalization, fallback, branching, random/cache signatures, rendering helpers, lifecycle setup, and teardown across valid, invalid, boundary, repeated, and missing-browser-API scenarios. Otherwise, test the helper through its public effects. Export a helper only when direct testing is needed to observe a stable contract and exposing it is appropriate for the library API.
 12. Run the package test command in regular developer mode after focused validation (for example, `pnpm test` without `CI=true` or coverage flags). This catches lifecycle, timer, watch-mode, environment, and dependency behavior that focused or CI-style runs may hide.
 13. Triage every failure before changing code. If the production implementation violates the observable contract, keep the failing regression test and write a Markdown report at the package root describing the component, reproduction command, expected behavior, actual behavior, evidence, and recommended source fix. If the failure is caused by the test fixture, matcher, mock, selector, lifecycle setup, or assertion, correct the test instead and do not create a defect report.
 14. After triage, rerun the focused test and the regular package test. Report which command passed, which remained blocked, and whether any Markdown defect report was created.
 15. Format the test before finalizing it. Generated tests must be readable source code, not compressed single-line blocks.
+
+## Incremental failure-first test pattern
+
+For a testable method, identify its ordered failure boundaries: dependency calls or contract-significant operations that can fail before the method can reach the next operation. Write tests in this order:
+
+1. Test the first failure before configuring unrelated later dependencies.
+2. For the second failure, mock the first operation to succeed, then make the second operation fail.
+3. Continue incrementally for each later failure: for failure `n`, mock operations `1` through `n - 1` with the minimum successful behavior needed to reach `n`, then make operation `n` fail.
+4. After all failure cases, mock every required operation successfully and test the successful result and its contract-significant side effects.
+
+This keeps each failure test focused on one failing boundary and proves that later work is skipped after an earlier failure. Verify the rejection or thrown error first, then verify that the failing dependency received the expected input and that later dependencies were not called. Do not invent tests for private implementation steps that have no observable contract; use public behavior and boundary failures.
+
+For example, a scanner that discovers files, reads them, and parses them should have this progression:
+
+| Scenario | Configure success | Make fail | Verify skipped work |
+| --- | --- | --- | --- |
+| discovery failure | none | file discovery | reading and parsing |
+| read failure | discovery | file reading | parsing |
+| parse failure | discovery and reading | parsing | result production |
+| success | discovery, reading, and parsing | none | return the expected sorted result |
+
+Apply the same progression when a method has synchronous throws, rejected promises, malformed collaborator results, or explicit fallback branches. If a method has independent branches rather than one ordered chain, group tests by branch and still put the failure case before that branch’s success case.
 
 ## Test code quality
 

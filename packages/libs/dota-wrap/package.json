@@ -63,6 +63,13 @@
       "require": "./dist/preloader-plugin/index.cjs",
       "default": "./dist/preloader-plugin/index.mjs"
     },
+    "./event-map-generator": {
+      "types": "./dist/event-map-generator/index.d.ts",
+      "module": "./dist/event-map-generator/index.mjs",
+      "import": "./dist/event-map-generator/index.mjs",
+      "require": "./dist/event-map-generator/index.cjs",
+      "default": "./dist/event-map-generator/index.mjs"
+    },
     "./web-type-json": {
       "types": "./dist/web-type-json/index.d.ts",
       "module": "./dist/web-type-json/index.mjs",
@@ -91,6 +98,7 @@
   },
   "devDependencies": {
     "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
+    "@ayu-sh-kr/dota-event-map-generator": "workspace:*",
     "@ayu-sh-kr/dota-web-type-json": "workspace:*",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"

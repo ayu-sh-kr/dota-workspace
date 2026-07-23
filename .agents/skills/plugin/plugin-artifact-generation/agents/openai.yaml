@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plugin Artifact Generation"
+  short_description: "Generate virtual modules or JSON artifacts from scan metadata."
+  default_prompt: "Use $plugin-artifact-generation to write or review the codegen and file-writing half of a Dota Vite plugin."

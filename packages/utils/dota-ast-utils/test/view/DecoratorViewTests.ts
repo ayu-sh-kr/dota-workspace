@@ -37,6 +37,8 @@ describe("DecoratorView", () => {
     expect(view.hasArguments()).toBe(false);
     expect(view.getArguments()).toEqual([]);
     expect(view.getName()).toBe("sealed");
+    expect(view.getArgument(0)).toBeNull();
+    expect(view.getStringArgument()).toBeNull();
   });
 
   it("returns the decorator name and arguments for call decorators", () => {
@@ -48,10 +50,14 @@ describe("DecoratorView", () => {
     expect(view.isCallee()).toBe(true);
     expect(view.hasArguments()).toBe(true);
     expect(view.getArguments()).toHaveLength(2);
+    expect(view.getArgument(0)).not.toBeNull();
+    expect(view.getArgument(1)).not.toBeNull();
+    expect(view.getStringArgument()).toBe("alpha");
+    expect(view.getStringArgument(1)).toBeNull();
     expect(view.getName()).toBe("tag");
   });
 
-  it("throws for unsupported decorator expressions", () => {
+  it("returns null and empty values for unsupported decorator expressions", () => {
     const view = new DecoratorView(loadDecorator(`
       @ns.tag
       class Foo {}
@@ -61,5 +67,15 @@ describe("DecoratorView", () => {
     expect(view.hasArguments()).toBe(false);
     expect(view.getArguments()).toEqual([]);
     expect(view.getName()).toBeNull();
+    expect(view.getArgument(0)).toBeNull();
+    expect(view.getStringArgument()).toBeNull();
+  });
+
+  it('returns null for a missing or non-string argument', () => {
+    const view = DecoratorView.from(loadDecorator('@tag(1) class Foo {}'));
+
+    expect(view.getStringArgument()).toBeNull();
+    expect(view.getArgument(1)).toBeNull();
+    expect(view.getStringArgument(1)).toBeNull();
   });
 });

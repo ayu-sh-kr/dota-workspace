@@ -34,6 +34,37 @@ export class DecoratorView {
   }
 
   /**
+   * Returns one decorator call argument by index when the decorator is callable.
+   * The helper keeps argument-position logic centralized so callers do not need
+   * to inspect the raw SWC shape before reading a value.
+   * @param index - Zero-based call-argument position to resolve.
+   * @returns The requested argument, or `null` when the decorator is not a call
+   *   expression or the index is out of range.
+   */
+  getArgument(index: number): Argument | null {
+    return this.getArguments()[index] ?? null;
+  }
+
+  /**
+   * Reads a string-literal argument from a callable decorator without leaking
+   * SWC traversal logic into callers.
+   * @param index - Zero-based call-argument position to inspect. Defaults to the
+   *   first argument because that is the common decorator pattern.
+   * @returns The argument text when the indexed argument is a string literal,
+   *   otherwise `null`.
+   */
+  getStringArgument(index: number = 0): string | null {
+    const argument = this.getArgument(index);
+    if (argument == null) return null;
+
+    if (argument.expression.type !== "StringLiteral") {
+      return null;
+    }
+
+    return argument.expression.value;
+  }
+
+  /**
    * Returns the decorator name for identifier decorators and simple call decorators.
    *
    * Returns `null` when the decorator expression is not a supported name-bearing

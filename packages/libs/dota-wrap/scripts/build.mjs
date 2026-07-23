@@ -9,6 +9,7 @@ const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const internalPackages = [
   '@ayu-sh-kr/dota-core',
   '@ayu-sh-kr/dota-event',
+  '@ayu-sh-kr/dota-event-map-generator',
   '@ayu-sh-kr/dota-preloader-plugin',
   '@ayu-sh-kr/dota-rest',
   '@ayu-sh-kr/dota-router',
@@ -30,6 +31,7 @@ const entries = [
   { name: '.', source: 'src/index.ts', outDir: 'dist' },
   { name: 'core', source: 'src/core/index.ts', outDir: 'dist/core' },
   { name: 'event', source: 'src/event/index.ts', outDir: 'dist/event' },
+  { name: 'event-map-generator', source: 'src/event-map-generator/index.ts', outDir: 'dist/event-map-generator', bundleInternal: true, external: nodePluginExternal },
   { name: 'router', source: 'src/router/index.ts', outDir: 'dist/router' },
   { name: 'rest', source: 'src/rest/index.ts', outDir: 'dist/rest' },
   {
@@ -56,6 +58,7 @@ function getExternal(entry) {
 const declarationSources = {
   core: '../dota-core/dist/index.d.ts',
   event: '../dota-event/dist/index.d.ts',
+  'event-map-generator': '../../plugins/event-map-generator/dist/index.d.ts',
   router: '../dota-router/dist/index.d.ts',
   rest: '../dota-rest/dist/index.d.ts',
   'preloader-plugin': '../../plugins/dota-vite-preloader/dist/index.d.ts',

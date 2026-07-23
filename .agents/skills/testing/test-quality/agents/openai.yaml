@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Quality"
+  short_description: "Keep tests and support code clear and maintainable."
+  default_prompt: "Use $test-quality to organize and document these tests, fixtures, and helpers."

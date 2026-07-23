@@ -5,7 +5,7 @@ description: Use when adding or improving developer-facing documentation in Type
 
 # Code Documentation
 
-Use this skill when documenting TypeScript classes, functions, methods, or exported APIs for developers who need to maintain or extend the code.
+Use this skill when documenting TypeScript classes, functions, methods, or exported APIs for developers who need to maintain or extend the code. Visibility does not determine documentation depth: every non-trivial method in a touched utility or service, including private helpers, must explain the policy a maintainer must preserve.
 
 ## Documentation standard
 
@@ -21,7 +21,7 @@ Use TSDoc block comments (`/** ... */`) immediately above the declaration. Keep 
 ## What good documentation covers
 
 - Document exported functions, public methods, lifecycle hooks with non-obvious behavior, and helpers whose name does not explain their policy.
-- Document private methods and helpers when they encode a maintenance-sensitive policy, coordinate multiple representations, perform recovery, or would be difficult to safely change without context. Private visibility does not remove the need for documentation when the method affects observable behavior or a domain invariant.
+- Document every non-trivial method in the touched code, whether public, protected, or private. Private visibility does not reduce the requirement: explain selection, fallback, normalization, ordering, error behavior, or representation coordination whenever a maintainer could change it incorrectly without that context. Truly trivial private accessors may use a concise one-line TSDoc comment, but do not leave policy-bearing helpers undocumented.
 - Describe inputs in domain terms: what a path, root, scan list, AST node, or configuration option represents and how it affects the result.
 - Call out side effects such as filesystem writes, logging, mutation, caching, event registration, or updating generated artifacts.
 - Explain decisions that are easy to break, such as sorting for deterministic output, filtering supported file shapes, normalizing path separators, or coalescing concurrent refreshes.
@@ -51,4 +51,4 @@ function sortWebComponentInfos(scannedInfos: WebComponentInfo[]): WebComponentIn
 
 ## Review checklist
 
-Before finishing, check that the comment is adjacent to the correct declaration, explains purpose and rationale, documents every parameter, stays within the 5–9 line target unless complexity genuinely requires more, and still matches the implementation after the change.
+Before finishing, check that every non-trivial touched declaration has adjacent TSDoc, regardless of visibility; that each comment explains purpose, observable result, rationale, fallback/error policy, and every parameter; that comments stay within the 5–9 line target unless complexity genuinely requires more; and that the wording still matches the implementation after the change.

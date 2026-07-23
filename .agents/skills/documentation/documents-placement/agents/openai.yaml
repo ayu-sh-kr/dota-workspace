@@ -1,0 +1,4 @@
+interface:
+  display_name: "Documents Placement"
+  short_description: "Place docs by ownership and content."
+  default_prompt: "Use $documents-placement to choose the correct documentation path for this document."
