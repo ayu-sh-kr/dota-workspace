@@ -6,18 +6,23 @@ import type { LogType } from 'consola';
  * `moduleSpecifier` identifies the event-bus module whose map is declaration-merged.
  */
 export type EventMapGeneratorPluginConfig = {
+  /** Package root used to resolve scan roots and generated output paths; Vite's resolved root is used when omitted. */
   root?: string;
+  /** Declaration file destination relative to `root`; defaults to `src/event-map.d.ts`. */
   outFile?: string;
+  /** Consola verbosity used by generation logs; defaults to `info`. */
   logType?: LogType;
+  /** Source roots scanned for event candidates, resolved relative to `root`; defaults to `[root]`. */
   scanRoots?: string[];
+  /** Module whose `ApplicationEventMap` interface receives the generated declaration augmentation. */
   moduleSpecifier?: string;
-  /** Enables the optional source-location JSON artifact; `true` uses its default path. */
+  /** Enables source-location JSON output; `true` uses the default path and an object selects a custom destination. */
   eventLocations?: boolean | EventMapLocationGeneratorConfig;
 };
 
-/** Configures the optional event source-location artifact written beside the declaration. */
+/** Configures the optional event source-location artifact written alongside the declaration. */
 export type EventMapLocationGeneratorConfig = {
-  /** Output path relative to the plugin root; defaults to the standard location file. */
+  /** JSON destination relative to the plugin root; defaults to `src/event-map.locations.json`. */
   outFile?: string;
 };
 
@@ -26,11 +31,11 @@ export type EventMapLocationGeneratorConfig = {
  * `sourceFile` lets the serializer rebase relative imports from the generated `.d.ts` location.
  */
 export type EventMapTypeImport = {
-  /** Local identifier used in the recovered payload type text. */
+  /** Local identifier referenced by the recovered payload text and emitted in a type-only import. */
   name: string;
-  /** Original module specifier from the scanned source file. */
+  /** Module specifier from the scanned source, retained so declaration generation can preserve its ownership. */
   moduleSpecifier: string;
-  /** Absolute source file that declared or imported the symbol. */
+  /** Absolute owner file used to rebase relative `moduleSpecifier` values from the generated declaration. */
   sourceFile: string;
 };
 
@@ -40,10 +45,11 @@ export type EventMapTypeImport = {
  * handler observations without losing the richest fallback shape or its imports.
  */
 export type EventMapPayloadType = {
+  /** TypeScript text emitted for the event's `data` field, such as `null`, `unknown`, or an author-written type. */
   text: string;
-  /** Whether the scanner resolved every part of the payload without guessing. */
+  /** Whether `text` is fully established by syntax; complete payloads take precedence when candidates are merged. */
   isComplete: boolean;
-  /** Type symbols referenced by `text` that must be emitted as type-only imports. */
+  /** Imported symbols referenced by `text`; the serializer deduplicates and rebases them for the output file. */
   imports: EventMapTypeImport[];
 };
 
@@ -53,35 +59,35 @@ export type EventMapPayloadType = {
  * evidence before producing the final `ApplicationEventMap` augmentation.
  */
 export type EventMapScanCandidate = {
-  /** Literal event key discovered in source. */
+  /** Literal event key used to group publisher and listener evidence into one map entry. */
   name: string;
-  /** Absolute source file containing this occurrence. */
+  /** Absolute source file containing the discovered event occurrence. */
   sourceFile: string;
-  /** Signal that produced the key; publication candidates can carry payload evidence. */
+  /** Discovery signal: `publish` covers publication calls, while `decorator` covers `@OnEvent` listeners. */
   kind: 'decorator' | 'publish';
-  /** Recovered payload, omitted only for legacy callers that provide names alone. */
+  /** Syntax-recovered payload evidence; omitted candidates are rendered as an incomplete `unknown` fallback. */
   payload?: EventMapPayloadType;
-  /** Source occurrences retained only when location collection is enabled. */
+  /** Repeated source occurrences retained when location collection is enabled; absent when scanning declarations only. */
   locations?: EventMapSourceLocation[];
 };
 
 /** Identifies one event-key occurrence and its containing class declaration. */
 export type EventMapSourceLocation = {
-  /** Absolute source file path before location-artifact path normalization. */
+  /** Absolute source file path before the location artifact converts it to a root-relative path. */
   sourceFile: string;
-  /** Zero-based source-string offset of the event-key literal. */
+  /** Zero-based JavaScript string offset of the event-key literal for editor navigation. */
   offset: number;
-  /** Containing class name, or `null` for a module-level publication. */
+  /** Innermost containing class name, or `null` when the event is published at module scope. */
   className: string | null;
-  /** Zero-based offset of the containing class identifier, or `null` without a class. */
+  /** Zero-based offset of the containing class identifier, or `null` when no class owns the occurrence. */
   classOffset: number | null;
 };
 
 /** Options controlling the target module and path context for declaration serialization. */
 export type EventMapDeclarationOptions = {
-  /** Module whose `ApplicationEventMap` interface is augmented. */
+  /** Module whose `ApplicationEventMap` interface is augmented by the generated source. */
   moduleSpecifier: string;
-  /** Generated declaration path used to rebase source-relative type imports. */
+  /** Generated declaration path used to rebase relative payload imports; omitted to retain source specifiers. */
   outFile?: string;
 };
 
@@ -90,36 +96,36 @@ export type EventMapDeclarationOptions = {
  * `names` gives lifecycle logging and tests a structured view without reparsing the source text.
  */
 export type EventMapDeclarationArtifact = {
-  /** Complete TypeScript module-augmentation source. */
+  /** Complete TypeScript module-augmentation source ready to write as the declaration file. */
   declaration: string;
-  /** Sorted event keys emitted into the augmentation. */
+  /** Sorted event keys emitted into the augmentation, also used for generation logging and assertions. */
   names: string[];
 };
 
 /** Groups published and listened-on source locations for each discovered event key. */
 export type EventMapLocationEntry = {
-  /** Event key shared by every location in this entry. */
+  /** Event key that links every publication and listener location in this entry. */
   key: string;
-  /** Publication call locations, sorted by source path and offset. */
+  /** Locations of `publish`, `publishAsync`, or `emit` calls, sorted for stable generated JSON. */
   published: EventMapSourceLocation[];
-  /** `@OnEvent` decorator locations, sorted by source path and offset. */
+  /** Locations of `@OnEvent` decorators, sorted for stable generated JSON. */
   listened: EventMapSourceLocation[];
 };
 
 /** JSON document consumed by tooling that navigates from an event key to source. */
 export type EventMapLocationArtifact = {
-  /** Deterministically sorted event entries. */
+  /** One entry per discovered key, sorted by key so repeated generation is deterministic. */
   events: EventMapLocationEntry[];
 };
 
 /** Root context used to convert scanner-owned absolute paths into artifact paths. */
 export type EventMapLocationGenerationOptions = {
-  /** Package root used as the base for relative source paths. */
+  /** Package root used to turn absolute scanner paths into portable root-relative JSON paths. */
   root: string;
 };
 
 /** Optional scanner behavior that avoids location work for declaration-only generation. */
 export type EventMapScanOptions = {
-  /** Collect event and class offsets for a location artifact. Defaults to `false`. */
+  /** Collect event and class offsets for `EventMapLocationArtifact`; defaults to `false` for declaration-only scans. */
   includeLocations?: boolean;
 };
