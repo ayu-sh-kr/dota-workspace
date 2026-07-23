@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Vite plugin scaffold for generating typed ApplicationEventMap declaration files from Dota application sources.",
   "author": {
     "name": "ayu-sh-kr",
