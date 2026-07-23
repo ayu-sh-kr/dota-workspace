@@ -68,6 +68,20 @@ describe("ObjectExpressionView", () => {
     expect(view.getProperty("missing")).toBeNull();
   });
 
+  it("returns string properties directly from getStringProperty()", () => {
+    const objectExpression = loadObjectExpression(`
+      const value = {
+        selector: "notification-holder",
+        shadow: false,
+      };
+    `);
+    const view = new ObjectExpressionView(objectExpression);
+
+    expect(view.getStringProperty("selector")).toBe("notification-holder");
+    expect(view.getStringProperty("shadow")).toBeNull();
+    expect(view.getStringProperty("missing")).toBeNull();
+  });
+
   it("returns a plain object from toObject()", () => {
     const objectExpression = loadObjectExpression(`
       const value = {
@@ -137,5 +151,49 @@ describe("ObjectExpressionView", () => {
     expect(view.getProperties()).toEqual([]);
     expect(view.getPropertiesNames()).toEqual([]);
     expect(view.getProperty("missing")).toBeNull();
+  });
+
+  it('indexes only statically named properties and keeps the last duplicate value', () => {
+    const objectExpression = loadObjectExpression(`
+      const value = {
+        duplicate: "first",
+        duplicate: "last",
+        [key]: "ignored",
+        ...other,
+      };
+    `);
+    const view = ObjectExpressionView.from(objectExpression);
+
+    expect(view.hasProperties()).toBe(true);
+    expect(view.getPropertiesNames()).toEqual(['duplicate']);
+    expect(view.getPropertiesNames(true)).toEqual(['duplicate']);
+    expect(view.getStringProperty('duplicate')).toBe('last');
+    expect(view.getProperty('computed')).toBeNull();
+  });
+
+  it('converts supported wrappers, nulls, identifiers, arrays, and unsupported expressions', () => {
+    const objectExpression = loadObjectExpression(`
+      const value = {
+        nullValue: null,
+        identifier: sample,
+        parenthesized: (1),
+        assertion: 2 as number,
+        nonNull: sample!,
+        values: [1, , 3],
+        call: createValue(),
+      };
+    `);
+
+    const result = ObjectExpressionView.toPlainObject(objectExpression);
+
+    expect(result).toMatchObject({
+      nullValue: null,
+      identifier: 'sample',
+      parenthesized: 1,
+      assertion: 2,
+      nonNull: 'sample',
+      values: [1, null, 3],
+    });
+    expect(result.call).toMatchObject({ type: 'CallExpression' });
   });
 });
