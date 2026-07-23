@@ -12,7 +12,7 @@ let log = createConsola();
 
 /**
  * Writes the declaration and optional source-navigation artifacts from one scan.
- * Both outputs share candidates so enabling locations adds metadata without a second
+ * Both outputs share candidates, so enabling locations adds metadata without a second
  * filesystem discovery or parse pass; each output creates its own parent directory.
  * @param root Package root used to resolve scan roots and output paths.
  * @param options Plugin configuration controlling declaration and location output.
