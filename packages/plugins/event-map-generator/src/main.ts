@@ -2,11 +2,11 @@ import { createConsola, LogLevels, type LogType } from 'consola';
 import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
-import { EventMapModuleConstants } from '@dota/Constants.ts';
+import { BUILT_IN_EVENT_NAMES, EventMapModuleConstants } from '@dota/Constants.ts';
 import { EventMapDeclarationUtils } from '@dota/generate/EventMapDeclarationUtils.ts';
 import { EventMapLocationUtils } from '@dota/generate/EventMapLocationUtils.ts';
 import { scanEventMapSources } from '@dota/scan/EventMapScanner.ts';
-import type { EventMapGeneratorPluginConfig, EventMapLocationGeneratorConfig } from '@dota/Types.ts';
+import type { EventMapGeneratorPluginConfig, EventMapLocationGeneratorConfig, EventMapScanCandidate } from '@dota/Types.ts';
 
 let log = createConsola();
 
@@ -33,7 +33,8 @@ async function writeGeneratedArtifacts(
   const scannedCandidates = await scanEventMapSources(root, scanRoots, {
     includeLocations: locationOutput != null,
   });
-  const artifact = EventMapDeclarationUtils.createDeclaration(scannedCandidates, {
+  const candidates = mergeBuiltInEventCandidates(root, scannedCandidates);
+  const artifact = EventMapDeclarationUtils.createDeclaration(candidates, {
     moduleSpecifier: options.moduleSpecifier ?? EventMapModuleConstants.DEFAULT_MODULE_SPECIFIER,
     outFile,
   });
@@ -51,6 +52,25 @@ async function writeGeneratedArtifacts(
   if (locationOutput != null) {
     log.info(`Generated event source locations at ${locationOutput}`);
   }
+}
+
+/**
+ * Adds the library-owned lifecycle contract to application observations.
+ * Built-ins use incomplete `any` payloads for compatibility and carry no
+ * source location because they are registry entries rather than source calls.
+ * @param root Package root used as the synthetic ownership context.
+ * @param candidates User-source event observations from the scanner.
+ * @returns A new candidate list containing each built-in event exactly once.
+ */
+function mergeBuiltInEventCandidates(root: string, candidates: EventMapScanCandidate[]): EventMapScanCandidate[] {
+  const builtInCandidates: EventMapScanCandidate[] = BUILT_IN_EVENT_NAMES.map(name => ({
+    name,
+    sourceFile: root,
+    kind: 'decorator',
+    payload: {text: 'any', isComplete: false, imports: []},
+  }));
+
+  return [...builtInCandidates, ...candidates];
 }
 
 /**

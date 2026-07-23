@@ -65,6 +65,7 @@ function parseClassMethodWithContext(methodSource: string): {
       moduleStart: module.span.start,
       sourceText,
       typeBindings: [],
+      callableReturnTypes: [],
     },
   };
 }

@@ -1,6 +1,7 @@
 export {};
 
 import type { MarkdownResult } from "../../../ui/dota-md/src/services/md.service.ts";
+import type { BlogPaginationState } from "./components/blogs/blog-pagination.component.ts";
 import type { NotificationColor } from "./components/utils/notification/notification.component.ts";
 import type { SoftNotification } from "./components/utils/notification/notification.service.ts";
 import type { ColorName, ThemeName } from "@ayu-sh-kr/dota-md";
@@ -12,11 +13,15 @@ import type { ColorName, ThemeName } from "@ayu-sh-kr/dota-md";
 declare module "@ayu-sh-kr/dota-wrap/event" {
   interface ApplicationEventMap {
     "app:initialized": null;
+    "attribute-changed": any;
+    "blog:pagination:changed": BlogPaginationState;
     "connected": any;
+    "constructed": any;
     "disconnected": any;
     "docs:color-change": { color: ColorName };
     "docs:theme-change": { theme: ThemeName };
     "docs:toc-update": any;
+    "dom-updated": any;
     "md:color-change": { color: ColorName };
     "md:render": MarkdownResult;
     "md:theme-change": { theme: ThemeName };

@@ -12,7 +12,7 @@ export default defineConfig({
     },
     minify: false,
     rollupOptions: {
-      external: dependencies ? Object.keys(dependencies) : []
+      external: ['node:path', ...(dependencies ? Object.keys(dependencies) : [])]
     }
   },
 

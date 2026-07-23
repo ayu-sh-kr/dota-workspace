@@ -10,14 +10,17 @@ import {
   DecoratorUtils,
   DecoratorView,
   ExpressionTypeUtils,
-  KeyValuePropertyView,
   ObjectExpressionView,
   TypeAnnotationUtils,
   findModuleSourceOffset,
   utf8ByteOffsetToSourceOffset,
+  AstModuleResolver,
+  type AstModuleIndex,
+  type ParsedAstModule,
   type ExpressionTypeInfo,
 } from '@ayu-sh-kr/dota-ast-utils';
 import { ASTFilterConstants, EventMapScanPath } from '@dota/Constants.ts';
+import { EventNamePolicy } from '@dota/scan/EventNamePolicy.ts';
 import type {
   EventMapPayloadType,
   EventMapScanCandidate,
@@ -60,7 +63,22 @@ type TypeBinding = {
   name: string;
   /** Declaration start used to choose the nearest binding at a reference site. */
   position: number;
-  /** Annotation-derived type information, including referenced type names. */
+  /** Explicit annotation-derived type; it takes precedence over initializer resolution. */
+  type?: ExpressionTypeInfo;
+  /** Direct call initializer used as a fallback when the declaration is unannotated. */
+  initializer?: Expression;
+};
+
+/**
+ * Associates a top-level callable with its explicit return annotation.
+ * Only named declarations can be matched safely without a type checker.
+ */
+type CallableReturnBinding = {
+  /** Source-level callable name used by direct identifier calls. */
+  name: string;
+  /** Declaration start used to choose the nearest matching callable. */
+  position: number;
+  /** Explicit return type recovered from the callable declaration. */
   type: ExpressionTypeInfo;
 };
 
@@ -76,8 +94,10 @@ type ModuleTypeContext = {
   moduleStart: number;
   /** Original module text from which exact annotation syntax is read. */
   sourceText: string;
-  /** Annotated bindings used by identifier and member-expression resolution. */
+  /** Local bindings used by identifier and member-expression payload resolution. */
   typeBindings: TypeBinding[];
+  /** Top-level callable return annotations used by direct call resolution. */
+  callableReturnTypes: CallableReturnBinding[];
 };
 
 /** Minimal span shape accepted by the source-offset conversion boundary. */
@@ -112,8 +132,110 @@ function createModuleTypeContext(ast: Module, sourceText: string, sourceFile: st
       AstTraversalUtils.findNodes<AstRecord>(ast, 'PrivateProperty'),
     )
     .flatMap(node => createTypeBinding(node, sourceText, moduleStart));
+  const callableReturnTypes = collectCallableReturnTypes(ast, sourceText, moduleStart);
 
-  return { imports, moduleStart, sourceText, typeBindings };
+  return { imports, moduleStart, sourceText, typeBindings, callableReturnTypes };
+}
+
+/**
+ * Collects explicit return annotations from top-level functions and const
+ * function initializers. Nested functions are excluded because their names are
+ * not module-level bindings and syntax alone cannot establish their call scope.
+ * @param ast - Parsed module whose direct body declarations are inspected.
+ * @param sourceText - Original source used to recover annotation text.
+ * @param moduleStart - SWC module span start used to normalize source offsets.
+ * @returns Named callable return types available to same-module call resolution.
+ */
+function collectCallableReturnTypes(ast: Module, sourceText: string, moduleStart: number): CallableReturnBinding[] {
+  return ast.body.flatMap(statement => {
+    const node = statement as unknown as AstRecord;
+    if (node.type === 'FunctionDeclaration') {
+      return createCallableReturnBinding(node, node.identifier as AstIdentifier | undefined, sourceText, moduleStart);
+    }
+
+    if (node.type === 'ExportDeclaration') {
+      const declaration = node.declaration as AstRecord | undefined;
+      if (declaration?.type === 'FunctionDeclaration') {
+        return createCallableReturnBinding(
+          declaration,
+          declaration.identifier as AstIdentifier | undefined,
+          sourceText,
+          moduleStart,
+        );
+      }
+
+      if (declaration?.type === 'VariableDeclaration') {
+        return createVariableCallableReturnBindings(declaration, sourceText, moduleStart);
+      }
+    }
+
+    return node.type === 'VariableDeclaration'
+      ? createVariableCallableReturnBindings(node, sourceText, moduleStart)
+      : [];
+  });
+}
+
+/**
+ * Collects callable return annotations from one direct const declaration.
+ * Function expressions and arrow functions are accepted only when assigned to
+ * a simple identifier, keeping the lookup independent of object property scope.
+ * @param declaration - Top-level variable declaration to inspect.
+ * @param sourceText - Original source used to recover annotation text.
+ * @param moduleStart - SWC module span start used to normalize source offsets.
+ * @returns Callable bindings found in the declaration.
+ */
+function createVariableCallableReturnBindings(
+  declaration: AstRecord,
+  sourceText: string,
+  moduleStart: number,
+): CallableReturnBinding[] {
+  if (declaration.kind !== 'const' || !Array.isArray(declaration.declarations)) return [];
+
+  return declaration.declarations.flatMap((candidate: unknown) => {
+    const declarator = candidate as AstRecord;
+    const identifier = declarator.id as AstIdentifier | undefined;
+    const initializer = declarator.init as AstRecord | undefined;
+    if (identifier?.type !== 'Identifier' || (initializer?.type !== 'ArrowFunctionExpression' && initializer?.type !== 'FunctionExpression')) {
+      return [];
+    }
+
+    return createCallableReturnBinding(initializer, identifier, sourceText, moduleStart);
+  });
+}
+
+/**
+ * Converts one named callable with an explicit return annotation into an index entry.
+ * Inferred returns are deliberately ignored so generated declarations never claim
+ * a payload type that syntax-only analysis cannot prove.
+ * @param callable - Function declaration or function initializer.
+ * @param identifier - Identifier bound to the callable.
+ * @param sourceText - Original source used to recover annotation text.
+ * @param moduleStart - SWC module span start used to normalize source offsets.
+ * @returns One callable binding, or an empty list when it is not fully explicit.
+ */
+function createCallableReturnBinding(
+  callable: AstRecord,
+  identifier: AstIdentifier | undefined,
+  sourceText: string,
+  moduleStart: number,
+): CallableReturnBinding[] {
+  if (identifier?.type !== 'Identifier' || typeof identifier.value !== 'string' || callable.returnType == null) {
+    return [];
+  }
+
+  const annotation = TypeAnnotationUtils.read(callable.returnType as never, sourceText, moduleStart);
+  const position = (identifier as AstIdentifier & { span?: { start?: unknown } }).span?.start;
+  if (annotation == null || typeof position !== 'number') return [];
+
+  return [{
+    name: identifier.value,
+    position,
+    type: {
+      text: annotation.text,
+      isComplete: true,
+      referencedNames: annotation.referencedNames,
+    },
+  }];
 }
 
 /**
@@ -196,14 +318,23 @@ function createTypeBinding(node: AstRecord, sourceText: string, moduleStart: num
   const annotationNode = node.type === 'ClassProperty' || node.type === 'PrivateProperty'
     ? node.typeAnnotation
     : identifier?.typeAnnotation;
+  const initializer = node.type === 'VariableDeclarator'
+    ? (node.init as Expression | null | undefined) ?? undefined
+    : undefined;
 
-  if (identifier?.type !== 'Identifier' || typeof identifier.value !== 'string' || annotationNode == null) {
+  if (identifier?.type !== 'Identifier' || typeof identifier.value !== 'string' || (annotationNode == null && initializer?.type !== 'CallExpression')) {
     return [];
   }
 
-  const annotation = TypeAnnotationUtils.read(annotationNode as never, sourceText, moduleStart);
   const position = ((node.span as { start?: unknown } | undefined)?.start);
-  if (annotation == null || typeof position !== 'number') return [];
+  if (typeof position !== 'number') return [];
+
+  if (annotationNode == null) {
+    return [{ name: identifier.value, position, initializer }];
+  }
+
+  const annotation = TypeAnnotationUtils.read(annotationNode as never, sourceText, moduleStart);
+  if (annotation == null) return [];
 
   return [{
     name: identifier.value,
@@ -213,6 +344,7 @@ function createTypeBinding(node: AstRecord, sourceText: string, moduleStart: num
       isComplete: true,
       referencedNames: annotation.referencedNames,
     },
+    initializer,
   }];
 }
 
@@ -233,10 +365,42 @@ function resolveReferenceType(expression: Expression, context: ModuleTypeContext
   const position = (expression as { span: { start: number } }).span.start;
   if (name == null) return null;
 
-  const matchingBindings = context.typeBindings.filter(binding => binding.name === name);
+  const binding = findNearestBinding(context.typeBindings, name, position);
+
+  return binding?.type ?? (binding?.initializer?.type === 'CallExpression'
+    ? resolveCallType(binding.initializer, context)
+    : null);
+}
+
+/**
+ * Chooses the closest declaration for a source name while retaining a useful
+ * fallback for hoisted declarations that appear after the reference site.
+ * @param bindings - Candidate bindings from one module.
+ * @param name - Referenced source-level identifier.
+ * @param position - SWC source position of the reference or call.
+ * @returns The nearest matching binding, or `undefined` when none exists.
+ */
+function findNearestBinding<T extends {name: string; position: number}>(bindings: T[], name: string, position: number): T | undefined {
+  const matchingBindings = bindings.filter(binding => binding.name === name);
   const preceding = matchingBindings.filter(binding => binding.position <= position);
-  const binding = [...(preceding.length > 0 ? preceding : matchingBindings)]
+  return [...(preceding.length > 0 ? preceding : matchingBindings)]
     .sort((left, right) => right.position - left.position)[0];
+}
+
+/**
+ * Resolves a direct named call using a top-level callable's explicit return type.
+ * Member, computed, imported, and otherwise dynamic callees remain unresolved
+ * because this scanner intentionally operates without TypeScript semantics.
+ * @param expression - Call expression whose callee is inspected.
+ * @param context - Same-module callable return annotations.
+ * @returns The explicit return type, or `null` when no safe match exists.
+ */
+function resolveCallType(expression: CallExpression, context: ModuleTypeContext): ExpressionTypeInfo | null {
+  if (expression.callee.type !== 'Identifier') return null;
+
+  const name = expression.callee.value;
+  const position = expression.span.start;
+  const binding = findNearestBinding(context.callableReturnTypes, name, position);
 
   return binding?.type ?? null;
 }
@@ -263,6 +427,7 @@ function resolvePayloadType(call: CallExpressionView, context: ModuleTypeContext
     sourceText: context.sourceText,
     moduleStart: context.moduleStart,
     resolveReference: expression => resolveReferenceType(expression, context),
+    resolveCall: expression => resolveCallType(expression, context),
   });
   return createPayloadType(type, context);
 }
@@ -441,6 +606,8 @@ function collectCandidatesFromModule(
   sourceText: string,
   sourceFile: string,
   options: EventMapScanOptions,
+  module: ParsedAstModule,
+  index: AstModuleIndex,
 ): EventMapScanCandidate[] {
   const context = createModuleTypeContext(ast, sourceText, sourceFile);
   const candidates: EventMapScanCandidate[] = [];
@@ -474,7 +641,8 @@ function collectCandidatesFromModule(
         .filter(decorator => DecoratorUtils.decoratorName(decorator) === ASTFilterConstants.ON_EVENT_DECORATOR_NAME)
         .forEach(decorator => {
           const decoratorView = DecoratorView.from(decorator);
-          const eventName = decoratorView.getStringArgument();
+          const eventExpression = decoratorView.getArgument(0)?.expression;
+          const eventName = eventExpression == null ? null : AstModuleResolver.resolve(eventExpression, module, index);
           if (eventName != null) {
             addCandidate(
               eventName,
@@ -482,7 +650,7 @@ function collectCandidatesFromModule(
               resolveHandlerPayloadType(method, classMethods, context),
               options.includeLocations === true
                 ? createSourceLocation(
-                  (decoratorView.getArgument(0)?.expression as SourceNode | undefined)?.span,
+                  (eventExpression as SourceNode | undefined)?.span,
                   classDeclaration,
                   ast,
                   sourceText,
@@ -506,7 +674,8 @@ function collectCandidatesFromModule(
     const event = call.getObjectArgument(0);
     const eventView = event == null ? null : ObjectExpressionView.from(event);
     const eventNameProperty = eventView?.getProperty(ASTFilterConstants.APPLICATION_EVENT_NAME_PROPERTY);
-    const eventName = eventNameProperty == null ? null : KeyValuePropertyView.from(eventNameProperty).getString();
+    const eventExpression = eventNameProperty?.value;
+    const eventName = eventExpression == null ? null : AstModuleResolver.resolve(eventExpression, module, index);
     if (eventName != null) {
       addCandidate(
         eventName,
@@ -514,7 +683,7 @@ function collectCandidatesFromModule(
         resolvePayloadType(call, context),
         options.includeLocations === true
           ? createSourceLocation(
-            (eventNameProperty.value as SourceNode).span,
+            (eventExpression as SourceNode).span,
             findContainingClass(callExpression.span, classDeclarations),
             ast,
             sourceText,
@@ -553,13 +722,22 @@ export async function scanEventMapSources(
     },
   )));
   const files = [...new Set(discoveredFiles.flat())].sort((left, right) => left.localeCompare(right));
-  const candidates: EventMapScanCandidate[] = [];
-
+  const modules: ParsedAstModule[] = [];
   for (const file of files) {
     const sourceText = await readFile(file, 'utf8');
     const ast = await parse(sourceText, { syntax: 'typescript', decorators: true });
-    candidates.push(...collectCandidatesFromModule(ast, sourceText, file, options));
+    modules.push({sourceFile: file, sourceText, ast});
   }
+
+  const index = AstModuleResolver.createIndex(modules, {isDeclarationNameEligible: EventNamePolicy.isEventConstantName});
+  const candidates = modules.flatMap(module => collectCandidatesFromModule(
+    module.ast,
+    module.sourceText,
+    module.sourceFile,
+    options,
+    module,
+    index,
+  ));
 
   return candidates.sort((left, right) => {
     const kindOrder = left.kind.localeCompare(right.kind);

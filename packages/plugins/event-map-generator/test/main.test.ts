@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { BUILT_IN_EVENT_NAMES } from '@dota/Constants.ts';
 import type { EventMapScanCandidate } from '@dota/Types.ts';
 
 const { scanMock, declarationMock, locationMock, mkdirMock, writeFileMock } = vi.hoisted(() => ({
@@ -75,6 +76,16 @@ describe('eventMapGenerator', () => {
     expect(writeFileMock).toHaveBeenCalledWith('/workspace/src/event-map.d.ts', 'export {};\n', 'utf8');
   });
 
+  it('merges built-in lifecycle events before declaration generation', async () => {
+    const plugin = eventMapGenerator({root: '/workspace'});
+
+    await runBuildStart(plugin);
+
+    const generatedCandidates = declarationMock.mock.calls[0]?.[0] as EventMapScanCandidate[];
+    expect(generatedCandidates.slice(0, BUILT_IN_EVENT_NAMES.length).map(candidate => candidate.name)).toEqual([...BUILT_IN_EVENT_NAMES]);
+    expect(generatedCandidates.slice(0, BUILT_IN_EVENT_NAMES.length).every(candidate => candidate.payload?.text === 'any')).toBe(true);
+  });
+
   it('writes the optional location artifact beside the declaration', async () => {
     const plugin = eventMapGenerator({
       root: '/workspace',
@@ -85,7 +96,7 @@ describe('eventMapGenerator', () => {
     await runBuildStart(plugin);
 
     expect(scanMock).toHaveBeenCalledWith('/workspace', ['/workspace'], {includeLocations: true});
-    expect(locationMock).toHaveBeenCalledWith(candidates, {root: '/workspace'});
+    expect(locationMock).toHaveBeenCalledWith(expect.arrayContaining(candidates), {root: '/workspace'});
     expect(writeFileMock).toHaveBeenCalledTimes(2);
     expect(writeFileMock).toHaveBeenCalledWith('/workspace/generated/event-map.locations.json', `${JSON.stringify({
       events: [{key: 'sample:event', published: [], listened: []}],

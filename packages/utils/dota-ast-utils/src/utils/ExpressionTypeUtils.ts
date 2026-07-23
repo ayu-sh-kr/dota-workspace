@@ -1,4 +1,4 @@
-import type { Expression, KeyValueProperty, ObjectExpression } from '@swc/core';
+import type { CallExpression, Expression, KeyValueProperty, ObjectExpression } from '@swc/core';
 import { KeyValuePropertyView } from '../view/KeyValuePropertyView.ts';
 import { TypeAnnotationUtils } from './TypeAnnotationUtils.ts';
 
@@ -11,9 +11,14 @@ export type ExpressionTypeInfo = {
 
 /** Context supplied by a scanner when identifiers need same-file resolution. */
 export type ExpressionTypeResolutionOptions = {
+  /** Original module text used to preserve source-authored type annotations. */
   sourceText: string;
+  /** SWC module span start used when converting annotation spans to source offsets. */
   moduleStart: number;
+  /** Resolves identifier and member expressions whose lexical scope belongs to the caller. */
   resolveReference?: (expression: Expression) => ExpressionTypeInfo | null;
+  /** Resolves statically named calls whose return annotation belongs to the caller. */
+  resolveCall?: (expression: CallExpression) => ExpressionTypeInfo | null;
 };
 
 /**
@@ -59,6 +64,8 @@ export class ExpressionTypeUtils {
       case 'Identifier':
       case 'MemberExpression':
         return options.resolveReference?.(expression) ?? this.unknown();
+      case 'CallExpression':
+        return options.resolveCall?.(expression) ?? this.unknown();
       default:
         return this.unknown();
     }
