@@ -2,11 +2,12 @@
 
 Vite plugin scaffold for generating `ApplicationEventMap` declaration files from Dota application sources.
 
-The package is set up to support the common Dota event workflow:
+The package supports the common Dota event workflow:
 
 - scan source files for `@OnEvent(...)` handlers
 - discover `publish({ name: ... })` event names
 - emit a declaration file that augments the application event map module
+- optionally emit source-navigation metadata for every published and listened-on event
 
 ## Output
 
@@ -24,21 +25,39 @@ The generated file contains a module augmentation for:
 
 You can override the output path and module specifier through the plugin options.
 
+When enabled, the optional location artifact defaults to:
+
+```text
+src/event-map.locations.json
+```
+
+It contains root-relative source paths, the exact zero-based event-key offset, and the
+containing class name and class-identifier offset when the occurrence is inside a class:
+
+```json
+{
+  "events": [
+    {
+      "key": "sample:created",
+      "published": [],
+      "listened": [
+        {
+          "sourceFile": "./src/sample.ts",
+          "offset": 64,
+          "className": "SampleFeature",
+          "classOffset": 43
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Payload typing
 
-The current generator discovers event names, but it does not infer the payload type
-carried by each event. That is why the generated declarations use `unknown`.
-
-If you want the generator itself to emit richer types, extend
-`EventMapDeclarationUtils.createDeclaration()` so it can resolve a payload type for
-each event name before writing the interface body.
-
-Practical implementation paths:
-
-- inspect `@OnEvent(...)` handlers and read the decorated method parameter type
-- inspect `publish({ name, data })` call sites and derive the type of `data`
-- maintain a separate manual augmentation file for concrete payload types, and
-  keep the generated file as the discovery layer only
+The scanner also recovers payload types syntactically from `publish`, `publishAsync`,
+and `emit` calls and uses handler forwarding as a fallback for listener-only events.
+Unsupported expressions remain safe incomplete types rather than being evaluated.
 
 ## Discovery model
 
@@ -50,9 +69,10 @@ The scaffold is organized around two jobs:
 The scanner currently looks for:
 
 - `@OnEvent("event:name")`
-- `publish({ name: "event:name" })`
+- `publish({ name: "event:name" })`, `publishAsync(...)`, and `emit(...)`
 
-Those event names are deduplicated and emitted as `unknown` payload entries. The package is ready for richer payload inference later.
+The declaration generator sorts and merges those observations into typed event entries.
+When location output is enabled, repeated occurrences are retained for navigation.
 
 ## Plugin hooks
 
@@ -85,7 +105,20 @@ Options:
 - `scanRoots`: additional roots to scan alongside `root`.
 - `moduleSpecifier`: module augmented by the generated declaration.
 - `logType`: consola log level.
+- `eventLocations`: optional source-navigation output. Set it to `true` for the default
+  path or `{ outFile: 'src/custom-event-locations.json' }` for a custom path.
+
+Example:
+
+```ts
+eventMapGenerator({
+  eventLocations: {
+    outFile: 'src/event-map.locations.json'
+  }
+})
+```
 
 ## Development status
 
-This package is scaffolded for plugin development. The directory structure, TypeScript config, Vite library build, and Vitest setup are in place so implementation work can start immediately.
+The package generates typed event declarations and can optionally emit source-navigation
+locations for editor and tooling integrations.
