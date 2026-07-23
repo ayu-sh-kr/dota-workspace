@@ -61,7 +61,7 @@ export type EventMapPayloadType = {
 export type EventMapScanCandidate = {
   /** Literal event key used to group publisher and listener evidence into one map entry. */
   name: string;
-  /** Absolute source file containing the discovered event occurrence. */
+  /** Absolute source file containing the occurrence, or scan root for registry-owned events. */
   sourceFile: string;
   /** Discovery signal: `publish` covers publication calls, while `decorator` covers `@OnEvent` listeners. */
   kind: 'decorator' | 'publish';
