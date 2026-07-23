@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
+    "@ayu-sh-kr/dota-event-map-generator": "workspace:*",
     "autoprefixer": "^10.4.19",
     "postcss": "8.5.10",
     "tailwindcss": "^3.4.4"

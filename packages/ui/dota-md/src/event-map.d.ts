@@ -1,14 +1,20 @@
-export {}
+export {};
+
+import type { MarkdownResult } from "./services/md.service.ts";
+
+// Auto-generated application event map. Do not edit by hand.
+// Payload types are recovered syntactically from publish, publishAsync, and emit calls.
+// Unsupported publisher expressions become unknown; handler-only events remain any for compatibility.
 
 declare module "@ayu-sh-kr/dota-event" {
   interface ApplicationEventMap {
-    "md:theme-change": { theme: string };
-    "md:color-change": { color: string };
-    /**
-     * Fired by MDService.render({ publish: true }).
-     * Contains both the rendered HTML and the extracted TOC entries
-     * so sibling components (e.g. a TOC sidebar) only need one listener.
-     */
-    "md:render": import("@dota/services/md.service.ts").MarkdownResult;
+    "attribute-changed": any;
+    "connected": any;
+    "constructed": any;
+    "disconnected": any;
+    "dom-updated": any;
+    "md:color-change": any;
+    "md:render": MarkdownResult;
+    "md:theme-change": any;
   }
 }
