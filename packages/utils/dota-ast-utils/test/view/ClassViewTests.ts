@@ -65,4 +65,43 @@ class SampleView {}`;
     expect(firstOffset).toBe(source.indexOf("SampleView"));
     expect(secondOffset).toBe(firstOffset);
   });
+
+  it('falls back to the class span when the declaration has no identifier', () => {
+    const anonymousClass = {
+      type: 'ClassDeclaration',
+      span: { start: 12, end: 30 },
+      identifier: null,
+      body: [],
+    } as unknown as ClassDeclaration;
+
+    const view = ClassView.from(anonymousClass);
+
+    expect(view.className()).toBeNull();
+    expect(view.getSourceOffset()).toBe(12);
+    expect(view.getSourceOffset('class {}', 0, 0)).toBeNull();
+  });
+
+  it('uses the normalized relative span when source text is omitted', () => {
+    const classDecl = loadClassDeclaration('class Sample {}');
+    const identifierStart = classDecl.identifier?.span.start;
+
+    if (identifierStart == null) {
+      throw new Error('Expected a class identifier.');
+    }
+
+    expect(ClassView.from(classDecl).getSourceOffset(undefined, classDecl.span.start, 5)).toBe(
+      5 + identifierStart - classDecl.span.start,
+    );
+  });
+
+  it('uses source matching when the identifier span is unavailable', () => {
+    const classDeclaration = {
+      type: 'ClassDeclaration',
+      span: { start: 0, end: 20 },
+      identifier: { value: 'Sample', span: { start: 99, end: 105 } },
+      body: [],
+    } as unknown as ClassDeclaration;
+
+    expect(ClassView.from(classDeclaration).getSourceOffset('class Sample {}')).toBe(6);
+  });
 });
