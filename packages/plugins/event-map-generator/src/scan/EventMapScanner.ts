@@ -446,6 +446,7 @@ function collectCandidatesFromModule(
   const candidates: EventMapScanCandidate[] = [];
   const candidatesByKey = new Map<string, EventMapScanCandidate>();
   const moduleSourceOffset = options.includeLocations === true ? findModuleSourceOffset(sourceText) : 0;
+  /** Merges equivalent declaration evidence while retaining every requested source occurrence. */
   const addCandidate = (
     name: string,
     kind: EventMapScanCandidate['kind'],
