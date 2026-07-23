@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plugin Build & Watcher"
+  short_description: "Wire scanning and codegen into the Vite build and dev lifecycle."
+  default_prompt: "Use $plugin-build-watcher to wire or debug the Vite hooks, caching, and dev watcher of a Dota plugin."
