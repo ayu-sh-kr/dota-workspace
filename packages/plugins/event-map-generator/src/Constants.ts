@@ -3,6 +3,19 @@ export class EventMapScanPath {
   static SOURCE_DECLARATION_IGNORE_PATTERN = '**/*.d.ts';
 }
 
+/**
+ * Public lifecycle event keys owned by Dota libraries.
+ * These names are registered directly because their implementations may live
+ * outside configured application scan roots and do not need source resolution.
+ */
+export const BUILT_IN_EVENT_NAMES = [
+  'constructed',
+  'connected',
+  'disconnected',
+  'attribute-changed',
+  'dom-updated',
+] as const;
+
 export class ASTFilterConstants {
   static ON_EVENT_DECORATOR_NAME = 'OnEvent';
   static APPLICATION_EVENT_NAME_PROPERTY = 'name';
