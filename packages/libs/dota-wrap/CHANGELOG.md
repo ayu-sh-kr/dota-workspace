@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.24
+
+### Patch Changes
+
+- 63cb5b3: Republish `@ayu-sh-kr/dota-wrap` with the latest bundled event-map generator so consumers receive
+  event-name constant resolution and annotated callable payload type resolution through the
+  `@ayu-sh-kr/dota-wrap/event-map-generator` entry point.
+
 ## 0.0.23
 
 ### Patch Changes
