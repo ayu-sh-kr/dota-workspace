@@ -34,6 +34,7 @@
     "paths": {
       "@dota/*": ["./src/*"],
       "@ayu-sh-kr/dota-preloader-plugin": ["../../plugins/dota-vite-preloader/dist/index.d.ts"],
+      "@ayu-sh-kr/dota-event-map-generator": ["../../plugins/event-map-generator/dist/index.d.ts"],
       "@ayu-sh-kr/dota-web-type-json": ["../../plugins/web-type-json/dist/index.d.ts"]
     }
 
