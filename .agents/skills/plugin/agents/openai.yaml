@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dota Vite Plugin"
+  short_description: "Build and extend Dota workspace Vite plugins."
+  default_prompt: "Use $dota-vite-plugin to build, extend, or review a Vite plugin under packages/plugins/."
