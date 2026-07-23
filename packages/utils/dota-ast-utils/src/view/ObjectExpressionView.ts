@@ -1,4 +1,5 @@
 import {KeyValueProperty, ObjectExpression} from "@swc/core";
+import {KeyValuePropertyView} from "./KeyValuePropertyView.ts";
 
 /**
  * Behavior-focused wrapper around an object expression.
@@ -48,6 +49,20 @@ export class ObjectExpressionView {
   /** Returns the indexed property with the given name, or `null` if missing. */
   getProperty(name: string): KeyValueProperty | null {
     return this.propertiesByKey.get(name) ?? null;
+  }
+
+  /**
+   * Reads a string-literal property from the object expression without exposing
+   * the underlying SWC property lookup to callers.
+   * @param name - Property key to resolve.
+   * @returns The property value when the named property exists and is a string
+   *   literal, otherwise `null`.
+   */
+  getStringProperty(name: string): string | null {
+    const property = this.getProperty(name);
+    if (property == null) return null;
+
+    return KeyValuePropertyView.from(property).getString();
   }
 
   toObject(): Record<string, any> {
