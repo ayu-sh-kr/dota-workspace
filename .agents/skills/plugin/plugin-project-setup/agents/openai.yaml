@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plugin Project Setup"
+  short_description: "Scaffold a new Dota Vite plugin package."
+  default_prompt: "Use $plugin-project-setup to scaffold or repair a Vite plugin package under packages/plugins/."
