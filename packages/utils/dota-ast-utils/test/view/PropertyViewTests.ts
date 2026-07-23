@@ -323,4 +323,99 @@ class Sample {
 
     expect(view.getType()).toBe("NotificationPosition");
   });
+
+  it('infers the remaining supported initializer types', () => {
+    const bigintView = new PropertyView(loadProperty(`
+      class Sample {
+        value = 42n;
+      }
+    `, "value"));
+    const nullView = new PropertyView(loadProperty(`
+      class Sample {
+        value = null;
+      }
+    `, "value"));
+    const identifierView = new PropertyView(loadProperty(`
+      class Sample {
+        value = defaultValue;
+      }
+    `, "value"));
+    const callView = new PropertyView(loadProperty(`
+      class Sample {
+        value = createValue();
+      }
+    `, "value"));
+
+    expect(bigintView.getType()).toBe('bigint');
+    expect(nullView.getType()).toBe('null');
+    expect(identifierView.getType()).toBe('identifier');
+    expect(callView.getType()).toBe('CallExpression');
+  });
+
+  it('maps built-in and literal type annotations to simplified types', () => {
+    const cases = [
+      ['String', 'string'],
+      ['Boolean', 'boolean'],
+      ['Number', 'number'],
+      ['BigInt', 'bigint'],
+      ['Array<string>', 'array'],
+      ['Object', 'object'],
+      ['"ready"', 'string'],
+      ['true', 'boolean'],
+      ['7', 'number'],
+    ] as const;
+
+    for (const [annotation, expectedType] of cases) {
+      const view = new PropertyView(loadProperty(`
+        class Sample {
+          value!: ${annotation};
+        }
+      `, "value"));
+
+      expect(view.getType()).toBe(expectedType);
+    }
+  });
+
+  it('returns null for properties without a value or annotation and for computed names', () => {
+    const classDecl = loadClassDeclaration(`
+      class Sample {
+        [computed] = 1;
+        value;
+      }
+    `);
+    const views = PropertyView.extractProperties(classDecl);
+
+    expect(views[0]?.propertyName()).toBeNull();
+    expect(views[1]?.propertyName()).toBe('value');
+    expect(views[1]?.defaultValue()).toBeNull();
+    expect(views[1]?.getType()).toBeNull();
+    expect(views[1]?.isRequired()).toBe(true);
+  });
+
+  it('uses the first matching decorator and handles non-call property decorators', () => {
+    const view = new PropertyView(loadProperty(`
+      class Sample {
+        @Property
+        @Property({ required: false })
+        value!: string;
+      }
+    `, "value"));
+
+    expect(view.hasDecorator('Property')).toBe(true);
+    expect(view.getDecorator('Property')?.expression.type).toBe('Identifier');
+    expect(view.getDecorator('Missing')).toBeNull();
+    expect(view.isRequired()).toBe(true);
+  });
+
+  it('falls back to the property span when source context is unavailable', () => {
+    const property = loadProperty(`
+      class Sample {
+        value = 1;
+      }
+    `, "value");
+    const view = PropertyView.from(property);
+
+    expect(view.getSourceOffset()).toBe(property.span.start);
+    expect(view.getSourceOffset(undefined, property.span.start, 4)).toBe(4);
+  });
 });
