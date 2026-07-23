@@ -1,5 +1,18 @@
 # @ayu-sh-kr/dota-event-map-generator
 
+## 0.0.3
+
+### Patch Changes
+
+- f6c3a19: Generate typed application event maps and resolve callable payload return types.
+
+  - Event payloads can be recovered from explicitly annotated function, arrow-function, and function-expression returns, including identifier-mediated calls.
+  - `dota-md` and `dota-ui` now generate package-local event-map declarations during their Vite builds.
+  - Unsupported inferred or dynamic calls remain safely unresolved instead of inventing payload types.
+
+- Updated dependencies [f6c3a19]
+  - @ayu-sh-kr/dota-ast-utils@0.0.4
+
 ## 0.0.2
 
 ### Patch Changes

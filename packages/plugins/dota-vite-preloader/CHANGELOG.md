@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-preloader-plugin
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [f6c3a19]
+  - @ayu-sh-kr/dota-ast-utils@0.0.4
+
 ## 0.0.6
 
 ### Patch Changes
