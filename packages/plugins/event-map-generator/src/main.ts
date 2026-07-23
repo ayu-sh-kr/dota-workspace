@@ -42,8 +42,8 @@ async function writeGeneratedArtifacts(
     ? null
     : `${JSON.stringify(EventMapLocationUtils.createArtifact(scannedCandidates, {root}), null, 2)}\n`;
   const writes: Array<Promise<void>> = [writeGeneratedFile(outFile, artifact.declaration)];
-  if (locationOutput != null) {
-    writes.push(writeGeneratedFile(locationOutput, locationContents ?? ''));
+  if (locationOutput != null && locationContents != null) {
+    writes.push(writeGeneratedFile(locationOutput, locationContents));
   }
 
   await Promise.all(writes);
@@ -113,6 +113,7 @@ export default function eventMapGenerator(options: EventMapGeneratorPluginConfig
     }
   });
 
+  /** Runs the shared scan and writes every artifact enabled by the plugin options. */
   const regenerate = async (): Promise<void> => {
     await writeGeneratedArtifacts(root, options);
   };
@@ -128,6 +129,10 @@ export default function eventMapGenerator(options: EventMapGeneratorPluginConfig
       await regenerate();
     },
     configureServer(server: ViteDevServer) {
+      /**
+       * Regenerates artifacts for one supported source change, then reloads the client.
+       * @param file Absolute or watcher-provided source path that triggered the refresh.
+       */
       const rebuild = async (file: string) => {
         if (!shouldRebuild(file)) return;
         await regenerate();
