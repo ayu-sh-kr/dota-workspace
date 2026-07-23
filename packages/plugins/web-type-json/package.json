@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Vite plugin that scans Dota Web Components once and generates JetBrains Web Types with optional Custom Elements Manifest 2.1 metadata.",
   "author": {
     "name": "ayu-sh-kr",
