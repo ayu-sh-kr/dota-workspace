@@ -85,6 +85,11 @@ type SourceSpan = {
   start?: number;
 };
 
+/** Node shape used when SWC's broad expression union hides its source span. */
+type SourceNode = {
+  span?: SourceSpan;
+};
+
 /**
  * Builds the same-file type context used for identifier payloads and imports.
  * Annotation-only lookup intentionally avoids a TypeScript program while still
@@ -428,6 +433,7 @@ export function getFirstParameterType(method: ClassMethod, context: ModuleTypeCo
  * @param ast - Parsed SWC module for one source file.
  * @param sourceText - Original source text paired with the parsed module.
  * @param sourceFile - Absolute source path associated with emitted candidates.
+ * @param options - Enables exact source and class locations when requested.
  * @returns Event candidates in source traversal order with recoverable payload types.
  */
 function collectCandidatesFromModule(
@@ -475,7 +481,7 @@ function collectCandidatesFromModule(
               resolveHandlerPayloadType(method, classMethods, context),
               options.includeLocations === true
                 ? createSourceLocation(
-                  decoratorView.getArgument(0)?.expression as SourceSpan | undefined,
+                  (decoratorView.getArgument(0)?.expression as SourceNode | undefined)?.span,
                   classDeclaration,
                   ast,
                   sourceText,
@@ -507,7 +513,7 @@ function collectCandidatesFromModule(
         resolvePayloadType(call, context),
         options.includeLocations === true
           ? createSourceLocation(
-            eventNameProperty.value as SourceSpan,
+            (eventNameProperty.value as SourceNode).span,
             findContainingClass(callExpression.span, classDeclarations),
             ast,
             sourceText,
@@ -528,6 +534,7 @@ function collectCandidatesFromModule(
  * stable source tree produces byte-identical declaration output across runs.
  * @param root - Vite-resolved package root used to normalize scan roots.
  * @param scanRoots - Optional source roots to scan alongside the plugin root.
+ * @param options - Optional location collection switch for source-navigation output.
  * @returns Event candidates sorted by kind, key, and recovered payload text.
  */
 export async function scanEventMapSources(
