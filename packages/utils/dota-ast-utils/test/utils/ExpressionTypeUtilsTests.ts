@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parseSync, type Expression, type Module, type VariableDeclarator } from '@swc/core';
+import { parseSync, type CallExpression, type Expression, type Module, type VariableDeclarator } from '@swc/core';
 import { AstTraversalUtils } from '../../src/utils/AstTraversalUtils.ts';
 import { ExpressionTypeUtils, type ExpressionTypeInfo } from '../../src/utils/ExpressionTypeUtils.ts';
 
@@ -143,6 +143,31 @@ describe('ExpressionTypeUtils', () => {
     expect(resolveReference).toHaveBeenCalledTimes(2);
     expect(resolveReference).toHaveBeenNthCalledWith(1, expect.objectContaining({ type: 'Identifier', value: 'identifier' }));
     expect(resolveReference).toHaveBeenNthCalledWith(2, expect.objectContaining({ type: 'MemberExpression' }));
+  });
+
+  it('delegates direct calls and falls back to unknown without a call resolver', () => {
+    const source = `const payload = createPayload(first, second);`;
+    const ast = parseSync(source, { syntax: 'typescript' }) as Module;
+    const call = AstTraversalUtils.findNodes<CallExpression>(ast, 'CallExpression')[0];
+    const resolvedType: ExpressionTypeInfo = {
+      text: 'Payload',
+      isComplete: true,
+      referencedNames: ['Payload'],
+    };
+    const resolveCall = vi.fn(() => resolvedType);
+
+    if (call == null) throw new Error('Expected a call expression.');
+
+    expect(ExpressionTypeUtils.resolve(call, {
+      sourceText: source,
+      moduleStart: ast.span.start,
+      resolveCall,
+    })).toEqual(resolvedType);
+    expect(resolveCall).toHaveBeenCalledWith(call);
+    expect(ExpressionTypeUtils.resolve(call, {
+      sourceText: source,
+      moduleStart: ast.span.start,
+    })).toEqual({ text: 'unknown', isComplete: false, referencedNames: [] });
   });
 
   it('uses unknown for empty arrays and de-duplicates referenced names', () => {
