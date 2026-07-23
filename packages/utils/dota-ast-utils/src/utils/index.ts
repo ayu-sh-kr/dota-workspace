@@ -1,2 +1,5 @@
 export * from "./DeclarationUtils";
 export * from "./DecoratorUtils";
+export * from './AstTraversalUtils';
+export * from './ExpressionTypeUtils';
+export * from './TypeAnnotationUtils';
