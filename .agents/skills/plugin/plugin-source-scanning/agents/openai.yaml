@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plugin Source Scanning"
+  short_description: "Scan decorated source into metadata via SWC + dota-ast-utils."
+  default_prompt: "Use $plugin-source-scanning to write or review the AST scanning half of a Dota Vite plugin."
