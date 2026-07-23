@@ -361,3 +361,4 @@ constant tests so changes to library registrations do not hide resolver bugs.
 
 - [Event-map generator overview](../architecture/overview.md)
 - [Event-map generator package README](../../../../../packages/plugins/event-map-generator/README.md)
+- [Function-call payload type resolution](./function-call-payload-type-resolution.md)
