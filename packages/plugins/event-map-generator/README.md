@@ -56,8 +56,49 @@ containing class name and class-identifier offset when the occurrence is inside 
 ## Payload typing
 
 The scanner also recovers payload types syntactically from `publish`, `publishAsync`,
-and `emit` calls and uses handler forwarding as a fallback for listener-only events.
-Unsupported expressions remain safe incomplete types rather than being evaluated.
+and `emit` calls. `@OnEvent(...)` establishes event membership but always contributes
+an incomplete `any` fallback; it does not infer a payload from arbitrary calls inside
+the handler. Unsupported publisher expressions remain safe incomplete types rather
+than being evaluated.
+
+## Identifier resolution
+
+Named event constants can be imported through Vite aliases when the aliased target is
+inside a configured scan root:
+
+```ts
+resolve: {
+  alias: {
+    '@dota': resolve(projectRoot, 'src')
+  }
+}
+```
+
+```ts
+import { BLOG_INDEX_DATA_EVENT } from '@dota/configs/blog-events.ts';
+```
+
+The plugin forwards Vite's resolved string aliases to `dota-ast-utils`. Standalone
+scanner users can provide the same Vite-independent shape explicitly:
+
+```ts
+eventMapGenerator({
+  resolver: {
+    aliases: [{
+      find: '@dota',
+      replacement: '/workspace/src',
+      kind: 'prefix'
+    }],
+    extensions: ['.ts', '.tsx']
+  }
+});
+```
+
+Resolution remains syntax-only. It follows relative, exact/prefix/wildcard alias,
+named/default/namespace, and wildcard re-export paths; unwraps TypeScript assertions
+and `satisfies`; and evaluates only bounded static strings. Dynamic expressions,
+ambiguous targets, cycles, regex aliases, and files outside the parsed scan index are
+skipped rather than emitted as identifier text.
 
 ## Discovery model
 
@@ -107,6 +148,8 @@ Options:
 - `logType`: consola log level.
 - `eventLocations`: optional source-navigation output. Set it to `true` for the default
   path or `{ outFile: 'src/custom-event-locations.json' }` for a custom path.
+- `resolver`: optional alias, source-extension, and static-resolution limits. Vite aliases
+  are merged automatically during `configResolved()`; explicit aliases take precedence.
 
 Example:
 

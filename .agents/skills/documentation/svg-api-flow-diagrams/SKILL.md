@@ -115,6 +115,23 @@ Include only behavior that changes the output artifact, persisted state, rendere
 
 Use `#64748b` for synchronous connectors, `#7c3aed` dashed for genuinely asynchronous paths, and `#94a3b8` for plain non-arrow fan-in segments. Use `#526174` for annotations and `#334155` for lane titles and branch labels. Do not use saturated card fills or a solid dark background by default; they flatten contrast and diverge from the repository’s minimalist diagram language. Lane panels, if used, should be white with a thin `#e2e8f0` border.
 
+### Large-diagram logical grouping
+
+When a diagram contains many elements, use open grouping instead of large rounded
+container boxes:
+
+- Use bold, pale vertical rails plus pale dashed top and bottom lines to mark a
+  logical region while keeping the canvas visible between groups.
+- Reserve rounded cards for actual operations, decisions, effects, and terminal
+  states. Do not use rounded rectangles as decorative containers around unrelated
+  cards.
+- Place the group label beside the rail or above the dashed boundary so it cannot
+  be mistaken for a flow step.
+- Add a legend sample whenever dashed grouping lines carry meaning distinct from
+  orthogonal flow connectors.
+- Enlarge the canvas when a group needs more space; do not compress cards or route
+  connectors through another group.
+
 **Text placement:** card labels do not need to fit entirely inside the card. Put the primary identifier (function name, hook name) on one short line inside the card. Place secondary detail — parameter hints, glob patterns, sub-step annotations — as a small `font-size="11"` text element immediately below or beside the card, outside its boundary. Never wrap two full sentences inside a 44 px-tall card.
 
 **Typography:** use a highly legible sans-serif for diagram text. Prefer `DM Sans`, then `Poppins`, then `Helvetica`, `Arial`, and a generic sans-serif fallback. A Google Fonts `@import` may provide the preferred font, but the fallback stack must remain usable when the SVG is viewed offline. Avoid monospace as the default for labels or support text; reserve it for short code identifiers only when it materially improves recognition.
@@ -151,6 +168,7 @@ Use a stable visual grammar rather than fitting every branch into the first empt
 6. Route cross-lane connectors through empty vertical corridors. If the corridor falls between two cards in the lane being crossed, verify the connector y-value is outside both cards' y + height ranges.
 7. Let parallel entry triggers (watcher `add` / `change` / `unlink`) merge at a single convergence card rather than fanning into three separate paths.
 8. Move explanatory notes to inline text annotations or a legend footer. Do not give a secondary implementation detail a full card that competes visually with the main flow.
+9. For large charts, use dashed pale group boundaries and bold pale rails; keep rounded boxes for nodes that perform work.
 
 For a decision, prefer this shape:
 
@@ -189,6 +207,7 @@ Then check:
 14. **Clutter audit.** Measure edge-to-edge card gaps in both axes. Reject any layout with less than 80 px clearance, or less than 100 px where labels, markers, annotations, or turns occupy the gap. Enlarge the canvas or stack cards instead of shrinking or crowding elements.
 15. **Port audit.** Verify each card's incoming arrow uses the boundary facing its source and each outgoing arrow uses the boundary facing its destination. For a vertical spine, require top-in and bottom-out unless the code actually branches sideways.
 16. **Rhythm audit.** Compare top-to-top distances in each unbroken card stack. Use one consistent pitch unless a measured branch corridor requires a larger gap; document that exception in the geometry plan.
+17. **Grouping audit.** Verify logical regions use open dashed/rail boundaries rather than large rounded containers, and verify those boundaries do not hide connectors or compete with node cards.
 
 If the flow cannot pass this table at a readable font size, enlarge the canvas or split the diagram into two files. Do not shrink text to make it fit.
 
@@ -214,6 +233,8 @@ When a chart feels crowded or an arrow is hidden, repair the structure rather th
 4. Increase the distance between connected cards before changing arrow styling; tails establish direction.
 5. Recheck that decision labels still describe the correct code branch after moving a card.
 6. Demote non-flow commentary to the footer if it distracts from the request path.
+7. Replace oversized rounded grouping panels with pale dashed boundaries and rails; keep only meaningful processing and decision nodes boxed.
+8. When fan-in or fan-out becomes crowded, give each branch a dedicated corridor or use one explicit convergence card; do not let multiple arrows terminate on the same point from opposing directions.
 
 ## Verify
 

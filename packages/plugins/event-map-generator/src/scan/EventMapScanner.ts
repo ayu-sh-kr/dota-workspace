@@ -54,6 +54,48 @@ type AstTypeSpecifier = {
 };
 
 /**
+ * Normalizes configured source suffixes for discovery and resolver probing.
+ * Keeping this policy in the scanner ensures the alias target can only resolve to a file
+ * shape that was actually parsed during the same scan.
+ * @param options Scan options containing optional resolver extensions.
+ * @returns Unique extensions with a leading dot, defaulting to TypeScript.
+ */
+function getSourceExtensions(options: EventMapScanOptions): string[] {
+  const extensions = options.resolver?.extensions ?? ['.ts'];
+  const normalized = [...new Set(extensions
+    .map(extension => extension.trim())
+    .filter(Boolean)
+    .map(extension => extension.startsWith('.') ? extension : `.${extension}`))];
+  return normalized.length > 0 ? normalized : ['.ts'];
+}
+
+/**
+ * Builds the glob list for the configured source suffixes while preserving the existing
+ * single-TypeScript pattern used by callers and mock-based scanner tests.
+ * @param options Scan options containing optional resolver extensions.
+ * @returns Fast-glob patterns rooted at each scan root's `src` directory.
+ */
+function createScanPatterns(options: EventMapScanOptions): string[] {
+  const extensions = getSourceExtensions(options);
+  return extensions.length === 1 && extensions[0] === '.ts'
+    ? [EventMapScanPath.SOURCE_DIRECTORY_SCAN_PATH]
+    : [`./src/**/*{${extensions.join(',')}}`];
+}
+
+/**
+ * Builds the SWC parser options required by the discovered source shapes.
+ * TSX parsing is opt-in through resolver extensions so existing TypeScript scans retain
+ * their original parser call shape and do not pay for an unrelated syntax mode.
+ * @param options Scan options containing optional resolver extensions.
+ * @returns Parser options accepted by SWC's TypeScript parser.
+ */
+function createParseOptions(options: EventMapScanOptions): { syntax: 'typescript'; decorators: true; tsx?: boolean } {
+  return getSourceExtensions(options).includes('.tsx')
+    ? {syntax: 'typescript', decorators: true, tsx: true}
+    : {syntax: 'typescript', decorators: true};
+}
+
+/**
  * Associates a source-level binding with its annotation and source position.
  * The position lets syntax-only resolution choose the nearest preceding binding
  * when a local variable shadows another binding with the same name.
@@ -448,54 +490,6 @@ function createPayloadType(type: ExpressionTypeInfo, context: ModuleTypeContext)
 }
 
 /**
- * Recovers a handler payload when `event.data` is forwarded to another typed method.
- * This covers subscription-only events whose publisher is outside scanned roots,
- * while refusing to infer a type from arbitrary event-object annotations.
- * @param handler - Decorated method that receives the application event object.
- * @param classMethods - Methods declared beside the handler and callable through `this`.
- * @param context - Same-file declarations and imports available to the handler.
- * @returns A typed payload for direct forwarding, otherwise a compatibility-safe `any` fallback.
- */
-function resolveHandlerPayloadType(handler: ClassMethod, classMethods: ClassMethod[], context: ModuleTypeContext): EventMapPayloadType {
-  const eventParameterName = (handler.function.params[0]?.pat as { type?: unknown; value?: unknown } | undefined)?.type === 'Identifier'
-    ? (handler.function.params[0]?.pat as { value?: unknown }).value
-    : null;
-  if (typeof eventParameterName !== 'string') {
-    return { text: 'any', isComplete: false, imports: [] };
-  }
-
-  const forwardedCall = AstTraversalUtils.findNodes<CallExpression>(handler, 'CallExpression')
-    .map(CallExpressionView.from)
-    .find(call => call.getReceiver()?.type === 'ThisExpression' && isEventDataExpression(call.getArgument(0)?.expression, eventParameterName));
-  const targetMethodName = forwardedCall?.getCalleeName();
-  const target = targetMethodName == null
-    ? null
-    : classMethods.find(method => getMethodName(method) === targetMethodName) ?? null;
-  const annotation = target == null ? null : getFirstParameterType(target, context);
-
-  return annotation == null
-    ? { text: 'any', isComplete: false, imports: [] }
-    : createPayloadType(annotation, context);
-}
-
-/**
- * Checks the narrow forwarding form supported by handler payload inference.
- * Only a direct `<handlerParameter>.data` member is accepted; nested access,
- * aliases, and computed properties remain unresolved because syntax alone
- * cannot prove that they carry the decorated event's payload.
- * @param expression - Argument expression passed to a same-class method.
- * @param eventParameterName - Identifier bound to the decorated handler event.
- * @returns Whether the expression directly reads the event data property.
- */
-function isEventDataExpression(expression: Expression | undefined, eventParameterName: string): boolean {
-  return expression?.type === 'MemberExpression'
-    && expression.object.type === 'Identifier'
-    && expression.object.value === eventParameterName
-    && expression.property.type === 'Identifier'
-    && expression.property.value === ASTFilterConstants.APPLICATION_EVENT_DATA_PROPERTY;
-}
-
-/**
  * Converts a SWC span start into the source-string index used by navigation tools.
  * The module offset corrects SWC's process-global span and UTF-8 conversion preserves
  * exact JavaScript indices when comments, emoji, or other multibyte text precede a node.
@@ -561,37 +555,6 @@ function createSourceLocation(
 }
 
 /**
- * Reads a class method name when SWC represents the key as a static identifier
- * or string literal. Computed and private keys are excluded because matching
- * them would require evaluating source expressions.
- * @param method - Class method whose key is being inspected.
- * @returns The statically known method name, or `null` when it cannot be read.
- */
-export function getMethodName(method: ClassMethod): string | null {
-  return method.key.type === 'Identifier' || method.key.type === 'StringLiteral'
-    ? method.key.value
-    : null;
-}
-
-/**
- * Reads the first target-method parameter annotation as a payload contract.
- * Destructured parameters keep their annotation on the pattern, so this works
- * for handlers such as `notify({ message }: SoftNotification)` as well as identifiers.
- * @param method - Same-class method receiving a forwarded `event.data` value.
- * @param context - Source text and module span needed to preserve type syntax.
- * @returns Recovered parameter type, or `null` when the method is unannotated.
- */
-export function getFirstParameterType(method: ClassMethod, context: ModuleTypeContext): ExpressionTypeInfo | null {
-  const pattern = method.function.params[0]?.pat as { typeAnnotation?: unknown } | undefined;
-  if (pattern?.typeAnnotation == null) return null;
-
-  const annotation = TypeAnnotationUtils.read(pattern.typeAnnotation as never, context.sourceText, context.moduleStart);
-  return annotation == null
-    ? null
-    : { text: annotation.text, isComplete: true, referencedNames: annotation.referencedNames };
-}
-
-/**
  * Extracts event candidates from one module, preserving every payload type the
  * syntax can prove. Decorators establish name membership, while publication
  * calls carry the payload data that supplies the generated map's type details.
@@ -633,35 +596,55 @@ function collectCandidatesFromModule(
     candidatesByKey.set(candidateKey, candidate);
   };
 
+  /**
+   * Resolves an event-site expression and forwards explainable failures to the generator.
+   * Event extraction remains conservative: only a proven string enters candidate generation.
+   * @param expression Event expression from a decorator or publication object.
+   * @returns Proven event key, or null when syntax cannot establish one.
+   */
+  const resolveEventName = (expression: Expression): string | null => {
+    const result = AstModuleResolver.resolveWithTrace(expression, module, index, options.resolver);
+    if (result.value == null) {
+      options.onResolutionFailure?.({
+        sourceFile,
+        expressionType: expression.type,
+        reason: result.reason,
+        trace: result.trace,
+      });
+    }
+    return result.value;
+  };
+
   const classDeclarations = AstTraversalUtils.findNodes<ClassDeclaration>(ast, 'ClassDeclaration');
   classDeclarations.forEach(classDeclaration => {
-    const classMethods = classDeclaration.body.filter((member): member is ClassMethod => member.type === 'ClassMethod');
-    classMethods.forEach(method => {
-      ClassMethodView.from(method).getDecorators()
-        .filter(decorator => DecoratorUtils.decoratorName(decorator) === ASTFilterConstants.ON_EVENT_DECORATOR_NAME)
-        .forEach(decorator => {
-          const decoratorView = DecoratorView.from(decorator);
-          const eventExpression = decoratorView.getArgument(0)?.expression;
-          const eventName = eventExpression == null ? null : AstModuleResolver.resolve(eventExpression, module, index);
-          if (eventName != null) {
-            addCandidate(
-              eventName,
-              'decorator',
-              resolveHandlerPayloadType(method, classMethods, context),
-              options.includeLocations === true
-                ? createSourceLocation(
-                  (eventExpression as SourceNode | undefined)?.span,
-                  classDeclaration,
-                  ast,
-                  sourceText,
-                  sourceFile,
-                  moduleSourceOffset,
-                )
-                : null,
-            );
-          }
-        });
-    });
+    classDeclaration.body
+      .filter((member): member is ClassMethod => member.type === 'ClassMethod')
+      .forEach(method => {
+        ClassMethodView.from(method).getDecorators()
+          .filter(decorator => DecoratorUtils.decoratorName(decorator) === ASTFilterConstants.ON_EVENT_DECORATOR_NAME)
+          .forEach(decorator => {
+            const decoratorView = DecoratorView.from(decorator);
+            const eventExpression = decoratorView.getArgument(0)?.expression;
+            const eventName = eventExpression == null ? null : resolveEventName(eventExpression);
+            if (eventName != null) {
+              addCandidate(
+                eventName,
+                'decorator',
+                { text: 'any', isComplete: false, imports: [] },
+                options.includeLocations === true
+                  ? createSourceLocation(
+                    (eventExpression as SourceNode | undefined)?.span,
+                    classDeclaration,
+                    ast,
+                    sourceText,
+                    sourceFile,
+                    moduleSourceOffset,
+                  )
+                  : null,
+              );
+            }
+          });
+      });
   });
 
   AstTraversalUtils.findNodes<CallExpression>(ast, 'CallExpression').forEach(callExpression => {
@@ -675,7 +658,7 @@ function collectCandidatesFromModule(
     const eventView = event == null ? null : ObjectExpressionView.from(event);
     const eventNameProperty = eventView?.getProperty(ASTFilterConstants.APPLICATION_EVENT_NAME_PROPERTY);
     const eventExpression = eventNameProperty?.value;
-    const eventName = eventExpression == null ? null : AstModuleResolver.resolve(eventExpression, module, index);
+    const eventName = eventExpression == null ? null : resolveEventName(eventExpression);
     if (eventName != null) {
       addCandidate(
         eventName,
@@ -712,8 +695,10 @@ export async function scanEventMapSources(
   scanRoots: string[] = [root],
   options: EventMapScanOptions = {},
 ): Promise<EventMapScanCandidate[]> {
+  const scanPatterns = createScanPatterns(options);
+  const parseOptions = createParseOptions(options);
   const discoveredFiles = await Promise.all(scanRoots.map(scanRoot => fg(
-    [EventMapScanPath.SOURCE_DIRECTORY_SCAN_PATH],
+    scanPatterns,
     {
       cwd: resolve(root, scanRoot),
       absolute: true,
@@ -725,7 +710,7 @@ export async function scanEventMapSources(
   const modules: ParsedAstModule[] = [];
   for (const file of files) {
     const sourceText = await readFile(file, 'utf8');
-    const ast = await parse(sourceText, { syntax: 'typescript', decorators: true });
+    const ast = await parse(sourceText, parseOptions);
     modules.push({sourceFile: file, sourceText, ast});
   }
 

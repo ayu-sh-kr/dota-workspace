@@ -1,6 +1,6 @@
 # Event map generator
 
-This package is a Vite plugin scaffold for generating typed `ApplicationEventMap` declarations from Dota source files. The current implementation is intentionally narrow: it discovers event names, writes a declaration file, and leaves payload inference for a later iteration.
+This package is a Vite plugin for generating typed `ApplicationEventMap` declarations from Dota source files. It discovers event names, resolves syntax-proven constants across the parsed scan graph, recovers payload evidence, and writes declaration and optional source-location artifacts.
 
 ## Context and intent
 
@@ -16,15 +16,16 @@ The goal is to keep application event names in one generated declaration file in
 The scanner in `src/scan/EventMapScanner.ts`:
 
 - resolves each scan root against the plugin root,
-- discovers `./src/**/*.ts` files,
+- discovers configured TypeScript source files,
 - ignores `*.d.ts`,
 - parses each file with SWC,
-- uses shared AST helpers from `@ayu-sh-kr/dota-ast-utils` to read decorator names, string arguments, and object-property strings,
-- extracts event names from `@OnEvent("...")`,
-- extracts event names from `publish({ name: "..." })` and `publishAsync({ name: "..." })`,
+- uses shared AST helpers from `@ayu-sh-kr/dota-ast-utils` to resolve literals, constants, static members, aliases, and supported re-export paths,
+- extracts event names from `@OnEvent(...)`,
+- extracts event names from `publish({ name: ... })`, `publishAsync({ name: ... })`, and `emit(...)`,
+- forwards Vite aliases and optional source extensions to the syntax-only resolver,
 - deduplicates candidate names, then sorts them.
 
-`src/generate/EventMapDeclarationUtils.ts` turns those names into a module augmentation for `@ayu-sh-kr/dota-wrap/event`. At this stage it emits `unknown` payloads, which is enough to establish the generated contract and keep the package iteration-ready.
+`src/generate/EventMapDeclarationUtils.ts` turns those candidates into a module augmentation for `@ayu-sh-kr/dota-wrap/event`. Publisher payloads are recovered syntactically from literals, typed bindings, explicit same-module callable returns, and type assertions; unresolved publisher payloads remain `unknown`, while decorator-only observations retain an `any` fallback and never infer a payload from handler internals.
 
 ## Configuration or usage
 
@@ -43,9 +44,10 @@ The default output path is `src/event-map.d.ts`.
 - The test fixture does not depend on real `@ayu-sh-kr/dota-wrap` or `@ayu-sh-kr/dota-event` runtime packages. It uses a local `.d.ts` shim so the scanner can see realistic import syntax without adding runtime coupling.
 - Declaration files are ignored during scanning so the plugin does not consume its own generated output.
 - Shared AST micro-policies such as decorator string extraction and object-property string lookup live in `@ayu-sh-kr/dota-ast-utils`; the plugin keeps only scan orchestration and event-map generation.
-- The current generator does not infer payload types; all generated event entries map to `unknown` until that work is added in a later iteration.
+- Dynamic or unresolved event expressions remain skipped, with optional resolver reason diagnostics; the generator never emits the identifier text as an event key.
 
 ## Related documentation
 
 - [SVG flow diagram](./event-map-generator-flow.svg)
+- [Payload type resolution](../matching/payload-type-resolution.md)
 - [SVG flow diagram grammar](../../../../standards/svg-flow-diagram-grammar.md)

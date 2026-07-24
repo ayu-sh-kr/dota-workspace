@@ -11,7 +11,7 @@ import type {
 const DECLARATION_GUIDANCE_LINES = [
   '// Auto-generated application event map. Do not edit by hand.',
   '// Payload types are recovered syntactically from publish, publishAsync, and emit calls.',
-  '// Unsupported publisher expressions become unknown; handler-only events remain any for compatibility.',
+  '// Unsupported publisher expressions become unknown; decorator-only events remain any for compatibility.',
 ] as const;
 
 /**
@@ -65,7 +65,7 @@ export class EventMapDeclarationUtils {
 
   /**
    * Groups observations by event key before the declaration body is assembled.
-   * Grouping preserves keys seen only in handlers, while payload selection is
+   * Grouping preserves keys seen only in decorators, while payload selection is
    * delegated so conflict and incomplete-evidence rules remain in one policy method.
    * @param candidates Raw observations collected from every configured source root.
    * @returns One sorted entry per key; payload imports remain attached to that entry.

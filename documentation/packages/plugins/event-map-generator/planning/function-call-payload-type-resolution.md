@@ -1,6 +1,10 @@
 # Function-call payload type resolution
 
-This plan adds syntax-only payload recovery for event data that is produced by a
+> Status: implemented. This document records the design and acceptance criteria;
+> see [current payload resolution behavior](../matching/payload-type-resolution.md)
+> for the maintained contract.
+
+This plan defined syntax-only payload recovery for event data that is produced by a
 function call. It targets the current `blog:pagination:changed` case in
 [blog-pagination.component.ts](../../../../../packages/apps/dota-web/src/components/blogs/blog-pagination.component.ts),
 where the publisher receives `persistedState` from a function whose return type
@@ -8,9 +12,9 @@ is explicitly `BlogPaginationState`.
 
 ## Context and intent
 
-The event-map generator currently resolves an identifier payload when the
-identifier has an explicit local annotation. It does not follow a call
-initializer, so this source is emitted as `unknown` today:
+Before this implementation, the event-map generator resolved an identifier payload when the
+identifier had an explicit local annotation. It did not follow a call
+initializer, so this source was emitted as `unknown`:
 
 ~~~ts
 export const persistBlogPaginationState = (...): BlogPaginationState => {
@@ -41,7 +45,7 @@ import type { BlogPaginationState } from "./components/blogs/blog-pagination.com
 ~~~
 
 The existing payload merge rules remain unchanged: a complete publisher payload
-overrides incomplete `unknown` or handler-only observations, and conflicting
+overrides incomplete `unknown` or decorator-only observations, and conflicting
 complete payloads still fail generation.
 
 ## Supported resolution contract
