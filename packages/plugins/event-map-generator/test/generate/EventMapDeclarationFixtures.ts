@@ -13,7 +13,7 @@ export function renderExpectedEventMapDeclaration(moduleSpecifier: string, bodyL
     '',
     '// Auto-generated application event map. Do not edit by hand.',
     '// Payload types are recovered syntactically from publish, publishAsync, and emit calls.',
-    '// Unsupported publisher expressions become unknown; handler-only events remain any for compatibility.',
+    '// Unsupported publisher expressions become unknown; decorator-only events remain any for compatibility.',
     '',
     `declare module ${JSON.stringify(moduleSpecifier)} {`,
     '  interface ApplicationEventMap {',
