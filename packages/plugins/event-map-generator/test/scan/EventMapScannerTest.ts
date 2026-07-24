@@ -8,6 +8,7 @@ const testDir = dirname(fileURLToPath(import.meta.url));
 const fixtureRoot = resolve(testDir, '../fixtures/basic');
 const constantsFixtureRoot = resolve(testDir, '../fixtures/constants');
 const payloadCallsFixtureRoot = resolve(testDir, '../fixtures/payload-calls');
+const blogEventsFixtureRoot = resolve(testDir, '../fixtures/blog-events');
 
 describe('event map scanner', () => {
   it('discovers decorated handlers and publish calls', async () => {
@@ -79,5 +80,42 @@ describe('event map scanner', () => {
       moduleSpecifier: './call-payload.ts',
       sourceFile: resolve(payloadCallsFixtureRoot, 'src/call-payload.ts'),
     }]);
+  });
+
+  it('captures exported blog event constants used by listeners and async publishers', async () => {
+    const candidates = await scanEventMapSources(blogEventsFixtureRoot, [blogEventsFixtureRoot], {
+      resolver: {
+        aliases: [{
+          find: '@dota',
+          replacement: resolve(blogEventsFixtureRoot, 'src'),
+          kind: 'prefix',
+        }],
+      },
+    });
+
+    expect(candidates.map(candidate => `${candidate.kind}:${candidate.name}`)).toEqual([
+      'decorator:blog:article-data',
+      'decorator:blog:article-error',
+      'decorator:blog:index-data',
+      'decorator:blog:markdown-source',
+      'publish:blog:article-data',
+      'publish:blog:article-error',
+      'publish:blog:index-data',
+      'publish:blog:markdown-source',
+    ]);
+
+    const publishedPayloads = new Map(
+      candidates
+        .filter(candidate => candidate.kind === 'publish')
+        .map(candidate => [candidate.name, candidate.payload]),
+    );
+    expect(publishedPayloads.get('blog:index-data')).toMatchObject({
+      text: 'BlogIndexData',
+      isComplete: true,
+    });
+    expect(publishedPayloads.get('blog:article-data')).toMatchObject({
+      text: 'BlogArticleData',
+      isComplete: true,
+    });
   });
 });
