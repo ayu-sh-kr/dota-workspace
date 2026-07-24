@@ -6,6 +6,11 @@ directly because their names are deterministic; user-defined values are resolved
 only when their declaration follows the event-constant naming and immutability
 rules below.
 
+For the alias-support and broader resolver upgrade plan, see
+[identifier-event-resolution-upgrade.md](./identifier-event-resolution-upgrade.md).
+This document remains the compatibility contract for the currently shipped
+syntax-only behavior.
+
 ## Context and intent
 
 The scanner currently discovers literal names from @OnEvent(...) and from the

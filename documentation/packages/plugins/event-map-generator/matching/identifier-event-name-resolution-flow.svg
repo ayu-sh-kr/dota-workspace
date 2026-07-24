@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="2400" viewBox="0 0 2200 2400" role="img" aria-labelledby="title desc">
+  <title id="title">Identifier-based event-name resolution in event-map-generator</title>
+  <desc id="desc">A spacious orthogonal flow showing source discovery, event expression extraction, identifier resolution through local constants and relative imports, and the candidate or skip outcomes. Vite alias imports are explicitly shown as unsupported by the current resolver.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <style>
+      .canvas { fill: #ffffff; }
+      .title { font: 700 32px 'DM Sans', 'Poppins', Helvetica, Arial, sans-serif; fill: #1f2937; }
+      .subtitle { font: 400 17px 'DM Sans', 'Poppins', Helvetica, Arial, sans-serif; fill: #526174; }
+      .lane-title { font: 700 18px 'DM Sans', 'Poppins', Helvetica, Arial, sans-serif; fill: #334155; letter-spacing: .3px; }
+      .card-title { font: 700 17px 'DM Sans', 'Poppins', Helvetica, Arial, sans-serif; fill: #1f2937; }
+      .card-text { font: 400 15px 'DM Sans', 'Poppins', Helvetica, Arial, sans-serif; fill: #526174; }
+      .annotation { font: 400 15px 'DM Sans', 'Poppins', Helvetica, Arial, sans-serif; fill: #526174; }
+      .branch { font: 700 14px 'DM Sans', 'Poppins', Helvetica, Arial, sans-serif; fill: #334155; }
+      .legend { font: 400 14px 'DM Sans', 'Poppins', Helvetica, Arial, sans-serif; fill: #526174; }
+      .entry { fill: #eef2ff; stroke: #3157c9; stroke-width: 2; }
+      .process { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .decision { fill: #fffaf0; stroke: #d6a24e; stroke-width: 2; }
+      .effect { fill: #f0fdf4; stroke: #9ac7a3; stroke-width: 2; }
+      .skip { fill: #f8fafc; stroke: #94a3b8; stroke-width: 2; }
+      .warning { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
+      .group-line { fill: none; stroke: #cbd5e1; stroke-width: 3; stroke-dasharray: 14 10; }
+      .group-rail { fill: none; stroke: #e2e8f0; stroke-width: 9; }
+      .connector { fill: none; stroke: #64748b; stroke-width: 2.5; marker-end: url(#arrow); }
+      .connector-plain { fill: none; stroke: #94a3b8; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect class="canvas" x="0" y="0" width="2200" height="2400"/>
+  <text class="title" x="90" y="70">Identifier-based event-name resolution</text>
+  <text class="subtitle" x="90" y="104">Current event-map-generator behavior for BLOG_*_EVENT constants and @OnEvent / publishAsync call sites</text>
+
+  <!-- Discovery and indexing -->
+  <path class="group-line" d="M90 145 H2110 M90 535 H2110"/>
+  <path class="group-rail" d="M80 145 V535"/>
+  <text class="lane-title" x="100" y="185">1 · Discover and index source modules</text>
+
+  <rect class="entry" x="110" y="235" width="500" height="84" rx="14"/>
+  <text class="card-title" x="140" y="272">scanEventMapSources(root, scanRoots)</text>
+  <text class="card-text" x="140" y="298">Vite buildStart invokes the source scan</text>
+
+  <rect class="process" x="850" y="235" width="500" height="84" rx="14"/>
+  <text class="card-title" x="880" y="272">Discover files</text>
+  <text class="card-text" x="880" y="298">fast-glob: ./src/**/*.ts · ignore *.d.ts</text>
+
+  <rect class="process" x="1590" y="235" width="500" height="84" rx="14"/>
+  <text class="card-title" x="1620" y="272">Read and parse once</text>
+  <text class="card-text" x="1620" y="298">SWC TypeScript AST with decorators enabled</text>
+
+  <path class="connector" d="M610 277 H850"/>
+  <path class="connector" d="M1350 277 H1590"/>
+
+  <rect class="warning" x="110" y="385" width="500" height="104" rx="14"/>
+  <text class="card-title" x="140" y="422">EventNamePolicy</text>
+  <text class="card-text" x="140" y="448">Admits names such as</text>
+  <text class="card-text" x="140" y="472">BLOG_INDEX_DATA_EVENT and BlogEvent</text>
+
+  <rect class="process" x="850" y="385" width="500" height="104" rx="14"/>
+  <text class="card-title" x="880" y="422">AstModuleResolver.createIndex(modules)</text>
+  <text class="card-text" x="880" y="448">Indexes eligible consts, static properties,</text>
+  <text class="card-text" x="880" y="472">named imports, exports, and relative re-exports</text>
+
+  <rect class="warning" x="1590" y="385" width="500" height="104" rx="14"/>
+  <text class="card-title" x="1620" y="422">Current import boundary</text>
+  <text class="card-text" x="1620" y="448">Only relative TypeScript imports are followed.</text>
+  <text class="card-text" x="1620" y="472">Vite aliases are not passed to this resolver.</text>
+
+  <path class="connector" d="M1840 319 V350 H1100 V385"/>
+  <path class="connector-plain" d="M850 437 H610"/>
+  <path class="connector-plain" d="M1350 437 H1590"/>
+
+  <!-- Event signal extraction -->
+  <path class="group-line" d="M90 590 H2110 M90 930 H2110"/>
+  <path class="group-rail" d="M80 590 V930"/>
+  <text class="lane-title" x="100" y="630">2 · Extract the event-name expression</text>
+
+  <rect class="process" x="110" y="685" width="560" height="96" rx="14"/>
+  <text class="card-title" x="140" y="723">@OnEvent(BLOG_INDEX_DATA_EVENT)</text>
+  <text class="card-text" x="140" y="750">Read the first decorator argument</text>
+
+  <rect class="process" x="1530" y="685" width="560" height="96" rx="14"/>
+  <text class="card-title" x="1560" y="723">publishAsync({ name: BLOG_*_EVENT })</text>
+  <text class="card-text" x="1560" y="750">Read the name property from the first object argument</text>
+
+  <path class="connector" d="M1100 489 V560 H390 V685"/>
+  <path class="connector" d="M1100 489 V560 H1810 V685"/>
+
+  <rect class="process" x="850" y="835" width="500" height="64" rx="14"/>
+  <text class="card-title" x="880" y="845">AstModuleResolver.resolve(expression)</text>
+  <path class="connector" d="M390 781 V835 H850"/>
+  <path class="connector" d="M1810 781 V835 H1350"/>
+
+  <!-- Resolution -->
+  <path class="group-line" d="M90 945 H2110 M90 2025 H2110"/>
+  <path class="group-rail" d="M80 945 V2025"/>
+  <text class="lane-title" x="100" y="985">3 · Resolve the expression without executing TypeScript</text>
+
+  <rect class="decision" x="850" y="1035" width="500" height="72" rx="14"/>
+  <text class="card-title" x="880" y="1078">What AST expression shape is it?</text>
+  <path class="connector" d="M1100 899 V1035"/>
+
+  <rect class="process" x="100" y="1170" width="420" height="88" rx="14"/>
+  <text class="card-title" x="130" y="1207">Literal or TS wrapper</text>
+  <text class="card-text" x="130" y="1233">Return the string, or recurse through as / ! / ()</text>
+  <path class="connector" d="M850 1071 H310 V1170"/>
+  <text class="branch" x="430" y="1100">literal / wrapper</text>
+
+  <rect class="process" x="650" y="1170" width="520" height="88" rx="14"/>
+  <text class="card-title" x="680" y="1207">Identifier: BLOG_INDEX_DATA_EVENT</text>
+  <text class="card-text" x="680" y="1233">Find the nearest eligible binding by source position</text>
+  <path class="connector" d="M1100 1107 V1170"/>
+  <text class="branch" x="1120" y="1140">identifier</text>
+
+  <rect class="process" x="1320" y="1170" width="420" height="88" rx="14"/>
+  <text class="card-title" x="1350" y="1207">Static member</text>
+  <text class="card-text" x="1350" y="1233">Resolve only non-computed Class.Property</text>
+  <path class="connector" d="M1350 1071 H1530 V1170"/>
+  <text class="branch" x="1385" y="1100">member expression</text>
+
+  <text class="annotation" x="1810" y="1080">dynamic / other → null → skip</text>
+
+  <!-- Identifier branch -->
+  <rect class="decision" x="650" y="1325" width="520" height="72" rx="14"/>
+  <text class="card-title" x="680" y="1368">Eligible local const found?</text>
+  <path class="connector" d="M910 1258 V1325"/>
+
+  <rect class="process" x="100" y="1450" width="450" height="88" rx="14"/>
+  <text class="card-title" x="130" y="1487">Resolve local initializer</text>
+  <text class="card-text" x="130" y="1513">Re-enter expression resolution recursively</text>
+  <path class="connector" d="M650 1361 H325 V1450"/>
+  <text class="branch" x="430" y="1389">yes</text>
+
+  <rect class="decision" x="650" y="1450" width="520" height="72" rx="14"/>
+  <text class="card-title" x="680" y="1493">Named import binding?</text>
+  <path class="connector" d="M910 1397 V1450"/>
+  <text class="branch" x="930" y="1428">no local binding</text>
+
+  <text class="annotation" x="1240" y="1484">no → skip occurrence</text>
+  <path class="connector-plain" d="M1170 1486 H1210"/>
+
+  <rect class="decision" x="650" y="1575" width="520" height="72" rx="14"/>
+  <text class="card-title" x="680" y="1618">Relative target is indexed?</text>
+  <path class="connector" d="M910 1522 V1575"/>
+  <text class="branch" x="930" y="1550">yes</text>
+
+  <rect class="warning" x="1240" y="1550" width="690" height="96" rx="14"/>
+  <text class="card-title" x="1270" y="1587">Alias / package / missing target</text>
+  <text class="card-text" x="1270" y="1613">@dota/... and @/... are not resolved by the current implementation</text>
+  <text class="card-text" x="1270" y="1637">because only relative specifiers are mapped to indexed files</text>
+  <path class="connector-plain" d="M1170 1611 H1240"/>
+  <text class="branch" x="1190" y="1599">no</text>
+
+  <rect class="decision" x="650" y="1700" width="520" height="72" rx="14"/>
+  <text class="card-title" x="680" y="1743">Export binding found?</text>
+  <path class="connector" d="M910 1647 V1700"/>
+  <text class="branch" x="930" y="1675">yes</text>
+
+  <text class="annotation" x="1240" y="1734">no → missing or cyclic → skip</text>
+  <path class="connector-plain" d="M1170 1736 H1210"/>
+
+  <rect class="process" x="650" y="1825" width="520" height="88" rx="14"/>
+  <text class="card-title" x="680" y="1862">Resolve exported initializer</text>
+  <text class="card-text" x="680" y="1888">Follow relative re-exports with cycle guards</text>
+  <path class="connector" d="M910 1772 V1825"/>
+  <text class="branch" x="930" y="1800">yes</text>
+
+  <rect class="process" x="1320" y="1325" width="420" height="88" rx="14"/>
+  <text class="card-title" x="1350" y="1362">Resolve static property</text>
+  <text class="card-text" x="1350" y="1388">Use local or relative imported Class.Property</text>
+  <path class="connector" d="M1530 1258 V1325"/>
+
+  <!-- Convergence -->
+  <rect class="decision" x="650" y="1965" width="520" height="72" rx="14"/>
+  <text class="card-title" x="680" y="2008">Explicit string value resolved?</text>
+  <path class="connector" d="M325 1538 V1930 H910 V1965"/>
+  <path class="connector" d="M910 1913 V1965"/>
+  <path class="connector" d="M1530 1413 V1480 H2010 V1930 H1170 V2001"/>
+  <text class="branch" x="930" y="1943">all supported paths converge</text>
+
+  <rect class="effect" x="650" y="2090" width="520" height="84" rx="14"/>
+  <text class="card-title" x="680" y="2127">Add EventMapScanCandidate</text>
+  <text class="card-text" x="680" y="2153">Capture event name, kind, payload evidence, and location</text>
+  <path class="connector" d="M910 2037 V2090"/>
+  <text class="branch" x="930" y="2065">yes</text>
+
+  <text class="annotation" x="1240" y="2008">no → null → skip occurrence</text>
+  <path class="connector-plain" d="M1170 2001 H1210"/>
+
+  <!-- Generation -->
+  <path class="group-line" d="M90 2220 H2110 M90 2345 H2110"/>
+  <path class="group-rail" d="M80 2220 V2345"/>
+  <text class="lane-title" x="100" y="2258">4 · Generate output</text>
+  <rect class="effect" x="650" y="2268" width="520" height="62" rx="14"/>
+  <text class="card-title" x="680" y="2306">Sort candidates → merge built-ins → write event-map.d.ts</text>
+  <path class="connector" d="M910 2174 V2268"/>
+
+  <text class="annotation" x="100" y="2380">Source example: packages/plugins/event-map-generator/test/fixtures/blog-events/src/blog-consumer.ts</text>
+  <g transform="translate(1450 2360)">
+    <line x1="0" y1="0" x2="48" y2="0" class="connector"/>
+    <text class="legend" x="62" y="5">flow</text>
+    <rect x="110" y="-12" width="24" height="24" class="decision"/>
+    <text class="legend" x="146" y="5">decision</text>
+    <rect x="230" y="-12" width="24" height="24" class="effect"/>
+    <text class="legend" x="266" y="5">output</text>
+    <rect x="350" y="-12" width="24" height="24" class="skip"/>
+    <text class="legend" x="386" y="5">skip</text>
+    <line x1="490" y1="0" x2="538" y2="0" class="group-line"/>
+    <text class="legend" x="552" y="5">logical group</text>
+  </g>
+</svg>
