@@ -25,7 +25,7 @@ The scanner in `src/scan/EventMapScanner.ts`:
 - forwards Vite aliases and optional source extensions to the syntax-only resolver,
 - deduplicates candidate names, then sorts them.
 
-`src/generate/EventMapDeclarationUtils.ts` turns those names into a module augmentation for `@ayu-sh-kr/dota-wrap/event`. At this stage it emits `unknown` payloads, which is enough to establish the generated contract and keep the package iteration-ready.
+`src/generate/EventMapDeclarationUtils.ts` turns those candidates into a module augmentation for `@ayu-sh-kr/dota-wrap/event`. Publisher payloads are recovered syntactically from literals, typed bindings, explicit same-module callable returns, and type assertions; unresolved publisher payloads remain `unknown`, while decorator-only observations retain an `any` fallback and never infer a payload from handler internals.
 
 ## Configuration or usage
 
@@ -49,4 +49,5 @@ The default output path is `src/event-map.d.ts`.
 ## Related documentation
 
 - [SVG flow diagram](./event-map-generator-flow.svg)
+- [Payload type resolution](../matching/payload-type-resolution.md)
 - [SVG flow diagram grammar](../../../../standards/svg-flow-diagram-grammar.md)

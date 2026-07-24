@@ -56,8 +56,10 @@ containing class name and class-identifier offset when the occurrence is inside 
 ## Payload typing
 
 The scanner also recovers payload types syntactically from `publish`, `publishAsync`,
-and `emit` calls and uses handler forwarding as a fallback for listener-only events.
-Unsupported expressions remain safe incomplete types rather than being evaluated.
+and `emit` calls. `@OnEvent(...)` establishes event membership but always contributes
+an incomplete `any` fallback; it does not infer a payload from arbitrary calls inside
+the handler. Unsupported publisher expressions remain safe incomplete types rather
+than being evaluated.
 
 ## Identifier resolution
 

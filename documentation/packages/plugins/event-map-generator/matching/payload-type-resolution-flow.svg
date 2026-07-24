@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="3400" viewBox="0 0 2200 3400" role="img" aria-labelledby="diagram-title diagram-desc">
+  <title id="diagram-title">Event payload type resolution</title>
+  <desc id="diagram-desc">A source-backed flow showing how event-map-generator discovers and parses source, resolves publisher and handler payload expressions syntactically, merges complete and incomplete observations, and writes the generated ApplicationEventMap declaration.</desc>
+
+  <defs>
+    <marker id="arrow-solid" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <style>
+      <![CDATA[
+        svg { background: #ffffff; text-rendering: geometricPrecision; }
+        text { font-family: "DM Sans", "Poppins", Helvetica, Arial, sans-serif; fill: #1f2937; }
+        .title { font-size: 34px; font-weight: 700; letter-spacing: -0.025em; }
+        .subtitle { font-size: 18px; fill: #526174; }
+        .section-title { font-size: 18px; font-weight: 700; letter-spacing: 0.05em; fill: #334155; }
+        .lane-title { font-size: 20px; font-weight: 700; fill: #334155; }
+        .lane-subtitle { font-size: 15px; fill: #64748b; }
+        .card-label { font-size: 16px; font-weight: 700; fill: #1f2937; }
+        .annotation { font-size: 14px; fill: #526174; }
+        .branch { font-size: 14px; font-weight: 700; fill: #334155; }
+        .legend-label { font-size: 14px; fill: #526174; }
+        .source { font-size: 13px; fill: #64748b; }
+        .connector { fill: none; stroke: #64748b; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow-solid); }
+        .connector-plain { fill: none; stroke: #94a3b8; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .card { width: 380px; height: 72px; rx: 10; stroke-width: 2; }
+        .entry { fill: #eef2ff; stroke: #3157c9; }
+        .process { fill: #ffffff; stroke: #cbd5e1; }
+        .decision { fill: #fffaf0; stroke: #d6a24e; }
+        .effect { fill: #f0fdf4; stroke: #9ac7a3; }
+        .skip { fill: #f8fafc; stroke: #94a3b8; }
+        .section-panel { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; }
+        .group-line { fill: none; stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 12 9; }
+        .group-rail { fill: none; stroke: #e2e8f0; stroke-width: 8; }
+      ]]>
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="2200" height="3100" fill="#ffffff"/>
+  <rect x="80" y="48" width="390" height="34" rx="17" fill="#eef2ff"/>
+  <text x="275" y="71" text-anchor="middle" class="section-title" fill="#3157c9">EVENT MAP · PAYLOAD MATCHING</text>
+  <text x="80" y="126" class="title">How event payload types are recovered</text>
+  <text x="80" y="162" class="subtitle">SWC syntax → safe type evidence → merged ApplicationEventMap declaration</text>
+  <rect x="80" y="187" width="2040" height="6" rx="3" fill="#dbe4ee"/>
+
+  <!-- 01 / source preparation -->
+  <path class="group-line" d="M80 230 H2120 M80 690 H2120"/>
+  <path class="group-rail" d="M70 230 V690"/>
+  <text x="100" y="270" class="section-title">01 / PREPARE SYNTAX EVIDENCE</text>
+  <text x="100" y="298" class="lane-subtitle">The scanner reads each source module once and builds the context needed for later payload decisions.</text>
+
+  <rect x="100" y="350" width="380" height="72" class="card entry"/>
+  <text x="290" y="394" text-anchor="middle" class="card-label">scanEventMapSources()</text>
+
+  <rect x="610" y="350" width="380" height="72" class="card process"/>
+  <text x="800" y="394" text-anchor="middle" class="card-label">glob, read, and parse</text>
+  <text x="800" y="444" text-anchor="middle" class="annotation">src/**/*.ts · ignore *.d.ts · SWC decorators</text>
+
+  <rect x="1120" y="350" width="380" height="72" class="card process"/>
+  <text x="1310" y="394" text-anchor="middle" class="card-label">build module type context</text>
+  <text x="1310" y="444" text-anchor="middle" class="annotation">annotations · callable returns · type imports</text>
+
+  <rect x="1630" y="350" width="380" height="72" class="card process"/>
+  <text x="1820" y="394" text-anchor="middle" class="card-label">extract event candidates</text>
+  <text x="1820" y="444" text-anchor="middle" class="annotation">@OnEvent · publish · publishAsync · emit</text>
+
+  <path class="connector" d="M480 386 H610"/>
+  <path class="connector" d="M990 386 H1120"/>
+  <path class="connector" d="M1500 386 H1630"/>
+
+  <rect x="610" y="540" width="380" height="72" class="card process"/>
+  <text x="800" y="584" text-anchor="middle" class="card-label">AstModuleResolver index</text>
+  <text x="800" y="634" text-anchor="middle" class="annotation">event constants, imports, exports, static members</text>
+  <path class="connector-plain" d="M1310 422 V500 H800 V540"/>
+
+  <!-- 02 / candidate and payload split -->
+  <path class="group-line" d="M80 750 H2120 M80 1790 H2120"/>
+  <path class="group-rail" d="M70 750 V1790"/>
+  <text x="100" y="790" class="section-title">02 / RESOLVE THE OCCURRENCE</text>
+  <text x="100" y="818" class="lane-subtitle">Event-name resolution gates the candidate; payload resolution then follows the signal that produced it.</text>
+
+  <rect x="910" y="870" width="380" height="72" class="card decision"/>
+  <text x="1100" y="914" text-anchor="middle" class="card-label">event key statically resolved?</text>
+  <path class="connector" d="M1820 422 V760 H1100 V870"/>
+
+  <rect x="1450" y="1030" width="380" height="72" class="card skip"/>
+  <text x="1640" y="1074" text-anchor="middle" class="card-label">skip occurrence</text>
+  <text x="1640" y="1124" text-anchor="middle" class="annotation">dynamic or unresolved event name</text>
+  <path class="connector" d="M1290 906 H1370 V1066 H1450"/>
+  <text x="1310" y="930" class="branch">no</text>
+
+  <rect x="330" y="1030" width="380" height="72" class="card process"/>
+  <text x="520" y="1074" text-anchor="middle" class="card-label">publisher candidate</text>
+  <text x="520" y="1124" text-anchor="middle" class="annotation">read data from the event object</text>
+  <path class="connector" d="M910 906 H800 V1066 H710"/>
+  <text x="830" y="930" class="branch">publish / emit</text>
+
+  <rect x="890" y="1030" width="380" height="72" class="card process"/>
+  <text x="1080" y="1074" text-anchor="middle" class="card-label">decorated-handler candidate</text>
+  <text x="1080" y="1124" text-anchor="middle" class="annotation">event membership only; handler body ignored</text>
+  <path class="connector" d="M1100 942 V1030"/>
+  <text x="1120" y="980" class="branch">@OnEvent</text>
+
+  <rect x="160" y="1210" width="380" height="72" class="card decision"/>
+  <text x="350" y="1254" text-anchor="middle" class="card-label">data absent or undefined?</text>
+  <path class="connector" d="M520 1102 V1210"/>
+
+  <rect x="30" y="1370" width="380" height="72" class="card process"/>
+  <text x="220" y="1414" text-anchor="middle" class="card-label">complete null payload</text>
+  <text x="220" y="1464" text-anchor="middle" class="annotation">emit data type: null</text>
+  <path class="connector" d="M350 1282 V1320 H220 V1370"/>
+  <text x="245" y="1312" class="branch">yes</text>
+
+  <rect x="590" y="1370" width="380" height="72" class="card process"/>
+  <text x="780" y="1414" text-anchor="middle" class="card-label">ExpressionTypeUtils.resolve</text>
+  <text x="780" y="1464" text-anchor="middle" class="annotation">data expression · no runtime evaluation</text>
+  <path class="connector" d="M350 1282 V1320 H780 V1370"/>
+  <text x="560" y="1312" class="branch">no</text>
+
+  <rect x="1090" y="1210" width="380" height="72" class="card skip"/>
+  <text x="1280" y="1254" text-anchor="middle" class="card-label">incomplete any fallback</text>
+  <text x="1280" y="1304" text-anchor="middle" class="annotation">handler internals never supply payload evidence</text>
+  <path class="connector" d="M1080 1102 V1210"/>
+
+  <!-- 03 / expression shapes -->
+  <path class="group-line" d="M80 1850 H2120 M80 2530 H2120"/>
+  <path class="group-rail" d="M70 1850 V2530"/>
+  <text x="100" y="1890" class="section-title">03 / CONVERT THE PAYLOAD EXPRESSION</text>
+  <text x="100" y="1918" class="lane-subtitle">Expression shapes produce complete or incomplete type evidence; unsupported syntax stays safe.</text>
+
+  <rect x="590" y="1970" width="380" height="72" class="card decision"/>
+  <text x="780" y="2014" text-anchor="middle" class="card-label">recognized AST shape?</text>
+  <path class="connector" d="M780 1442 V1970"/>
+
+  <rect x="110" y="2140" width="380" height="72" class="card process"/>
+  <text x="300" y="2184" text-anchor="middle" class="card-label">literal / object / array</text>
+  <text x="300" y="2234" text-anchor="middle" class="annotation">primitive, structural, or union-array type</text>
+  <path class="connector" d="M590 2006 H300 V2140"/>
+  <text x="390" y="2030" class="branch">literal shape</text>
+
+  <rect x="560" y="2140" width="380" height="72" class="card process"/>
+  <text x="750" y="2184" text-anchor="middle" class="card-label">annotation wrapper</text>
+  <text x="750" y="2234" text-anchor="middle" class="annotation">as · type assertion · satisfies</text>
+  <path class="connector" d="M780 2042 V2140"/>
+  <text x="800" y="2075" class="branch">explicit type</text>
+
+  <rect x="1010" y="2140" width="380" height="72" class="card process"/>
+  <text x="1200" y="2184" text-anchor="middle" class="card-label">identifier / member</text>
+  <text x="1200" y="2234" text-anchor="middle" class="annotation">annotation, or call-backed binding</text>
+  <path class="connector" d="M970 2006 H1200 V2140"/>
+  <text x="1000" y="2030" class="branch">reference</text>
+
+  <rect x="1460" y="2140" width="380" height="72" class="card process"/>
+  <text x="1650" y="2184" text-anchor="middle" class="card-label">same-module named call</text>
+  <text x="1650" y="2234" text-anchor="middle" class="annotation">explicit function / arrow return type</text>
+  <path class="connector" d="M970 2006 H1650 V2140"/>
+  <text x="1500" y="2030" class="branch">call</text>
+
+  <rect x="1880" y="2140" width="260" height="72" class="card skip"/>
+  <text x="2010" y="2184" text-anchor="middle" class="card-label">unknown</text>
+  <text x="2010" y="2234" text-anchor="middle" class="annotation">unsupported / unresolved</text>
+  <path class="connector" d="M970 2006 H2010 V2140"/>
+  <text x="1870" y="2030" class="branch">other</text>
+
+  <rect x="910" y="2350" width="380" height="72" class="card process"/>
+  <text x="1100" y="2394" text-anchor="middle" class="card-label">payload evidence</text>
+  <text x="1100" y="2444" text-anchor="middle" class="annotation">type text · completeness · referenced imports</text>
+  <path class="connector" d="M220 1442 V1510 H20 V2300 H910 V2350"/>
+  <path class="connector" d="M1280 1282 V1510 H2190 V2300 H1290 V2350"/>
+  <path class="connector" d="M300 2212 V2300 H910 V2350"/>
+  <path class="connector" d="M750 2212 V2300 H910 V2350"/>
+  <path class="connector" d="M1200 2212 V2300 H1100 V2350"/>
+  <path class="connector" d="M1650 2212 V2300 H1290 V2350"/>
+  <path class="connector" d="M2010 2212 V2300 H1290 V2350"/>
+
+  <!-- 04 / merge and emit -->
+  <path class="group-line" d="M80 2590 H2120 M80 3140 H2120"/>
+  <path class="group-rail" d="M70 2590 V3140"/>
+  <text x="100" y="2630" class="section-title">04 / MERGE AND WRITE THE DECLARATION</text>
+  <text x="100" y="2658" class="lane-subtitle">All observations for one event key are merged before deterministic declaration output.</text>
+
+  <rect x="910" y="2700" width="380" height="72" class="card process"/>
+  <text x="1100" y="2744" text-anchor="middle" class="card-label">group candidates by event key</text>
+  <text x="1100" y="2794" text-anchor="middle" class="annotation">decorator and publisher evidence</text>
+  <path class="connector" d="M1100 2422 V2700"/>
+
+  <rect x="910" y="2850" width="380" height="72" class="card decision"/>
+  <text x="1100" y="2894" text-anchor="middle" class="card-label">complete payload evidence?</text>
+  <path class="connector" d="M1100 2772 V2850"/>
+
+  <rect x="1420" y="2850" width="380" height="72" class="card effect"/>
+  <text x="1610" y="2894" text-anchor="middle" class="card-label">choose complete type</text>
+  <text x="1610" y="2944" text-anchor="middle" class="annotation">conflicting complete types throw</text>
+  <path class="connector" d="M1290 2886 H1420"/>
+  <text x="1310" y="2878" class="branch">yes</text>
+
+  <rect x="400" y="2850" width="380" height="72" class="card skip"/>
+  <text x="590" y="2894" text-anchor="middle" class="card-label">choose richest fallback</text>
+  <text x="590" y="2944" text-anchor="middle" class="annotation">longest incomplete shape, otherwise unknown</text>
+  <path class="connector" d="M910 2886 H780"/>
+  <text x="820" y="2878" class="branch">no</text>
+
+  <rect x="910" y="3020" width="380" height="72" class="card effect"/>
+  <text x="1100" y="3064" text-anchor="middle" class="card-label">emit ApplicationEventMap</text>
+  <text x="1100" y="3114" text-anchor="middle" class="annotation">type-only imports · sorted event names · event-map.d.ts</text>
+  <path class="connector" d="M1610 2922 V2980 H1100 V3020"/>
+  <path class="connector" d="M590 2922 V2980 H1100 V3020"/>
+
+  <!-- Legend -->
+  <rect x="100" y="3180" width="2000" height="1" fill="#dbe4ee"/>
+  <text x="100" y="3225" class="section-title">LEGEND</text>
+  <rect x="100" y="3260" width="28" height="28" rx="6" class="entry"/>
+  <text x="145" y="3281" class="legend-label">entry / scan trigger</text>
+  <rect x="390" y="3260" width="28" height="28" rx="6" class="process"/>
+  <text x="435" y="3281" class="legend-label">processing step</text>
+  <rect x="680" y="3260" width="28" height="28" rx="6" class="decision"/>
+  <text x="725" y="3281" class="legend-label">decision / guard</text>
+  <rect x="980" y="3260" width="28" height="28" rx="6" class="effect"/>
+  <text x="1025" y="3281" class="legend-label">generated artifact / effect</text>
+  <rect x="1350" y="3260" width="28" height="28" rx="6" class="skip"/>
+  <text x="1395" y="3281" class="legend-label">skip / incomplete fallback</text>
+  <path d="M1740 3274 H1810" class="connector"/>
+  <text x="1840" y="3281" class="legend-label">synchronous flow</text>
+
+  <text x="100" y="3340" class="source">Source: packages/plugins/event-map-generator/src/scan/EventMapScanner.ts and src/generate/EventMapDeclarationUtils.ts</text>
+</svg>
