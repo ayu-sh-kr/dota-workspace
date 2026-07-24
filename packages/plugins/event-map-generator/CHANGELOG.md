@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-event-map-generator
 
+## 0.0.4
+
+### Patch Changes
+
+- 7cce9b6: Fixed the event map generator to resolve types of the event correctly
+- Updated dependencies [7cce9b6]
+  - @ayu-sh-kr/dota-ast-utils@0.0.5
+
 ## 0.0.3
 
 ### Patch Changes

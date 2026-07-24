@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.25
+
+### Patch Changes
+
+- 7cce9b6: Fixed the event map generator to resolve types of the event correctly
+
 ## 0.0.24
 
 ### Patch Changes
