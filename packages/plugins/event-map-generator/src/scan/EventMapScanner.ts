@@ -490,54 +490,6 @@ function createPayloadType(type: ExpressionTypeInfo, context: ModuleTypeContext)
 }
 
 /**
- * Recovers a handler payload when `event.data` is forwarded to another typed method.
- * This covers subscription-only events whose publisher is outside scanned roots,
- * while refusing to infer a type from arbitrary event-object annotations.
- * @param handler - Decorated method that receives the application event object.
- * @param classMethods - Methods declared beside the handler and callable through `this`.
- * @param context - Same-file declarations and imports available to the handler.
- * @returns A typed payload for direct forwarding, otherwise a compatibility-safe `any` fallback.
- */
-function resolveHandlerPayloadType(handler: ClassMethod, classMethods: ClassMethod[], context: ModuleTypeContext): EventMapPayloadType {
-  const eventParameterName = (handler.function.params[0]?.pat as { type?: unknown; value?: unknown } | undefined)?.type === 'Identifier'
-    ? (handler.function.params[0]?.pat as { value?: unknown }).value
-    : null;
-  if (typeof eventParameterName !== 'string') {
-    return { text: 'any', isComplete: false, imports: [] };
-  }
-
-  const forwardedCall = AstTraversalUtils.findNodes<CallExpression>(handler, 'CallExpression')
-    .map(CallExpressionView.from)
-    .find(call => call.getReceiver()?.type === 'ThisExpression' && isEventDataExpression(call.getArgument(0)?.expression, eventParameterName));
-  const targetMethodName = forwardedCall?.getCalleeName();
-  const target = targetMethodName == null
-    ? null
-    : classMethods.find(method => getMethodName(method) === targetMethodName) ?? null;
-  const annotation = target == null ? null : getFirstParameterType(target, context);
-
-  return annotation == null
-    ? { text: 'any', isComplete: false, imports: [] }
-    : createPayloadType(annotation, context);
-}
-
-/**
- * Checks the narrow forwarding form supported by handler payload inference.
- * Only a direct `<handlerParameter>.data` member is accepted; nested access,
- * aliases, and computed properties remain unresolved because syntax alone
- * cannot prove that they carry the decorated event's payload.
- * @param expression - Argument expression passed to a same-class method.
- * @param eventParameterName - Identifier bound to the decorated handler event.
- * @returns Whether the expression directly reads the event data property.
- */
-function isEventDataExpression(expression: Expression | undefined, eventParameterName: string): boolean {
-  return expression?.type === 'MemberExpression'
-    && expression.object.type === 'Identifier'
-    && expression.object.value === eventParameterName
-    && expression.property.type === 'Identifier'
-    && expression.property.value === ASTFilterConstants.APPLICATION_EVENT_DATA_PROPERTY;
-}
-
-/**
  * Converts a SWC span start into the source-string index used by navigation tools.
  * The module offset corrects SWC's process-global span and UTF-8 conversion preserves
  * exact JavaScript indices when comments, emoji, or other multibyte text precede a node.
@@ -603,37 +555,6 @@ function createSourceLocation(
 }
 
 /**
- * Reads a class method name when SWC represents the key as a static identifier
- * or string literal. Computed and private keys are excluded because matching
- * them would require evaluating source expressions.
- * @param method - Class method whose key is being inspected.
- * @returns The statically known method name, or `null` when it cannot be read.
- */
-export function getMethodName(method: ClassMethod): string | null {
-  return method.key.type === 'Identifier' || method.key.type === 'StringLiteral'
-    ? method.key.value
-    : null;
-}
-
-/**
- * Reads the first target-method parameter annotation as a payload contract.
- * Destructured parameters keep their annotation on the pattern, so this works
- * for handlers such as `notify({ message }: SoftNotification)` as well as identifiers.
- * @param method - Same-class method receiving a forwarded `event.data` value.
- * @param context - Source text and module span needed to preserve type syntax.
- * @returns Recovered parameter type, or `null` when the method is unannotated.
- */
-export function getFirstParameterType(method: ClassMethod, context: ModuleTypeContext): ExpressionTypeInfo | null {
-  const pattern = method.function.params[0]?.pat as { typeAnnotation?: unknown } | undefined;
-  if (pattern?.typeAnnotation == null) return null;
-
-  const annotation = TypeAnnotationUtils.read(pattern.typeAnnotation as never, context.sourceText, context.moduleStart);
-  return annotation == null
-    ? null
-    : { text: annotation.text, isComplete: true, referencedNames: annotation.referencedNames };
-}
-
-/**
  * Extracts event candidates from one module, preserving every payload type the
  * syntax can prove. Decorators establish name membership, while publication
  * calls carry the payload data that supplies the generated map's type details.
@@ -696,33 +617,34 @@ function collectCandidatesFromModule(
 
   const classDeclarations = AstTraversalUtils.findNodes<ClassDeclaration>(ast, 'ClassDeclaration');
   classDeclarations.forEach(classDeclaration => {
-    const classMethods = classDeclaration.body.filter((member): member is ClassMethod => member.type === 'ClassMethod');
-    classMethods.forEach(method => {
-      ClassMethodView.from(method).getDecorators()
-        .filter(decorator => DecoratorUtils.decoratorName(decorator) === ASTFilterConstants.ON_EVENT_DECORATOR_NAME)
-        .forEach(decorator => {
-          const decoratorView = DecoratorView.from(decorator);
-          const eventExpression = decoratorView.getArgument(0)?.expression;
-          const eventName = eventExpression == null ? null : resolveEventName(eventExpression);
-          if (eventName != null) {
-            addCandidate(
-              eventName,
-              'decorator',
-              resolveHandlerPayloadType(method, classMethods, context),
-              options.includeLocations === true
-                ? createSourceLocation(
-                  (eventExpression as SourceNode | undefined)?.span,
-                  classDeclaration,
-                  ast,
-                  sourceText,
-                  sourceFile,
-                  moduleSourceOffset,
-                )
-                : null,
-            );
-          }
-        });
-    });
+    classDeclaration.body
+      .filter((member): member is ClassMethod => member.type === 'ClassMethod')
+      .forEach(method => {
+        ClassMethodView.from(method).getDecorators()
+          .filter(decorator => DecoratorUtils.decoratorName(decorator) === ASTFilterConstants.ON_EVENT_DECORATOR_NAME)
+          .forEach(decorator => {
+            const decoratorView = DecoratorView.from(decorator);
+            const eventExpression = decoratorView.getArgument(0)?.expression;
+            const eventName = eventExpression == null ? null : resolveEventName(eventExpression);
+            if (eventName != null) {
+              addCandidate(
+                eventName,
+                'decorator',
+                { text: 'any', isComplete: false, imports: [] },
+                options.includeLocations === true
+                  ? createSourceLocation(
+                    (eventExpression as SourceNode | undefined)?.span,
+                    classDeclaration,
+                    ast,
+                    sourceText,
+                    sourceFile,
+                    moduleSourceOffset,
+                  )
+                  : null,
+              );
+            }
+          });
+      });
   });
 
   AstTraversalUtils.findNodes<CallExpression>(ast, 'CallExpression').forEach(callExpression => {
