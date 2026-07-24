@@ -1,12 +1,19 @@
 import { createConsola, LogLevels, type LogType } from 'consola';
 import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { dirname, isAbsolute, resolve } from 'node:path';
+import type { AstPathAlias } from '@ayu-sh-kr/dota-ast-utils';
 import { BUILT_IN_EVENT_NAMES, EventMapModuleConstants } from '@dota/Constants.ts';
 import { EventMapDeclarationUtils } from '@dota/generate/EventMapDeclarationUtils.ts';
 import { EventMapLocationUtils } from '@dota/generate/EventMapLocationUtils.ts';
 import { scanEventMapSources } from '@dota/scan/EventMapScanner.ts';
-import type { EventMapGeneratorPluginConfig, EventMapLocationGeneratorConfig, EventMapScanCandidate } from '@dota/Types.ts';
+import type {
+  EventMapGeneratorPluginConfig,
+  EventMapLocationGeneratorConfig,
+  EventMapResolutionDiagnostic,
+  EventMapResolverOptions,
+  EventMapScanCandidate,
+} from '@dota/Types.ts';
 
 let log = createConsola();
 
@@ -22,6 +29,7 @@ let log = createConsola();
 async function writeGeneratedArtifacts(
   root: string,
   options: EventMapGeneratorPluginConfig,
+  resolverOptions?: EventMapResolverOptions,
 ): Promise<void> {
   const scanRoots = options.scanRoots ?? [root];
   const locationOutput = resolveLocationOutput(root, options.eventLocations);
@@ -30,9 +38,16 @@ async function writeGeneratedArtifacts(
     throw new Error('Event declaration and location outputs must use different files');
   }
 
-  const scannedCandidates = await scanEventMapSources(root, scanRoots, {
+  const scanOptions = {
     includeLocations: locationOutput != null,
-  });
+    ...(resolverOptions == null ? {} : {
+      resolver: resolverOptions,
+      onResolutionFailure: (diagnostic: EventMapResolutionDiagnostic) => {
+        log.debug(`Skipped unresolved event expression ${diagnostic.expressionType} in ${diagnostic.sourceFile}: ${diagnostic.reason}`);
+      },
+    }),
+  };
+  const scannedCandidates = await scanEventMapSources(root, scanRoots, scanOptions);
   const candidates = mergeBuiltInEventCandidates(root, scannedCandidates);
   const artifact = EventMapDeclarationUtils.createDeclaration(candidates, {
     moduleSpecifier: options.moduleSpecifier ?? EventMapModuleConstants.DEFAULT_MODULE_SPECIFIER,
@@ -111,7 +126,82 @@ async function writeGeneratedFile(file: string, contents: string): Promise<void>
  * @returns Whether the file is a supported source input.
  */
 function shouldRebuild(file: string): boolean {
-  return file.endsWith('.ts') && !file.endsWith('.d.ts');
+  return !file.endsWith('.d.ts');
+}
+
+/**
+ * Converts Vite's resolved alias list and explicit plugin aliases into one plain AST model.
+ * Regex aliases are skipped with a warning because the generic resolver only accepts deterministic
+ * string mappings; explicit aliases take precedence when their visible prefix is equal.
+ * @param root Effective Vite/project root used to normalize relative replacements.
+ * @param explicit Explicit aliases supplied directly to the event generator.
+ * @param viteAliases Alias entries produced by Vite's resolved configuration.
+ * @returns Resolver settings safe to pass into `dota-ast-utils`.
+ */
+function normalizeResolverOptions(
+  root: string,
+  explicit: EventMapResolverOptions | undefined,
+  viteAliases?: unknown,
+): EventMapResolverOptions | undefined {
+  const explicitAliases = normalizeAliasEntries(root, explicit?.aliases ?? [], false);
+  const configAliases = normalizeAliasEntries(root, viteAliases, true);
+  const aliases = [...explicitAliases, ...configAliases];
+  if (explicit == null && aliases.length === 0) return undefined;
+  return {...explicit, ...(aliases.length === 0 ? {} : {aliases})};
+}
+
+/**
+ * Normalizes either Vite's array/object alias shape or the explicit AST alias contract.
+ * Replacements become absolute before the resolver sees them, preventing process-cwd dependent
+ * imports and keeping all alias targets inside the scanner's indexed boundary.
+ * @param root Effective Vite/project root used for relative replacements.
+ * @param aliases Alias collection from plugin options or Vite.
+ * @param fromVite Whether entries should be interpreted as Vite alias records.
+ * @returns Deterministically ordered string alias mappings.
+ */
+function normalizeAliasEntries(root: string, aliases: unknown, fromVite: boolean): AstPathAlias[] {
+  const records = Array.isArray(aliases)
+    ? aliases
+    : aliases != null && typeof aliases === 'object'
+      ? Object.entries(aliases as Record<string, unknown>).map(([find, replacement]) => ({find, replacement}))
+      : [];
+
+  return records.flatMap(record => {
+    const entry = record as {find?: unknown; replacement?: unknown; kind?: unknown};
+    const find = entry.find;
+    const replacement = entry.replacement;
+    if (typeof find !== 'string' || typeof replacement !== 'string') {
+      if (find instanceof RegExp) log.warn(`Skipping unsupported regex event alias ${find}`);
+      return [];
+    }
+
+    const kind = fromVite
+      ? (find.includes('*') ? 'wildcard' : 'prefix')
+      : entry.kind === 'exact' || entry.kind === 'wildcard' ? entry.kind : 'prefix';
+    return [{find, replacement: isAbsolute(replacement) ? replacement : resolve(root, replacement), kind}];
+  });
+}
+
+/**
+ * Checks whether a watcher path can affect the configured event scan.
+ * Declaration outputs, unsupported suffixes, and files outside every scan root are ignored
+ * before a scan is scheduled, which is important when shared UI roots sit outside Vite root.
+ * @param file Absolute or watcher-provided source path.
+ * @param root Effective project root used to resolve relative scan roots.
+ * @param scanRoots Configured roots whose `src` trees are scanned.
+ * @param extensions Accepted source suffixes, defaulting to `.ts`.
+ * @returns Whether the path is a contributing source file.
+ */
+export function isEventMapSourceFile(file: string, root: string, scanRoots: string[], extensions: string[] = ['.ts']): boolean {
+  if (!shouldRebuild(file)) return false;
+  const normalizedFile = resolve(file);
+  const normalizedExtensions = extensions.map(extension => extension.startsWith('.') ? extension : `.${extension}`);
+  if (!normalizedExtensions.some(extension => normalizedFile.endsWith(extension)) || normalizedFile.endsWith('.d.ts')) return false;
+
+  return scanRoots.some(scanRoot => {
+    const normalizedRoot = resolve(root, scanRoot);
+    return normalizedFile === normalizedRoot || normalizedFile.startsWith(`${normalizedRoot}/`);
+  });
 }
 
 /**
@@ -124,6 +214,7 @@ function shouldRebuild(file: string): boolean {
 export default function eventMapGenerator(options: EventMapGeneratorPluginConfig = {}): Plugin {
   const { logType = 'info' } = options;
   let root = options.root ?? process.cwd();
+  let resolverOptions = normalizeResolverOptions(root, options.resolver);
 
   log = createConsola({
     level: LogLevels[logType],
@@ -135,7 +226,7 @@ export default function eventMapGenerator(options: EventMapGeneratorPluginConfig
 
   /** Runs the shared scan and writes every artifact enabled by the plugin options. */
   const regenerate = async (): Promise<void> => {
-    await writeGeneratedArtifacts(root, options);
+    await writeGeneratedArtifacts(root, options, resolverOptions);
   };
 
   return {
@@ -144,18 +235,33 @@ export default function eventMapGenerator(options: EventMapGeneratorPluginConfig
       if (!options.root) {
         root = config.root;
       }
+      resolverOptions = normalizeResolverOptions(root, options.resolver, config.resolve.alias);
     },
     async buildStart() {
       await regenerate();
     },
     configureServer(server: ViteDevServer) {
+      const scanRoots = options.scanRoots ?? [root];
+      const extensions = resolverOptions?.extensions ?? ['.ts'];
+      const externalScanRoots = scanRoots.map(scanRoot => resolve(root, scanRoot)).filter(scanRoot => scanRoot !== root);
+      if (externalScanRoots.length > 0) server.watcher.add(externalScanRoots);
+
+      let pendingRefresh: Promise<void> | null = null;
+      const refresh = (): Promise<void> => {
+        if (pendingRefresh != null) return pendingRefresh;
+        pendingRefresh = regenerate().finally(() => {
+          pendingRefresh = null;
+        });
+        return pendingRefresh;
+      };
+
       /**
        * Regenerates artifacts for one supported source change, then reloads the client.
        * @param file Absolute or watcher-provided source path that triggered the refresh.
        */
       const rebuild = async (file: string) => {
-        if (!shouldRebuild(file)) return;
-        await regenerate();
+        if (!isEventMapSourceFile(file, root, scanRoots, extensions)) return;
+        await refresh();
         server.ws.send({type: 'full-reload'});
       };
 
@@ -172,6 +278,8 @@ export type {
   EventMapLocationEntry,
   EventMapLocationGenerationOptions,
   EventMapLocationGeneratorConfig,
+  EventMapResolutionDiagnostic,
+  EventMapResolverOptions,
   EventMapScanCandidate,
   EventMapScanOptions,
   EventMapSourceLocation,
