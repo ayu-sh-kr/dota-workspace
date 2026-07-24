@@ -208,6 +208,28 @@ describe('scanEventMapSources', () => {
     expect(parseMock).not.toHaveBeenCalled();
   });
 
+  it('reports unresolved event expressions without emitting fabricated identifier names', async () => {
+    const root = '/workspace';
+    const sourceFile = resolve(root, './src/dynamic.ts');
+    const source = `
+      declare const DYNAMIC_EVENT: string;
+      publisher.publish({name: DYNAMIC_EVENT});
+    `;
+    const onResolutionFailure = vi.fn();
+
+    fgMock.mockResolvedValueOnce([sourceFile]);
+    readFileMock.mockResolvedValueOnce(source);
+    parseMock.mockResolvedValueOnce(parseSource(source));
+
+    await expect(scanEventMapSources(root, [root], {onResolutionFailure})).resolves.toEqual([]);
+
+    expect(onResolutionFailure).toHaveBeenCalledWith(expect.objectContaining({
+      sourceFile,
+      expressionType: 'Identifier',
+      reason: 'binding-not-found',
+    }));
+  });
+
   it('normalizes roots, deduplicates files, and recovers typed publish and emit payloads', async () => {
     const root = '/workspace';
     const firstRoot = './src';
