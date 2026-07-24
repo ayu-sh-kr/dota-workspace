@@ -33,7 +33,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@dota': resolve('./src')
+      '@dota': resolve(__dirname, 'src')
     }
   },
 
