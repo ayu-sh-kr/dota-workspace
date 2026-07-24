@@ -28,7 +28,7 @@ vi.mock('node:fs/promises', () => ({
   writeFile: writeFileMock,
 }));
 
-import eventMapGenerator from '@dota/main.ts';
+import eventMapGenerator, { isEventMapSourceFile } from '@dota/main.ts';
 
 const candidates: EventMapScanCandidate[] = [{
   name: 'sample:event',
@@ -44,6 +44,19 @@ async function runBuildStart(plugin: ReturnType<typeof eventMapGenerator>): Prom
   }
 
   await plugin.buildStart.call({} as never, {} as never);
+}
+
+async function runConfigResolved(plugin: ReturnType<typeof eventMapGenerator>): Promise<void> {
+  if (typeof plugin.configResolved !== 'function') {
+    throw new Error('Expected the plugin to expose a configResolved hook.');
+  }
+
+  await plugin.configResolved.call({} as never, {
+    root: '/workspace',
+    resolve: {
+      alias: [{find: '@dota', replacement: '/workspace/src'}],
+    },
+  } as never);
 }
 
 beforeEach(() => {
@@ -84,6 +97,59 @@ describe('eventMapGenerator', () => {
     const generatedCandidates = declarationMock.mock.calls[0]?.[0] as EventMapScanCandidate[];
     expect(generatedCandidates.slice(0, BUILT_IN_EVENT_NAMES.length).map(candidate => candidate.name)).toEqual([...BUILT_IN_EVENT_NAMES]);
     expect(generatedCandidates.slice(0, BUILT_IN_EVENT_NAMES.length).every(candidate => candidate.payload?.text === 'any')).toBe(true);
+  });
+
+  it('normalizes Vite aliases before passing them to the scanner', async () => {
+    const plugin = eventMapGenerator({root: '/workspace'});
+
+    await runConfigResolved(plugin);
+    await runBuildStart(plugin);
+
+    expect(scanMock).toHaveBeenCalledWith('/workspace', ['/workspace'], expect.objectContaining({
+      includeLocations: false,
+      resolver: {
+        aliases: [{find: '@dota', replacement: '/workspace/src', kind: 'prefix'}],
+      },
+      onResolutionFailure: expect.any(Function),
+    }));
+  });
+
+  it('filters watcher paths by scan roots, declarations, and configured extensions', () => {
+    expect(isEventMapSourceFile('/workspace/src/events.ts', '/workspace', ['/workspace'])).toBe(true);
+    expect(isEventMapSourceFile('/workspace/src/event-map.d.ts', '/workspace', ['/workspace'])).toBe(false);
+    expect(isEventMapSourceFile('/workspace/src/events.ts', '/workspace', ['/workspace/shared'])).toBe(false);
+    expect(isEventMapSourceFile('/workspace/src/events.tsx', '/workspace', ['/workspace'], ['.ts', '.tsx'])).toBe(true);
+  });
+
+  it('watches external scan roots and reloads only for contributing source changes', async () => {
+    const handlers = new Map<string, (file: string) => Promise<void>>();
+    const watcher = {
+      add: vi.fn(),
+      on: vi.fn((event: string, handler: (file: string) => Promise<void>) => {
+        handlers.set(event, handler);
+      }),
+    };
+    const server = {
+      watcher,
+      ws: {send: vi.fn()},
+    };
+    const plugin = eventMapGenerator({
+      root: '/workspace',
+      scanRoots: ['/workspace', '/workspace/shared'],
+    });
+
+    if (typeof plugin.configureServer !== 'function') {
+      throw new Error('Expected the plugin to expose configureServer.');
+    }
+    plugin.configureServer.call({} as never, server as never);
+
+    expect(watcher.add).toHaveBeenCalledWith(['/workspace/shared']);
+    await handlers.get('change')?.('/outside/other.ts');
+    expect(scanMock).not.toHaveBeenCalled();
+
+    await handlers.get('change')?.('/workspace/shared/src/events.ts');
+    expect(scanMock).toHaveBeenCalledOnce();
+    expect(server.ws.send).toHaveBeenCalledWith({type: 'full-reload'});
   });
 
   it('writes the optional location artifact beside the declaration', async () => {
