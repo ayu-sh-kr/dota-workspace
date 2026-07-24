@@ -1,4 +1,20 @@
 import type { LogType } from 'consola';
+import type { AstModuleResolutionOptions, AstResolutionReason, AstResolutionTraceStep } from '@ayu-sh-kr/dota-ast-utils';
+
+/** Resolver settings exposed by the event generator while remaining Vite-independent. */
+export type EventMapResolverOptions = AstModuleResolutionOptions;
+
+/** Explains one event expression that the syntax-only resolver could not prove. */
+export type EventMapResolutionDiagnostic = {
+  /** Absolute file containing the decorator or publication expression. */
+  sourceFile: string;
+  /** SWC expression kind that failed to resolve. */
+  expressionType: string;
+  /** Generic resolver reason used to classify the safe skip. */
+  reason: AstResolutionReason;
+  /** Optional import/binding path useful when debug logging is enabled. */
+  trace: AstResolutionTraceStep[];
+};
 
 /**
  * Configures the Vite lifecycle that scans source roots and writes the event-map declaration.
@@ -18,6 +34,8 @@ export type EventMapGeneratorPluginConfig = {
   moduleSpecifier?: string;
   /** Enables source-location JSON output; `true` uses the default path and an object selects a custom destination. */
   eventLocations?: boolean | EventMapLocationGeneratorConfig;
+  /** Optional normalized resolver settings used by direct scans and merged with Vite aliases. */
+  resolver?: EventMapResolverOptions;
 };
 
 /** Configures the optional event source-location artifact written alongside the declaration. */
@@ -128,4 +146,8 @@ export type EventMapLocationGenerationOptions = {
 export type EventMapScanOptions = {
   /** Collect event and class offsets for `EventMapLocationArtifact`; defaults to `false` for declaration-only scans. */
   includeLocations?: boolean;
+  /** Alias, extension, and safety settings forwarded to `AstModuleResolver`. */
+  resolver?: EventMapResolverOptions;
+  /** Receives unresolved event expressions without changing the scanner's safe skip behavior. */
+  onResolutionFailure?: (diagnostic: EventMapResolutionDiagnostic) => void;
 };
