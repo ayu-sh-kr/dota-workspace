@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseSync, type ClassMethod, type Module } from '@swc/core';
+import { parseSync, type Module } from '@swc/core';
 import { EventMapScanPath } from '@dota/Constants.ts';
 
 const { fgMock, readFileMock, parseMock } = vi.hoisted(() => ({
@@ -21,11 +21,7 @@ vi.mock('@swc/core', async () => {
   return { ...actual, parse: parseMock };
 });
 
-import {
-  getFirstParameterType,
-  getMethodName,
-  scanEventMapSources,
-} from '@dota/scan/EventMapScanner.ts';
+import { scanEventMapSources } from '@dota/scan/EventMapScanner.ts';
 
 const sourceByFile = new Map<string, string>();
 
@@ -33,110 +29,11 @@ function parseSource(source: string): Module {
   return parseSync(source, { syntax: 'typescript', decorators: true }) as Module;
 }
 
-function findClassMethod(module: Module): ClassMethod {
-  const classDeclaration = module.body[0];
-  if (classDeclaration?.type !== 'ClassDeclaration') {
-    throw new Error('Expected a class declaration');
-  }
-
-  const method = classDeclaration.body.find(member => member.type === 'ClassMethod');
-  if (method == null) {
-    throw new Error('Expected a class method');
-  }
-
-  return method;
-}
-
-function parseClassMethod(methodSource: string): ClassMethod {
-  return findClassMethod(parseSource(`class Feature { ${methodSource} }`));
-}
-
-function parseClassMethodWithContext(methodSource: string): {
-  method: ClassMethod;
-  context: Parameters<typeof getFirstParameterType>[1];
-} {
-  const sourceText = `class Feature { ${methodSource} }`;
-  const module = parseSource(sourceText);
-
-  return {
-    method: findClassMethod(module),
-    context: {
-      imports: new Map(),
-      moduleStart: module.span.start,
-      sourceText,
-      typeBindings: [],
-      callableReturnTypes: [],
-    },
-  };
-}
-
 beforeEach(() => {
   fgMock.mockReset();
   readFileMock.mockReset();
   parseMock.mockReset();
   sourceByFile.clear();
-});
-
-describe('getMethodName', () => {
-  it('returns null for computed method names', () => {
-    const method = parseClassMethod('[computed]() {}');
-
-    expect(getMethodName(method)).toBeNull();
-  });
-
-  it('returns null for unsupported private method keys', () => {
-    const method = {
-      key: { type: 'PrivateName', value: 'private' },
-    } as unknown as ClassMethod;
-
-    expect(getMethodName(method)).toBeNull();
-  });
-
-  it('returns the identifier method name', () => {
-    const method = parseClassMethod('handle() {}');
-
-    expect(getMethodName(method)).toBe('handle');
-  });
-
-  it('returns the string-literal method name', () => {
-    const method = parseClassMethod("'named-handler'() {}");
-
-    expect(getMethodName(method)).toBe('named-handler');
-  });
-});
-
-describe('getFirstParameterType', () => {
-  it('returns null when the method has no first parameter', () => {
-    const { method, context } = parseClassMethodWithContext('handle() {}');
-
-    expect(getFirstParameterType(method, context)).toBeNull();
-  });
-
-  it('returns null when the first parameter is unannotated', () => {
-    const { method, context } = parseClassMethodWithContext('handle(payload) {}');
-
-    expect(getFirstParameterType(method, context)).toBeNull();
-  });
-
-  it('returns the first identifier parameter annotation', () => {
-    const { method, context } = parseClassMethodWithContext('handle(payload: FeaturePayload) {}');
-
-    expect(getFirstParameterType(method, context)).toEqual({
-      text: 'FeaturePayload',
-      isComplete: true,
-      referencedNames: ['FeaturePayload'],
-    });
-  });
-
-  it('returns the annotation attached to a destructured first parameter', () => {
-    const { method, context } = parseClassMethodWithContext('handle({ message }: SoftNotification) {}');
-
-    expect(getFirstParameterType(method, context)).toEqual({
-      text: 'SoftNotification',
-      isComplete: true,
-      referencedNames: ['SoftNotification'],
-    });
-  });
 });
 
 describe('scanEventMapSources', () => {
@@ -461,18 +358,29 @@ publisher.emit({ name: "module:event" });`;
     });
   });
 
-  it('recovers subscription-only payload types forwarded from event.data to an annotated method', async () => {
+  it('keeps handler payloads incomplete and derives the type from publishers only', async () => {
     const root = '/workspace';
-    const sourceFile = resolve(root, './src/notification.ts');
+    const sourceFile = resolve(root, './src/pricing-estimator.ts');
     const source = `
-      export interface SoftNotification { message: string }
-      class NotificationService {
-        @OnEvent('notification:info')
-        handle(event: ApplicationEvent<'notification:info'>) {
-          this.show(event.data);
+      class PricingEstimator {
+        @OnEvent('pricing:estimator-stage')
+        onStageSelected(event: ApplicationEvent<'pricing:estimator-stage'>) {
+          this.isKnownStage(event.data);
         }
 
-        show({ message }: SoftNotification) {}
+        isKnownStage(stage: PricingEstimatorSelection): boolean { return Boolean(stage); }
+
+        @OnEvent('pricing:estimator-type')
+        onTypeSelected(event: ApplicationEvent<'pricing:estimator-type'>) {
+          this.isKnownType(event.data);
+        }
+
+        isKnownType(type: PricingEstimatorType): boolean { return Boolean(type); }
+
+        publish() {
+          publisher.publish({ name: 'pricing:estimator-stage', data: { id: 'stage' } });
+          publisher.publish({ name: 'pricing:estimator-type', data: { id: 'type' } });
+        }
       }
     `;
 
@@ -482,11 +390,32 @@ publisher.emit({ name: "module:event" });`;
 
     const candidates = await scanEventMapSources(root);
 
-    expect(candidates[0]?.payload).toEqual({
-      text: 'SoftNotification',
-      isComplete: true,
-      imports: [{ name: 'SoftNotification', moduleSpecifier: './notification.ts', sourceFile }],
-    });
+    expect(candidates).toEqual([
+      {
+        name: 'pricing:estimator-stage',
+        sourceFile,
+        kind: 'decorator',
+        payload: { text: 'any', isComplete: false, imports: [] },
+      },
+      {
+        name: 'pricing:estimator-type',
+        sourceFile,
+        kind: 'decorator',
+        payload: { text: 'any', isComplete: false, imports: [] },
+      },
+      {
+        name: 'pricing:estimator-stage',
+        sourceFile,
+        kind: 'publish',
+        payload: { text: '{ id: string }', isComplete: true, imports: [] },
+      },
+      {
+        name: 'pricing:estimator-type',
+        sourceFile,
+        kind: 'publish',
+        payload: { text: '{ id: string }', isComplete: true, imports: [] },
+      },
+    ]);
   });
 
 });
