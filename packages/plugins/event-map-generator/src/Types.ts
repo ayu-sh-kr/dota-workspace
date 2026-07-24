@@ -59,8 +59,8 @@ export type EventMapTypeImport = {
 
 /**
  * Represents one syntax-derived event payload between scanning and serialization.
- * It records completeness separately so known publisher types can outrank uncertain
- * handler observations without losing the richest fallback shape or its imports.
+ * It records completeness separately so known publisher types can outrank the
+ * incomplete decorator fallback without losing the richest fallback shape or its imports.
  */
 export type EventMapPayloadType = {
   /** TypeScript text emitted for the event's `data` field, such as `null`, `unknown`, or an author-written type. */
