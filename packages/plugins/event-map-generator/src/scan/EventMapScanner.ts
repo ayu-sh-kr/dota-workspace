@@ -54,6 +54,48 @@ type AstTypeSpecifier = {
 };
 
 /**
+ * Normalizes configured source suffixes for discovery and resolver probing.
+ * Keeping this policy in the scanner ensures the alias target can only resolve to a file
+ * shape that was actually parsed during the same scan.
+ * @param options Scan options containing optional resolver extensions.
+ * @returns Unique extensions with a leading dot, defaulting to TypeScript.
+ */
+function getSourceExtensions(options: EventMapScanOptions): string[] {
+  const extensions = options.resolver?.extensions ?? ['.ts'];
+  const normalized = [...new Set(extensions
+    .map(extension => extension.trim())
+    .filter(Boolean)
+    .map(extension => extension.startsWith('.') ? extension : `.${extension}`))];
+  return normalized.length > 0 ? normalized : ['.ts'];
+}
+
+/**
+ * Builds the glob list for the configured source suffixes while preserving the existing
+ * single-TypeScript pattern used by callers and mock-based scanner tests.
+ * @param options Scan options containing optional resolver extensions.
+ * @returns Fast-glob patterns rooted at each scan root's `src` directory.
+ */
+function createScanPatterns(options: EventMapScanOptions): string[] {
+  const extensions = getSourceExtensions(options);
+  return extensions.length === 1 && extensions[0] === '.ts'
+    ? [EventMapScanPath.SOURCE_DIRECTORY_SCAN_PATH]
+    : [`./src/**/*{${extensions.join(',')}}`];
+}
+
+/**
+ * Builds the SWC parser options required by the discovered source shapes.
+ * TSX parsing is opt-in through resolver extensions so existing TypeScript scans retain
+ * their original parser call shape and do not pay for an unrelated syntax mode.
+ * @param options Scan options containing optional resolver extensions.
+ * @returns Parser options accepted by SWC's TypeScript parser.
+ */
+function createParseOptions(options: EventMapScanOptions): { syntax: 'typescript'; decorators: true; tsx?: boolean } {
+  return getSourceExtensions(options).includes('.tsx')
+    ? {syntax: 'typescript', decorators: true, tsx: true}
+    : {syntax: 'typescript', decorators: true};
+}
+
+/**
  * Associates a source-level binding with its annotation and source position.
  * The position lets syntax-only resolution choose the nearest preceding binding
  * when a local variable shadows another binding with the same name.
@@ -633,6 +675,25 @@ function collectCandidatesFromModule(
     candidatesByKey.set(candidateKey, candidate);
   };
 
+  /**
+   * Resolves an event-site expression and forwards explainable failures to the generator.
+   * Event extraction remains conservative: only a proven string enters candidate generation.
+   * @param expression Event expression from a decorator or publication object.
+   * @returns Proven event key, or null when syntax cannot establish one.
+   */
+  const resolveEventName = (expression: Expression): string | null => {
+    const result = AstModuleResolver.resolveWithTrace(expression, module, index, options.resolver);
+    if (result.value == null) {
+      options.onResolutionFailure?.({
+        sourceFile,
+        expressionType: expression.type,
+        reason: result.reason,
+        trace: result.trace,
+      });
+    }
+    return result.value;
+  };
+
   const classDeclarations = AstTraversalUtils.findNodes<ClassDeclaration>(ast, 'ClassDeclaration');
   classDeclarations.forEach(classDeclaration => {
     const classMethods = classDeclaration.body.filter((member): member is ClassMethod => member.type === 'ClassMethod');
@@ -642,7 +703,7 @@ function collectCandidatesFromModule(
         .forEach(decorator => {
           const decoratorView = DecoratorView.from(decorator);
           const eventExpression = decoratorView.getArgument(0)?.expression;
-          const eventName = eventExpression == null ? null : AstModuleResolver.resolve(eventExpression, module, index);
+          const eventName = eventExpression == null ? null : resolveEventName(eventExpression);
           if (eventName != null) {
             addCandidate(
               eventName,
@@ -675,7 +736,7 @@ function collectCandidatesFromModule(
     const eventView = event == null ? null : ObjectExpressionView.from(event);
     const eventNameProperty = eventView?.getProperty(ASTFilterConstants.APPLICATION_EVENT_NAME_PROPERTY);
     const eventExpression = eventNameProperty?.value;
-    const eventName = eventExpression == null ? null : AstModuleResolver.resolve(eventExpression, module, index);
+    const eventName = eventExpression == null ? null : resolveEventName(eventExpression);
     if (eventName != null) {
       addCandidate(
         eventName,
@@ -712,8 +773,10 @@ export async function scanEventMapSources(
   scanRoots: string[] = [root],
   options: EventMapScanOptions = {},
 ): Promise<EventMapScanCandidate[]> {
+  const scanPatterns = createScanPatterns(options);
+  const parseOptions = createParseOptions(options);
   const discoveredFiles = await Promise.all(scanRoots.map(scanRoot => fg(
-    [EventMapScanPath.SOURCE_DIRECTORY_SCAN_PATH],
+    scanPatterns,
     {
       cwd: resolve(root, scanRoot),
       absolute: true,
@@ -725,7 +788,7 @@ export async function scanEventMapSources(
   const modules: ParsedAstModule[] = [];
   for (const file of files) {
     const sourceText = await readFile(file, 'utf8');
-    const ast = await parse(sourceText, { syntax: 'typescript', decorators: true });
+    const ast = await parse(sourceText, parseOptions);
     modules.push({sourceFile: file, sourceText, ast});
   }
 
