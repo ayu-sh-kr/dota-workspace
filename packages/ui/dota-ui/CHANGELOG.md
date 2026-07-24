@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.0.22
+
+### Patch Changes
+
+- 7cce9b6: Fixed the event map generator to resolve types of the event correctly
+  - @ayu-sh-kr/dota-web-type-json@0.0.10
+
 ## 0.0.21
 
 ### Patch Changes
