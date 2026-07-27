@@ -1,4 +1,13 @@
-import {ComponentClass, DefaultRouterConfig, RouteConfig, RouteRenderer, Router, RouterConstructor, RouterService} from "@dota/Types";
+import {
+  ComponentClass,
+  DefaultRouterConfig,
+  GlobalNavigationHooks,
+  RouteConfig,
+  RouteRenderer,
+  Router,
+  RouterConstructor,
+  RouterService
+} from "@dota/Types";
 import {RouterUtils} from "@dota/RouterUtils";
 import {configure} from "@dota/route/route-configurer";
 import {createRouteRenderer} from "@dota/coordinator";
@@ -18,14 +27,25 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
   _defaultRoute: RouteConfig<HTMLElement>;
   _root: ComponentClass
   readonly renderer: RouteRenderer;
+  private readonly globalHooks?: GlobalNavigationHooks;
   instance!: T;
 
-
+  /**
+   * Retains compiled router dependencies until adapter initialization.
+   * @param router - Browser adapter constructor selected by the application.
+   * @param routes - Configured segment tree supplied to the adapter.
+   * @param errorRoute - Fallback used for unresolved destinations.
+   * @param defaultRoute - Application default route retained by the adapter.
+   * @param root - Component that owns the route output host.
+   * @param globalHooks - Optional application-wide navigation callbacks.
+   */
   constructor(
     router: RouterConstructor<T>,
     routes: RouteConfig<HTMLElement>[],
-    errorRoute: RouteConfig<HTMLElement>, defaultRoute: RouteConfig<HTMLElement>,
-    root: ComponentClass
+    errorRoute: RouteConfig<HTMLElement>,
+    defaultRoute: RouteConfig<HTMLElement>,
+    root: ComponentClass,
+    globalHooks?: GlobalNavigationHooks
   ) {
     this._router = router;
     this._routes = routes;
@@ -33,6 +53,7 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
     this._defaultRoute = defaultRoute;
     this._root = root;
     this.renderer = createRouteRenderer(root);
+    this.globalHooks = globalHooks;
   }
 
   /**
@@ -57,7 +78,8 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
       configure(flatRoutes, config.errorRoute),
       config.errorRoute,
       config.defaultRoute,
-      config.root
+      config.root,
+      config.globalHooks
     )
   }
 
@@ -68,7 +90,14 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
    * @returns This service with its router instance initialized.
    */
   init(): RouterService<T> {
-    this.instance = new this._router(this._routes, this._errorRoute, this._defaultRoute, this._root, this.renderer);
+    this.instance = new this._router(
+      this._routes,
+      this._errorRoute,
+      this._defaultRoute,
+      this._root,
+      this.renderer,
+      this.globalHooks
+    );
     return this;
   }
 

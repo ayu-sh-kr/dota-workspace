@@ -44,7 +44,26 @@ describe("coordinator transition integration", () => {
       events.push(`render:${match.pathname}`);
     });
     const pushState = vi.spyOn(window.history, "pushState").mockImplementation(() => {});
-    const coordinator = new HistoryCoordinator(routes, errorRoute, renderer);
+    const coordinator = new HistoryCoordinator(routes, errorRoute, renderer, {
+      beforeEach: [
+        () => {
+          events.push("beforeEach:first");
+          return true;
+        },
+        () => {
+          events.push("beforeEach:second");
+          return true;
+        }
+      ],
+      afterEach: [
+        () => {
+          events.push("afterEach:first");
+        },
+        () => {
+          events.push("afterEach:second");
+        }
+      ]
+    });
 
     await coordinator.navigate("/start");
     events.length = 0;
@@ -52,16 +71,20 @@ describe("coordinator transition integration", () => {
 
     expect(result.status).toBe("completed");
     expect(events).toEqual([
+      "beforeEach:first",
+      "beforeEach:second",
       "beforeLeave",
       "beforeEnter",
       "render:/next",
       "afterLeave",
-      "afterEnter"
+      "afterEnter",
+      "afterEach:first",
+      "afterEach:second"
     ]);
     expect(pushState).toHaveBeenCalledTimes(2);
   });
 
-  it("skips commit, rendering, and after hooks when an entering guard cancels", async () => {
+  it("skips route work, commit, rendering, and after hooks when a global guard cancels", async () => {
     const events: string[] = [];
     const renderer = vi.fn();
     const routes: RouteConfig<HTMLElement>[] = [
@@ -71,7 +94,7 @@ describe("coordinator transition integration", () => {
         component: NextPage,
         beforeEnter: () => {
           events.push("beforeEnter");
-          return false;
+          return true;
         },
         afterEnter: () => {
           events.push("afterEnter");
@@ -79,29 +102,39 @@ describe("coordinator transition integration", () => {
       }
     ];
     const pushState = vi.spyOn(window.history, "pushState").mockImplementation(() => {});
-    const coordinator = new HistoryCoordinator(routes, errorRoute, renderer);
+    const coordinator = new HistoryCoordinator(routes, errorRoute, renderer, {
+      beforeEach: [() => {
+        events.push("beforeEach");
+        return false;
+      }],
+      afterEach: [() => {
+        events.push("afterEach");
+      }]
+    });
     await coordinator.navigate("/start");
     vi.clearAllMocks();
+    events.length = 0;
 
     const result = await coordinator.navigate("/next");
 
     expect(result.status).toBe("cancelled");
-    expect(events).toEqual(["beforeEnter"]);
+    expect(events).toEqual(["beforeEach"]);
     expect(renderer).not.toHaveBeenCalled();
     expect(pushState).not.toHaveBeenCalled();
   });
 
-  it("returns a redirect without committing or rendering the guarded destination", async () => {
+  it("resolves a global redirect without committing or rendering the destination", async () => {
     const renderer = vi.fn();
     const routes: RouteConfig<HTMLElement>[] = [
       {
         path: "/private",
-        component: NextPage,
-        beforeEnter: () => "/sign-in"
+        component: NextPage
       }
     ];
     const pushState = vi.spyOn(window.history, "pushState").mockImplementation(() => {});
-    const coordinator = new HistoryCoordinator(routes, errorRoute, renderer);
+    const coordinator = new HistoryCoordinator(routes, errorRoute, renderer, {
+      beforeEach: [() => "/sign-in"]
+    });
 
     const result = await coordinator.navigate("/private");
 
@@ -117,18 +150,19 @@ describe("coordinator transition integration", () => {
     const routes: RouteConfig<HTMLElement>[] = [
       {
         path: "/next",
-        component: NextPage,
-        beforeEnter: context => new Promise<boolean>(resolve => {
-          if (context.signal.aborted) {
-            resolve(true);
-            return;
-          }
-          context.signal.addEventListener("abort", () => resolve(true), {once: true});
-        })
+        component: NextPage
       }
     ];
     const pushState = vi.spyOn(window.history, "pushState").mockImplementation(() => {});
-    const coordinator = new HistoryCoordinator(routes, errorRoute, renderer);
+    const coordinator = new HistoryCoordinator(routes, errorRoute, renderer, {
+      beforeEach: [context => new Promise<boolean>(resolve => {
+        if (context.signal.aborted) {
+          resolve(true);
+          return;
+        }
+        context.signal.addEventListener("abort", () => resolve(true), {once: true});
+      })]
+    });
     const transition = coordinator.navigate("/next", {signal: controller.signal});
 
     await flush();
@@ -144,6 +178,17 @@ describe("coordinator transition integration", () => {
     const events: string[] = [];
     const routes: RouteConfig<HTMLElement>[] = [
       {
+        path: "/start",
+        component: StartPage,
+        beforeLeave: () => {
+          events.push("beforeLeave");
+          return true;
+        },
+        afterLeave: () => {
+          events.push("afterLeave");
+        }
+      },
+      {
         path: "/next",
         component: NextPage,
         beforeEnter: () => {
@@ -158,7 +203,17 @@ describe("coordinator transition integration", () => {
     const renderer = vi.fn(async () => {
       events.push("render");
     });
-    const coordinator = new NavigationCoordinator(routes, errorRoute, renderer);
+    const coordinator = new NavigationCoordinator(routes, errorRoute, renderer, {
+      beforeEach: [() => {
+        events.push("beforeEach");
+        return true;
+      }],
+      afterEach: [() => {
+        events.push("afterEach");
+      }]
+    });
+    await coordinator.navigate("/start");
+    events.length = 0;
     const prepared = await coordinator.prepare(
       new URL("/next", window.location.origin),
       new AbortController().signal,
@@ -171,6 +226,60 @@ describe("coordinator transition integration", () => {
     const result = await coordinator.complete(prepared.prepared);
 
     expect(result.status).toBe("completed");
-    expect(events).toEqual(["beforeEnter", "render", "afterEnter"]);
+    expect(events).toEqual([
+      "beforeEach",
+      "beforeLeave",
+      "beforeEnter",
+      "render",
+      "afterLeave",
+      "afterEnter",
+      "afterEach"
+    ]);
+  });
+
+  it("runs global hooks when the resolved branch does not change", async () => {
+    const historyEvents: string[] = [];
+    const navigationEvents: string[] = [];
+    const routeHook = vi.fn(() => true as const);
+    const route: RouteConfig<HTMLElement> = {
+      path: "/next",
+      component: NextPage,
+      beforeEnter: routeHook
+    };
+    const history = new HistoryCoordinator([route], errorRoute, () => {
+      historyEvents.push("render");
+    }, {
+      beforeEach: [() => {
+        historyEvents.push("beforeEach");
+        return true;
+      }],
+      afterEach: [() => {
+        historyEvents.push("afterEach");
+      }]
+    });
+    const navigation = new NavigationCoordinator([route], errorRoute, () => {
+      navigationEvents.push("render");
+    }, {
+      beforeEach: [() => {
+        navigationEvents.push("beforeEach");
+        return true;
+      }],
+      afterEach: [() => {
+        navigationEvents.push("afterEach");
+      }]
+    });
+
+    await history.navigate("/next", {commit: false});
+    await navigation.navigate("/next");
+    historyEvents.length = 0;
+    navigationEvents.length = 0;
+    routeHook.mockClear();
+
+    await history.navigate("/next", {commit: false});
+    await navigation.navigate("/next");
+
+    expect(historyEvents).toEqual(["beforeEach", "render", "afterEach"]);
+    expect(navigationEvents).toEqual(["beforeEach", "render", "afterEach"]);
+    expect(routeHook).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,5 @@
 import {
+  GlobalNavigationHooks,
   NavigationContext,
   NavigationOptions,
   NavigationResult,
@@ -7,7 +8,12 @@ import {
   RouteRenderer
 } from "@dota/Types";
 import {resolveRoute} from "@dota/route/route-resolver";
-import {runRouteGuards, runRouteLifecycleHooks} from "@dota/coordinator/navigation-lifecycle";
+import {
+  runGlobalGuards,
+  runGlobalLifecycleHooks,
+  runRouteGuards,
+  runRouteLifecycleHooks
+} from "@dota/coordinator/navigation-lifecycle";
 import {createNavigationContext, getBranchDelta, toNavigationResult, toNavigationUrl} from "@dota/coordinator/route-transition";
 import type {Coordinator} from "@dota/coordinator/Coordinator";
 
@@ -24,8 +30,9 @@ export class HistoryCoordinator<T extends HTMLElement = HTMLElement> implements 
    * @param routes - Segment tree used to resolve history destinations.
    * @param errorRoute - Fallback route used when a history destination is unmatched.
    * @param renderer - Callback that mounts an approved route match.
+   * @param globalHooks - Application-wide callbacks wrapped around route lifecycle work.
    */
-  constructor(public readonly routes: RouteConfig<T>[], public readonly errorRoute: RouteConfig<T>, public readonly renderer: RouteRenderer<T>) {}
+  constructor(public readonly routes: RouteConfig<T>[], public readonly errorRoute: RouteConfig<T>, public readonly renderer: RouteRenderer<T>, public readonly globalHooks: GlobalNavigationHooks<T> = {}) {}
 
   /**
    * Runs guards, commits a new history entry, renders, and runs after-hooks.
@@ -41,6 +48,9 @@ export class HistoryCoordinator<T extends HTMLElement = HTMLElement> implements 
     const branchDelta = getBranchDelta(this.currentMatch, match);
 
     try {
+      const globalResult = await runGlobalGuards(this.globalHooks.beforeEach ?? [], context);
+      if (globalResult !== true) return toNavigationResult(globalResult, match, context);
+
       const leaveResult = await runRouteGuards(branchDelta.leaving, "beforeLeave", context);
       if (leaveResult !== true) return toNavigationResult(leaveResult, match, context);
 
@@ -53,6 +63,7 @@ export class HistoryCoordinator<T extends HTMLElement = HTMLElement> implements 
       this.currentMatch = match;
       await runRouteLifecycleHooks(branchDelta.leaving, "afterLeave", context);
       await runRouteLifecycleHooks(branchDelta.entering, "afterEnter", context);
+      await runGlobalLifecycleHooks(this.globalHooks.afterEach ?? [], context);
 
       return {status: "completed", match};
     } catch (error) {

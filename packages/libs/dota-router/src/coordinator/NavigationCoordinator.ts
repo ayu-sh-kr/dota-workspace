@@ -1,4 +1,5 @@
 import {
+  GlobalNavigationHooks,
   NavigationContext,
   NavigationOptions,
   NavigationPreparationResult,
@@ -9,7 +10,12 @@ import {
   RouteRenderer
 } from "@dota/Types";
 import {resolveRoute} from "@dota/route/route-resolver";
-import {runRouteGuards, runRouteLifecycleHooks} from "@dota/coordinator/navigation-lifecycle";
+import {
+  runGlobalGuards,
+  runGlobalLifecycleHooks,
+  runRouteGuards,
+  runRouteLifecycleHooks
+} from "@dota/coordinator/navigation-lifecycle";
 import {createNavigationContext, getBranchDelta, toNavigationResult, toNavigationUrl} from "@dota/coordinator/route-transition";
 import type {Coordinator} from "@dota/coordinator/Coordinator";
 
@@ -36,8 +42,9 @@ export class NavigationCoordinator<T extends HTMLElement = HTMLElement> implemen
    * @param routes - Segment tree used to resolve navigation destinations.
    * @param errorRoute - Fallback route used when a destination is unmatched.
    * @param renderer - Callback that mounts an approved route match.
+   * @param globalHooks - Application-wide callbacks wrapped around route lifecycle work.
    */
-  constructor(public readonly routes: RouteConfig<T>[], public readonly errorRoute: RouteConfig<T>, public readonly renderer: RouteRenderer<T>) {}
+  constructor(public readonly routes: RouteConfig<T>[], public readonly errorRoute: RouteConfig<T>, public readonly renderer: RouteRenderer<T>, public readonly globalHooks: GlobalNavigationHooks<T> = {}) {}
 
   /**
    * Installs an intercept handler for one Navigation API event.
@@ -95,6 +102,9 @@ export class NavigationCoordinator<T extends HTMLElement = HTMLElement> implemen
     const branchDelta = getBranchDelta(this.currentMatch, match);
 
     try {
+      const globalResult = await runGlobalGuards(this.globalHooks.beforeEach ?? [], context);
+      if (globalResult !== true) return toNavigationResult(globalResult, match, context);
+
       const leaveResult = await runRouteGuards(branchDelta.leaving, "beforeLeave", context);
       if (leaveResult !== true) return toNavigationResult(leaveResult, match, context);
 
@@ -120,6 +130,7 @@ export class NavigationCoordinator<T extends HTMLElement = HTMLElement> implemen
       this.currentMatch = prepared.match;
       await runRouteLifecycleHooks(prepared.branchDelta.leaving, "afterLeave", prepared.context);
       await runRouteLifecycleHooks(prepared.branchDelta.entering, "afterEnter", prepared.context);
+      await runGlobalLifecycleHooks(this.globalHooks.afterEach ?? [], prepared.context);
       return {status: "completed", match: prepared.match};
     } catch (error) {
       return {status: "failed", match: prepared.match, error};

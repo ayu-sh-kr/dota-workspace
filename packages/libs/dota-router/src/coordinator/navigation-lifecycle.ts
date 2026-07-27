@@ -1,8 +1,47 @@
 import {
   NavigationContext,
   RouteConfig,
-  RouteGuardResult
+  RouteGuard,
+  RouteGuardResult,
+  RouteLifecycleHook
 } from "@dota/Types";
+
+/**
+ * Runs application-wide guards sequentially before route-specific guards.
+ * The first cancellation or redirect stops the chain, while an abort after an
+ * allowed asynchronous guard cancels the pending transition.
+ * @param guards - Global guards in application registration order.
+ * @param context - Navigation state shared with route-specific callbacks.
+ * @returns Allow, cancellation, or the first redirect requested by a guard.
+ */
+export async function runGlobalGuards<T extends HTMLElement>(
+  guards: readonly RouteGuard<T>[],
+  context: NavigationContext<T>
+): Promise<RouteGuardResult> {
+  for (const guard of guards) {
+    const result = await guard(context);
+    if (result !== true) return result;
+    if (context.signal.aborted) return false;
+  }
+
+  return true;
+}
+
+/**
+ * Runs application-wide observers after rendering and route lifecycle callbacks.
+ * Awaiting each callback preserves registration order and surfaces failures through
+ * the coordinator's existing post-commit failure result.
+ * @param hooks - Global observers in application registration order.
+ * @param context - Completed transition state shared with route callbacks.
+ */
+export async function runGlobalLifecycleHooks<T extends HTMLElement>(
+  hooks: readonly RouteLifecycleHook<T>[],
+  context: NavigationContext<T>
+): Promise<void> {
+  for (const hook of hooks) {
+    await hook(context);
+  }
+}
 
 /**
  * Executes one guard phase for the supplied route order.

@@ -35,6 +35,7 @@ export interface Router<T extends HTMLElement> {
  * Constructor shape accepted by `DotaRouterService` for selecting a browser adapter.
  * Keeping the constructor contract generic lets applications choose history,
  * Navigation API, or a compatible custom router without changing service setup.
+ * Runtime arguments after `root` include the renderer and optional global hooks.
  * @template T - Router instance produced by the constructor.
  */
 export type RouterConstructor<T extends Router<HTMLElement>> = new (
@@ -48,7 +49,7 @@ export type RouterConstructor<T extends Router<HTMLElement>> = new (
 /**
  * Carries the route information declared by `@Route` before the router compiles it
  * into its segment tree. It keeps component declarations independent from a router
- * instance while preserving navigation hooks for a future transition pipeline.
+ * instance while preserving the navigation hooks consumed by the transition coordinators.
  */
 export type RouteMeta<T extends HTMLElement = HTMLElement> = {
   path: string;
@@ -69,8 +70,8 @@ export type RouteGuardResult = true | false | string;
 
 /**
  * Gives navigation hooks the two route matches and browser state involved in one
- * transition. The router will create this value when transition handling is added;
- * keeping it separate makes guards portable across history and Navigation API adapters.
+ * transition. The coordinators create one context for the complete transition, which
+ * keeps guards portable across history and Navigation API adapters.
  */
 export type NavigationContext<T extends HTMLElement = HTMLElement> = {
   /** Last successfully rendered match, absent during initial navigation. */
@@ -104,6 +105,18 @@ export type RouteGuard<T extends HTMLElement = HTMLElement> = (
 export type RouteLifecycleHook<T extends HTMLElement = HTMLElement> = (
   context: NavigationContext<T>
 ) => void | Promise<void>;
+
+/**
+ * Defines application-wide policy that wraps every resolved navigation attempt.
+ * Coordinators run each collection in registration order independently of route
+ * branch changes.
+ */
+export type GlobalNavigationHooks<T extends HTMLElement = HTMLElement> = {
+  /** Guards evaluated before route-specific leave and enter guards. */
+  readonly beforeEach?: readonly RouteGuard<T>[];
+  /** Observers invoked after rendering and route-specific lifecycle hooks. */
+  readonly afterEach?: readonly RouteLifecycleHook<T>[];
+}
 
 /** Names the terminal state reported by a browser-independent route transition. */
 export type NavigationStatus = "completed" | "cancelled" | "redirected" | "failed";
@@ -152,8 +165,8 @@ export type RouteRenderer<T extends HTMLElement = HTMLElement> = (
 
 /**
  * Represents one route node after configuration compiles flat page declarations into
- * segment-local paths. Routers and matchers consume this form, while its optional hooks
- * remain declarative until the transition pipeline is implemented.
+ * segment-local paths. Routers and matchers consume this form, and coordinators invoke
+ * its optional hooks during the matching transition phases.
  */
 export type RouteConfig<T extends HTMLElement> = {
   path: string;
@@ -272,6 +285,8 @@ export interface DefaultRouterConfig<T extends Router<HTMLElement>> {
   router: RouterConstructor<T>;
   /** Decorated component classes used when explicit routes are absent. */
   components?: ComponentClass[];
+  /** Application-wide guards and observers owned by this router instance. */
+  globalHooks?: GlobalNavigationHooks<HTMLElement>;
 }
 
 /**

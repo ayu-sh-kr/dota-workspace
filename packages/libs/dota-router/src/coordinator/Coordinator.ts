@@ -1,4 +1,4 @@
-import {RouteConfig, RouteRenderer} from "@dota/Types";
+import {GlobalNavigationHooks, RouteConfig, RouteRenderer} from "@dota/Types";
 
 /**
  * Describes the shared route and rendering dependencies owned by a coordinator.
@@ -12,4 +12,6 @@ export interface Coordinator<T extends HTMLElement = HTMLElement> {
   readonly errorRoute: RouteConfig<T>;
   /** Presentation callback invoked after a transition is approved. */
   readonly renderer: RouteRenderer<T>;
+  /** Application-wide callbacks wrapped around route-specific lifecycle work. */
+  readonly globalHooks: GlobalNavigationHooks<T>;
 }

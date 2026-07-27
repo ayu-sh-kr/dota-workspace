@@ -70,10 +70,31 @@ export function getBranchDelta<T extends HTMLElement>(
   const currentBranch = currentMatch?.branch ?? [];
   const commonLength = getCommonBranchLength(currentBranch, nextMatch.branch);
 
+  if (currentMatch && commonLength === currentBranch.length && commonLength === nextMatch.branch.length && routeStateChanged(currentMatch, nextMatch)) {
+    const currentLeaf = currentBranch[currentBranch.length - 1];
+    const nextLeaf = nextMatch.branch[nextMatch.branch.length - 1];
+
+    return {
+      leaving: currentLeaf ? [currentLeaf] : [],
+      entering: nextLeaf ? [nextLeaf] : []
+    };
+  }
+
   return {
     leaving: currentBranch.slice(commonLength).reverse(),
     entering: nextMatch.branch.slice(commonLength)
   };
+}
+
+/**
+ * Detects a meaningful destination change when the router matched the same route objects.
+ * Parameterized URLs reuse one route configuration, so identity comparison alone would
+ * otherwise skip guards and lifecycle hooks for transitions such as `/blog/one` to
+ * `/blog/two`. Hash-only changes are intentionally excluded because they do not represent
+ * a new document view and should not create another page-view event.
+ */
+function routeStateChanged<T extends HTMLElement>(currentMatch: RouteMatch<T>, nextMatch: RouteMatch<T>): boolean {
+  return currentMatch.pathname !== nextMatch.pathname || currentMatch.searchParams.toString() !== nextMatch.searchParams.toString();
 }
 
 function getCommonBranchLength<T extends HTMLElement>(

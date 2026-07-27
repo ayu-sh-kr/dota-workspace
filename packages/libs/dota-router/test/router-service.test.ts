@@ -105,12 +105,17 @@ describe('RouterService', () => {
   });
 
   it('should initialize the router with the configured route dependencies', () => {
+    const globalHooks = {
+      beforeEach: [vi.fn(() => true as const)],
+      afterEach: [vi.fn()]
+    };
     const routerService = DotaRouterService.fromComponents({
       router: MockRouter,
       components: components,
       defaultRoute: defaultRoute,
       errorRoute: errorRoute,
-      root: AppComponent
+      root: AppComponent,
+      globalHooks
     });
     routerService.init();
 
@@ -119,6 +124,8 @@ describe('RouterService', () => {
     expect(routerService.instance.errorRoute).toBe(errorRoute);
     expect(routerService.instance.defaultRoute).toBe(defaultRoute);
     expect(routerService.instance.root).toBe(AppComponent);
+    expect(routerService.instance.renderer).toBe(routerService.renderer);
+    expect(routerService.instance.globalHooks).toBe(globalHooks);
   });
 
   it('should call RouterUtils.route with the exact router instance and path', () => {

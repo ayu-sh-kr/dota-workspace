@@ -1,4 +1,11 @@
-import {ComponentClass, NavigationOption, RouteConfig, RouteRenderer, Router} from "@dota/Types";
+import {
+  ComponentClass,
+  GlobalNavigationHooks,
+  NavigationOption,
+  RouteConfig,
+  RouteRenderer,
+  Router
+} from "@dota/Types";
 import {HistoryCoordinator} from "@dota/coordinator/HistoryCoordinator";
 import {createRouteRenderer} from "@dota/coordinator/route-renderer";
 
@@ -19,13 +26,15 @@ export class DomHistoryRouter<T extends HTMLElement> implements Router<T>{
    * @param defaultRoute - Application default route retained by the adapter.
    * @param root - Component whose host receives rendered route elements.
    * @param renderer - Optional presentation callback supplied by the service.
+   * @param globalHooks - Optional application-wide navigation callbacks.
    */
   constructor(
     routes: RouteConfig<T>[],
     errorRoute: RouteConfig<T>,
     defaultRoute: RouteConfig<T>,
     root: ComponentClass,
-    renderer?: RouteRenderer<T>
+    renderer?: RouteRenderer<T>,
+    globalHooks?: GlobalNavigationHooks<T>
   ) {
     if (!routes || routes.length === 0) {
       throw new Error('Routes configuration cannot be empty.');
@@ -36,7 +45,7 @@ export class DomHistoryRouter<T extends HTMLElement> implements Router<T>{
     this.routes = routes;
     this.root = root;
     this.renderer = renderer ?? createRouteRenderer(root);
-    this.coordinator = new HistoryCoordinator(this.routes, this.errorRoute, this.renderer);
+    this.coordinator = new HistoryCoordinator(this.routes, this.errorRoute, this.renderer, globalHooks);
     this.init();
     void this.coordinator.navigate(window.location.href, {commit: false});
   }
