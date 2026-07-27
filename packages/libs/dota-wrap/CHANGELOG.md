@@ -1,5 +1,16 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.0.26
+
+### Patch Changes
+
+- a40fbbe: Add optional router-instance global navigation hooks. Applications can register
+  ordered `beforeEach` guards and `afterEach` observers through
+  `DotaRouterService.fromComponents()` or `dota-wrap`'s `initializeApp()`; existing
+  configuration behaves unchanged when the option is omitted.
+- Updated dependencies [a40fbbe]
+  - @ayu-sh-kr/dota-router@0.0.30
+
 ## 0.0.25
 
 ### Patch Changes
