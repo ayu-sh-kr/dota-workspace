@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clean Code"
+  short_description: "Readable structure, low verbosity, clear naming"
+  default_prompt: "Use $clean-code to improve this TypeScript for structure, verbosity, and naming without changing behavior, and inline trivial one-caller helpers."
