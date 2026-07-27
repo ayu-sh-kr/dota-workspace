@@ -1,4 +1,10 @@
-import {ComponentClass, RouteConfig, Router} from "@dota/Types";
+import {
+  ComponentClass,
+  GlobalNavigationHooks,
+  RouteConfig,
+  RouteRenderer,
+  Router
+} from "@dota/Types";
 import {vi} from "vitest";
 
 export class MockRouter implements Router<HTMLElement> {
@@ -7,22 +13,24 @@ export class MockRouter implements Router<HTMLElement> {
   errorRoute: RouteConfig<HTMLElement>;
   defaultRoute: RouteConfig<HTMLElement>;
   root: ComponentClass;
-  init: () => void;
-  route: (path: string) => void;
+  renderer?: RouteRenderer<HTMLElement>;
+  globalHooks?: GlobalNavigationHooks<HTMLElement>;
+  init: () => void = vi.fn();
+  route: (path: string) => void = vi.fn();
 
   constructor(
     routes: RouteConfig<HTMLElement>[],
     errorRoute: RouteConfig<HTMLElement>,
     defaultRoute: RouteConfig<HTMLElement>,
     root: ComponentClass,
-    mockInit: () => void = vi.fn(),
-    mockRoute: (path: string) => void = vi.fn()
+    renderer?: RouteRenderer<HTMLElement>,
+    globalHooks?: GlobalNavigationHooks<HTMLElement>
   ) {
     this.routes = routes;
     this.defaultRoute = defaultRoute;
     this.errorRoute = errorRoute;
     this.root = root;
-    this.init = mockInit;
-    this.route = mockRoute;
+    this.renderer = renderer;
+    this.globalHooks = globalHooks;
   }
 }
