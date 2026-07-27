@@ -11,13 +11,13 @@ class Page extends HTMLElement {}
 
 const route = (path: string): RouteConfig<HTMLElement> => ({path, component: Page});
 
-const match = (pathname: string, branch: RouteConfig<HTMLElement>[]): RouteMatch<HTMLElement> => ({
+const match = (pathname: string, branch: RouteConfig<HTMLElement>[], params: Record<string, string> = {}, search = ""): RouteMatch<HTMLElement> => ({
   route: branch[branch.length - 1] ?? route("/error"),
   branch,
   matched: true,
-  params: {},
+  params,
   pathname,
-  searchParams: new URLSearchParams(),
+  searchParams: new URLSearchParams(search),
   hash: ""
 });
 
@@ -82,5 +82,33 @@ describe("route transition helpers", () => {
 
     expect(delta.leaving).toEqual([currentLeaf]);
     expect(delta.entering).toEqual([nextLeaf]);
+  });
+
+  it("re-runs the leaf hooks when a parameterized route receives a new destination", () => {
+    const project = route("/projects/:slug");
+    const delta = getBranchDelta(
+      match("/projects/alpha", [project], {slug: "alpha"}),
+      match("/projects/beta", [project], {slug: "beta"})
+    );
+
+    expect(delta.leaving).toEqual([project]);
+    expect(delta.entering).toEqual([project]);
+  });
+
+  it("re-runs the leaf hooks when only the query changes, but ignores hash changes", () => {
+    const projects = route("/projects");
+    const queryDelta = getBranchDelta(
+      match("/projects", [projects], {}, "page=1"),
+      match("/projects", [projects], {}, "page=2")
+    );
+    const hashDelta = getBranchDelta(
+      {...match("/projects", [projects]), hash: "#one"},
+      {...match("/projects", [projects]), hash: "#two"}
+    );
+
+    expect(queryDelta.leaving).toEqual([projects]);
+    expect(queryDelta.entering).toEqual([projects]);
+    expect(hashDelta.leaving).toEqual([]);
+    expect(hashDelta.entering).toEqual([]);
   });
 });
