@@ -1,6 +1,6 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {HistoryCoordinator} from "@dota/coordinator";
-import {RouteConfig} from "@dota/Types";
+import {NavigationContext, RouteConfig} from "@dota/Types";
 
 class ErrorPage extends HTMLElement {}
 class HomePage extends HTMLElement {}
@@ -83,10 +83,12 @@ describe("HistoryCoordinator", () => {
 
   it("returns a failed result when rendering throws after the history commit", async () => {
     const error = new Error("render failed");
+    const afterEach = vi.fn();
     const coordinator = new HistoryCoordinator(
       [{path: "/account", component: AccountPage}],
       errorRoute,
-      vi.fn().mockRejectedValue(error)
+      vi.fn().mockRejectedValue(error),
+      {afterEach: [afterEach]}
     );
     const pushState = vi.spyOn(window.history, "pushState");
 
@@ -94,5 +96,27 @@ describe("HistoryCoordinator", () => {
 
     expect(result).toMatchObject({status: "failed", error});
     expect(pushState).toHaveBeenCalledTimes(1);
+    expect(afterEach).not.toHaveBeenCalled();
+  });
+
+  it("reports a global after-hook failure without undoing the committed match", async () => {
+    const error = new Error("analytics failed");
+    const beforeEach = vi.fn((_context: NavigationContext) => true as const);
+    const coordinator = new HistoryCoordinator(
+      [{path: "/account", component: AccountPage}],
+      errorRoute,
+      vi.fn(),
+      {
+        beforeEach: [beforeEach],
+        afterEach: [vi.fn().mockRejectedValue(error)]
+      }
+    );
+
+    const result = await coordinator.navigate("/account");
+    await coordinator.navigate("/account");
+
+    expect(result).toMatchObject({status: "failed", error});
+    expect(window.location.pathname).toBe("/account");
+    expect(beforeEach.mock.calls[1][0].currentMatch?.pathname).toBe("/account");
   });
 });
