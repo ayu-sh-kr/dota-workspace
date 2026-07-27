@@ -67,6 +67,26 @@ DomNavigationRouter.route('/products', {
 
 ## Advanced Routing
 
+### Navigation Hooks
+
+Apply authorization or analytics to every transition through the router service:
+
+```typescript
+import {DotaRouterService, DomHistoryRouter} from "@ayu-sh-kr/dota-router";
+
+const router = DotaRouterService.fromComponents({
+  router: DomHistoryRouter,
+  routes,
+  errorRoute,
+  defaultRoute,
+  root: AppRoot,
+  globalHooks: {
+    beforeEach: [context => session.canOpen(context.url) || "/sign-in"],
+    afterEach: [context => analytics.pageView(context.url)]
+  }
+}).init();
+```
+
 ### Custom Render Functions
 
 ```typescript
