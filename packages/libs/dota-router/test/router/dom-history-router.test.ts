@@ -36,12 +36,15 @@ describe('DomHistoryRouter', () => {
   it('should create a instance of DomHistoryRouter and render the initial route through its coordinator', async () => {
     const routes = RouterUtils.prepareConfig(components);
     const renderer = vi.fn();
+    const beforeEach = vi.fn(() => true as const);
+    const afterEach = vi.fn();
     const router = new DomHistoryRouter<BaseElement>(
       routes,
       errorRoute,
       defaultRoute,
       AppComponent,
-      renderer
+      renderer,
+      {beforeEach: [beforeEach], afterEach: [afterEach]}
     );
     await new Promise<void>(resolve => setTimeout(resolve, 0));
 
@@ -55,6 +58,10 @@ describe('DomHistoryRouter', () => {
       expect.objectContaining({pathname: "/", matched: true}),
       expect.objectContaining({url: expect.any(URL)})
     );
+    expect(beforeEach).toHaveBeenCalledWith(expect.objectContaining({
+      nextMatch: expect.objectContaining({pathname: "/"})
+    }));
+    expect(afterEach).toHaveBeenCalledTimes(1);
 
     // Verify event listener was added during init
     expect(addEventListenerSpy).toHaveBeenCalledWith('popstate', expect.any(Function));

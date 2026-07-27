@@ -51,12 +51,15 @@ describe('DomNavigationRouter', () => {
   it('should create an instance of DomNavigationRouter and render through its coordinator', async () => {
     const routes = RouterUtils.prepareConfig(components);
     const renderer = vi.fn();
+    const beforeEach = vi.fn(() => true as const);
+    const afterEach = vi.fn();
     const router = new DomNavigationRouter<BaseElement>(
       routes,
       errorRoute,
       defaultRoute,
       AppComponent,
-      renderer
+      renderer,
+      {beforeEach: [beforeEach], afterEach: [afterEach]}
     );
     await new Promise<void>(resolve => setTimeout(resolve, 0));
 
@@ -70,6 +73,10 @@ describe('DomNavigationRouter', () => {
       expect.objectContaining({pathname: "/", matched: true}),
       expect.objectContaining({url: expect.any(URL)})
     );
+    expect(beforeEach).toHaveBeenCalledWith(expect.objectContaining({
+      nextMatch: expect.objectContaining({pathname: "/"})
+    }));
+    expect(afterEach).toHaveBeenCalledTimes(1);
 
     // Verify navigation event listener was added during init
     expect(mockNavigation.addEventListener).toHaveBeenCalledWith('navigate', expect.any(Function));
