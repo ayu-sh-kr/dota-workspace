@@ -56,6 +56,12 @@ initializeApp({
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},
   root: AppComponent,
+  globalHooks: {
+    afterEach: [context => {
+      if (context.url.hash) return;
+      window.scrollTo({top: 0, behavior: 'instant'});
+    }]
+  }
 })
   .then((value) => {
     DefaultApplicationEventListenerRegistry.setListener(applicationEventListener)
