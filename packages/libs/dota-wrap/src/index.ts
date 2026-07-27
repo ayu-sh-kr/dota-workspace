@@ -3,6 +3,7 @@ import {
   ComponentClass,
   DomHistoryRouter,
   DotaRouterService,
+  GlobalNavigationHooks,
   RouteConfig,
   Router,
   RouterService,
@@ -22,6 +23,7 @@ export type AppConfig = {
   errorRoute: RouteConfig<HTMLElement>;
   defaultRoute: RouteConfig<HTMLElement>;
   root: ComponentClass;
+  globalHooks?: GlobalNavigationHooks<HTMLElement>;
 }
 
 async function extractComponent(modules: Record<string, unknown>): Promise<DotaElementConstructor[]> {
@@ -75,7 +77,8 @@ export async function registerRoutes(
   errorRoute: RouteConfig<HTMLElement>,
   defaultRoute: RouteConfig<HTMLElement>,
   root: ComponentClass,
-  routes: RouteConfig<HTMLElement>[] = []
+  routes: RouteConfig<HTMLElement>[] = [],
+  globalHooks?: GlobalNavigationHooks<HTMLElement>
 ): Promise<RouterService<Router<HTMLElement>>> {
   return DotaRouterService.fromComponents({
     router: DomHistoryRouter,
@@ -83,7 +86,8 @@ export async function registerRoutes(
     routes: routes.length > 0 ? [...routes] : undefined,
     errorRoute,
     defaultRoute,
-    root
+    root,
+    globalHooks
   });
 }
 
@@ -95,7 +99,12 @@ export async function initializeApp(config: AppConfig): Promise<{
   console.info(`${components.length} Components registered.`);
 
   const routerService = await registerRoutes(
-    components, config.errorRoute, config.defaultRoute, config.root, config.routes ?? []
+    components,
+    config.errorRoute,
+    config.defaultRoute,
+    config.root,
+    config.routes ?? [],
+    config.globalHooks
   );
   routerService.init();
   console.info(`${routerService._routes.length} Routes registered.`);
