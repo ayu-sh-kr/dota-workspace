@@ -28,10 +28,13 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "lint": "tsc",
-    "build": "tsup src/index.ts --format esm, cjs --dts",
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
-    "test": "tsc --noEmit && jest --detectOpenHandles",
-    "test:coverage": "jest --coverage"
+    "test": "tsc --noEmit && vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "files": [
     "dist/",

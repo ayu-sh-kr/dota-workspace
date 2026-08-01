@@ -34,11 +34,14 @@
     "url": "https://github.com/ayu-sh-kr/dota-core"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm, cjs --dts",
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
     "build-pack": "pnpm build && pnpm pack",
+    "preview": "vite preview",
     "lint": "tsc",
-    "test": "tsc --noEmit && jest",
-    "test:coverage": "jest --coverage",
+    "test": "tsc --noEmit && vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "release": "pnpm run build && changeset publish"
   },
   "keywords": [
