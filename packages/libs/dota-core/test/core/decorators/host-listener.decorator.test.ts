@@ -6,12 +6,12 @@ describe('HostListenerDecorator', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('binds the method to the host event on connect and unbinds on disconnect', async () => {
-    const mockMethod = jest.fn();
-    const mockThis = jest.fn();
+    const mockMethod = vi.fn();
+    const mockThis = vi.fn();
 
     @Component({
       selector: 'test-component-decorator-selector-only',
@@ -62,7 +62,7 @@ describe('HostListenerDecorator', () => {
   });
 
   it('supports multiple events when HostListener is used with an array', async () => {
-    const mockMethod = jest.fn();
+    const mockMethod = vi.fn();
 
     @Component({
       selector: 'test-component-decorator-selector-only-2',
