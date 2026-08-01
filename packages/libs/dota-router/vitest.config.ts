@@ -1,11 +1,11 @@
-import { defineConfig } from 'vitest/config';
-import path from 'path';
+import {defineConfig} from 'vitest/config';
+import {resolve} from 'node:path';
 
 export default defineConfig({
   resolve: {
     alias: {
-      '@dota': path.resolve(__dirname, 'src'),
-      '@test': path.resolve(__dirname, 'test')
+      '@dota': resolve(import.meta.dirname, 'src'),
+      '@test': resolve(import.meta.dirname, 'test')
     }
   },
   test: {

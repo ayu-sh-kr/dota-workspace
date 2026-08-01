@@ -1,15 +1,16 @@
-import { resolve } from 'path';
-import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts'
-import { dependencies } from './package.json';
+import {resolve} from 'node:path';
+import {defineConfig} from 'vite';
+import dts from 'vite-plugin-dts';
+import {dependencies} from './package.json';
 
 export default defineConfig({
   build: {
     lib: {
-      entry : resolve(__dirname, 'src/main.ts'),
-      formats: ["cjs", "es"],
+      entry: resolve(import.meta.dirname, 'src/main.ts'),
+      formats: ['cjs', 'es'],
       fileName: (format) => format === 'es' ? 'index.mjs' : 'index.js'
     },
+    emptyOutDir: true,
     minify: false,
     rollupOptions: {
       external: dependencies ? Object.keys(dependencies) : []
@@ -18,7 +19,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      '@dota': resolve('./src')
+      '@dota': resolve(import.meta.dirname, 'src')
     }
   },
 
@@ -28,4 +29,4 @@ export default defineConfig({
       rollupTypes: true
     })
   ]
-})
+});
