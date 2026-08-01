@@ -6,12 +6,12 @@ describe('WindowListenerDecorator', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('binds the method to the window event on connect and unbinds on disconnect', async () => {
-    const mockMethod = jest.fn();
-    const mockThis = jest.fn();
+    const mockMethod = vi.fn();
+    const mockThis = vi.fn();
 
     @Component({
       selector: 'test-component-decorator-selector-only',

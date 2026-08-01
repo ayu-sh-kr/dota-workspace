@@ -1,12 +1,13 @@
 import {RestClient} from "@dota/index.ts";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
 describe('RestClient', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should create a RestClient with the correct baseUrl, headers, and timeout', () => {
@@ -27,7 +28,7 @@ describe('RestClient', () => {
       status: 200,
       headers: {'Content-Type': 'application/json'}
     });
-    (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
+    vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse);
 
     const client = RestClient.builder()
       .baseUrl('https://api.example.com')
@@ -126,7 +127,7 @@ describe('RestClient', () => {
       status: 200,
       headers: {'Content-Type': 'application/json'}
     });
-    (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
+    vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse);
 
     const response = await restClient.get<{ key: string }>()
       .uri('/test')

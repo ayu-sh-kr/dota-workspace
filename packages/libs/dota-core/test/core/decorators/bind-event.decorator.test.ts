@@ -119,11 +119,11 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('invokes the method when the bound element is clicked', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-basic-click', shadow: false })
     class TestComponent extends BaseElement {
@@ -149,7 +149,7 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('passes the original Event object to the handler', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-passes-event', shadow: false })
     class TestComponent extends BaseElement {
@@ -206,7 +206,7 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('does not fire the handler before the component is connected to the DOM', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-not-before-connect', shadow: false })
     class TestComponent extends BaseElement {
@@ -230,7 +230,7 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('does not fire the handler after the component is disconnected', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-stops-after-disconnect', shadow: false })
     class TestComponent extends BaseElement {
@@ -262,8 +262,8 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('binds multiple methods to separate child elements independently', async () => {
-    const saveHandler = jest.fn();
-    const cancelHandler = jest.fn();
+    const saveHandler = vi.fn();
+    const cancelHandler = vi.fn();
 
     @Component({ selector: 'bind-multiple-methods', shadow: false })
     class TestComponent extends BaseElement {
@@ -297,7 +297,7 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('binds to a class-selector and fires when a matching child is clicked', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-class-selector', shadow: false })
     class TestComponent extends BaseElement {
@@ -325,7 +325,7 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('binds to a tag selector and fires when the matching element triggers the event', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-tag-selector', shadow: false })
     class TestComponent extends BaseElement {
@@ -352,8 +352,8 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('binds different event types to the same element', async () => {
-    const clickHandler = jest.fn();
-    const mouseoverHandler = jest.fn();
+    const clickHandler = vi.fn();
+    const mouseoverHandler = vi.fn();
 
     @Component({ selector: 'bind-different-events-same-element', shadow: false })
     class TestComponent extends BaseElement {
@@ -383,7 +383,7 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('does not invoke the handler when a different element inside the component is clicked', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-no-cross-fire', shadow: false })
     class TestComponent extends BaseElement {
@@ -410,7 +410,7 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('does not register a duplicate listener when the component re-renders', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-no-duplicate-on-rerender', shadow: false })
     class TestComponent extends BaseElement {
@@ -437,7 +437,7 @@ describe('@BindEvent decorator – DOM event binding on connectedCallback', () =
   });
 
   it('fires an input event handler when the bound input value changes', async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     @Component({ selector: 'bind-input-event', shadow: false })
     class TestComponent extends BaseElement {

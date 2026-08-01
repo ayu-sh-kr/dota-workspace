@@ -54,11 +54,11 @@ describe('@AfterInit – runs after all connectedCallback tasks complete', () =>
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('invokes afterViewInit when the component is connected', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'after-basic-invoke', shadow: false })
     class TestComponent extends BaseElement {
@@ -179,7 +179,7 @@ describe('@AfterInit – runs after all connectedCallback tasks complete', () =>
   });
 
   it('does not invoke afterViewInit before the component is connected', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'after-not-before-connect', shadow: false })
     class TestComponent extends BaseElement {
@@ -252,7 +252,7 @@ describe('@BeforeInit and @AfterInit – combined ordering', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('beforeViewInit fires before afterViewInit', async () => {

@@ -66,7 +66,7 @@ describe('BaseElement – construction', () => {
   });
 
   it('emits the CONSTRUCTED lifecycle event immediately on construction', () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
     const svc = ApplicationEventService.getInstance();
     svc.getListener().on(`ctor-emits-constructed:1:${LifecycleEventConstants.CONSTRUCTED}`, spy);
 
@@ -82,7 +82,7 @@ describe('BaseElement – construction', () => {
     };
 
     // Use the event bus directly to capture any published event
-    const busSpy = jest.fn();
+    const busSpy = vi.fn();
     svc.getEventBus().on('ctor-constructed-check:1:constructed', busSpy);
 
     @Component({ selector: 'ctor-constructed-check', shadow: false })
@@ -126,7 +126,7 @@ describe('BaseElement – connectedCallback', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders HTML into innerHTML on connect for a non-shadow component', async () => {
@@ -191,7 +191,7 @@ describe('BaseElement – connectedCallback', () => {
   });
 
   it('emits the CONNECTED lifecycle event after all tasks resolve', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'connected-emits-connected', shadow: false })
     class TestComponent extends BaseElement {
@@ -246,7 +246,7 @@ describe('BaseElement – connectedCallback', () => {
   });
 
   it('binds @BindEvent listener so clicking the child invokes the method', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'connected-bind-event', shadow: false })
     class TestComponent extends BaseElement {
@@ -265,7 +265,7 @@ describe('BaseElement – connectedCallback', () => {
   });
 
   it('binds @HostListener so clicking the host element invokes the method', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'connected-host-listener', shadow: false })
     class TestComponent extends BaseElement {
@@ -301,7 +301,7 @@ describe('BaseElement – connectedCallback', () => {
   });
 
   it('does not duplicate @BindEvent listeners on re-render', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'connected-no-duplicate-bind', shadow: false })
     class TestComponent extends BaseElement {
@@ -330,7 +330,7 @@ describe('BaseElement – attributeChangedCallback', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('updates the typed property when the attribute is set', async () => {
@@ -435,7 +435,7 @@ describe('BaseElement – attributeChangedCallback', () => {
   });
 
   it('emits the ATTRIBUTE_CHANGED lifecycle event on every attribute change', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'attr-emits-event', shadow: false })
     class TestComponent extends BaseElement {
@@ -468,7 +468,7 @@ describe('BaseElement – attributeChangedCallback', () => {
   });
 
   it('ATTRIBUTE_CHANGED fires exactly once per external setAttribute call', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'attr-fires-once', shadow: false })
     class TestComponent extends BaseElement {
@@ -569,7 +569,7 @@ describe('BaseElement – disconnectedCallback', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('sets __initialized to false after disconnection', async () => {
@@ -595,7 +595,7 @@ describe('BaseElement – disconnectedCallback', () => {
   });
 
   it('emits the DISCONNECTED lifecycle event after removal', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'disconnected-emits-event', shadow: false })
     class TestComponent extends BaseElement {
@@ -620,7 +620,7 @@ describe('BaseElement – disconnectedCallback', () => {
   });
 
   it('unbinds @BindEvent listeners so clicking after removal does not fire the handler', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'disconnected-unbind-bind-event', shadow: false })
     class TestComponent extends BaseElement {
@@ -649,7 +649,7 @@ describe('BaseElement – disconnectedCallback', () => {
   });
 
   it('unbinds @HostListener so the host element no longer fires the handler', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'disconnected-unbind-host', shadow: false })
     class TestComponent extends BaseElement {
@@ -726,7 +726,7 @@ describe('BaseElement – disconnectedCallback', () => {
   });
 
   it('can be reconnected after disconnection and works normally', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'disconnected-reconnect', shadow: false })
     class TestComponent extends BaseElement {
@@ -761,11 +761,11 @@ describe('BaseElement – lifecycle events emitted through EventChannel', () => 
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('CONNECTED event fires exactly once per connect', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'lifecycle-connected-once', shadow: false })
     class TestComponent extends BaseElement {
@@ -786,7 +786,7 @@ describe('BaseElement – lifecycle events emitted through EventChannel', () => 
   });
 
   it('DISCONNECTED event fires exactly once per disconnect', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'lifecycle-disconnected-once', shadow: false })
     class TestComponent extends BaseElement {
@@ -836,7 +836,7 @@ describe('BaseElement – lifecycle events emitted through EventChannel', () => 
   });
 
   it('DOM_UPDATED event fires after updateHTML completes', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'lifecycle-dom-updated', shadow: false })
     class TestComponent extends BaseElement {
@@ -891,7 +891,7 @@ describe('BaseElement – @State reactivity', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('setting @State property re-renders the component', async () => {
@@ -964,7 +964,7 @@ describe('BaseElement – @State reactivity', () => {
   });
 
   it('emits DOM_UPDATED event after @State triggers a re-render', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'state-dom-updated-event', shadow: false })
     class TestComponent extends BaseElement {
@@ -996,7 +996,7 @@ describe('BaseElement – @Property reactivity', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('property getter returns the value set via setAttribute', async () => {
@@ -1097,7 +1097,7 @@ describe('BaseElement – updateHTML', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('updates innerHTML with the latest render output', async () => {
@@ -1145,7 +1145,7 @@ describe('BaseElement – updateHTML', () => {
   });
 
   it('re-binds @BindEvent listeners after re-render so clicks still work', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'updatehtml-rebind-events', shadow: false })
     class TestComponent extends BaseElement {
@@ -1170,7 +1170,7 @@ describe('BaseElement – updateHTML', () => {
   });
 
   it('emits DOM_UPDATED event after every updateHTML call', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'updatehtml-dom-updated', shadow: false })
     class TestComponent extends BaseElement {

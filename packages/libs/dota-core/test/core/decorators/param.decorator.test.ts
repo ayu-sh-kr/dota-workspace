@@ -8,13 +8,13 @@ function getParamMetadata(target: any): Map<string, ParameterConfig> {
   return HelperUtils.fetchOrCreate<ParameterConfig>(target, 'Param');
 }
 
-let urlSearchParamsSpy: jest.SpyInstance;
+let urlSearchParamsSpy: {mockRestore: () => void} | undefined;
 
 function setSearchParams(params: Record<string, string>): void {
   const real = new URLSearchParams(params);
-  urlSearchParamsSpy = jest
+  urlSearchParamsSpy = vi
     .spyOn(global, 'URLSearchParams')
-    .mockImplementation(() => real);
+    .mockImplementation(function () { return real; });
 }
 
 describe('@Param decorator – metadata registration', () => {
@@ -103,7 +103,7 @@ describe('@Param decorator – URL param binding on connectedCallback', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     urlSearchParamsSpy?.mockRestore();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('injects the URL param value into the component field on connect', async () => {
@@ -337,5 +337,3 @@ describe('@Param decorator – URL param binding on connectedCallback', () => {
     expect((el as any).mode).toBe(modeAfterConnect);
   });
 });
-
-

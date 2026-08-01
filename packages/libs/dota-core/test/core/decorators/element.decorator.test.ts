@@ -107,7 +107,7 @@ describe('@Element decorator – DOM binding on connectedCallback', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('assigns the element queried by id to the component property', async () => {

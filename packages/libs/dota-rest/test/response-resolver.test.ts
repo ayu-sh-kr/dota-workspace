@@ -1,10 +1,11 @@
 import {RestResponseResolver} from "@dota/ResponseResolver.ts";
+import {describe, expect, it, vi} from "vitest";
 
 describe('ResponseResolver', () => {
 
   const createResolver = () => {
     const response = Promise.resolve(new Response());
-    const handler = jest.fn();
+    const handler = vi.fn();
     return new RestResponseResolver(response, handler);
   }
 
@@ -15,14 +16,14 @@ describe('ResponseResolver', () => {
 
   it('should set a custom response converter', () => {
     const resolver = createResolver();
-    const converter = jest.fn();
+    const converter = vi.fn();
     resolver.converter(converter);
     expect(resolver['_converter']).toBe(converter);
   });
 
   it('should set a custom response handler', () => {
     const resolver = createResolver();
-    const handler = jest.fn();
+    const handler = vi.fn();
     resolver.handler(handler);
     expect(resolver['_handler']).toBe(handler);
   });

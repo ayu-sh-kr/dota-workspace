@@ -7,7 +7,7 @@ describe('EventEmitter', () => {
     const eventData = {key: 'value'};
     const eventEmitter = new EventEmitter<typeof eventData>(eventName);
 
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
     window.addEventListener(eventName, mockCallback);
 
     eventEmitter.emit(eventData);
@@ -23,7 +23,7 @@ describe('EventEmitter', () => {
     const eventData = {key: 'value'};
     const eventEmitter = new EventEmitter<typeof eventData>(eventName);
 
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
     const rootElement = document.createElement('div');
     rootElement.addEventListener(eventName, mockCallback);
 
@@ -40,7 +40,7 @@ describe('EventEmitter', () => {
     const eventData = {key: 'value'};
     const eventEmitter = new EventEmitter<typeof eventData>(eventName);
 
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
     window.addEventListener(eventName, mockCallback);
 
     const rootElement = document.createElement('div');
@@ -60,7 +60,7 @@ describe('EventEmitter', () => {
     const eventData = {key: 'value'};
     const eventEmitter = new EventEmitter<typeof eventData>(eventName);
 
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
     window.addEventListener(eventName, mockCallback);
 
     const rootElement = document.createElement('div');
@@ -80,7 +80,7 @@ describe('EventEmitter', () => {
     const eventData = {key: 'value'};
     const eventEmitter = new EventEmitter<typeof eventData>(eventName);
 
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
     window.addEventListener(eventName, mockCallback);
 
     const rootElement = document.createElement('div');

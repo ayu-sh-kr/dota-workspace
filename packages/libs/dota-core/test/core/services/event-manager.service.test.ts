@@ -8,7 +8,7 @@ import { defineAndCreate } from '../../Utils.ts';
 function makeOption(overrides: Partial<EventOptionMeta> & { event: string | string[] }): EventOptionMeta {
   return {
     name:   overrides.name   ?? 'handler',
-    method: overrides.method ?? jest.fn(),
+    method: overrides.method ?? vi.fn(),
     event:  overrides.event,
   };
 }
@@ -34,7 +34,7 @@ describe('EventManagerService – addEvent and getEvent', () => {
   it('stores a record that can be retrieved with the correct type and key', () => {
     const { service, el } = makeService();
     const option = makeOption({ event: 'click', name: 'onClick' });
-    const handler = jest.fn() as unknown as EventListener;
+    const handler = vi.fn() as unknown as EventListener;
 
     const record: EventBindRecord = {
       element: el,
@@ -62,7 +62,7 @@ describe('EventManagerService – addEvent and getEvent', () => {
     const option = makeOption({ event: 'click', name: 'onClick' });
 
     service.addEvent('Host', {
-      element: el, type: 'Host', option, event: 'click', handler: jest.fn() as unknown as EventListener,
+      element: el, type: 'Host', option, event: 'click', handler: vi.fn() as unknown as EventListener,
     });
 
     expect(service.getEvent('Host', 'mouseover:onClick')).toBeUndefined();
@@ -71,8 +71,8 @@ describe('EventManagerService – addEvent and getEvent', () => {
   it('overwrites an existing record when addEvent is called with the same key', () => {
     const { service, el } = makeService();
     const option = makeOption({ event: 'click', name: 'onClick' });
-    const handler1 = jest.fn() as unknown as EventListener;
-    const handler2 = jest.fn() as unknown as EventListener;
+    const handler1 = vi.fn() as unknown as EventListener;
+    const handler2 = vi.fn() as unknown as EventListener;
 
     service.addEvent('Host', { element: el, type: 'Host', option, event: 'click', handler: handler1 });
     service.addEvent('Host', { element: el, type: 'Host', option, event: 'click', handler: handler2 });
@@ -85,8 +85,8 @@ describe('EventManagerService – addEvent and getEvent', () => {
     const clickOpt  = makeOption({ event: 'click',  name: 'onClick' });
     const resizeOpt = makeOption({ event: 'resize', name: 'onResize' });
 
-    service.addEvent('Host',   { element: el,     type: 'Host',   option: clickOpt,  event: 'click',  handler: jest.fn() as unknown as EventListener });
-    service.addEvent('Window', { element: window, type: 'Window', option: resizeOpt, event: 'resize', handler: jest.fn() as unknown as EventListener });
+    service.addEvent('Host',   { element: el,     type: 'Host',   option: clickOpt,  event: 'click',  handler: vi.fn() as unknown as EventListener });
+    service.addEvent('Window', { element: window, type: 'Window', option: resizeOpt, event: 'resize', handler: vi.fn() as unknown as EventListener });
 
     expect(service.getEvent('Host',   'click:onClick')).toBeDefined();
     expect(service.getEvent('Window', 'resize:onResize')).toBeDefined();
@@ -99,7 +99,7 @@ describe('EventManagerService – addEvent and getEvent', () => {
     const option = makeOption({ event: 'keydown', name: 'onKeydown' });
 
     service.addEvent('Document', {
-      element: document, type: 'Document', option, event: 'keydown', handler: jest.fn() as unknown as EventListener,
+      element: document, type: 'Document', option, event: 'keydown', handler: vi.fn() as unknown as EventListener,
     });
 
     expect(service.getEvent('Document', 'keydown:onKeydown')).toBeDefined();
@@ -113,12 +113,12 @@ describe('EventManagerService – bindEvent with a single event string', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('attaches the event listener to the target element', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'click', name: 'onClick', method: spy });
 
     document.body.appendChild(el);
@@ -146,7 +146,7 @@ describe('EventManagerService – bindEvent with a single event string', () => {
 
   it('passes the Event object to the handler', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'click', name: 'onClick', method: spy });
 
     document.body.appendChild(el);
@@ -178,7 +178,7 @@ describe('EventManagerService – bindEvent with a single event string', () => {
 
   it('binds to window and fires when window dispatches the event', () => {
     const { service } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'resize', name: 'onResize', method: spy });
 
     service.bindEvent(window, option, 'Window');
@@ -191,7 +191,7 @@ describe('EventManagerService – bindEvent with a single event string', () => {
 
   it('binds to document and fires when document dispatches the event', () => {
     const { service } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'keyup', name: 'onKeyup', method: spy });
 
     service.bindEvent(document, option, 'Document');
@@ -207,12 +207,12 @@ describe('EventManagerService – bindEvent does not duplicate listeners', () =>
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('calling bindEvent twice with the same option does not double-fire the handler', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'click', name: 'onClick', method: spy });
 
     document.body.appendChild(el);
@@ -225,7 +225,7 @@ describe('EventManagerService – bindEvent does not duplicate listeners', () =>
 
   it('calling bindEvent three times still fires the handler exactly once per event', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'click', name: 'onClick', method: spy });
 
     document.body.appendChild(el);
@@ -251,8 +251,8 @@ describe('EventManagerService – bindEvent does not duplicate listeners', () =>
 
   it('different option names on the same event are treated as separate bindings', () => {
     const { service, el } = makeService();
-    const spyA = jest.fn();
-    const spyB = jest.fn();
+    const spyA = vi.fn();
+    const spyB = vi.fn();
     const optA = makeOption({ event: 'click', name: 'handlerA', method: spyA });
     const optB = makeOption({ event: 'click', name: 'handlerB', method: spyB });
 
@@ -267,7 +267,7 @@ describe('EventManagerService – bindEvent does not duplicate listeners', () =>
 
   it('same option bound under different types does not duplicate within each type', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'click', name: 'onClick', method: spy });
 
     document.body.appendChild(el);
@@ -290,12 +290,12 @@ describe('EventManagerService – bindEvent with an array of event names', () =>
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('binds every event in the array independently', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: ['click', 'keydown'], name: 'onInteract', method: spy });
 
     document.body.appendChild(el);
@@ -319,7 +319,7 @@ describe('EventManagerService – bindEvent with an array of event names', () =>
 
   it('does not duplicate array-bound events when bindEvent is called again', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: ['click', 'keydown'], name: 'onInteract', method: spy });
 
     document.body.appendChild(el);
@@ -339,12 +339,12 @@ describe('EventManagerService – unbindEvent', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('removes the listener so the handler no longer fires after unbind', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'click', name: 'onClick', method: spy });
 
     document.body.appendChild(el);
@@ -372,8 +372,8 @@ describe('EventManagerService – unbindEvent', () => {
 
   it('unbinding one event does not affect other events on the same element', () => {
     const { service, el } = makeService();
-    const spyA = jest.fn();
-    const spyB = jest.fn();
+    const spyA = vi.fn();
+    const spyB = vi.fn();
     const optA = makeOption({ event: 'click',    name: 'onClick',    method: spyA });
     const optB = makeOption({ event: 'mouseover', name: 'onMouseover', method: spyB });
 
@@ -410,7 +410,7 @@ describe('EventManagerService – unbindEvent', () => {
 
   it('unbinds from window and the handler stops firing', () => {
     const { service } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'resize', name: 'onResize', method: spy });
 
     service.bindEvent(window, option, 'Window');
@@ -424,7 +424,7 @@ describe('EventManagerService – unbindEvent', () => {
 
   it('unbinds from document and the handler stops firing', () => {
     const { service } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'keyup', name: 'onKeyup', method: spy });
 
     service.bindEvent(document, option, 'Document');
@@ -438,7 +438,7 @@ describe('EventManagerService – unbindEvent', () => {
 
   it('unbinds each event in an array and none of them fire afterwards', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: ['click', 'keydown'], name: 'onInteract', method: spy });
 
     document.body.appendChild(el);
@@ -465,7 +465,7 @@ describe('EventManagerService – unbindEvent', () => {
 
   it('bind → unbind → re-bind fires the handler again correctly', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'click', name: 'onClick', method: spy });
 
     document.body.appendChild(el);
@@ -485,14 +485,14 @@ describe('EventManagerService – unbindEvent', () => {
 
   it('uses the stored handler reference to remove the exact listener that was added', () => {
     const { service, el } = makeService();
-    const spy = jest.fn();
+    const spy = vi.fn();
     const option = makeOption({ event: 'click', name: 'onClick', method: spy });
 
     document.body.appendChild(el);
     service.bindEvent(el, option, 'Host');
 
     // Manually add a second listener so we confirm only the stored one is removed
-    const extra = jest.fn();
+    const extra = vi.fn();
     el.addEventListener('click', extra);
 
     service.unbindEvent(el, option, 'Host');
