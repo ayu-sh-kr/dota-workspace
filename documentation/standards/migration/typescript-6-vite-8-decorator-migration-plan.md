@@ -1,5 +1,7 @@
 # TypeScript 6 and Vite 8 decorator migration plan
 
+> **Current-status note:** This plan was written before the workspace dependency and Vite 8 work reached its present state. Use the [TypeScript 6 migration audit with legacy decorators preserved](./typescript-6-legacy-decorator-migration-audit.md) for the current compiler-only migration. This document remains the design reference for a later standard-decorator migration.
+
 This plan moves the workspace from TypeScript 5.9.3 and Vite 7.3.1 to TypeScript 6.0.3 and Vite 8.1.5 without combining the build-system change with the higher-risk conversion from legacy decorators to standard decorators.
 
 The target versions and external constraints in this document were checked on 2026-07-28. TypeScript 7.0.2 is already the npm `latest`, but TypeScript 6 is the recommended first target because it is the direct next major, retains the TypeScript compiler API used by this repository's declaration and Jest tooling, and exposes the configuration changes that TypeScript 7 turns into hard errors.
