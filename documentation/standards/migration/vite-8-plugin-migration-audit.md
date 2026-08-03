@@ -405,7 +405,7 @@ Aligning the first group to `tsc --noEmit && vite build` is a cleanup, not a Vit
 
 The following files still use the Vite 7-compatible spelling:
 
-- `packages/libs/dota-core/vite.config.ts`;
+- `packages/libs/dota-core/vite.config.mts`;
 - `packages/libs/dota-event/vite.config.ts`;
 - `packages/libs/dota-router/vite.config.ts`;
 - `packages/libs/dota-wrap/scripts/build.mjs`;
@@ -456,7 +456,7 @@ Use the equivalent package and subpath for each library. For `dota-wrap`, test e
 
 ### 1. `@ayu-sh-kr/dota-core`
 
-Sources: [`vite.config.ts`](../../../packages/libs/dota-core/vite.config.ts), [`vitest.config.ts`](../../../packages/libs/dota-core/vitest.config.ts), and [`tsconfig.json`](../../../packages/libs/dota-core/tsconfig.json).
+Sources: [`vite.config.mts`](../../../packages/libs/dota-core/vite.config.mts), [`vitest.config.mts`](../../../packages/libs/dota-core/vitest.config.mts), and [`tsconfig.json`](../../../packages/libs/dota-core/tsconfig.json).
 
 `dota-core` is the core decorated web-component runtime. It has the highest source-level sensitivity because its build output must preserve decorator behavior, custom-element registration, metadata, and browser DOM interactions. Its Vite config is otherwise a conventional library build with `reflect-metadata` and `@ayu-sh-kr/dota-event` externalized.
 
@@ -524,7 +524,7 @@ Risk is low to medium. The source does not use Vite APIs or esbuild configuratio
 
 ### 3. `@ayu-sh-kr/dota-rest`
 
-Sources: [`vite.config.ts`](../../../packages/libs/dota-rest/vite.config.ts), [`vitest.config.ts`](../../../packages/libs/dota-rest/vitest.config.ts), and [`tsconfig.json`](../../../packages/libs/dota-rest/tsconfig.json).
+Sources: [`vite.config.mts`](../../../packages/libs/dota-rest/vite.config.mts), [`vitest.config.mts`](../../../packages/libs/dota-rest/vitest.config.mts), and [`tsconfig.json`](../../../packages/libs/dota-rest/tsconfig.json).
 
 `dota-rest` is the lowest-risk library. It is a fetch-based client with no declared runtime dependencies and no `rollupOptions` block. Its build only needs the shared Vite/Vitest/declaration toolchain upgrade and ESM config cleanup.
 
@@ -885,6 +885,7 @@ The likely first migration commit is still mostly mechanical: update the root to
 
 ## Related documentation
 
+- [Workspace dependency and Vite 8 migration execution record](./workspace-dependency-and-vite-8-migration-execution.md) — completed implementation chronology, branch integration, declaration regression, repair, and final validation.
 - [TypeScript 6 and Vite 8 decorator migration plan](./typescript-6-vite-8-decorator-migration-plan.md) — broader workspace toolchain and decorator risks.
 - [Vite migration from v7](https://vite.dev/guide/migration.html) — official compatibility and deprecation guidance.
 - [Vite plugin API](https://vite.dev/guide/api-plugin.html) — hook, server, path-normalization, and Rolldown compatibility guidance.
