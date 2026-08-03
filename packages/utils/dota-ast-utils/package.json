@@ -42,8 +42,18 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@swc/core": "^1.13.5",
-    "fast-glob": "^3.3.3"
+    "@swc/core": "catalog:",
+    "fast-glob": "catalog:"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   },
   "files": [
     "dist/",

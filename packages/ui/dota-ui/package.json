@@ -44,15 +44,23 @@
   },
   "devDependencies": {
     "@ayu-sh-kr/dota-event-map-generator": "workspace:*",
-    "autoprefixer": "^10.4.19",
-    "postcss": "8.5.10",
-    "tailwindcss": "^3.4.4"
+    "@microsoft/api-extractor": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "autoprefixer": "catalog:",
+    "happy-dom": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
     "@ayu-sh-kr/dota-web-type-json": "workspace:*",
-    "@floating-ui/dom": "^1.7.5"
+    "@floating-ui/dom": "catalog:"
   },
   "web-types": "./web-types.json"
 }

@@ -92,20 +92,25 @@
     "@ayu-sh-kr/dota-event": "workspace:*",
     "@ayu-sh-kr/dota-rest": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
-    "@swc/core": "^1.13.5",
-    "consola": "3.4.2",
-    "fast-glob": "^3.3.3"
+    "@swc/core": "catalog:",
+    "consola": "catalog:",
+    "fast-glob": "catalog:"
   },
   "devDependencies": {
     "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
     "@ayu-sh-kr/dota-event-map-generator": "workspace:*",
     "@ayu-sh-kr/dota-web-type-json": "workspace:*",
-    "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.4"
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
-    "reflect-metadata": ">=0.2.0",
-    "vite": "^7.1.0"
+    "reflect-metadata": "catalog:peer-reflect-metadata",
+    "vite": "catalog:peer-vite"
   },
   "files": [
     "dist/",

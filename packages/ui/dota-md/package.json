@@ -43,20 +43,25 @@
     "release": "pnpm run build && changeset publish"
   },
   "devDependencies": {
-    "@types/markdown-it": "^14.1.2",
     "@ayu-sh-kr/dota-event-map-generator": "workspace:*",
-    "autoprefixer": "^10.4.19",
-    "postcss": "8.5.10",
-    "tailwindcss": "^3.4.4"
+    "@microsoft/api-extractor": "catalog:",
+    "@types/markdown-it": "catalog:",
+    "@types/node": "catalog:",
+    "autoprefixer": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:"
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
     "@ayu-sh-kr/dota-web-type-json": "workspace:*",
-    "markdown-it": "latest",
-    "markdown-it-anchor": "^9.2.0",
-    "markdown-it-highlightjs": "^4.2.0",
-    "markdown-it-toc-done-right": "^4.2.0"
+    "markdown-it": "catalog:",
+    "markdown-it-anchor": "catalog:",
+    "markdown-it-highlightjs": "catalog:",
+    "markdown-it-toc-done-right": "catalog:"
   },
   "web-types": "./web-types.json"
 }

@@ -50,7 +50,17 @@
     "Decorated Components"
   ],
   "dependencies": {
-    "reflect-metadata": "^0.2.2",
+    "reflect-metadata": "catalog:",
     "@ayu-sh-kr/dota-event": "workspace:*"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   }
 }

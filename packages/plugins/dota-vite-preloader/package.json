@@ -39,13 +39,22 @@
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-ast-utils": "workspace:*",
-    "@swc/core": "^1.13.5",
-    "fast-glob": "^3.3.3",
-    "consola": "3.4.2",
-    "reflect-metadata": "^0.2.2"
+    "@swc/core": "catalog:",
+    "fast-glob": "catalog:",
+    "consola": "catalog:",
+    "reflect-metadata": "catalog:"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
+    "@types/node": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
-    "vite": "^7.1.0"
+    "vite": "catalog:peer-vite"
   },
   "files": [
     "dist/",
