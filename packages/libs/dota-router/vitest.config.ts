@@ -2,6 +2,11 @@ import {defineConfig} from 'vitest/config';
 import {resolve} from 'node:path';
 
 export default defineConfig({
+  oxc: {
+    decorator: {
+      legacy: true,
+    },
+  },
   resolve: {
     alias: {
       '@dota': resolve(import.meta.dirname, 'src'),
