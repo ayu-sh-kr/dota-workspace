@@ -12,7 +12,6 @@
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
-    "baseUrl": ".",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "declaration": true,
     "declarationDir": "dist/types",
     "outDir": "dist",
@@ -11,7 +11,6 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "rootDir": ".",
     "types": ["node", "dom-navigation", "vitest/globals"],
     "lib": ["ES2020", "DOM"],

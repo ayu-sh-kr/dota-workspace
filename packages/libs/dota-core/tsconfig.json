@@ -15,7 +15,6 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "baseUrl": ".",
     "rootDir": ".",
     "types": ["node", "vitest/globals"],
 
