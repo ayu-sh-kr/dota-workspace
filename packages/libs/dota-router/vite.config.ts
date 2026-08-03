@@ -1,10 +1,16 @@
 import {resolve} from 'node:path';
 import {defineConfig} from 'vite';
 import dts from 'vite-plugin-dts';
-import {dependencies} from './package.json';
+import { dependencies } from './package.json' with { type: 'json' };
 
 export default defineConfig({
+  oxc: {
+    decorator: {
+      legacy: true,
+    },
+  },
   build: {
+    target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
     lib: {
       entry: resolve(import.meta.dirname, 'src/main.ts'),
       formats: ['cjs', 'es'],
@@ -12,7 +18,7 @@ export default defineConfig({
     },
     emptyOutDir: true,
     minify: false,
-    rollupOptions: {
+    rolldownOptions: {
       external: dependencies ? Object.keys(dependencies) : []
     }
   },
@@ -26,7 +32,7 @@ export default defineConfig({
   plugins: [
     dts({
       insertTypesEntry: true,
-      rollupTypes: true
+      bundleTypes: true
     })
   ]
 });

@@ -3,9 +3,15 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
+  oxc: {
+    decorator: {
+      legacy: true,
+    },
+  },
   build: {
+    target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
       formats: ["cjs", "es"],
       fileName: (format) => format === 'es' ? 'index.mjs' : 'index.cjs'
     },
@@ -21,13 +27,7 @@ export default defineConfig({
 
   plugins: [
     dts({
-      insertTypesEntry: true,
-      bundledPackages: [
-        '@ayu-sh-kr/dota-core',
-        '@ayu-sh-kr/dota-event',
-        '@ayu-sh-kr/dota-rest',
-        '@ayu-sh-kr/dota-router'
-      ]
+      insertTypesEntry: true
     })
   ]
 })

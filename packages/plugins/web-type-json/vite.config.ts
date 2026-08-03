@@ -3,14 +3,20 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts'
 
 export default defineConfig({
+  oxc: {
+    decorator: {
+      legacy: true,
+    },
+  },
   build: {
+    target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
     lib: {
-      entry: resolve(__dirname, 'src/main.ts'),
+      entry: resolve(import.meta.dirname, 'src/main.ts'),
       formats: ["cjs", "es"],
       fileName: (format) => format === 'es' ? 'index.mjs' : 'index.js'
     },
     minify: false,
-    rollupOptions: {
+    rolldownOptions: {
       external: [
         /^node:.*/,
         "fs",
@@ -32,7 +38,7 @@ export default defineConfig({
   plugins: [
     dts({
       insertTypesEntry: true,
-      rollupTypes: true
+      bundleTypes: true
     })
   ]
 })

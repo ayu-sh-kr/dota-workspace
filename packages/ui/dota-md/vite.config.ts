@@ -5,16 +5,22 @@ import dotaWebTypeJson from "@ayu-sh-kr/dota-web-type-json";
 import eventMapGenerator from "@ayu-sh-kr/dota-event-map-generator";
 
 export default defineConfig({
+  oxc: {
+    decorator: {
+      legacy: true,
+    },
+  },
   build: {
+    target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
     lib: {
-      entry: resolve(__dirname, 'src/main.ts'),
+      entry: resolve(import.meta.dirname, 'src/main.ts'),
       name: 'dota-md',
       formats: ["es", "cjs"],
       fileName: (format) => `dota-md.${format === 'es' ? 'mjs' : 'cjs'}`
     },
     minify: false,
 
-    rollupOptions: {
+    rolldownOptions: {
       external: ['@ayu-sh-kr/dota-core', '@ayu-sh-kr/dota-event'],
 
       output: {
@@ -33,22 +39,22 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@dota': resolve(__dirname, 'src')
+      '@dota': resolve(import.meta.dirname, 'src')
     }
   },
 
   plugins: [
     dts({
       insertTypesEntry: true,
-      rollupTypes: true
+      bundleTypes: true
     }),
     dotaWebTypeJson({
-      root: resolve(__dirname),
+      root: resolve(import.meta.dirname),
       outFile: 'web-types.json',
       logType: 'info'
     }),
     eventMapGenerator({
-      root: resolve(__dirname),
+      root: resolve(import.meta.dirname),
       outFile: 'src/event-map.d.ts',
       moduleSpecifier: '@ayu-sh-kr/dota-event',
       logType: 'info',
