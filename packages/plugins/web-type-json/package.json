@@ -40,12 +40,12 @@
   "dependencies": {
     "@ayu-sh-kr/dota-ast-utils": "workspace:*",
     "@ayu-sh-kr/dota-core": "workspace:*",
-    "@swc/core": "^1.13.5",
-    "consola": "3.4.2",
-    "fast-glob": "^3.3.3"
+    "@swc/core": "catalog:",
+    "consola": "catalog:",
+    "fast-glob": "catalog:"
   },
   "peerDependencies": {
-    "vite": "^7.1.0"
+    "vite": "catalog:peer-vite"
   },
   "files": [
     "dist/",
@@ -53,7 +53,14 @@
     "package.json"
   ],
   "devDependencies": {
-    "ajv": "^8.13.0",
-    "custom-elements-manifest": "^2.1.0"
+    "@microsoft/api-extractor": "catalog:",
+    "@types/node": "catalog:",
+    "ajv": "catalog:",
+    "custom-elements-manifest": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   }
 }

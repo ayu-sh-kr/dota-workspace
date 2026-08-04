@@ -8,6 +8,14 @@ import dotaWebTypeJson from "@ayu-sh-kr/dota-wrap/web-type-json";
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig({
+  oxc: {
+    decorator: {
+      legacy: true,
+    },
+  },
+  build: {
+    target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
+  },
   plugins: [
     dotaVitePreloader({
       root: projectRoot,

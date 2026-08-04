@@ -1,4 +1,5 @@
 import {RestRequestBuilder} from "@dota/RequestBuilder.ts";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 
 describe('RequestBuilder', () => {
 
@@ -12,11 +13,11 @@ describe('RequestBuilder', () => {
   };
 
   beforeEach(() => {
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should create a RequestBuilder without failing and have required properties', () => {
@@ -108,7 +109,7 @@ describe('RequestBuilder', () => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-    (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
+    vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse);
 
     const responseResolver = requestBuilder.retrieve();
     expect(responseResolver).toBeDefined();

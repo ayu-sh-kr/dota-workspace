@@ -12,7 +12,7 @@ describe('@Property decorator – metadata registration', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('stores the attribute name, prototype key and type in metadata', () => {
@@ -104,7 +104,7 @@ describe('@Property – runtime binding and attribute reflection', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('reflects the initial default value to the DOM attribute after connect', async () => {

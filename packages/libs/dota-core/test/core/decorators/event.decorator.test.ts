@@ -165,7 +165,7 @@ describe('@Emitter – emitter injection into component', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should inject an EventEmitter instance into the decorated property after connect', async () => {
@@ -206,7 +206,7 @@ describe('@Emitter – emitter injection into component', () => {
     await microtask();
 
     // Access the private `name` field via the emitter itself by observing dispatched event
-    const handler = jest.fn();
+    const handler = vi.fn();
     window.addEventListener('onRowSelected', handler);
 
     (el as any).rowSelected.emit('row-1');
@@ -232,7 +232,7 @@ describe('@Emitter – emitter injection into component', () => {
     document.body.appendChild(el);
     await microtask();
 
-    const handler = jest.fn();
+    const handler = vi.fn();
     window.addEventListener('widget:opened', handler);
 
     (el as any).open.emit(undefined);
@@ -314,8 +314,8 @@ describe('@Emitter – emitter injection into component', () => {
     document.body.appendChild(el);
     await microtask();
 
-    const windowHandler = jest.fn();
-    const elHandler = jest.fn();
+    const windowHandler = vi.fn();
+    const elHandler = vi.fn();
 
     window.addEventListener('btn:clicked', windowHandler);
     el.addEventListener('btn:clicked', elHandler);
@@ -350,7 +350,7 @@ describe('@Emitter – emitter injection into component', () => {
     document.body.appendChild(el);
     await microtask();
 
-    const parentHandler = jest.fn();
+    const parentHandler = vi.fn();
     document.body.addEventListener('form:submit', parentHandler);
 
     (el as any).formSubmit.emit('payload', el, true);

@@ -76,11 +76,11 @@ describe('@Watcher – invoked when @Property value changes', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('calls the watcher method when the watched property changes', async () => {
-    const watcherSpy = jest.fn();
+    const watcherSpy = vi.fn();
 
     @Component({ selector: 'watcher-property-change', shadow: false })
     class TestComponent extends BaseElement {
@@ -137,7 +137,7 @@ describe('@Watcher – invoked when @Property value changes', () => {
   });
 
   it('does not call the watcher when the same value is assigned again', async () => {
-    const watcherSpy = jest.fn();
+    const watcherSpy = vi.fn();
 
     @Component({ selector: 'watcher-no-call-same-value', shadow: false })
     class TestComponent extends BaseElement {
@@ -197,8 +197,8 @@ describe('@Watcher – invoked when @Property value changes', () => {
   });
 
   it('invokes all registered watchers for the same property', async () => {
-    const spyA = jest.fn();
-    const spyB = jest.fn();
+    const spyA = vi.fn();
+    const spyB = vi.fn();
 
     @Component({ selector: 'watcher-multiple-same-property', shadow: false })
     class TestComponent extends BaseElement {
@@ -227,7 +227,7 @@ describe('@Watcher – invoked when @Property value changes', () => {
   });
 
   it('fires the watcher when the property is updated via setAttribute', async () => {
-    const watcherSpy = jest.fn();
+    const watcherSpy = vi.fn();
 
     @Component({ selector: 'watcher-via-set-attribute', shadow: false })
     class TestComponent extends BaseElement {
@@ -290,11 +290,11 @@ describe('@Watcher – invoked when @State value changes', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('calls the watcher when the watched state property changes', async () => {
-    const watcherSpy = jest.fn();
+    const watcherSpy = vi.fn();
 
     @Component({ selector: 'watcher-on-state-change', shadow: false })
     class TestComponent extends BaseElement {
@@ -322,7 +322,7 @@ describe('@Watcher – invoked when @State value changes', () => {
   });
 
   it('does not call the watcher when the same state value reference is reassigned', async () => {
-    const watcherSpy = jest.fn();
+    const watcherSpy = vi.fn();
 
     @Component({ selector: 'watcher-state-no-call-same-ref', shadow: false })
     class TestComponent extends BaseElement {

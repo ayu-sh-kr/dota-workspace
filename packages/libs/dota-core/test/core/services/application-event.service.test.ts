@@ -152,7 +152,7 @@ describe('ApplicationEventService – getEventBus', () => {
   it('a callback registered directly on the bus fires when the bus emits the event', async () => {
     const svc = ApplicationEventService.getInstance();
     const bus = svc.getEventBus();
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     bus.on('bus:ping', spy);
     bus.emit({name: 'bus:ping', data: 'hello'});
@@ -164,7 +164,7 @@ describe('ApplicationEventService – getEventBus', () => {
   it('a callback removed directly from the bus no longer fires', async () => {
     const svc = ApplicationEventService.getInstance();
     const bus = svc.getEventBus();
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     bus.on('bus:pong', spy);
     bus.emit({name: 'bus:pong'});
@@ -179,7 +179,7 @@ describe('ApplicationEventService – getEventBus', () => {
 describe('ApplicationEventService – bus, listener and publisher share one DefaultApplicationEventBus', () => {
 
   beforeEach(() => resetSingleton());
-  afterEach(() => jest.clearAllMocks());
+  afterEach(() => vi.clearAllMocks());
 
   it('the event bus is the exact DefaultApplicationEventBus singleton', () => {
     const svc = ApplicationEventService.getInstance();
@@ -188,7 +188,7 @@ describe('ApplicationEventService – bus, listener and publisher share one Defa
 
   it('a listener subscription is visible from the bus — bus.emit fires the listener callback', async () => {
     const svc = ApplicationEventService.getInstance();
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     svc.getListener().on('shared:event', spy);
     svc.getEventBus().emit({name: 'shared:event', data: 42});
@@ -199,7 +199,7 @@ describe('ApplicationEventService – bus, listener and publisher share one Defa
 
   it('a publisher.publish reaches a listener subscribed directly on the bus', async () => {
     const svc = ApplicationEventService.getInstance();
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     svc.getEventBus().on('bus:direct', spy);
     svc.getPublisher().publish({ name: 'bus:direct' });
@@ -209,7 +209,7 @@ describe('ApplicationEventService – bus, listener and publisher share one Defa
 
   it('bus, listener and publisher all use the same underlying event manager — one subscription covers all paths', () => {
     const svc = ApplicationEventService.getInstance();
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     svc.getListener().on('unified:event', spy);
 
@@ -220,7 +220,7 @@ describe('ApplicationEventService – bus, listener and publisher share one Defa
 
   it('after singleton reset the new service creates a fresh bus that has no old subscriptions', () => {
     const first = ApplicationEventService.getInstance();
-    const spy   = jest.fn();
+    const spy   = vi.fn();
     first.getListener().on('stale:event', spy);
 
     resetSingleton();
@@ -235,14 +235,14 @@ describe('ApplicationEventService – bus, listener and publisher share one Defa
 describe('ApplicationEventService – listener and publisher share the same event bus', () => {
 
   beforeEach(() => resetSingleton());
-  afterEach(() => jest.clearAllMocks());
+  afterEach(() => vi.clearAllMocks());
 
   it('a callback registered on the listener fires when the publisher publishes the event', () => {
     const svc      = ApplicationEventService.getInstance();
     const listener = svc.getListener();
     const publisher = svc.getPublisher();
 
-    const spy = jest.fn();
+    const spy = vi.fn();
     listener.on('user:login', spy);
     publisher.publish({ name: 'user:login', data: { userId: 42 } });
 
@@ -255,7 +255,7 @@ describe('ApplicationEventService – listener and publisher share the same even
     const listener = svc.getListener();
     const publisher = svc.getPublisher();
 
-    const spy = jest.fn();
+    const spy = vi.fn();
     listener.on('user:logout', spy);
     await publisher.publishAsync({ name: 'user:logout', data: { userId: 1 } });
 
@@ -268,9 +268,9 @@ describe('ApplicationEventService – listener and publisher share the same even
     const listener  = svc.getListener();
     const publisher = svc.getPublisher();
 
-    const spyA = jest.fn();
-    const spyB = jest.fn();
-    const spyC = jest.fn();
+    const spyA = vi.fn();
+    const spyB = vi.fn();
+    const spyC = vi.fn();
 
     listener.on('page:load', spyA);
     listener.on('page:load', spyB);
@@ -288,7 +288,7 @@ describe('ApplicationEventService – listener and publisher share the same even
     const listener  = svc.getListener();
     const publisher = svc.getPublisher();
 
-    const spy = jest.fn();
+    const spy = vi.fn();
     listener.on('item:removed', spy);
     publisher.publish({ name: 'item:removed' });
     expect(spy).toHaveBeenCalledTimes(1);
@@ -303,8 +303,8 @@ describe('ApplicationEventService – listener and publisher share the same even
     const listener  = svc.getListener();
     const publisher = svc.getPublisher();
 
-    const spyA = jest.fn();
-    const spyB = jest.fn();
+    const spyA = vi.fn();
+    const spyB = vi.fn();
 
     listener.on('data:ready', spyA);
     listener.on('data:ready', spyB);
@@ -321,8 +321,8 @@ describe('ApplicationEventService – listener and publisher share the same even
     const listener  = svc.getListener();
     const publisher = svc.getPublisher();
 
-    const loginSpy  = jest.fn();
-    const logoutSpy = jest.fn();
+    const loginSpy  = vi.fn();
+    const logoutSpy = vi.fn();
 
     listener.on('auth:login',  loginSpy);
     listener.on('auth:logout', logoutSpy);
@@ -354,7 +354,7 @@ describe('ApplicationEventService – listener and publisher share the same even
     const listener  = svc.getListener();
     const publisher = svc.getPublisher();
 
-    const spy = jest.fn();
+    const spy = vi.fn();
     listener.on('ping', spy);
 
     expect(() => publisher.publish({ name: 'ping' })).not.toThrow();
@@ -366,7 +366,7 @@ describe('ApplicationEventService – listener and publisher share the same even
 describe('ApplicationEventService – createEventChannel', () => {
 
   beforeEach(() => resetSingleton());
-  afterEach(() => jest.clearAllMocks());
+  afterEach(() => vi.clearAllMocks());
 
   it('returns an EventChannel instance', () => {
     const svc = ApplicationEventService.getInstance();
@@ -391,7 +391,7 @@ describe('ApplicationEventService – createEventChannel', () => {
   it('channel.on subscribes to a namespaced event on the shared listener', () => {
     const svc     = ApplicationEventService.getInstance();
     const channel = svc.createEventChannel('my-comp:42');
-    const spy     = jest.fn();
+    const spy     = vi.fn();
 
     channel.on('connected', spy);
     svc.getPublisher().publish({ name: 'my-comp:42:connected' });
@@ -402,7 +402,7 @@ describe('ApplicationEventService – createEventChannel', () => {
   it('channel.emit publishes a namespaced event received by a channel subscriber', () => {
     const svc     = ApplicationEventService.getInstance();
     const channel = svc.createEventChannel('widget:7');
-    const spy     = jest.fn();
+    const spy     = vi.fn();
 
     channel.on('ready', spy);
     channel.emit({ name: 'ready' });
@@ -413,8 +413,8 @@ describe('ApplicationEventService – createEventChannel', () => {
   it('channel event does not fire a raw (non-namespaced) subscriber for the same base name', () => {
     const svc     = ApplicationEventService.getInstance();
     const channel = svc.createEventChannel('ns:1');
-    const rawSpy  = jest.fn();
-    const nsSpy   = jest.fn();
+    const rawSpy  = vi.fn();
+    const nsSpy   = vi.fn();
 
     svc.getListener().on('ready', rawSpy);
     channel.on('ready', nsSpy);
@@ -430,8 +430,8 @@ describe('ApplicationEventService – createEventChannel', () => {
     const channelA = svc.createEventChannel('comp-a:1');
     const channelB = svc.createEventChannel('comp-b:1');
 
-    const spyA = jest.fn();
-    const spyB = jest.fn();
+    const spyA = vi.fn();
+    const spyB = vi.fn();
 
     channelA.on('init', spyA);
     channelB.on('init', spyB);
@@ -447,8 +447,8 @@ describe('ApplicationEventService – createEventChannel', () => {
     const channelA = svc.createEventChannel('shared:1');
     const channelB = svc.createEventChannel('shared:1');
 
-    const spyA = jest.fn();
-    const spyB = jest.fn();
+    const spyA = vi.fn();
+    const spyB = vi.fn();
 
     channelA.on('tick', spyA);
     channelB.on('tick', spyB);
@@ -462,7 +462,7 @@ describe('ApplicationEventService – createEventChannel', () => {
   it('channel forwards event payload data intact to subscribers', () => {
     const svc     = ApplicationEventService.getInstance();
     const channel = svc.createEventChannel('store:1');
-    const spy     = jest.fn();
+    const spy     = vi.fn();
 
     channel.on('updated', spy);
     channel.emit({ name: 'updated', data: { key: 'theme', value: 'dark' } });

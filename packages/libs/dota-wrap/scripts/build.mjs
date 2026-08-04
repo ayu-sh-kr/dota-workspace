@@ -73,8 +73,14 @@ for (const entry of entries) {
   await build({
     configFile: false,
     root: packageRoot,
+    oxc: {
+      decorator: {
+        legacy: true,
+      },
+    },
     build: {
       emptyOutDir: false,
+      target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
       lib: {
         entry: resolve(packageRoot, entry.source),
         formats: ['cjs', 'es'],
@@ -82,7 +88,7 @@ for (const entry of entries) {
       },
       minify: false,
       outDir,
-      rollupOptions: {
+      rolldownOptions: {
         // Keep stateful browser runtimes as package references so every subpath
         // resolves one core/event instance. Build-time plugins stay bundled so a
         // packed wrapper contains the exact scanner implementation it was built with.
@@ -99,7 +105,6 @@ for (const entry of entries) {
         outDir,
         entryRoot: dirname(resolve(packageRoot, entry.source)),
         insertTypesEntry: true,
-        bundledPackages: internalPackages,
       }),
     ],
   });

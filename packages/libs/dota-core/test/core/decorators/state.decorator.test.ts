@@ -64,7 +64,7 @@ describe('@State – runtime reactive behaviour', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('returns the assigned value through the getter', async () => {

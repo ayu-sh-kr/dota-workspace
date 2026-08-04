@@ -56,11 +56,11 @@ describe('@BeforeInit – runs before connectedCallback tasks', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('invokes beforeViewInit when the component is connected', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'before-basic-invoke', shadow: false })
     class TestComponent extends BaseElement {
@@ -155,7 +155,7 @@ describe('@BeforeInit – runs before connectedCallback tasks', () => {
   });
 
   it('is invoked each time the component is reconnected to the DOM', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'before-on-reconnect', shadow: false })
     class TestComponent extends BaseElement {
@@ -182,7 +182,7 @@ describe('@BeforeInit – runs before connectedCallback tasks', () => {
   });
 
   it('does not invoke beforeViewInit before the component is connected', async () => {
-    const spy = jest.fn();
+    const spy = vi.fn();
 
     @Component({ selector: 'before-not-before-connect', shadow: false })
     class TestComponent extends BaseElement {

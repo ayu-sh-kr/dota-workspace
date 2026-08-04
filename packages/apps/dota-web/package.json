@@ -10,25 +10,27 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.16",
-    "@types/markdown-it": "^14.1.2",
-    "autoprefixer": "^10.4.19",
-    "jiti": "2.6.1",
-    "postcss": "8.5.10",
-    "tailwindcss": "^3.4.4",
-    "vite": "7.3.1"
+    "@tailwindcss/typography": "catalog:",
+    "@types/markdown-it": "catalog:",
+    "@types/node": "catalog:",
+    "autoprefixer": "catalog:",
+    "jiti": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
   },
   "dependencies": {
     "@ayu-sh-kr/dota-ui": "workspace:*",
     "@ayu-sh-kr/dota-wrap": "workspace:*",
     "@ayu-sh-kr/dota-md": "workspace:*",
-    "@floating-ui/dom": "^1.7.5",
-    "highlight.js": "^11.11.1",
-    "markdown-it": "latest",
-    "markdown-it-anchor": "^9.2.0",
-    "markdown-it-highlightjs": "^4.2.0",
-    "markdown-it-toc-done-right": "^4.2.0",
-    "reflect-metadata": "^0.2.2"
+    "@floating-ui/dom": "catalog:",
+    "highlight.js": "catalog:",
+    "markdown-it": "catalog:",
+    "markdown-it-anchor": "catalog:",
+    "markdown-it-highlightjs": "catalog:",
+    "markdown-it-toc-done-right": "catalog:",
+    "reflect-metadata": "catalog:"
   },
   "web-types": "./web-types.json",
   "customElements": "custom-elements.json"

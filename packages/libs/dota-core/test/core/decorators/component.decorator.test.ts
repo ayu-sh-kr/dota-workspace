@@ -400,7 +400,7 @@ describe('@Component decorator – custom element registration', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('defineAndCreate registers and instantiates the component using __dotaSelector', () => {

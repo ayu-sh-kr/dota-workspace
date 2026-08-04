@@ -54,7 +54,11 @@ async function runConfigResolved(plugin: ReturnType<typeof eventMapGenerator>): 
   await plugin.configResolved.call({} as never, {
     root: '/workspace',
     resolve: {
-      alias: [{find: '@dota', replacement: '/workspace/src'}],
+      alias: [
+        {find: /^\/?@vite\/env/, replacement: '/vite/env.mjs'},
+        {find: /^\/?@vite\/client/, replacement: '/vite/client.mjs'},
+        {find: '@dota', replacement: '/workspace/src'},
+      ],
     },
   } as never);
 }

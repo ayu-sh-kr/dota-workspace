@@ -30,3 +30,8 @@ export class EventMapModuleConstants {
   static DEFAULT_OUTPUT_PATH = './src/event-map.d.ts';
   static DEFAULT_LOCATION_OUTPUT_PATH = './src/event-map.locations.json';
 }
+
+/** Vite-owned aliases that cannot resolve application event source imports. */
+export class ViteAliasConstants {
+  static INTERNAL_ALIAS_SOURCE_PREFIX = '^\\/?@vite\\/';
+}

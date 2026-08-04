@@ -3,7 +3,7 @@ import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import type { AstPathAlias } from '@ayu-sh-kr/dota-ast-utils';
-import { BUILT_IN_EVENT_NAMES, EventMapModuleConstants } from '@dota/Constants.ts';
+import { BUILT_IN_EVENT_NAMES, EventMapModuleConstants, ViteAliasConstants } from '@dota/Constants.ts';
 import { EventMapDeclarationUtils } from '@dota/generate/EventMapDeclarationUtils.ts';
 import { EventMapLocationUtils } from '@dota/generate/EventMapLocationUtils.ts';
 import { scanEventMapSources } from '@dota/scan/EventMapScanner.ts';
@@ -131,8 +131,9 @@ function shouldRebuild(file: string): boolean {
 
 /**
  * Converts Vite's resolved alias list and explicit plugin aliases into one plain AST model.
- * Regex aliases are skipped with a warning because the generic resolver only accepts deterministic
- * string mappings; explicit aliases take precedence when their visible prefix is equal.
+ * Regex aliases are skipped because the generic resolver only accepts deterministic string mappings.
+ * Vite's internal client aliases are ignored silently; unsupported user aliases retain a warning.
+ * Explicit aliases take precedence when their visible prefix is equal.
  * @param root Effective Vite/project root used to normalize relative replacements.
  * @param explicit Explicit aliases supplied directly to the event generator.
  * @param viteAliases Alias entries produced by Vite's resolved configuration.
@@ -171,7 +172,11 @@ function normalizeAliasEntries(root: string, aliases: unknown, fromVite: boolean
     const find = entry.find;
     const replacement = entry.replacement;
     if (typeof find !== 'string' || typeof replacement !== 'string') {
-      if (find instanceof RegExp) log.warn(`Skipping unsupported regex event alias ${find}`);
+      if (find instanceof RegExp) {
+        const isViteInternalAlias = fromVite
+          && find.source.startsWith(ViteAliasConstants.INTERNAL_ALIAS_SOURCE_PREFIX);
+        if (!isViteInternalAlias) log.warn(`Skipping unsupported regex event alias ${find}`);
+      }
       return [];
     }
 

@@ -33,7 +33,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "release": "pnpm run build && changeset publish",
     "test": "tsc --noEmit && vitest run",
@@ -42,7 +42,18 @@
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "catalog:"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "catalog:",
+    "@types/dom-navigation": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   },
   "files": [
     "dist/",
