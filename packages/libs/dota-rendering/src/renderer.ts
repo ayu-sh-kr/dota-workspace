@@ -42,6 +42,12 @@ interface RenderRoot {
    */
   replaceChildren(fragment: DocumentFragment): void;
   /**
+   * Resolves a live element carrying one mount-unique dynamic marker.
+   * @param locator Marker value assigned while the template was indexed.
+   * @returns The matching live element, or null when the marker is no longer rendered.
+   */
+  findDynamicElement(locator: string): Element | null;
+  /**
    * Commits legacy markup within this boundary using browser HTML parsing.
    * @param value Complete trusted legacy render string.
    */
@@ -84,6 +90,8 @@ type AttributePart = {
   valueIndexes: number[];
   /** Parsed element receiving the standard `setAttribute` mutation. */
   element: Element;
+  /** Mount-unique marker used only if a light-DOM renderer replaces the parsed host. */
+  locator: string;
   /** HTML attribute name reported by the browser parser. */
   name: string;
   /** Parsed quoted value containing temporary interpolation markers. */
@@ -146,6 +154,11 @@ class NativeRoot implements RenderRoot {
     this.root.replaceChildren(fragment);
   }
 
+  /** Finds a replacement host inside this component-owned root. */
+  findDynamicElement(locator: string): Element | null {
+    return this.root.querySelector(`[${DYNAMIC_ATTRIBUTE}="${locator}"]`);
+  }
+
   /**
    * Preserves legacy rendering semantics by assigning the complete HTML string.
    * @param value Trusted legacy markup produced by the component.
@@ -170,6 +183,13 @@ class RangeRoot implements RenderRoot {
   replaceChildren(fragment: DocumentFragment): void {
     this.clear();
     this.end.parentNode?.insertBefore(fragment, this.end);
+  }
+
+  /** Finds a replacement host in the document or shadow tree containing this range. */
+  findDynamicElement(locator: string): Element | null {
+    const searchRoot = this.start.getRootNode();
+    if (!('querySelector' in searchRoot)) return null;
+    return (searchRoot as ParentNode).querySelector(`[${DYNAMIC_ATTRIBUTE}="${locator}"]`);
   }
 
   /**
@@ -385,6 +405,7 @@ class TemplateStrategy implements RenderStrategy {
   private indexElementsAndFindAttributeParts(fragment: DocumentFragment, attributeNames: ReadonlyMap<string, string>, parts: Map<number, RenderPart[]>): void {
     const elements = [...fragment.querySelectorAll('*')];
     elements.forEach((element, index) => {
+      const locator = `${this.markerPrefix}element-${index}`;
       element.setAttribute(NODE_INDEX_ATTRIBUTE, String(index));
       if (element.localName.includes('-')) element.setAttribute(COMPONENT_ATTRIBUTE, element.localName);
 
@@ -400,11 +421,12 @@ class TemplateStrategy implements RenderStrategy {
           kind: 'attribute',
           valueIndexes,
           element,
+          locator,
           name,
           templateValue: attribute.value
         };
         element.removeAttribute(attribute.name);
-        element.setAttribute(DYNAMIC_ATTRIBUTE, '');
+        element.setAttribute(DYNAMIC_ATTRIBUTE, locator);
         valueIndexes.forEach((valueIndex) => recordRenderPart(parts, valueIndex, part));
       }
     });
@@ -441,6 +463,9 @@ class TemplateStrategy implements RenderStrategy {
     }
     const nextValue = part.templateValue.replace(this.markerPattern, (_, markerIndex: string) =>
       valueText(values[Number(markerIndex)]));
+    if (!part.element.isConnected) {
+      part.element = this.root.findDynamicElement(part.locator) ?? part.element;
+    }
     part.element.setAttribute(part.name, nextValue);
   }
 

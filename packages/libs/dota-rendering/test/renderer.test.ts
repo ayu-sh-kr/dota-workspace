@@ -55,16 +55,20 @@ describe('renderer public API', () => {
     const tagName = 'dota-renderer-observed-child';
     if (!customElements.get(tagName)) {
       customElements.define(tagName, class extends HTMLElement {
+        count = 0;
+
         static get observedAttributes(): string[] {
           return ['count'];
         }
 
         attributeChangedCallback(_name: string, _oldValue: string | null, newValue: string | null): void {
           attributeValues.push(newValue);
+          this.count = Number(newValue);
         }
 
         connectedCallback(): void {
           connectedValues.push(this.getAttribute('count'));
+          this.append(document.createElement('span'));
         }
       });
     }
@@ -75,11 +79,15 @@ describe('renderer public API', () => {
       <dota-renderer-observed-child count="${count}"></dota-renderer-observed-child>
     `;
     const instance = render(root, view(2));
-    const child = root.querySelector(tagName);
+    const child = root.querySelector(tagName) as (HTMLElement & {count: number}) | null;
+    const internalChild = child?.firstElementChild;
 
     update(instance, view(3));
 
     expect(root.querySelector(tagName)).toBe(child);
+    expect(child?.getAttribute('count')).toBe('3');
+    expect(child?.count).toBe(3);
+    expect(child?.firstElementChild).toBe(internalChild);
     expect(attributeValues).toEqual(['2', '3']);
     expect(connectedValues).toEqual(['2']);
     root.remove();

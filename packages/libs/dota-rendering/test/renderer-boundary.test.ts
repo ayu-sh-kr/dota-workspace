@@ -1,4 +1,4 @@
-import {html, render} from '@dota/main';
+import {html, render, update} from '@dota/main';
 
 describe('renderer component boundaries', () => {
   it('shows which light and shadow descendants the current traversal sees', () => {
@@ -51,5 +51,53 @@ describe('renderer component boundaries', () => {
     expect(childContent).toBeTruthy();
     expect(childContent?.hasAttribute('data-dota-index')).toBe(false);
     expect(childContent?.hasAttribute('data-dota-dynamic')).toBe(false);
+  });
+
+  it('patches a live custom-element host recreated by an intermediate light-DOM component', () => {
+    const wrapperName = 'dota-recreating-wrapper';
+    const childName = 'dota-recreated-child';
+    if (!customElements.get(wrapperName)) {
+      customElements.define(wrapperName, class extends HTMLElement {
+        connectedCallback(): void {
+          this.innerHTML = this.innerHTML;
+        }
+      });
+    }
+    if (!customElements.get(childName)) {
+      customElements.define(childName, class extends HTMLElement {
+        color = '';
+
+        static get observedAttributes(): string[] {
+          return ['color'];
+        }
+
+        attributeChangedCallback(_name: string, _oldValue: string | null, newValue: string | null): void {
+          this.color = newValue ?? '';
+        }
+
+        connectedCallback(): void {
+          this.append(document.createElement('span'));
+        }
+      });
+    }
+
+    const root = document.createElement('div');
+    document.body.append(root);
+    const view = (color: string) => html`
+      <dota-recreating-wrapper>
+        <dota-recreated-child color="${color}"></dota-recreated-child>
+      </dota-recreating-wrapper>
+    `;
+    const instance = render(root, view('indigo'));
+    const child = root.querySelector(childName) as (HTMLElement & {color: string}) | null;
+    const internalChild = child?.firstElementChild;
+
+    update(instance, view('rose'));
+
+    expect(root.querySelector(childName)).toBe(child);
+    expect(child?.getAttribute('color')).toBe('rose');
+    expect(child?.color).toBe('rose');
+    expect(child?.firstElementChild).toBe(internalChild);
+    root.remove();
   });
 });
