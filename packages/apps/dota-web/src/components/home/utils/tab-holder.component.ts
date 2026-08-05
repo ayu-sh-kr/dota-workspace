@@ -1,4 +1,5 @@
-import {AfterInit, BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {TAB_REGISTRY} from "./capability.config.ts";
 
 /**
@@ -58,19 +59,19 @@ export class TabHolderComponent extends BaseElement {
     });
   }
 
-  render(): string {
+  render(): TemplateResult {
     const tabs = TAB_REGISTRY[this.key] ?? [];
 
-    const buttons = tabs.map((tab, i) => `
+    const buttons = tabs.map((tab, i) => html`
       <button class="tab-btn ${i === 0 ? 'tab-btn-active' : 'tab-btn-inactive'}"
               data-tab="${tab.id}"
               aria-selected="${i === 0}"
               role="tab">
         ${tab.title}
       </button>
-    `).join('');
+    `);
 
-    return HTML`
+    return html`
         <div class="flex flex-wrap gap-2" role="tablist" aria-label="Tabs">
             ${buttons}
         </div>

@@ -1,4 +1,5 @@
-import {AfterInit, BaseElement, BindEvent, Component, HTML, Property, Boolean} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, BindEvent, Component, Property, Boolean} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 
 @Component({
@@ -29,8 +30,8 @@ export class OfferComponent extends BaseElement {
     LocalStorageService.add('offer', 'false');
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
         <div 
             class="${this.isVisible ? '' : 'hidden'} relative font-dm flex items-center justify-center w-full bg-gradient-to-r from-purple-600 via-black to-purple-600 py-4"
         >

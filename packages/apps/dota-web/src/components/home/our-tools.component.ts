@@ -1,4 +1,5 @@
-import {AfterInit, BaseElement, Component, HostListener, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, Component, HostListener} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {DOTA_TOOLS, type DotaTool} from "@dota/components/home/utils/tools.config.ts";
 
 type PackagePresentation = {
@@ -65,11 +66,11 @@ export class OurToolsComponent extends BaseElement {
     return tool.name.replace(/^dota-/, "");
   }
 
-  private chapter(tool: DotaTool, index: number): string {
+  private chapter(tool: DotaTool, index: number): TemplateResult {
     const presentation = PRESENTATION[tool.id];
     const facts = tool.tags.slice(0, 3);
 
-    return HTML`
+    return html`
       <section class="dota-package-chapter" data-chapter data-index="${index}"
                style="--tint:${presentation.tint};--tint-end:${presentation.tintEnd}"
                aria-labelledby="dota-package-${index}">
@@ -86,7 +87,7 @@ export class OurToolsComponent extends BaseElement {
               </h3>
               <p class="dota-package-description dota-reveal-segment">${tool.description}</p>
               <ul class="dota-package-spec" role="list" aria-label="${tool.name} highlights">
-                ${facts.map((fact, factIndex) => `<li class="dota-reveal-segment" style="--fact-index:${factIndex}">${fact}</li>`).join("")}
+                ${facts.map((fact, factIndex) => html`<li class="dota-reveal-segment" style="--fact-index:${factIndex}">${fact}</li>`)}
               </ul>
             </div>
           </article>
@@ -98,18 +99,18 @@ export class OurToolsComponent extends BaseElement {
     `;
   }
 
-  private constellationLines(): string {
+  private constellationLines(): TemplateResult[] {
     return CONSTELLATION_EDGES.map(([fromId, toId]) => {
       const from = PRESENTATION[fromId];
       const to = PRESENTATION[toId];
       const length = Math.hypot(to.x - from.x, to.y - from.y).toFixed(2);
-      return `<line style="--edge-length:${length}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`;
-    }).join("");
+      return html`<line style="--edge-length:${length}" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}"></line>`;
+    });
   }
 
-  private constellationNode(tool: DotaTool, index: number): string {
+  private constellationNode(tool: DotaTool, index: number): TemplateResult {
     const point = PRESENTATION[tool.id];
-    return HTML`
+    return html`
       <div class="dota-constellation-node" data-constellation-node style="--node-delay:${(index * .035).toFixed(3)};--node-x:${point.x}%;--node-y:${point.y}%;--mobile-x:${point.mobileX}%;--mobile-y:${point.mobileY}%;--tint:${point.tint};--tint-end:${point.tintEnd}">
         <span class="dota-constellation-glyph" aria-hidden="true">
           <dota-icon name="${tool.icon}" classname="text-white" size="md"></dota-icon>
@@ -119,9 +120,9 @@ export class OurToolsComponent extends BaseElement {
     `;
   }
 
-  private finale(): string {
+  private finale(): TemplateResult {
     const tools = this.orderedTools;
-    return HTML`
+    return html`
       <section class="dota-constellation-finale" data-finale aria-labelledby="dota-constellation-title">
         <div class="dota-constellation-pin">
           <div class="dota-constellation-copy">
@@ -137,7 +138,7 @@ export class OurToolsComponent extends BaseElement {
             <svg class="dota-constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
               ${this.constellationLines()}
             </svg>
-            ${tools.map((tool, index) => this.constellationNode(tool, index)).join("")}
+            ${tools.map((tool, index) => this.constellationNode(tool, index))}
           </figure>
           <p class="dota-constellation-caption">Eight focused packages. One coherent framework.</p>
         </div>
@@ -145,17 +146,17 @@ export class OurToolsComponent extends BaseElement {
     `;
   }
 
-  private progressRail(): string {
-    return HTML`
+  private progressRail(): TemplateResult {
+    return html`
       <nav class="dota-package-rail" data-rail aria-label="Dota packages">
         <span class="dota-package-rail-track" aria-hidden="true"><i></i></span>
-        ${this.orderedTools.map((tool, index) => HTML`
+        ${this.orderedTools.map((tool, index) => html`
           <button type="button" data-rail-index="${index}" aria-label="Jump to ${tool.name}"
                   aria-current="${index === this.activeChapter ? "step" : "false"}"
                   style="--dot:${PRESENTATION[tool.id].tint}">
             <span></span>
           </button>
-        `).join("")}
+        `)}
       </nav>
     `;
   }
@@ -271,9 +272,9 @@ export class OurToolsComponent extends BaseElement {
     tilt?.style.removeProperty("--my");
   }
 
-  render(): string {
+  render(): TemplateResult {
     const tools = this.orderedTools;
-    return HTML`
+    return html`
       <section class="dota-ecosystem-reveal font-dm" aria-labelledby="dota-ecosystem-title">
         <header class="dota-ecosystem-intro">
           <p>Ecosystem / 08 native packages</p>
@@ -282,7 +283,7 @@ export class OurToolsComponent extends BaseElement {
         </header>
         ${this.progressRail()}
         <div class="dota-package-chapters">
-          ${tools.map((tool, index) => this.chapter(tool, index)).join("")}
+          ${tools.map((tool, index) => this.chapter(tool, index))}
         </div>
         ${this.finale()}
       </section>
