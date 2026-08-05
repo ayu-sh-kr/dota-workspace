@@ -225,6 +225,24 @@ describe('@Property – runtime binding and attribute reflection', () => {
     expect((el as any).max).toBe(42);
   });
 
+  it('updates the typed public field before reactive accessors are connected', () => {
+    @Component({ selector: 'prop-before-connect-public-field', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @Property({ name: 'count', type: Number })
+      count = 0;
+
+      render() { return `<span>${this.count}</span>`; }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    el.setAttribute('count', '7');
+
+    expect((el as any).count).toBe(7);
+    expect(el.render()).toBe('<span>7</span>');
+  });
+
   it('coerces the attribute string to a Boolean type on property access', async () => {
     @Component({ selector: 'prop-boolean-coerce', shadow: false })
     class TestComponent extends BaseElement {
@@ -316,4 +334,3 @@ describe('@Property – runtime binding and attribute reflection', () => {
     expect((el as any).reactive).toBe(false);
   });
 });
-
