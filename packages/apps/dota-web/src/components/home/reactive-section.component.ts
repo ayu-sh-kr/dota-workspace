@@ -1,4 +1,5 @@
-import {AfterInit, BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {MDService} from "@ayu-sh-kr/dota-md";
 import {notificationService} from "@dota/main.ts";
 import {CapabilityTab, TAB_REGISTRY} from "@dota/components/home/utils/capability.config.ts";
@@ -74,10 +75,10 @@ export class ReactiveSectionComponent extends BaseElement {
         }
     }
 
-    render(): string {
+    render(): TemplateResult {
         const first = this.tabs[0];
 
-        return HTML`
+        return html`
         <section role="region" aria-labelledby="reactive-heading"
                  class="hero-fade-up relative isolate font-dm w-full
                         before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r

@@ -1,4 +1,4 @@
-import {BaseElement, BindEvent, Component, Number, Property} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, BindEvent, Component, html, Number, Property} from "@ayu-sh-kr/dota-wrap/core";
 
 
 @Component({
@@ -27,9 +27,9 @@ export class CounterComponent extends BaseElement {
     this.counter--;
   }
 
-  render(): string {
+  render() {
     // language=html
-    return `
+    return html`
       <div class="flex flex-col items-center justify-center p-8">
         <h1 class="text-2xl font-bold mb-4">Counter Component</h1>
         <div class="flex items-center space-x-4">

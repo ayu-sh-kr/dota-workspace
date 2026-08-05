@@ -1,5 +1,6 @@
 import {ApplicationEventService, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
 
 /**
@@ -59,9 +60,8 @@ export class DocSectionComponent extends BaseElement {
     return params.get('content') ?? 'Getting-Started.md';
   }
 
-  render(): string {
-    //language=HTML
-    return `
+  render(): TemplateResult {
+    return html`
       <section class="mx-auto md:max-w-7xl w-full">
         <doc-header
           active-file="${this.activeFile}"

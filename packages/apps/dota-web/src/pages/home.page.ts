@@ -1,5 +1,6 @@
 import {DotaPageElement, Component, SEO} from "@ayu-sh-kr/dota-wrap/core";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
@@ -32,9 +33,8 @@ export class HomePage extends DotaPageElement {
     GeneralUtils.scrollToTop('smooth');
   }
 
-  render(): string {
-    //language=html
-    return `
+  render(): TemplateResult {
+    return html`
            <app-header></app-header>
            <main class="min-h-screen overflow-x-clip bg-[#faf8ff] text-slate-950
                         dark:bg-[#09080b] dark:text-slate-50">

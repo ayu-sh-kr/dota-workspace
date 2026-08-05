@@ -11,6 +11,7 @@ const internalPackages = [
   '@ayu-sh-kr/dota-event',
   '@ayu-sh-kr/dota-event-map-generator',
   '@ayu-sh-kr/dota-preloader-plugin',
+  '@ayu-sh-kr/dota-rendering',
   '@ayu-sh-kr/dota-rest',
   '@ayu-sh-kr/dota-router',
   '@ayu-sh-kr/dota-web-type-json',
@@ -31,6 +32,7 @@ const entries = [
   { name: '.', source: 'src/index.ts', outDir: 'dist' },
   { name: 'core', source: 'src/core/index.ts', outDir: 'dist/core' },
   { name: 'event', source: 'src/event/index.ts', outDir: 'dist/event' },
+  { name: 'rendering', source: 'src/rendering/index.ts', outDir: 'dist/rendering' },
   { name: 'event-map-generator', source: 'src/event-map-generator/index.ts', outDir: 'dist/event-map-generator', bundleInternal: true, external: nodePluginExternal },
   { name: 'router', source: 'src/router/index.ts', outDir: 'dist/router' },
   { name: 'rest', source: 'src/rest/index.ts', outDir: 'dist/rest' },
@@ -58,6 +60,7 @@ function getExternal(entry) {
 const declarationSources = {
   core: '../dota-core/dist/index.d.ts',
   event: '../dota-event/dist/index.d.ts',
+  rendering: '../dota-rendering/dist/index.d.ts',
   'event-map-generator': '../../plugins/event-map-generator/dist/index.d.ts',
   router: '../dota-router/dist/index.d.ts',
   rest: '../dota-rest/dist/index.d.ts',
@@ -121,7 +124,9 @@ for (const [name, source] of Object.entries(declarationSources)) {
     content = content.replaceAll(
       "from '@ayu-sh-kr/dota-event'",
       "from '../event/index'"
-    );
+    )
+      .replaceAll("'@ayu-sh-kr/dota-rendering'", "'../rendering/index'")
+      .replaceAll('"@ayu-sh-kr/dota-rendering"', '"../rendering/index"');
   }
 
   await mkdir(destinationDir, { recursive: true });

@@ -1,5 +1,6 @@
-import {ApplicationEventService, BaseElement, Component, HTML, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {ApplicationEventService, BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import {THEMES, type ThemeName} from "@ayu-sh-kr/dota-md";
 
@@ -52,7 +53,7 @@ export class ThemePickerComponent extends BaseElement {
     this.style.display = 'none';
   }
 
-  private buildOptions(): string {
+  private buildOptions(): TemplateResult[] {
     return THEME_NAMES.map(name => {
       const isActive = name === this.currentTheme;
       const ring = isActive
@@ -61,13 +62,18 @@ export class ThemePickerComponent extends BaseElement {
       const nameClass = isActive
         ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
         : 'text-gray-800 dark:text-gray-200 font-medium';
-      const checkmark = isActive
-        ? `<svg class="w-4 h-4 text-indigo-500 dark:text-indigo-400 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-           </svg>`
-        : '';
       const desc = THEME_DESC[name] ?? '';
-      return `
+      const checkmark = isActive
+        ? html`
+            <svg class="w-4 h-4 text-indigo-500 dark:text-indigo-400 shrink-0"
+                 viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+            </svg>
+          `
+        : nothing;
+
+      return html`
         <button
           data-theme="${name}"
           class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left
@@ -78,7 +84,7 @@ export class ThemePickerComponent extends BaseElement {
           </div>
           ${checkmark}
         </button>`;
-    }).join('');
+    });
   }
 
   @HostListener({event: 'click'})
@@ -89,8 +95,8 @@ export class ThemePickerComponent extends BaseElement {
     }
   }
 
-  render() {
-    return HTML`
+  render(): TemplateResult {
+    return html`
       <div class="z-[100] p-3 rounded-xl border border-gray-200 dark:border-gray-700
                   bg-white dark:bg-gray-900 shadow-xl min-w-[13rem]">
         <p class="text-[0.6rem] font-bold uppercase tracking-widest

@@ -35,6 +35,13 @@
       "require": "./dist/core/index.cjs",
       "default": "./dist/core/index.mjs"
     },
+    "./rendering": {
+      "types": "./dist/rendering/index.d.ts",
+      "module": "./dist/rendering/index.mjs",
+      "import": "./dist/rendering/index.mjs",
+      "require": "./dist/rendering/index.cjs",
+      "default": "./dist/rendering/index.mjs"
+    },
     "./event": {
       "types": "./dist/event/index.d.ts",
       "module": "./dist/event/index.mjs",
@@ -90,6 +97,7 @@
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
+    "@ayu-sh-kr/dota-rendering": "workspace:*",
     "@ayu-sh-kr/dota-rest": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
     "@swc/core": "catalog:",

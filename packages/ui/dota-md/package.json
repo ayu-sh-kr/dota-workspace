@@ -57,6 +57,7 @@
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
+    "@ayu-sh-kr/dota-rendering": "workspace:*",
     "@ayu-sh-kr/dota-web-type-json": "workspace:*",
     "markdown-it": "catalog:",
     "markdown-it-anchor": "catalog:",

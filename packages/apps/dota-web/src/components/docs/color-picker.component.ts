@@ -1,5 +1,6 @@
-import {ApplicationEventService, BaseElement, Component, HTML, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {ApplicationEventService, BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import type {ColorName} from "@ayu-sh-kr/dota-md";
 
@@ -47,6 +48,7 @@ export class ColorPickerComponent extends BaseElement {
     const saved = LocalStorageService.get('docs-color') as ColorName | null;
     if (saved && saved !== this.currentColor) {
       this.currentColor = saved;
+      this.updateHTML();
     }
   }
 
@@ -59,42 +61,48 @@ export class ColorPickerComponent extends BaseElement {
     }
   }
 
-  private publishColor(color: ColorName) {
+  private selectColor(color: ColorName) {
+    if (color !== this.currentColor) {
+      this.currentColor = color;
+      this.updateHTML();
+    }
     LocalStorageService.add('docs-color', color);
+    const popover = document.querySelector<HTMLElement & {close?: () => void}>(
+      'dota-popover[anchored-selector="color-picker"]'
+    );
     ApplicationEventService.getInstance()
       .getPublisher()
       .publishAsync({ name: 'docs:color-change', data: { color } });
-    // Close the parent dota-popover by hiding this anchored element
-    this.style.display = 'none';
+    popover?.close?.();
   }
 
-  private buildSwatches(): string {
+  private buildSwatches(): TemplateResult[] {
     return COLOR_SWATCHES.map(({ name, bg }) => {
       const isActive = name === this.currentColor;
       const ring = isActive
         ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 ring-gray-600 dark:ring-gray-300 scale-110'
         : 'hover:scale-110 hover:ring-2 hover:ring-offset-1 hover:ring-offset-white dark:hover:ring-offset-gray-900 hover:ring-gray-400 dark:hover:ring-gray-500';
-      return `
+      return html`
         <button
           data-color="${name}"
           title="${name}"
-          aria-label="Color ${name}"
+          aria-label="${`Color ${name}`}"
           class="w-6 h-6 rounded-full ${bg} transition-transform duration-150
                  focus:outline-none cursor-pointer ${ring}">
         </button>`;
-    }).join('');
+    });
   }
 
   @HostListener({event: 'click'})
   handleClick(event: MouseEvent) {
     const target = (event.target as HTMLElement).closest('[data-color]') as HTMLElement | null;
     if (target?.dataset?.['color']) {
-      this.publishColor(target.dataset['color'] as ColorName);
+      this.selectColor(target.dataset['color'] as ColorName);
     }
   }
 
-  render() {
-    return HTML`
+  render(): TemplateResult {
+    return html`
       <div class="z-[100] p-3 rounded-xl border border-gray-200 dark:border-gray-700
                   bg-white dark:bg-gray-900 shadow-xl w-52">
         <p class="text-[0.6rem] font-bold uppercase tracking-widest
@@ -106,4 +114,3 @@ export class ColorPickerComponent extends BaseElement {
     `;
   }
 }
-

@@ -21,14 +21,19 @@ export default defineConfig({
     minify: false,
 
     rolldownOptions: {
-      external: ['@ayu-sh-kr/dota-core', '@ayu-sh-kr/dota-event'],
+      external: [
+        '@ayu-sh-kr/dota-core',
+        '@ayu-sh-kr/dota-event',
+        '@ayu-sh-kr/dota-rendering'
+      ],
 
       output: {
         dir: 'dist',
         exports: 'named',
         globals: {
           '@ayu-sh-kr/dota-core': 'DotaCore',
-          '@ayu-sh-kr/dota-event': 'DotaEvent'
+          '@ayu-sh-kr/dota-event': 'DotaEvent',
+          '@ayu-sh-kr/dota-rendering': 'DotaRendering'
         }
       }
     }

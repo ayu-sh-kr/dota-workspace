@@ -1,6 +1,7 @@
-import {BaseElement, Component, HostListener, HTML, Property, String, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, HostListener, Property, String, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
 import type {TocEntry} from "@dota/service/markdown.service.ts";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import {THEMES, type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 
@@ -207,8 +208,8 @@ export class DocTocComponent extends BaseElement {
    * text, and recursively renders child headings if present. Active items get highlighted
    * with theme-colored text and bar, inactive ones use neutral gray tones.
    */
-  private buildItems(entries: TocEntry[], depth = 0): string {
-    if (!entries.length) return '';
+  private buildItems(entries: TocEntry[], depth = 0): TemplateResult[] {
+    if (!entries.length) return [];
     const toc = tocClasses(this.theme, this.color);
     const indent = depth === 0 ? '' : depth === 1 ? 'pl-3' : 'pl-6';
 
@@ -216,22 +217,21 @@ export class DocTocComponent extends BaseElement {
       const isActive  = entry.id === this.activeId;
       const linkClass = isActive ? toc.activeLink : toc.link;
       const barClass  = isActive ? toc.activeBar  : 'bg-transparent';
+      const children = entry.children.length > 0
+        ? html`<ul class="mt-1 space-y-1">${this.buildItems(entry.children, depth + 1)}</ul>`
+        : nothing;
 
-      const children = entry.children.length
-        ? `<ul class="mt-1 space-y-1">${this.buildItems(entry.children, depth + 1)}</ul>`
-        : '';
-
-      return `
+      return html`
         <li class="relative">
           <span class="absolute left-0 top-0 bottom-0 w-0.5 rounded-full transition-colors duration-200 ${barClass}"></span>
           <a
-            href="#${entry.id}"
+            href="${`#${entry.id}`}"
             data-toc-id="${entry.id}"
             class="block pl-3 pr-1 py-0.5 text-xs leading-5 truncate transition-colors duration-150 ${indent} ${linkClass}"
           >${entry.text}</a>
           ${children}
         </li>`;
-    }).join('');
+    });
   }
 
   /**
@@ -242,12 +242,12 @@ export class DocTocComponent extends BaseElement {
    * label and a scrollable navigation list built by buildItems(). Includes custom scrollbar
    * styling and a left border separator. The sticky positioning keeps it visible while scrolling.
    */
-  render(): string {
+  render(): TemplateResult {
     if (!this.toc.length) {
-      return HTML`<div class="hidden xl:block w-56 shrink-0"></div>`;
+      return html`<div class="hidden xl:block w-56 shrink-0"></div>`;
     }
 
-    return HTML`
+    return html`
       <aside class="hidden xl:flex flex-col w-56 shrink-0
                     sticky top-14
                     h-[calc(100vh-3.5rem)]
@@ -268,4 +268,3 @@ export class DocTocComponent extends BaseElement {
     `;
   }
 }
-

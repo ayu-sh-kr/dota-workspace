@@ -1,5 +1,6 @@
-import { BaseElement, Component, HTML } from "@ayu-sh-kr/dota-wrap/core";
+import { BaseElement, Component } from "@ayu-sh-kr/dota-wrap/core";
 import { type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-wrap/event";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import { DOTA_TOOLS, DotaTool } from "@dota/components/home/utils/tools.config.ts";
 
 /**
@@ -20,15 +21,15 @@ export class ToolDetailComponent extends BaseElement {
     super();
   }
 
-  private tagChip(tag: string): string {
-    return `<span class="px-3 py-1 rounded-full text-xs font-medium
+  private tagChip(tag: string): TemplateResult {
+    return html`<span class="px-3 py-1 rounded-full text-xs font-medium
                          bg-white/50 text-purple-600 dark:bg-white/[0.055] dark:text-purple-300
                          border border-purple-300/25 dark:border-purple-300/15 backdrop-blur-xl"
                   >${tag}</span>`;
   }
 
-  private renderTags(tags: string[]): string {
-    return tags.map(t => this.tagChip(t)).join('');
+  private renderTags(tags: string[]): TemplateResult[] {
+    return tags.map(t => this.tagChip(t));
   }
 
   @OnEvent('tools:select')
@@ -36,38 +37,28 @@ export class ToolDetailComponent extends BaseElement {
     const tool = DOTA_TOOLS.find(t => t.id === event.data?.toolId);
     if (!tool || tool.id === this.activeTool.id) return;
     this.activeTool = tool;
-    this.updateContent(tool);
+    this.updateContent();
   }
 
-  private updateContent(tool: DotaTool) {
+  private updateContent() {
     const panel = this.querySelector<HTMLElement>('[data-detail-panel]');
     if (!panel) return;
 
     panel.classList.add('tab-content-exit');
 
     setTimeout(() => {
-      const icon    = panel.querySelector<HTMLElement>('[data-detail-icon]');
-      const name    = panel.querySelector<HTMLElement>('[data-detail-name]');
-      const tagline = panel.querySelector<HTMLElement>('[data-detail-tagline]');
-      const desc    = panel.querySelector<HTMLElement>('[data-detail-desc]');
-      const tags    = panel.querySelector<HTMLElement>('[data-detail-tags]');
-
-      if (icon)    icon.setAttribute('name', tool.icon);
-      if (name)    name.textContent    = tool.name;
-      if (tagline) tagline.textContent = `"${tool.tagline}"`;
-      if (desc)    desc.textContent    = tool.description;
-      if (tags)    tags.innerHTML      = this.renderTags(tool.tags);
-
-      panel.classList.remove('tab-content-exit');
-      panel.classList.add('tab-content-enter');
-      setTimeout(() => panel.classList.remove('tab-content-enter'), 250);
+      this.updateHTML();
+      const updatedPanel = this.querySelector<HTMLElement>('[data-detail-panel]');
+      updatedPanel?.classList.remove('tab-content-exit');
+      updatedPanel?.classList.add('tab-content-enter');
+      setTimeout(() => updatedPanel?.classList.remove('tab-content-enter'), 250);
     }, 150);
   }
 
-  render(): string {
-    const first = DOTA_TOOLS[0];
+  render(): TemplateResult {
+    const tool = this.activeTool;
 
-    return HTML`
+    return html`
         <div data-detail-panel
              class="group flex min-h-0 flex-col gap-5 overflow-hidden rounded-2xl p-4 sm:min-h-[320px] sm:p-6 lg:p-8
                     border border-white/70 dark:border-white/10
@@ -83,7 +74,7 @@ export class ToolDetailComponent extends BaseElement {
                 <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0
                             bg-white/55 dark:bg-white/[0.055] border border-purple-300/25 dark:border-purple-300/15 backdrop-blur-xl">
                     <dota-icon data-detail-icon
-                               name="${first.icon}" color="purple" size="lg" variant="ghost">
+                               name="${tool.icon}" color="purple" size="lg" variant="ghost">
                     </dota-icon>
                 </div>
                 <div class="pt-1 min-w-0">
@@ -94,7 +85,7 @@ export class ToolDetailComponent extends BaseElement {
                     <h3 data-detail-name
                         class="text-base sm:text-2xl font-bold font-mono leading-none
                                text-gray-900 dark:text-gray-100 break-all">
-                        ${first.name}
+                        ${tool.name}
                     </h3>
                 </div>
             </div>
@@ -104,21 +95,21 @@ export class ToolDetailComponent extends BaseElement {
                class="text-sm sm:text-base font-medium italic pl-4 leading-relaxed
                       border-l-2 border-purple-500/50
                       text-gray-700 dark:text-gray-300 break-words">
-                "${first.tagline}"
+                "${tool.tagline}"
             </p>
 
             <!-- Description -->
             <p data-detail-desc
                class="text-sm leading-relaxed flex-1
                       text-gray-500 dark:text-gray-400 break-words overflow-hidden">
-                ${first.description}
+                ${tool.description}
             </p>
 
             <!-- Feature tags -->
             <div data-detail-tags
                  class="flex flex-wrap gap-2 pt-2
                         border-t border-slate-200/70 dark:border-white/10">
-                ${this.renderTags(first.tags)}
+                ${this.renderTags(tool.tags)}
             </div>
 
         </div>

@@ -3,11 +3,11 @@ import {
   BaseElement,
   BindEvent,
   Component,
-  HTML,
   Property,
   String
 } from "@ayu-sh-kr/dota-wrap/core";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 
@@ -46,8 +46,10 @@ export class DocHeaderComponent extends BaseElement {
   onConnected() {
     const savedTheme = LocalStorageService.get('docs-theme') as ThemeName | null;
     const savedColor = LocalStorageService.get('docs-color') as ColorName | null;
+    const colorChanged = savedColor !== null && savedColor !== this.color;
     this.theme = savedTheme ?? 'flat';
     this.color = savedColor ?? 'indigo';
+    if (colorChanged) this.updateHTML();
     // Publish docs: immediately so doc-section / doc-header siblings sync up.
     this._publishDocsTheme(this.theme);
     this._publishDocsColor(this.color);
@@ -74,6 +76,7 @@ export class DocHeaderComponent extends BaseElement {
     if (c && c !== this.color) {
       this.color = c;
       LocalStorageService.add('docs-color', c);
+      this.updateHTML();
     }
   }
 
@@ -106,9 +109,9 @@ export class DocHeaderComponent extends BaseElement {
     return (this.activeFile ?? 'Getting-Started.md').replace('.md', '').replace(/-/g, ' ');
   }
 
-  render(): string {
+  render(): TemplateResult {
 
-    return HTML`
+    return html`
       <header class="sticky top-0 z-40 w-full
                      border-b border-gray-200 dark:border-gray-800
                      bg-white/90 dark:bg-gray-950/90
@@ -168,4 +171,3 @@ export class DocHeaderComponent extends BaseElement {
     `;
   }
 }
-

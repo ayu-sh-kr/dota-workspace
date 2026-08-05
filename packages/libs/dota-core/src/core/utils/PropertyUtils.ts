@@ -1,14 +1,17 @@
-import {BaseElement, HelperUtils, PropertyDetails, PropertyType, Sanitizer, WatcherOptionMeta} from "@dota/core";
+import {HelperUtils, Sanitizer} from "@dota/core";
+import type {BaseElement, PropertyDetails, PropertyType, WatcherOptionMeta} from "@dota/core";
 
 
 export class PropertyUtils {
+  private static readonly reflectingAttributes = new WeakMap<BaseElement, Set<string>>();
+
   /**
    * Converts a reactive property value to the string required by the DOM attribute API.
    * Object-like property types provide JSON serialization so field initializers and JavaScript
    * assignments do not degrade to `"[object Object]"` before attribute observers read them.
- * @param value - Current public property value selected during binding or assignment.
- * @param type - Property contract that may define its own attribute serialization.
- * @returns The string representation stored in the matching HTML attribute.
+   * @param value Current public property value selected during binding or assignment.
+   * @param type Property contract that may define its own attribute serialization.
+   * @returns The string representation stored in the matching HTML attribute.
    */
   private static serializeAttributeValue(value: any, type: PropertyType<any>): string {
     return type.serialize ? type.serialize(value) : String(value);
@@ -18,10 +21,10 @@ export class PropertyUtils {
    * Compares values using their reflected form when a property type has custom serialization.
    * This prevents an attribute callback's parsed object from replacing an equivalent object and
    * re-entering the reactive setter after a JavaScript assignment.
- * @param current - Value currently stored in the reactive backing field.
- * @param next - Candidate value supplied by an attribute callback or caller.
- * @param type - Property contract that may supply stable serialization.
- * @returns Whether both values are already equivalent for attribute reflection.
+   * @param current Value currently stored in the reactive backing field.
+   * @param next Candidate value supplied by an attribute callback or caller.
+   * @param type Property contract that may supply stable serialization.
+   * @returns Whether both values are already equivalent for attribute reflection.
    */
   private static isEquivalentValue(current: any, next: any, type: PropertyType<any>): boolean {
     if (current === next) return true;
@@ -32,6 +35,67 @@ export class PropertyUtils {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Reflects a property value while identifying the resulting custom-element callback
+   * as framework-owned. The marker is scoped to the element and removed even when the
+   * browser attribute operation throws, preventing stale reflection state.
+   * @param element Component whose public property is being reflected.
+   * @param name Observed attribute associated with the property.
+   * @param value Serialized value written to the DOM attribute.
+   */
+  static reflectAttribute(element: BaseElement, name: string, value: string): void {
+    let reflecting = this.reflectingAttributes.get(element);
+    if (!reflecting) {
+      reflecting = new Set<string>();
+      this.reflectingAttributes.set(element, reflecting);
+    }
+
+    reflecting.add(name);
+    try {
+      HTMLElement.prototype.setAttribute.call(element, name, value);
+    } finally {
+      reflecting.delete(name);
+    }
+  }
+
+  /**
+   * Identifies callbacks caused by framework property reflection so BaseElement can
+   * skip parsing and setter re-entry while still recording its lifecycle event.
+   * @param element Component receiving the observed-attribute callback.
+   * @param name Attribute reported by the browser.
+   * @returns Whether the callback is inside a matching reflection operation.
+   */
+  static isReflectingAttribute(element: BaseElement, name: string): boolean {
+    return this.reflectingAttributes.get(element)?.has(name) ?? false;
+  }
+
+  /**
+   * Applies an external attribute value to the storage active for the element lifecycle.
+   * Before reactive accessors exist it preserves the public class field used by render;
+   * afterward it writes the backing field to avoid setter reflection and re-entry.
+   * @param element Component whose observed attribute changed.
+   * @param name Attribute name used to resolve property metadata.
+   * @param value Serialized value supplied by the browser callback.
+   * @returns Changed public property name, or undefined when no semantic value changed.
+   */
+  static bindAttribute(element: BaseElement, name: string, value: string): string | undefined {
+    const property = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property').get(name);
+    if (!property) return;
+
+    const nextValue = Sanitizer.sanitize(value, property.type);
+    if (!element.reactive) {
+      if (PropertyUtils.isEquivalentValue(element[property.prototype], nextValue, property.type)) return;
+      element[property.prototype] = nextValue;
+      return property.prototype;
+    }
+
+    const backingKey = `_${property.prototype}`;
+    if (this.isEquivalentValue(element[backingKey], nextValue, property.type)) return;
+
+    element[backingKey] = nextValue;
+    return property.prototype;
   }
 
   /**
@@ -50,14 +114,14 @@ export class PropertyUtils {
    * - Installs a reactive accessor pair on the public property name that:
    *   * Getter: Returns the current value from the backing field
    *   * Setter: Updates the backing field, reflects the new value to the corresponding DOM attribute,
-   *     and invokes all registered watchers for the property
+   *     schedules one DOM update, and invokes all registered watchers for the property
    * - Handles cleanup of conflicting property descriptors to ensure clean installation
    * - Reflects computed initial values back to DOM attributes when appropriate
    *
    * The reactive setter performs change detection and only triggers side effects (attribute updates
    * and watcher invocations) when the new value differs from the current backing field value.
-   * Attribute synchronization uses HTMLElement.prototype.setAttribute to bypass observed attribute
-   * callbacks during internal initialization, preventing infinite loops.
+   * Attribute synchronization marks framework-owned callbacks so BaseElement can skip
+   * parsing and setter re-entry during initialization and runtime reflection.
    *
    * After all properties are bound, the element's `reactive` flag is set to true, indicating that
    * the reactive system is active and property changes will propagate through the system.
@@ -130,11 +194,21 @@ export class PropertyUtils {
 
       // --- Compute initial value using precedence: attr > js > default ---
       const defaultValue = meta.default;
-      const initial =
+      const resolvedInitial =
         attrValue !== undefined ? attrValue :
           jsValue !== undefined ? jsValue :
             defaultValue !== undefined ? defaultValue :
               undefined;
+      const reflectedInitial = !hasAttr && resolvedInitial !== undefined
+        ? Sanitizer.sanitize(
+          PropertyUtils.serializeAttributeValue(resolvedInitial, meta.type),
+          meta.type,
+        )
+        : resolvedInitial;
+      const initial = reflectedInitial !== undefined
+        && PropertyUtils.isEquivalentValue(resolvedInitial, reflectedInitial, meta.type)
+        ? resolvedInitial
+        : reflectedInitial;
 
       // Seed backing field BEFORE installing accessor (preserves initial).
       // We intentionally seed even if initial is undefined? No—avoid clobbering.
@@ -151,7 +225,12 @@ export class PropertyUtils {
         set(v: any) {
           if (!PropertyUtils.isEquivalentValue(element[backingKey], v, meta.type)) {
             element[backingKey] = v;
-            element.setAttribute(attrName, PropertyUtils.serializeAttributeValue(v, meta.type));
+            PropertyUtils.reflectAttribute(
+              element,
+              attrName,
+              PropertyUtils.serializeAttributeValue(v, meta.type),
+            );
+            element.requestHTMLUpdate();
             PropertyUtils.bindWatchers(element, publicKey);
           }
         },
@@ -160,11 +239,10 @@ export class PropertyUtils {
         configurable: true
       });
 
-      // Reflect initial value to attribute ONLY if attribute wasn't already the source of truth.
-      // Use HTMLElement.prototype.setAttribute directly so the observed-attribute callback is
-      // NOT triggered — this is an internal setup step, not a user-driven change.
+      // Reflect only when the attribute was not the source of truth. The framework marker
+      // lets BaseElement ignore the observed callback during initial state seeding.
       if (!hasAttr && initial !== undefined) {
-        HTMLElement.prototype.setAttribute.call(
+        PropertyUtils.reflectAttribute(
           element,
           attrName,
           PropertyUtils.serializeAttributeValue(initial, meta.type),
