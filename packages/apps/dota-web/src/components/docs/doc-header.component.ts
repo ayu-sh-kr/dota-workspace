@@ -46,8 +46,10 @@ export class DocHeaderComponent extends BaseElement {
   onConnected() {
     const savedTheme = LocalStorageService.get('docs-theme') as ThemeName | null;
     const savedColor = LocalStorageService.get('docs-color') as ColorName | null;
+    const colorChanged = savedColor !== null && savedColor !== this.color;
     this.theme = savedTheme ?? 'flat';
     this.color = savedColor ?? 'indigo';
+    if (colorChanged) this.updateHTML();
     // Publish docs: immediately so doc-section / doc-header siblings sync up.
     this._publishDocsTheme(this.theme);
     this._publishDocsColor(this.color);
@@ -74,6 +76,7 @@ export class DocHeaderComponent extends BaseElement {
     if (c && c !== this.color) {
       this.color = c;
       LocalStorageService.add('docs-color', c);
+      this.updateHTML();
     }
   }
 
