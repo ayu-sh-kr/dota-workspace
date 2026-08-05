@@ -7,10 +7,18 @@ import {
   WindowListener,
 } from '@ayu-sh-kr/dota-core';
 import { type ApplicationEvent, OnEvent } from '@ayu-sh-kr/dota-event';
+import {
+  html,
+  keyed,
+  nothing,
+  type KeyedValue,
+  type TemplateResult,
+  when,
+} from '@ayu-sh-kr/dota-rendering';
 import { type TocEntry } from '@dota/services/md.service.ts';
 import { type ThemeName } from '@dota/themes.ts';
 import { type ColorName } from '@dota/Types.ts';
-import { TocUtils } from '@dota/toc-utils.ts';
+import { type TocClasses, TocUtils } from '@dota/toc-utils.ts';
 
 /**
  * `<md-toc>` — standalone, generic Table of Contents component for `dota-md`.
@@ -168,32 +176,72 @@ export class MdTocComponent extends BaseElement {
     return parseInt(this.headerHeight, 10) || 64;
   }
 
+  /** Builds keyed TOC branches so active-state updates preserve unchanged entries. */
+  private buildItems(
+    entries: TocEntry[],
+    classes: TocClasses,
+    depth = 0,
+  ): KeyedValue {
+    const indent = depth === 0 ? '' : depth === 1 ? 'pl-3' : 'pl-6';
 
-  render(): string {
-    if (!this._toc.length) {
-      return `<div class="hidden xl:block w-56 shrink-0"></div>`;
-    }
+    return keyed(
+      entries,
+      (entry) => entry.id,
+      (entry) => {
+        const isActive = entry.id === this._activeId;
+        const linkClass = isActive ? classes.activeLink : classes.link;
+        const barClass = isActive ? classes.activeBar : 'bg-transparent';
+        const children = entry.children.length > 0
+          ? html`
+              <ul class="mt-1 space-y-1">
+                ${this.buildItems(entry.children, classes, depth + 1)}
+              </ul>
+            `
+          : nothing;
 
+        return html`
+          <li class="relative">
+            <span class="absolute left-0 top-0 bottom-0 w-0.5 rounded-full
+                         transition-colors duration-200 ${barClass}"></span>
+            <a href=${`#${entry.id}`}
+               data-toc-id=${entry.id}
+               class="block pl-3 pr-1 py-0.5 text-xs leading-5 truncate
+                      transition-colors duration-150 ${indent} ${linkClass}">
+              ${entry.text}
+            </a>
+            ${children}
+          </li>
+        `;
+      },
+    );
+  }
+
+  render(): TemplateResult {
+    const hasItems = this._toc.length > 0;
     const classes = TocUtils.resolveClasses(this.theme, this.color);
-    const items   = TocUtils.buildItems(this._toc, this._activeId, classes);
+    const containerClass = hasItems
+      ? `hidden xl:flex flex-col w-56 shrink-0
+         sticky top-14 h-[calc(100vh-3.5rem)]
+         border-l border-gray-200 dark:border-gray-800`
+      : 'hidden xl:block w-56 shrink-0';
+    const contents = html`
+      <div class="overflow-y-auto flex-1 py-6 pr-2 pl-4
+                  scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
+        <p class="text-[0.65rem] font-semibold uppercase tracking-widest
+                  text-gray-400 dark:text-gray-500 mb-3 px-3">
+          ${this.label}
+        </p>
+        <nav aria-label="Table of contents">
+          <ul class="space-y-1 border-l border-gray-200 dark:border-gray-700">
+            ${this.buildItems(this._toc, classes)}
+          </ul>
+        </nav>
+      </div>
+    `;
 
-    return `
-      <aside class="hidden xl:flex flex-col w-56 shrink-0
-                    sticky top-14
-                    h-[calc(100vh-3.5rem)]
-                    border-l border-gray-200 dark:border-gray-800">
-        <div class="overflow-y-auto flex-1 py-6 pr-2 pl-4
-                    scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
-          <p class="text-[0.65rem] font-semibold uppercase tracking-widest
-                     text-gray-400 dark:text-gray-500 mb-3 px-3">
-            ${this.label}
-          </p>
-          <nav aria-label="Table of contents">
-            <ul class="space-y-1 border-l border-gray-200 dark:border-gray-700">
-              ${items}
-            </ul>
-          </nav>
-        </div>
+    return html`
+      <aside class=${containerClass} aria-hidden=${hasItems ? nothing : 'true'}>
+        ${when(hasItems, contents)}
       </aside>
     `;
   }
