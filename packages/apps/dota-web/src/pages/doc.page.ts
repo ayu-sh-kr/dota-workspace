@@ -1,5 +1,6 @@
-import {AfterInit, Component, DotaPageElement, HTML, SEO} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, Component, DotaPageElement, SEO} from "@ayu-sh-kr/dota-wrap/core";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 
@@ -43,8 +44,8 @@ export class DocPage extends DotaPageElement {
     GeneralUtils.scrollToTop('instant');
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
             <doc-section></doc-section>
         `;
   }
