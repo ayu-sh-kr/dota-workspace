@@ -8,8 +8,8 @@ results whose dynamic values can be diffed and patched without replacing unchang
 ```ts
 import { html, keyed, render, trustedHTML, update, when } from '@ayu-sh-kr/dota-rendering';
 
-const view = render(root, html`<p title=${title}>${message}</p>`);
-update(view, html`<p title=${nextTitle}>${nextMessage}</p>`);
+const view = render(root, html`<p title="${title}">${message}</p>`);
+update(view, html`<p title="${nextTitle}">${nextMessage}</p>`);
 
 const markdownHtml = '<h1>Documentation</h1>';
 const markdownView = html`<article>${trustedHTML(markdownHtml)}</article>`;
@@ -60,7 +60,7 @@ main architectural boundary maintainers should preserve.
 | Template helpers | Static strings, dynamic values, flattening plans | Describe render output without touching the DOM. |
 | Diffing | Previous and next output | Select `mount`, `noop`, `patch`, or `replace` without causing side effects. |
 | Render session | Current strategy and render root | Preserve the public instance while routing legacy and structured output. |
-| Render strategy | Last output, parts, listeners, nested sessions | Translate a diff decision into browser mutations. |
+| Render strategy | Last output, parts, nested sessions | Translate a diff decision into browser mutations. |
 | Render root | Native root or sibling-range boundary | Limit where a strategy may replace or insert nodes. |
 
 `RenderInstance` is intentionally the only stateful renderer contract exposed to Core. The
@@ -74,7 +74,7 @@ can evolve without changing the Core integration.
 TemplateStrategy.mount() in src/renderer.ts:
 
 1. Creates an inert HTMLTemplateElement.
-2. Joins static template strings with temporary dota-value-N tokens.
+2. Joins static template strings with mount-local interpolation tokens.
 3. Adds component boundary comments reserved for future SSR and hydration.
 4. Traverses the detached template fragment with browser DOM APIs.
 5. Assigns document-order indexes and custom-element markers.
@@ -83,7 +83,7 @@ TemplateStrategy.mount() in src/renderer.ts:
    connect with parser tokens.
 8. Attaches the completed fragment to the supplied Element or ShadowRoot.
 
-Temporary dota-value-N tokens are removed during part discovery and never become committed DOM.
+Temporary interpolation tokens are removed during part discovery and never become committed DOM.
 Legacy strings use StringStrategy and assign innerHTML directly. RenderSession keeps the public
 instance stable when a client changes between legacy and structured output.
 
@@ -123,8 +123,8 @@ storage or migration logic for old and new component render methods.
 
 Sessions form an ownership tree. The top-level session belongs to the component root. A
 conditional branch owns a nested session, and every keyed entry owns another nested session.
-Disposal cascades through that tree so event listeners and child ranges do not survive after
-their owner is replaced. Calling `dispose()` releases renderer-managed resources but does not
+Disposal cascades through that tree so child ranges do not survive after their owner is
+replaced. Calling `dispose()` releases renderer-managed resources but does not
 remove the already committed DOM.
 
 ### NativeRoot
@@ -237,14 +237,15 @@ This module creates structured results and defines parsing policies:
   that range when the markup changes;
 - keyed(items, getKey, renderItem) retains, inserts, removes, and moves item ranges by stable key;
 - when(condition, truthy, falsy) replaces only its local child range when a branch changes;
-- valueMarkerFor(index) creates the parser-only dota-value-N token;
-- valueMarkerPattern finds temporary tokens in parsed text and attributes;
+- valueMarkerFor(index) creates the canonical token available to template-inspection consumers;
+- valueMarkerPattern recognizes that canonical token format;
 - valueText(value) applies child text conversion and empty-value semantics;
 - isAttributePosition(source) checks a source-level attribute position for consumers that need
   it; the current renderer discovers attributes after browser parsing;
 - isTemplateResult(value) checks the structured-result kind brand.
 
-If the temporary token format changes, update valueMarkerFor() and all consumers of
+Mounted renderer sessions use private token namespaces to avoid collisions with authored text.
+If the canonical inspection-token format changes, update valueMarkerFor() and
 valueMarkerPattern together.
 
 ### src/diff.ts
@@ -288,8 +289,8 @@ public contracts from types.ts.
 
 RenderPart maps dynamic indexes to DOM write operations. ChildPart stores invisible text-node
 range boundaries used for text, trusted markup, conditional branches, and keyed lists.
-AttributePart stores all indexes used by an attribute, its target, binding mode, and tokenized
-value. The mapping stays in memory rather than becoming verbose DOM metadata.
+AttributePart stores all indexes used by a quoted HTML attribute, its target, and tokenized
+serialized value. The mapping stays in memory rather than becoming verbose DOM metadata.
 
 #### StringStrategy
 
@@ -328,19 +329,21 @@ each dynamic child. ChildPart uses the bounded range for ordinary text, trusted 
 conditional branch, or a keyed list. Empty text boundaries do not appear in serialized
 innerHTML.
 
-For attributes, findParts() scans actual parsed attributes. Each tokenized attribute becomes one
-AttributePart registered under every interpolation index it contains. Any changed interpolation
-reconstructs the complete attribute using all next values.
+Before parsing, quoted dynamic attributes receive neutral placeholder names so temporary values
+cannot reach an observed attribute or its callback. During part discovery, each placeholder
+becomes one AttributePart registered under every interpolation index it contains. Any changed
+interpolation reconstructs the complete original attribute using all next values.
 
-Structured attribute syntax is explicit:
+Structured attributes retain Dota's existing HTML contract:
 
-- `class="card ${size} theme-${theme}"` reconstructs a multi-value ordinary attribute;
-- `?disabled=${disabled}` toggles a boolean attribute by presence;
-- `.value=${value}` writes the DOM property, preserving form control state semantics;
-- `@click=${listener}` replaces or removes an EventListener without remounting the element.
+- Quote assigned values, for example `class="card ${size} theme-${theme}"`.
+- Write native boolean attributes by presence, for example `disabled`, without a value.
+- Pass component inputs as normal attributes so Dota Core handles `@Property` conversion and
+  `attributeChangedCallback`, for example `count="${count}"`.
+- Bind events through Dota Core decorators instead of template-specific attribute syntax.
 
-Property, boolean, and event bindings must contain exactly one interpolation. Event listeners
-are removed on replacement and disposal.
+The renderer only reconstructs serialized attribute values with `setAttribute`. It does not
+assign DOM properties, reinterpret booleans, or install event listeners.
 
 ## Template flattening architecture
 
@@ -494,9 +497,8 @@ nodes when the value changes. The `<article>` and its surrounding component DOM 
 Like `unsafeHTML()`, this directive does not sanitize input or create a browser `TrustedHTML`
 object; callers must sanitize untrusted content before passing it to the directive.
 
-`trustedHTML()` is valid only in a child position. Passing it to an attribute, property,
-boolean, or event binding throws because those bindings have browser-native value semantics and
-cannot own a parsed sibling range.
+`trustedHTML()` is valid only in a child position. Passing it to an attribute throws because an
+attribute cannot own a parsed sibling range.
 
 ### Separating content updates from visual updates
 
@@ -519,8 +521,8 @@ not proposals.
 | Preserve legacy string rendering | Existing components can continue returning strings. Equal strings are no-ops; changed strings remain whole-boundary replacements because they contain no part metadata. |
 | Keep `RenderInstance` stable | Core retains one handle even when a component migrates between legacy strings and structured templates. `RenderSession` changes its internal strategy instead. |
 | Separate pure diffing from DOM commits | `diff()` can be tested and consumed without browser mutation. Strategies remain solely responsible for applying the selected operation. |
-| Parse with the browser in a detached template | Browser parsing handles real HTML structure more reliably than source-level regular expressions. Part discovery and initial values complete before custom elements connect. |
-| Store precise part metadata in memory | Interpolation indexes, node references, attribute templates, listeners, and keyed ownership do not pollute serialized DOM. Only compact element-level diagnostic markers remain. |
+| Parse with the browser in a detached template | Browser parsing handles real HTML structure, while neutral placeholder names keep parser tokens away from observed attributes. Part discovery and initial values complete before custom elements connect. |
+| Store precise part metadata in memory | Interpolation indexes, node references, attribute templates, and keyed ownership do not pollute serialized DOM. Only compact element-level diagnostic markers remain. |
 | Use one dynamic marker per affected element | `data-dota-dynamic` narrows diagnostics without creating one attribute for every interpolation. Exact relationships remain in `RenderPart` records. |
 | Treat document indexes as local diagnostics | `data-dota-index` describes document order for one mounted template. It is regenerated after remount and is never global identity or the lookup mechanism for patches. |
 | Mark custom-element hosts, not rendered internals | Hyphenated hosts receive `data-dota-component`. Content later created by their callback or shadow renderer belongs to a different rendering session and is not traversed by the parent mount. |
@@ -528,8 +530,8 @@ not proposals.
 | Require explicit keyed and conditional ranges | Structural collection and branch changes remain local without introducing an implicit whole-tree reconciler. |
 | Keep trusted dynamic markup range-local | `trustedHTML()` can replace parser-produced markup without turning a value change into a component remount. Trust and sanitization remain caller responsibilities. |
 | Replace incompatible static structure | A remount is safer and deterministic when existing part indexes no longer describe the next template. |
-| Apply initial values while detached | Attributes, properties, events, and child values are ready before custom elements connect to the live document. |
-| Dispose renderer-owned resources explicitly | Event listeners and nested sessions are removed before strategy replacement, branch removal, keyed deletion, or public disposal. |
+| Apply initial values while detached | Quoted attributes and child values are ready before custom elements connect to the live document. |
+| Dispose renderer-owned resources explicitly | Nested sessions are removed before strategy replacement, branch removal, keyed deletion, or public disposal. |
 | Keep component boundary comments non-operational | The comments establish a possible SSR/hydration boundary format, but the client patcher does not depend on them yet. |
 
 ### Ownership rules for custom elements
@@ -580,8 +582,8 @@ Coordinate releases in dependency order:
   identity but may trigger custom-element lifecycle reactions.
 - `unsafeHTML()` does not sanitize input or satisfy Trusted Types by itself.
 - `trustedHTML()` provides local range ownership but likewise requires trusted or sanitized input.
-- Structured `@event` bindings are renderer-owned; decorator-based legacy events remain owned by
-  Dota Core.
+- Dynamic attributes must use quoted values; native boolean attributes remain static,
+  presence-only HTML and events remain owned by Dota Core decorators.
 
 Preserve the distinction between diffing and patching when extending the package: diffing
 decides what changed, while a renderer decides which browser operation safely applies it.
