@@ -1,23 +1,27 @@
 import {isTemplateResult} from './template';
-import {PartChange, RenderDiff, RenderOutput, TemplateResult} from './types';
+import type {PartChange, RenderDiff, RenderOutput, TemplateResult} from './types';
 
 /**
- * Accepts both tagged-template identity and equivalent static segments.
- * Identity is the normal fast path; segment comparison keeps separately created
- * but structurally identical results patchable in tests and adapter code.
+ * Determines whether existing part indexes remain valid for the next template.
+ * Tagged-template identity is the normal fast path; segment comparison keeps
+ * separately created but equivalent template results patchable.
+ * @param previous Previously committed structured output.
+ * @param next Structured output produced by the next render pass.
+ * @returns Whether both templates describe the same static DOM structure.
  */
-function hasSameTemplateStructure(left: TemplateResult, right: TemplateResult): boolean {
-  return left.strings === right.strings ||
-    (left.strings.length === right.strings.length && left.strings.every((part, index) => part === right.strings[index]));
+function hasSameTemplateStructure(previous: TemplateResult, next: TemplateResult): boolean {
+  if (previous.strings === next.strings) return true;
+  return previous.strings.length === next.strings.length &&
+    previous.strings.every((segment, index) => segment === next.strings[index]);
 }
 
 /**
- * Compares two render outputs and identifies the smallest supported commit strategy.
- * Compatible structured templates produce one change record per changed value, while
- * different output kinds or static structures require replacement rather than guessing.
+ * Selects the smallest safe commit for two render outputs without touching the DOM.
+ * Compatible templates report changed interpolation indexes using `Object.is`
+ * semantics; output-kind or static-structure changes require full replacement.
  * @param previous Previously committed output, or `undefined` before the first mount.
  * @param next Output produced by the next render pass.
- * @returns A render diff consumed by the renderer before DOM mutation.
+ * @returns The comparison result consumed by the active rendering strategy.
  */
 export function diff(previous: RenderOutput | undefined, next: RenderOutput): RenderDiff {
   if (previous === undefined) return {kind: 'mount', changedParts: []};
@@ -26,11 +30,11 @@ export function diff(previous: RenderOutput | undefined, next: RenderOutput): Re
   if (!isTemplateResult(previous) || !isTemplateResult(next)) return {kind: 'replace', changedParts: []};
   if (!hasSameTemplateStructure(previous, next)) return {kind: 'replace', changedParts: []};
 
-  const changes: PartChange[] = [];
-  for (let index = 0; index < next.values.length; index++) {
+  const changedParts: PartChange[] = [];
+  for (let index = 0; index < next.values.length; index += 1) {
     const nextValue = next.values[index];
     const previousValue = previous.values[index];
-    if (!Object.is(previousValue, nextValue)) changes.push({index, previousValue, nextValue});
+    if (!Object.is(previousValue, nextValue)) changedParts.push({index, previousValue, nextValue});
   }
-  return {kind: changes.length === 0 ? 'noop' : 'patch', changedParts: changes};
+  return {kind: changedParts.length === 0 ? 'noop' : 'patch', changedParts};
 }
