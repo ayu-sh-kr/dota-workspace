@@ -67,11 +67,13 @@ export class ColorPickerComponent extends BaseElement {
       this.updateHTML();
     }
     LocalStorageService.add('docs-color', color);
+    const popover = document.querySelector<HTMLElement & {close?: () => void}>(
+      'dota-popover[anchored-selector="color-picker"]'
+    );
     ApplicationEventService.getInstance()
       .getPublisher()
       .publishAsync({ name: 'docs:color-change', data: { color } });
-    // Close the parent dota-popover by hiding this anchored element
-    this.style.display = 'none';
+    popover?.close?.();
   }
 
   private buildSwatches(): TemplateResult[] {
@@ -82,9 +84,9 @@ export class ColorPickerComponent extends BaseElement {
         : 'hover:scale-110 hover:ring-2 hover:ring-offset-1 hover:ring-offset-white dark:hover:ring-offset-gray-900 hover:ring-gray-400 dark:hover:ring-gray-500';
       return html`
         <button
-          data-color=${name}
-          title=${name}
-          aria-label=${`Color ${name}`}
+          data-color="${name}"
+          title="${name}"
+          aria-label="${`Color ${name}`}"
           class="w-6 h-6 rounded-full ${bg} transition-transform duration-150
                  focus:outline-none cursor-pointer ${ring}">
         </button>`;
