@@ -2,6 +2,7 @@ import {AfterInit, BaseElement, Component, Param, Property, String, WindowListen
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {WithLoading} from "@dota/utils/DecoratorUtils.ts";
 import {MDService} from "@ayu-sh-kr/dota-md";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: 'doc-content',
@@ -69,8 +70,8 @@ export class DocContentComponent extends BaseElement {
     this.scrollToAnchor();
   }
 
-  render(): string {
-    return `<md-view></md-view>`;
+  render(): TemplateResult {
+    return html`<md-view></md-view>`;
   }
 
 }
