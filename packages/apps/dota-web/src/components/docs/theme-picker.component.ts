@@ -75,7 +75,7 @@ export class ThemePickerComponent extends BaseElement {
 
       return html`
         <button
-          data-theme=${name}
+          data-theme="${name}"
           class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left
                  transition-all duration-150 cursor-pointer ${ring}">
           <div class="flex-1 min-w-0">
