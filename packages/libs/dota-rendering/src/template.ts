@@ -3,6 +3,7 @@ import {
   KeyedValue,
   RenderKey,
   TemplateResult,
+  TrustedHtmlValue,
   UnsafeHtmlValue,
   nothing
 } from './types';
@@ -182,6 +183,17 @@ export function unsafeHTML(value: string): UnsafeHtmlValue {
 }
 
 /**
+ * Creates a dynamic HTML range without making the parent template structural.
+ * The caller must provide sanitized or otherwise trusted markup; this directive
+ * deliberately does not sanitize and writes through the browser HTML parser.
+ * @param value Trusted markup owned by the interpolation's local child range.
+ * @returns A directive patched independently from surrounding component nodes.
+ */
+export function trustedHTML(value: string): TrustedHtmlValue {
+  return {kind: 'dota-trusted-html', value};
+}
+
+/**
  * Creates a list directive that retains each rendered range by application identity.
  *
  * Keys must be unique within one list; retained keys can move without recreating DOM.
@@ -223,7 +235,7 @@ export function when(
  * Reports whether an interpolation changes its parent template's static structure.
  *
  * @param value Interpolation being inspected.
- * @returns Whether nested templates, trusted markup, or nested arrays must be flattened.
+ * @returns Whether nested templates, structural unsafe markup, or nested arrays must be flattened.
  */
 function requiresStructuralFlattening(value: unknown): boolean {
   return isTemplateResult(value) || isUnsafeHtmlValue(value) ||
@@ -288,6 +300,16 @@ export function valueText(value: unknown): string {
  */
 export function isTemplateResult(value: unknown): value is TemplateResult {
   return typeof value === 'object' && value !== null && (value as TemplateResult).kind === 'dota-template';
+}
+
+/**
+ * Identifies markup intended for a dynamic trusted child range.
+ * @param value Candidate dynamic interpolation value.
+ * @returns Whether the value was created by {@link trustedHTML}.
+ */
+export function isTrustedHtmlValue(value: unknown): value is TrustedHtmlValue {
+  return typeof value === 'object' && value !== null &&
+    (value as TrustedHtmlValue).kind === 'dota-trusted-html';
 }
 
 /**
