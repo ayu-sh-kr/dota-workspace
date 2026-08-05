@@ -135,7 +135,7 @@
           "name": "app-feature",
           "source": {
             "file": "./src/components/home/feature.component.ts",
-            "offset": 150
+            "offset": 218
           },
           "attributes": [],
           "js": {
@@ -168,7 +168,7 @@
           "name": "app-hero",
           "source": {
             "file": "./src/components/home/hero-section.component.ts",
-            "offset": 205
+            "offset": 273
           },
           "attributes": [],
           "js": {
@@ -387,7 +387,7 @@
           "name": "app-offer",
           "source": {
             "file": "./src/components/home/offer.component.ts",
-            "offset": 260
+            "offset": 328
           },
           "attributes": [
             {
@@ -399,7 +399,7 @@
               },
               "source": {
                 "file": "./src/components/home/offer.component.ts",
-                "offset": 358
+                "offset": 426
               }
             }
           ],
@@ -411,7 +411,7 @@
                 "default": "true",
                 "source": {
                   "file": "./src/components/home/offer.component.ts",
-                  "offset": 358
+                  "offset": 426
                 }
               }
             ]
@@ -688,7 +688,7 @@
           "name": "blob-wrapper",
           "source": {
             "file": "./src/components/home/blob-wrapper.component.ts",
-            "offset": 288
+            "offset": 368
           },
           "attributes": [
             {
@@ -700,7 +700,7 @@
               },
               "source": {
                 "file": "./src/components/home/blob-wrapper.component.ts",
-                "offset": 445
+                "offset": 525
               }
             },
             {
@@ -712,7 +712,7 @@
               },
               "source": {
                 "file": "./src/components/home/blob-wrapper.component.ts",
-                "offset": 376
+                "offset": 456
               }
             }
           ],
@@ -724,7 +724,7 @@
                 "default": "0",
                 "source": {
                   "file": "./src/components/home/blob-wrapper.component.ts",
-                  "offset": 445
+                  "offset": 525
                 }
               },
               {
@@ -733,7 +733,7 @@
                 "default": "left",
                 "source": {
                   "file": "./src/components/home/blob-wrapper.component.ts",
-                  "offset": 376
+                  "offset": 456
                 }
               }
             ]
@@ -1133,7 +1133,7 @@
           "name": "capability-section",
           "source": {
             "file": "./src/components/home/capability-section.component.ts",
-            "offset": 354
+            "offset": 422
           },
           "attributes": [],
           "js": {
@@ -1332,7 +1332,7 @@
           "name": "client-section",
           "source": {
             "file": "./src/components/home/client-section.component.ts",
-            "offset": 198
+            "offset": 272
           },
           "attributes": [],
           "js": {
@@ -1440,7 +1440,7 @@
           "name": "code-section",
           "source": {
             "file": "./src/components/home/code-section.component.ts",
-            "offset": 147
+            "offset": 215
           },
           "attributes": [],
           "js": {
@@ -1451,7 +1451,7 @@
           "name": "code-snippet",
           "source": {
             "file": "./src/components/home/utils/code-snippet.component.ts",
-            "offset": 283
+            "offset": 351
           },
           "attributes": [
             {
@@ -1463,7 +1463,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/code-snippet.component.ts",
-                "offset": 411
+                "offset": 479
               }
             },
             {
@@ -1475,7 +1475,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/code-snippet.component.ts",
-                "offset": 551
+                "offset": 619
               }
             }
           ],
@@ -1487,7 +1487,7 @@
                 "default": "component.ts",
                 "source": {
                   "file": "./src/components/home/utils/code-snippet.component.ts",
-                  "offset": 411
+                  "offset": 479
                 }
               },
               {
@@ -1496,7 +1496,7 @@
                 "default": "typescript",
                 "source": {
                   "file": "./src/components/home/utils/code-snippet.component.ts",
-                  "offset": 551
+                  "offset": 619
                 }
               }
             ]
@@ -1701,7 +1701,7 @@
           "name": "counter-component",
           "source": {
             "file": "./src/components/example/counter.component.ts",
-            "offset": 175
+            "offset": 181
           },
           "attributes": [
             {
@@ -1713,7 +1713,7 @@
               },
               "source": {
                 "file": "./src/components/example/counter.component.ts",
-                "offset": 274
+                "offset": 280
               }
             }
           ],
@@ -1725,7 +1725,7 @@
                 "default": "0",
                 "source": {
                   "file": "./src/components/example/counter.component.ts",
-                  "offset": 274
+                  "offset": 280
                 }
               }
             ]
@@ -2077,7 +2077,7 @@
           "name": "device-preview",
           "source": {
             "file": "./src/components/home/utils/device-preview.component.ts",
-            "offset": 171
+            "offset": 245
           },
           "attributes": [
             {
@@ -2088,7 +2088,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/device-preview.component.ts",
-                "offset": 422
+                "offset": 496
               }
             },
             {
@@ -2099,7 +2099,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/device-preview.component.ts",
-                "offset": 348
+                "offset": 422
               }
             },
             {
@@ -2110,7 +2110,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/device-preview.component.ts",
-                "offset": 274
+                "offset": 348
               }
             },
             {
@@ -2121,7 +2121,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/device-preview.component.ts",
-                "offset": 503
+                "offset": 577
               }
             }
           ],
@@ -2132,7 +2132,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/home/utils/device-preview.component.ts",
-                  "offset": 422
+                  "offset": 496
                 }
               },
               {
@@ -2140,7 +2140,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/home/utils/device-preview.component.ts",
-                  "offset": 348
+                  "offset": 422
                 }
               },
               {
@@ -2148,7 +2148,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/home/utils/device-preview.component.ts",
-                  "offset": 274
+                  "offset": 348
                 }
               },
               {
@@ -2156,7 +2156,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/home/utils/device-preview.component.ts",
-                  "offset": 503
+                  "offset": 577
                 }
               }
             ]
@@ -2166,7 +2166,7 @@
           "name": "device-section",
           "source": {
             "file": "./src/components/home/device-section.component.ts",
-            "offset": 244
+            "offset": 312
           },
           "attributes": [],
           "js": {
@@ -4038,7 +4038,7 @@
           "name": "emitter-section",
           "source": {
             "file": "./src/components/home/emitter-section.component.ts",
-            "offset": 149
+            "offset": 217
           },
           "attributes": [],
           "js": {
@@ -4049,7 +4049,7 @@
           "name": "faq-section",
           "source": {
             "file": "./src/components/home/faq-section.component.ts",
-            "offset": 1710
+            "offset": 1778
           },
           "attributes": [],
           "js": {
@@ -4060,7 +4060,7 @@
           "name": "get-started-button",
           "source": {
             "file": "./src/components/home/utils/get-started-button.component.ts",
-            "offset": 207
+            "offset": 281
           },
           "attributes": [],
           "js": {
@@ -4093,7 +4093,7 @@
           "name": "home-page",
           "source": {
             "file": "./src/pages/home.page.ts",
-            "offset": 329
+            "offset": 403
           },
           "attributes": [],
           "js": {
@@ -4811,7 +4811,7 @@
           "name": "our-tools",
           "source": {
             "file": "./src/components/home/our-tools.component.ts",
-            "offset": 1728
+            "offset": 1796
           },
           "attributes": [],
           "js": {
@@ -4833,7 +4833,7 @@
           "name": "reactive-dota",
           "source": {
             "file": "./src/components/home/reactive-section.component.ts",
-            "offset": 353
+            "offset": 421
           },
           "attributes": [],
           "js": {
@@ -5127,7 +5127,7 @@
           "name": "tab-holder",
           "source": {
             "file": "./src/components/home/utils/tab-holder.component.ts",
-            "offset": 669
+            "offset": 737
           },
           "attributes": [
             {
@@ -5139,7 +5139,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/tab-holder.component.ts",
-                "offset": 754
+                "offset": 822
               }
             }
           ],
@@ -5151,7 +5151,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/home/utils/tab-holder.component.ts",
-                  "offset": 754
+                  "offset": 822
                 }
               }
             ]
@@ -5195,7 +5195,7 @@
           "name": "tool-detail",
           "source": {
             "file": "./src/components/home/utils/tool-detail.component.ts",
-            "offset": 520
+            "offset": 588
           },
           "attributes": [],
           "js": {
@@ -5206,7 +5206,7 @@
           "name": "tool-list-item",
           "source": {
             "file": "./src/components/home/utils/tool-list-item.component.ts",
-            "offset": 641
+            "offset": 718
           },
           "attributes": [
             {
@@ -5218,7 +5218,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/tool-list-item.component.ts",
-                "offset": 735
+                "offset": 812
               }
             }
           ],
@@ -5230,7 +5230,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/home/utils/tool-list-item.component.ts",
-                  "offset": 735
+                  "offset": 812
                 }
               }
             ]
