@@ -145,8 +145,8 @@ between the boundaries.
 Each session owns its own part map and indexing namespace, including sessions nested inside the
 same physical DOM tree. Repeated `data-dota-index="0"` values are therefore expected across a
 parent template, a conditional branch, keyed entries, or a child component. Index attributes
-are diagnostics for a mounted template; they are never queried globally and are not node
-identity.
+are diagnostics for a mounted template; they are not node identity. A mount-unique dynamic
+marker is used only to recover a bound host when an intermediate light-DOM component clones it.
 
 ## DOM marker meanings
 
@@ -154,7 +154,7 @@ Structured mounts add small markers for Core, diagnostics, and future SSR or hyd
 
 ~~~html
 <!--dota-component-start-->
-<dota-card data-dota-index="0" data-dota-dynamic="" data-dota-component="dota-card">
+<dota-card data-dota-index="0" data-dota-dynamic="dota-render-0-value-element-0" data-dota-component="dota-card">
   Count: 1
 </dota-card>
 <!--dota-component-end-->
@@ -173,9 +173,11 @@ equal numbers in nested components cannot collide.
 
 ### data-dota-dynamic
 
-An element receives one empty marker when one or more interpolations belong to it. It is one
-marker per element, not one marker per interpolation. The exact interpolation index, target
-attribute, and text-node reference remain in runtime-only RenderPart records.
+An element receives one marker when one or more interpolations belong to it. Attribute-bearing
+elements use a mount-unique marker value; child-text-only elements retain an empty marker. It is
+one marker per element, not one marker per interpolation. Normal patches use the element reference
+stored in the runtime-only `RenderPart`. If a light-DOM component replaces that element with a
+serialized clone, the renderer uses the unique marker once to bind the part to the live host.
 
 ### data-dota-component
 
@@ -184,11 +186,12 @@ data-dota-component containing its local name. This follows the platform naming 
 works before customElements.define() has run. A parent renderer marks the custom-element host;
 the child component's own renderer handles its internal DOM.
 
-Declarative light-DOM children belong to the parent template that created them. A custom element
-that renders into its own light DOM will replace those children and therefore must not share that
-same region with parent-owned dynamic content. Components that accept parent-owned children
-should render internally to ShadowRoot and expose a slot; light-DOM components should receive
-dynamic input through their host attributes or properties.
+Declarative light-DOM children belong to the parent template that created them. If an intermediate
+custom element serializes and recreates those children, mount-unique markers let attribute parts
+recover a cloned custom-element host. Recovery updates only that marked host attribute; it does
+not inspect or patch the host's component-owned descendants. Dynamic text ranges still require
+stable parent-owned nodes, so components that project arbitrary dynamic content should preserve
+those nodes or expose a shadow slot.
 
 ### Component boundary comments
 
@@ -522,10 +525,10 @@ not proposals.
 | Keep `RenderInstance` stable | Core retains one handle even when a component migrates between legacy strings and structured templates. `RenderSession` changes its internal strategy instead. |
 | Separate pure diffing from DOM commits | `diff()` can be tested and consumed without browser mutation. Strategies remain solely responsible for applying the selected operation. |
 | Parse with the browser in a detached template | Browser parsing handles real HTML structure, while neutral placeholder names keep parser tokens away from observed attributes. Part discovery and initial values complete before custom elements connect. |
-| Store precise part metadata in memory | Interpolation indexes, node references, attribute templates, and keyed ownership do not pollute serialized DOM. Only compact element-level diagnostic markers remain. |
-| Use one dynamic marker per affected element | `data-dota-dynamic` narrows diagnostics without creating one attribute for every interpolation. Exact relationships remain in `RenderPart` records. |
+| Store precise part metadata in memory | Interpolation indexes, node references, attribute templates, and keyed ownership do not pollute serialized DOM. Only compact element-level markers remain. |
+| Use one dynamic marker per affected element | `data-dota-dynamic` narrows diagnostics and gives attribute parts a mount-unique fallback when a light-DOM component clones their host. Exact relationships remain in `RenderPart` records. |
 | Treat document indexes as local diagnostics | `data-dota-index` describes document order for one mounted template. It is regenerated after remount and is never global identity or the lookup mechanism for patches. |
-| Mark custom-element hosts, not rendered internals | Hyphenated hosts receive `data-dota-component`. Content later created by their callback or shadow renderer belongs to a different rendering session and is not traversed by the parent mount. |
+| Mark custom-element hosts, not rendered internals | Hyphenated hosts receive `data-dota-component`. Content created by their callback or child renderer belongs to a different rendering session; a parent can recover a cloned marked host but never patches that host's internals. |
 | Flatten composition before comparison | Nested templates expose one patchable interpolation index space. Shape caching avoids rebuilding stable flattened strings. |
 | Require explicit keyed and conditional ranges | Structural collection and branch changes remain local without introducing an implicit whole-tree reconciler. |
 | Keep trusted dynamic markup range-local | `trustedHTML()` can replace parser-produced markup without turning a value change into a component remount. Trust and sanitization remain caller responsibilities. |
@@ -537,14 +540,25 @@ not proposals.
 ### Ownership rules for custom elements
 
 A parent structured template owns the custom-element host and any declarative light-DOM children
-present in that parent template. It does not inspect content later produced by the custom
-element's `connectedCallback`, child render session, or shadow root. The child renderer starts a
-new index and part namespace.
+present in that parent template. Content later produced by the custom element's
+`connectedCallback`, child render session, or shadow root belongs to the child. The parent can
+recover a serialized clone carrying its mount-unique marker, but does not index or patch the
+clone's component-owned descendants. The child renderer starts a new index and part namespace.
 
-This boundary prevents a parent update from accidentally patching child-owned internals. It also
-means a custom element that replaces its own light DOM must not share that region with
-parent-owned dynamic children. Prefer host attributes or properties for input; use a shadow root
-and slots when the parent must retain ownership of projected children.
+This boundary prevents a parent update from accidentally patching child-owned internals. When an
+intermediate custom element replaces its light DOM from serialized markup, an attribute part may
+recover its marked custom-element host and update that host only. The renderer does not recover
+child text boundaries or enter the recovered host's rendered descendants.
+
+For a binding such as `<dota-icon color="${color}">`, ownership flows through three boundaries:
+
+1. The parent renderer calls `setAttribute("color", nextColor)` on the retained `dota-icon` host.
+2. The custom-element callback and Dota Core convert that attribute into the icon's `color` property.
+3. The icon's own render session updates its internal SVG; the parent renderer never traverses or
+   patches that child-owned markup.
+
+The renderer intentionally does not assign the JavaScript property itself. Doing so would bypass
+Dota Core's `@Property`, serialization, watcher, and `attributeChangedCallback` contract.
 
 ## Compatibility and downstream integration
 
