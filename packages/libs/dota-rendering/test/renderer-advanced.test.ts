@@ -1,4 +1,4 @@
-import {html, keyed, nothing, render, update, when} from '@dota/main';
+import {html, keyed, nothing, render, trustedHTML, update, when} from '@dota/main';
 
 describe('renderer advanced contracts', () => {
   it('mounts and patches a root-level text interpolation', () => {
@@ -83,6 +83,57 @@ describe('renderer advanced contracts', () => {
     update(instance, view(nextValue));
 
     expect(target?.selectedItem).toBe(nextValue);
+  });
+
+  it('updates an innerHTML property range without replacing its owning structure', () => {
+    const root = document.createElement('div');
+    const view = (markup: string) => html`
+      <article>
+        <div class="content" .innerHTML=${markup}></div>
+        <button>Persistent action</button>
+      </article>
+    `;
+    const instance = render(root, view('<p>Before</p>'));
+    const article = root.querySelector('article');
+    const content = root.querySelector('.content');
+    const button = root.querySelector('button');
+
+    const result = update(instance, view('<h2>After</h2>'));
+
+    expect(result).toEqual({kind: 'patch', changedParts: 1, replacedNodes: 0});
+    expect(root.querySelector('article')).toBe(article);
+    expect(root.querySelector('.content')).toBe(content);
+    expect(root.querySelector('button')).toBe(button);
+    expect(content?.innerHTML).toBe('<h2>After</h2>');
+  });
+
+  it('patches trusted markup inside its child range without replacing surrounding nodes', () => {
+    const root = document.createElement('div');
+    const view = (markup: string) => html`
+      <article>
+        <div class="content">${trustedHTML(markup)}</div>
+        <button>Persistent action</button>
+      </article>
+    `;
+    const instance = render(root, view('<p>Before</p>'));
+    const article = root.querySelector('article');
+    const content = root.querySelector('.content');
+    const button = root.querySelector('button');
+
+    const result = update(instance, view('<h2>After</h2>'));
+
+    expect(result).toEqual({kind: 'patch', changedParts: 1, replacedNodes: 0});
+    expect(root.querySelector('article')).toBe(article);
+    expect(root.querySelector('.content')).toBe(content);
+    expect(root.querySelector('button')).toBe(button);
+    expect(content?.innerHTML).toContain('<h2>After</h2>');
+  });
+
+  it('rejects trusted markup in attribute positions', () => {
+    const root = document.createElement('div');
+
+    expect(() => render(root, html`<div title=${trustedHTML('<strong>invalid</strong>')}></div>`))
+      .toThrow('trustedHTML() can only be used in a child position');
   });
 
   it('replaces and removes declarative event listeners without remounting', () => {
