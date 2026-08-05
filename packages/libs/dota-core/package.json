@@ -51,7 +51,8 @@
   ],
   "dependencies": {
     "reflect-metadata": "catalog:",
-    "@ayu-sh-kr/dota-event": "workspace:*"
+    "@ayu-sh-kr/dota-event": "workspace:*",
+    "@ayu-sh-kr/dota-rendering": "workspace:*"
   },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
