@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import {
   BaseElement,
   Component,
+  html,
   Property,
   State,
   BindEvent,
@@ -9,6 +10,7 @@ import {
   AfterInit,
   BeforeInit,
   Emitter,
+  Watcher,
 } from '@dota/core';
 import { String, Number, Object } from '@dota/core';
 import { LifecycleEventConstants } from '@dota/core/constants';
@@ -158,6 +160,31 @@ describe('BaseElement – connectedCallback', () => {
     expect(el.shadowRoot).not.toBeNull();
     expect(el.shadowRoot!.querySelector('#shadow-inner')).not.toBeNull();
     expect(el.querySelector('#shadow-inner')).toBeNull();
+  });
+
+  it('uses structured rendering to patch values without replacing the element', async () => {
+    @Component({ selector: 'connected-structured-render', shadow: false })
+    class TestComponent extends BaseElement {
+      value = 'before';
+
+      constructor() { super(); }
+
+      render() {
+        return html`<button title=${this.value}>${this.value}</button>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    const button = el.querySelector('button');
+    el.value = 'after';
+    (el as any).updateHTML();
+
+    expect(el.querySelector('button')).toBe(button);
+    expect(button?.getAttribute('title')).toBe('after');
+    expect(button?.textContent).toBe('after');
   });
 
   it('sets __initialized to true after all tasks complete', async () => {
@@ -988,6 +1015,147 @@ describe('BaseElement – @State reactivity', () => {
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
+
+  it('batches synchronous state changes into one render', async () => {
+    let renders = 0;
+
+    @Component({ selector: 'state-batches-sync-changes', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @State()
+      first!: number;
+
+      @State()
+      second!: number;
+
+      @State()
+      third!: number;
+
+      render() {
+        renders++;
+        return `<span>${this.first ?? 0}:${this.second ?? 0}:${this.third ?? 0}</span>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    (el as any).first = 1;
+    (el as any).second = 2;
+    (el as any).third = 3;
+
+    expect(renders).toBe(1);
+    expect(el.textContent).toBe('0:0:0');
+
+    await microtask();
+
+    expect(renders).toBe(2);
+    expect(el.textContent).toBe('1:2:3');
+  });
+
+  it('renders state changes separately when a microtask separates them', async () => {
+    let renders = 0;
+
+    @Component({ selector: 'state-separate-microtasks', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @State()
+      count!: number;
+
+      render() {
+        renders++;
+        return `<span>${this.count ?? 0}</span>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    (el as any).count = 1;
+    await microtask();
+    (el as any).count = 2;
+    await microtask();
+
+    expect(renders).toBe(3);
+    expect(el.textContent).toBe('2');
+  });
+
+  it('cancels a pending state render on disconnect and schedules after reconnect', async () => {
+    let renders = 0;
+    const domUpdated = vi.fn();
+
+    @Component({ selector: 'state-cancel-on-disconnect', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @State()
+      count!: number;
+
+      render() {
+        renders++;
+        return `<span>${this.count ?? 0}</span>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    (el as any).__eventChannel.on(LifecycleEventConstants.DOM_UPDATED, domUpdated);
+    document.body.appendChild(el);
+    await microtask();
+
+    (el as any).count = 1;
+    el.remove();
+    await microtask();
+    await microtask();
+
+    expect(renders).toBe(1);
+    expect(domUpdated).not.toHaveBeenCalled();
+
+    document.body.appendChild(el);
+    await microtask();
+
+    (el as any).count = 2;
+    await microtask();
+    await microtask();
+
+    expect(renders).toBe(3);
+    expect(el.textContent).toBe('2');
+    expect(domUpdated).toHaveBeenCalledTimes(1);
+  });
+
+  it('batches state changes for shadow DOM components', async () => {
+    let renders = 0;
+
+    @Component({ selector: 'state-batches-shadow', shadow: true })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @State()
+      first!: number;
+
+      @State()
+      second!: number;
+
+      render() {
+        renders++;
+        return `<span>${this.first ?? 0}:${this.second ?? 0}</span>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    (el as any).first = 1;
+    (el as any).second = 2;
+    await microtask();
+
+    expect(renders).toBe(2);
+    expect(el.shadowRoot!.textContent).toBe('1:2');
+  });
 });
 
 // ─── @Property reactivity ─────────────────────────────────────────────────────
@@ -1089,6 +1257,140 @@ describe('BaseElement – @Property reactivity', () => {
     await microtask();
     expect(el.reactive).toBe(false);
   });
+
+  it('batches reflected properties and emits lifecycle events against the final DOM', async () => {
+    let renders = 0;
+    const watched: string[] = [];
+    const lifecycle: string[] = [];
+
+    @Component({ selector: 'prop-batches-lifecycle', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @Property({ name: 'first', type: Number })
+      first = 0;
+
+      @Property({ name: 'second', type: Number })
+      second = 0;
+
+      @Property({ name: 'third', type: Number })
+      third = 0;
+
+      @Watcher(['first', 'second', 'third'])
+      trackProperty() {
+        watched.push(`${this.first}:${this.second}:${this.third}`);
+      }
+
+      render() {
+        renders++;
+        return `<span>${this.first}:${this.second}:${this.third}</span>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    const channel = (el as any).__eventChannel;
+    channel.on(LifecycleEventConstants.ATTRIBUTE_CHANGED, (event: any) => {
+      lifecycle.push(`attribute:${event.data.name}:${el.textContent}`);
+    });
+    channel.on(LifecycleEventConstants.DOM_UPDATED, () => {
+      lifecycle.push(`dom:${el.textContent}`);
+    });
+
+    document.body.appendChild(el);
+    await microtask();
+    lifecycle.length = 0;
+
+    (el as any).first = 1;
+    (el as any).second = 2;
+    (el as any).third = 3;
+
+    expect(el.getAttribute('first')).toBe('1');
+    expect(el.getAttribute('second')).toBe('2');
+    expect(el.getAttribute('third')).toBe('3');
+    expect(watched).toEqual(['1:0:0', '1:2:0', '1:2:3']);
+    expect(renders).toBe(1);
+    expect(lifecycle).toEqual([]);
+
+    await microtask();
+    await microtask();
+
+    expect(renders).toBe(2);
+    expect(lifecycle).toEqual([
+      'attribute:first:1:2:3',
+      'attribute:second:1:2:3',
+      'attribute:third:1:2:3',
+      'dom:1:2:3',
+    ]);
+  });
+
+  it('updates an externally changed attribute and watcher once', async () => {
+    const watcher = vi.fn();
+
+    @Component({ selector: 'prop-external-attribute-once', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @Property({ name: 'count', type: Number })
+      count = 0;
+
+      @Watcher('count')
+      trackCount() {
+        watcher(this.count);
+      }
+
+      render() {
+        return `<span>${this.count}</span>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    el.setAttribute('count', '5');
+    await microtask();
+
+    expect((el as any).count).toBe(5);
+    expect(el.textContent).toBe('5');
+    expect(watcher).toHaveBeenCalledTimes(1);
+    expect(watcher).toHaveBeenCalledWith(5);
+  });
+
+  it('lets a watcher flush its pending property render without a duplicate update', async () => {
+    let renders = 0;
+
+    @Component({ selector: 'prop-watcher-explicit-flush', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @Property({ name: 'count', type: Number })
+      count = 0;
+
+      @Watcher('count')
+      flushCount() {
+        this.updateHTML();
+      }
+
+      render() {
+        renders++;
+        return `<span>${this.count}</span>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    (el as any).count = 1;
+
+    expect(renders).toBe(2);
+    expect(el.textContent).toBe('1');
+
+    await microtask();
+    await microtask();
+
+    expect(renders).toBe(2);
+  });
 });
 
 // ─── updateHTML ───────────────────────────────────────────────────────────────
@@ -1144,7 +1446,7 @@ describe('BaseElement – updateHTML', () => {
     expect(el.shadowRoot!.querySelector('#sp')!.textContent).toBe('updated');
   });
 
-  it('re-binds @BindEvent listeners after re-render so clicks still work', async () => {
+  it('keeps delegated @BindEvent listeners working after re-render', async () => {
     const spy = vi.fn();
 
     @Component({ selector: 'updatehtml-rebind-events', shadow: false })
@@ -1167,6 +1469,60 @@ describe('BaseElement – updateHTML', () => {
 
     el.querySelector<HTMLButtonElement>('#btn')!.click();
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not rescan delegated method bindings during an update', async () => {
+    @Component({ selector: 'updatehtml-no-bind-rescan', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @BindEvent({ event: 'click', id: '#btn' })
+      handleClick() {}
+
+      render() { return `<button id="btn">go</button>`; }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    const bindMethods = vi.spyOn(el as any, 'bindMethods');
+    (el as any).updateHTML();
+    await microtask();
+
+    expect(bindMethods).not.toHaveBeenCalled();
+  });
+
+  it('flushes a scheduled state update immediately without rendering twice', async () => {
+    let renders = 0;
+
+    @Component({ selector: 'updatehtml-consumes-scheduled', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @State()
+      count!: number;
+
+      render() {
+        renders++;
+        return `<span>${this.count ?? 0}</span>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    (el as any).count = 1;
+    (el as any).updateHTML();
+
+    expect(renders).toBe(2);
+    expect(el.textContent).toBe('1');
+
+    await microtask();
+    await microtask();
+
+    expect(renders).toBe(2);
   });
 
   it('emits DOM_UPDATED event after every updateHTML call', async () => {
@@ -1215,5 +1571,3 @@ describe('BaseElement – updateHTML', () => {
     expect(renders).toBe(0);
   });
 });
-
-

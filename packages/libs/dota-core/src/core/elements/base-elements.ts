@@ -2,9 +2,9 @@ import {
   BindConfig, ElementConfigInternal, EventDetails,
   EventOptionMeta,
   MethodDetails, ParameterConfig,
-  PropertyDetails, StateConfig
+  StateConfig
 } from "@dota/core/types";
-import {HelperUtils, PropertyUtils, Sanitizer} from "@dota/core/utils";
+import {HelperUtils, PropertyUtils} from "@dota/core/utils";
 import {EventManagerService} from "@dota/core/services";
 import {EventEmitter} from "@dota/core";
 import {
@@ -16,6 +16,26 @@ import {
 import {ApplicationEventService} from "@dota/core/services/application-event.service.ts";
 import {KeyUtils} from "@dota/core/utils/KeyUtils.ts";
 import {LifecycleEventConstants} from "@dota/core/constants";
+import {
+  render as mountRender,
+  update as updateRender,
+  type RenderInstance,
+  type RenderOutput
+} from "@ayu-sh-kr/dota-rendering";
+
+
+/**
+ * Records an observed attribute change until the coalesced DOM update is complete.
+ * Lifecycle listeners receive these records in mutation order against the final DOM.
+ */
+type PendingAttributeChange = {
+  /** Attribute whose serialized DOM value changed. */
+  name: string;
+  /** Serialized value before the mutation, or null when previously absent. */
+  oldValue: string | null;
+  /** Serialized value after the mutation. */
+  newValue: string;
+};
 
 
 export abstract class BaseElement extends HTMLElement {
@@ -26,6 +46,9 @@ export abstract class BaseElement extends HTMLElement {
   reactive = false;
   readonly __uid!: number;
   private __initialized = false;
+  private __updateScheduled = false;
+  private __pendingAttributeChanges: PendingAttributeChange[] = [];
+  private __renderInstance?: RenderInstance;
 
   private __eventManagerService: EventManagerService<BaseElement>;
   private __applicationEventService = ApplicationEventService.getInstance();
@@ -74,12 +97,13 @@ export abstract class BaseElement extends HTMLElement {
     const bindHostEvents = this.bindHostEvents();
     const bindWindowEvents = this.bindWindowEvents();
     const bindDocumentEvents = this.bindDocumentEvents();
+    this.__classApplicationEventManager.bind();
+    this.__classScopedApplicationEventManager.bind();
 
     Promise.all([
       exposedMethods, bindMethods, bindEmitter, bindHostEvents,
       bindWindowEvents, bindDocumentEvents, bindProperties, bindParameters,
-      bindState, bindElements, this.__classApplicationEventManager.bind(),
-      this.__classScopedApplicationEventManager.bind()
+      bindState, bindElements
     ])
       .then(() => {
         this.__initialized = true;
@@ -92,19 +116,25 @@ export abstract class BaseElement extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this.__initialized = false;
+    this.__updateScheduled = false;
+    this.__pendingAttributeChanges.length = 0;
+    this.__renderInstance?.dispose();
+    this.__renderInstance = undefined;
+
     const unbindMethods = this.unbindMethods();
     const unbindHostEvents = this.unbindHostEvents();
     const unbindWindowEvents = this.unbindWindowEvents();
     const documentEvents = this.unbindDocumentEvents();
     const unbindProperties = this.unbindProperties();
+    this.__classApplicationEventManager.unbind();
+    this.__classScopedApplicationEventManager.unbind();
 
     Promise.all([
       unbindMethods, unbindHostEvents, unbindWindowEvents,
-      documentEvents, unbindProperties, this.__classApplicationEventManager.unbind(),
-      this.__classScopedApplicationEventManager.unbind()
+      documentEvents, unbindProperties
     ])
       .then(() => {
-        this.__initialized = false;
         this.__eventChannel.emit({
           name: LifecycleEventConstants.DISCONNECTED
         })
@@ -112,29 +142,39 @@ export abstract class BaseElement extends HTMLElement {
       .catch((reason) => console.error(reason));
   }
 
-  abstract render(): string;
+  abstract render(): RenderOutput;
 
   /**
    * Updates the component's rendered HTML.
    *
-   * This method re-renders the component's HTML content based on the current state.
-   * If the component uses a shadow DOM, it updates the shadow root's inner HTML.
-   * Otherwise, it updates the component's inner HTML. After updating the HTML,
-   * it re-binds the component's methods to their corresponding events.
-   *
-   * @method updateHTML
+   * Immediately renders the latest component state and refreshes node references.
+   * A direct call consumes any pending reactive update so its queued microtask cannot
+   * render twice. Attribute lifecycle events are emitted after replacement so their
+   * listeners always inspect the final DOM for the current batch.
    */
   updateHTML() {
     if (!this.__initialized) return;
-    if (this.isShadow && this.shadowRoot) {
-      this.shadowRoot.innerHTML = this.render();
+
+    this.__updateScheduled = false;
+    const attributeChanges = this.__pendingAttributeChanges.splice(0);
+
+    const root: Element | ShadowRoot = this.isShadow && this.shadowRoot ? this.shadowRoot : this;
+    const output = this.render();
+    if (this.__renderInstance) {
+      updateRender(this.__renderInstance, output);
     } else {
-      this.innerHTML = this.render();
+      this.__renderInstance = mountRender(root, output);
     }
-    const bindMethods = this.bindMethods();
     const bindElements = this.bindElements();
 
-    Promise.all([bindMethods, bindElements])
+    attributeChanges.forEach(({name, oldValue, newValue}) => {
+      this.__eventChannel.emit({
+        name: LifecycleEventConstants.ATTRIBUTE_CHANGED,
+        data: {name, oldValue, newValue}
+      });
+    });
+
+    bindElements
       .then(() => {
         this.__eventChannel.emit({
           name: LifecycleEventConstants.DOM_UPDATED
@@ -143,44 +183,54 @@ export abstract class BaseElement extends HTMLElement {
       .catch((reason) => console.error(reason));
   }
 
+  /**
+   * Coalesces reactive mutations into one DOM replacement at the end of the task.
+   * Explicit updateHTML calls remain immediate and clear the flag, which makes a
+   * queued callback harmless when a consumer chooses to flush synchronously.
+   */
+  private requestHTMLUpdate(): void {
+    if (!this.__initialized || this.__updateScheduled) return;
+
+    this.__updateScheduled = true;
+    queueMicrotask(() => {
+      if (!this.__updateScheduled) return;
+      this.updateHTML();
+    });
+  }
+
 
   /**
    * Called when an observed attribute changes.
-   *
-   * This method is invoked when one of the component's attributes, specified in the `observedAttributes` array, changes.
-   * It updates the component's properties and re-renders the component if the new value is different from the old value.
-   *
-   * @method attributeChangedCallback
-   * @param {string} name - The name of the attribute that changed.
-   * @param {string} oldValue - The old value of the attribute.
-   * @param {string} newValue - The new value of the attribute.
+   * External values update typed property storage, while framework reflections skip
+   * parsing and setter re-entry. Runtime changes are queued so listeners receive them
+   * after the coalesced DOM replacement and before DOM_UPDATED.
+   * @param name Attribute whose serialized value changed.
+   * @param oldValue Serialized value before the change, or null when absent.
+   * @param newValue Serialized value after the change, or null when removed.
    */
-  attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null) {
+    if (newValue === null || newValue === oldValue) return;
 
-    if (newValue === null) {
-      return;
+    const isPropertyReflection = PropertyUtils.isReflectingAttribute(this, name);
+    const changedProperty = isPropertyReflection
+      ? undefined
+      : PropertyUtils.bindAttribute(this, name, newValue);
+
+    if (this.__initialized) {
+      this.__pendingAttributeChanges.push({name, oldValue, newValue});
+      if (!isPropertyReflection) this.requestHTMLUpdate();
     }
 
-    if (newValue !== oldValue) {
-      this.bindProperty(name, newValue);
-      this.updateHTML();
-      this.__eventChannel.emit({
-        name: LifecycleEventConstants.ATTRIBUTE_CHANGED,
-        data: {name, oldValue, newValue}
-      });
+    if (this.reactive && changedProperty) {
+      PropertyUtils.bindWatchers(this, changedProperty);
     }
   }
 
   /**
-   * Sets the value of an attribute on the component and updates the corresponding property.
-   *
-   * This method overrides the default `setAttribute` method to ensure that the component's
-   * property is updated whenever an attribute is set. It assigns the provided value to the
-   * property with the same name as the attribute and then calls the superclasses `setAttribute`
-   * method to update the attribute on the DOM element.
-   *
-   * @param {number} qualifiedName - The name of the attribute to set.
-   * @param {number} value - The value to assign to the attribute.
+   * Retains the framework's permissive attribute value contract while delegating the
+   * actual mutation and string conversion to the native DOM implementation.
+   * @param qualifiedName Attribute name accepted by the native element API.
+   * @param value Value the browser converts to its serialized attribute form.
    */
   setAttribute(qualifiedName: string, value: any) {
     super.setAttribute(qualifiedName, value);
@@ -245,10 +295,10 @@ export abstract class BaseElement extends HTMLElement {
     if (this.isShadow) {
       this.shadowRoot = this.attachShadow({mode: "open"})
       if (this.shadowRoot) {
-        this.shadowRoot.innerHTML = this.render();
+        this.__renderInstance = mountRender(this.shadowRoot, this.render());
       }
     } else {
-      this.innerHTML = this.render();
+      this.__renderInstance = mountRender(this, this.render());
     }
   }
 
@@ -304,7 +354,7 @@ export abstract class BaseElement extends HTMLElement {
       for (const eventName of events) {
         const key = `${eventName}@@${config.id}@@${methodName}`;
 
-        // prevent duplicate bindings across updateHTML()
+        // Prevent duplicates if setup is requested more than once in one connection.
         if (this.__delegatedBindListeners.has(key)) continue;
 
         const listener: EventListener = (e: Event) => {
@@ -380,31 +430,6 @@ export abstract class BaseElement extends HTMLElement {
     }
   }
 
-
-  /**
-   * Binds a component's property to a new value based on metadata.
-   *
-   * This method is called by `attributeChangedCallback` to update the component's
-   * properties when an attribute changes. It retrieves metadata associated with
-   * the component's constructor to find property details and assigns the new value
-   * to the corresponding property.
-   *
-   * @method bindProperty
-   * @param {string} name - The name of the attribute that changed.
-   * @param {string} value - The new value of the attribute.
-   */
-  private bindProperty(name: string, value: any) {
-    let data: Map<string, PropertyDetails> = HelperUtils.fetchOrCreate<PropertyDetails>(this, 'Property')
-
-    if (data) {
-      let property = data.get(name);
-
-      if (property) {
-        this[property.prototype] = Sanitizer.sanitize(value, property.type);
-        return;
-      }
-    }
-  }
 
   /**
    * Binds event emitters to the component's properties based on metadata.
@@ -625,8 +650,7 @@ export abstract class BaseElement extends HTMLElement {
         set(v: any) {
           if (element[propertyKey] !== v) {
             element[propertyKey] = v;
-            element.updateHTML();
-
+            element.requestHTMLUpdate();
             PropertyUtils.bindWatchers(element, value.prototype);
           }
         },
