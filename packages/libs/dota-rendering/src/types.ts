@@ -1,19 +1,24 @@
 /** Sentinel that renders no output instead of the string representation of a symbol. */
 export const nothing = Symbol('dota-rendering.nothing');
 
-/** All output forms understood by the legacy and structured rendering strategies. */
+/**
+ * Output accepted by the component render boundary.
+ * Strings preserve legacy whole-root rendering, `TemplateResult` enables part updates,
+ * and `nothing` clears the owned boundary.
+ */
 export type RenderOutput = string | TemplateResult | typeof nothing;
 
 /**
- * Describes one structured template before its values are committed to the DOM.
- * The renderer compares the static strings to decide whether existing parts can be reused.
+ * Carries one structured HTML template from `html()` to the DOM renderer.
+ * Static strings define reusable structure; values become text parts or serialized quoted
+ * attributes, while Dota Core owns typed property and attribute-change behavior.
  */
 export interface TemplateResult {
   /** Identifies this value as a Dota structured template. */
   readonly kind: 'dota-template';
   /** Static template segments whose order defines the dynamic part indexes. */
   readonly strings: TemplateStringsArray;
-  /** Dynamic values paired by position with the gaps between `strings`. */
+  /** Values paired with string gaps and interpreted by their parsed HTML position. */
   readonly values: readonly unknown[];
 }
 
@@ -97,6 +102,6 @@ export interface RenderInstance {
   readonly output: RenderOutput;
   /** Compares and commits a new output against the instance baseline. */
   update(output: RenderOutput): CommitResult;
-  /** Releases renderer-owned listeners and nested range instances without clearing committed DOM. */
+  /** Releases nested range instances without clearing committed DOM. */
   dispose(): void;
 }
