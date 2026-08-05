@@ -4,8 +4,6 @@ import {
   isKeyedValue,
   isTemplateResult,
   isTrustedHtmlValue,
-  valueMarkerFor,
-  valueMarkerPattern,
   valueText
 } from './template';
 import {
@@ -23,7 +21,8 @@ const COMPONENT_END_MARKER = '<!--dota-component-end-->';
 const COMPONENT_ATTRIBUTE = 'data-dota-component';
 const NODE_INDEX_ATTRIBUTE = 'data-dota-index';
 const DYNAMIC_ATTRIBUTE = 'data-dota-dynamic';
-const SOURCE_BINDING_NAME_PATTERN = /([@?.][^\s"'<>/=]+)\s*=\s*["']?$/;
+/** Supplies a unique parser-token namespace to every mounted template strategy. */
+let templateMarkerId = 0;
 
 /** Browser-owned component boundary accepted by render(); both variants support complete DOM replacement. */
 type NativeRenderRoot = Element | ShadowRoot;
@@ -74,43 +73,26 @@ type ChildPart = {
 };
 
 /**
- * Selects browser mutation semantics encoded by source syntax: ordinary attributes,
- * `?` presence toggles, `.` properties, or `@` event listeners.
- */
-type AttributeMode = 'attribute' | 'boolean' | 'property' | 'event';
-
-/** Maps structured binding prefixes to their browser mutation policy. */
-const ATTRIBUTE_MODE_BY_PREFIX: Readonly<Record<string, AttributeMode>> = {
-  '?': 'boolean',
-  '.': 'property',
-  '@': 'event'
-};
-
-/**
- * Retains parsed ownership for one dynamic attribute, property, or event binding.
- * The same record can be registered under several indexes so a multi-value ordinary
- * attribute is reconstructed once when any contributing interpolation changes.
+ * Retains one quoted HTML attribute containing dynamic values.
+ * Dota Rendering only reconstructs its serialized value; Dota Core remains responsible
+ * for converting observed attributes into typed component properties.
  */
 type AttributePart = {
-  /** Selects attribute-position handling from the RenderPart union. */
+  /** Selects attribute handling from the render-part union. */
   kind: 'attribute';
-  /** Interpolation positions contributing to the complete binding value. */
+  /** Interpolation positions used to rebuild the complete serialized value. */
   valueIndexes: number[];
-  /** Parsed element receiving attribute, property, or listener mutations. */
+  /** Parsed element receiving the standard `setAttribute` mutation. */
   element: Element;
-  /** Browser operation selected from ordinary, boolean, property, and event syntax. */
-  mode: AttributeMode;
-  /** Target name with source casing preserved for properties and custom events. */
+  /** HTML attribute name reported by the browser parser. */
   name: string;
-  /** Tokenized parsed value used to reconstruct multi-interpolation attributes. */
+  /** Parsed quoted value containing temporary interpolation markers. */
   templateValue: string;
-  /** Currently registered listener, retained so replacement and disposal can remove it. */
-  listener?: EventListenerOrEventListenerObject;
 };
 
 /**
  * Runtime mutation target discovered from structured template tokens.
- * TemplateStrategy discriminates this union before applying child or binding policy.
+ * TemplateStrategy discriminates this union before applying child or attribute policy.
  */
 type RenderPart = ChildPart | AttributePart;
 
@@ -137,7 +119,7 @@ interface RenderStrategy {
    * @returns Observable mutation summary for the commit.
    */
   update(output: RenderOutput): CommitResult;
-  /** Releases strategy-owned listeners and nested renderer resources. */
+  /** Releases nested renderer resources owned by this strategy. */
   dispose(): void;
 }
 
@@ -195,7 +177,7 @@ class RangeRoot implements RenderRoot {
    * @param value Trusted legacy markup owned by the nested renderer.
    */
   writeHTML(value: string): void {
-    const template = document.createElement('template');
+    const template = this.end.ownerDocument.createElement('template');
     template.innerHTML = value;
     this.replaceChildren(template.content);
   }
@@ -241,7 +223,7 @@ class StringStrategy implements RenderStrategy {
     return {kind: 'replace', changedParts: 0, replacedNodes: 1};
   }
 
-  /** Legacy output owns no listeners or nested sessions requiring disposal. */
+  /** Legacy output owns no nested sessions requiring disposal. */
   dispose(): void {}
 }
 
@@ -285,7 +267,7 @@ class RenderSession implements RenderInstance {
     return {kind: 'replace', changedParts: 0, replacedNodes: 1};
   }
 
-  /** Releases listeners and nested ranges owned by the currently active strategy. */
+  /** Releases nested ranges owned by the currently active strategy. */
   dispose(): void {
     this.strategy.dispose();
   }
@@ -295,8 +277,10 @@ class RenderSession implements RenderInstance {
 class TemplateStrategy implements RenderStrategy {
   /** Runtime mutation targets grouped by the values that can schedule them. */
   private partsByIndex = new Map<number, RenderPart[]>();
-  /** Listener-bearing parts requiring explicit cleanup before replacement or disposal. */
-  private eventParts = new Set<AttributePart>();
+  /** Mount-local token prevents authored text from colliding with interpolation markers. */
+  private readonly markerPrefix = `dota-render-${templateMarkerId++}-value-`;
+  /** Finds interpolation indexes created by this strategy's private marker prefix. */
+  private readonly markerPattern = new RegExp(`${this.markerPrefix}(\\d+)`, 'g');
 
   /** Last committed structured output used by diff() as the patch baseline. */
   public output: TemplateResult;
@@ -313,7 +297,7 @@ class TemplateStrategy implements RenderStrategy {
 
   /**
    * Applies compatible value changes through retained parts and remounts changed structure.
-   * Disposal precedes remounting so stale event listeners and nested sessions cannot survive.
+   * Disposal precedes remounting so nested sessions cannot survive a replaced structure.
    * @param output Next output supplied by the owning RenderSession.
    * @returns No-op, part patch, or structural replacement summary.
    */
@@ -334,7 +318,7 @@ class TemplateStrategy implements RenderStrategy {
     return {kind: 'patch', changedParts: result.changedParts.length, replacedNodes: 0};
   }
 
-  /** Releases renderer-owned listeners and nested sessions without clearing committed DOM. */
+  /** Releases nested sessions without clearing committed DOM. */
   dispose(): void {
     this.disposeParts();
   }
@@ -344,13 +328,13 @@ class TemplateStrategy implements RenderStrategy {
    * Child and attribute discovery stay separate because they mutate different DOM
    * representations but register into the same interpolation-indexed map.
    * @param fragment Detached parsed template fragment.
-   * @param sourceBindingNames Original case-sensitive property and event names by index.
+   * @param attributeNames Original names keyed by neutral parser placeholder attributes.
    * @returns Runtime parts grouped by every interpolation index that can update them.
    */
-  private findParts(fragment: DocumentFragment, sourceBindingNames: ReadonlyMap<number, string>): Map<number, RenderPart[]> {
+  private findParts(fragment: DocumentFragment, attributeNames: ReadonlyMap<string, string>): Map<number, RenderPart[]> {
     const parts = new Map<number, RenderPart[]>();
     this.findChildParts(fragment, parts);
-    this.indexElementsAndFindAttributeParts(fragment, sourceBindingNames, parts);
+    this.indexElementsAndFindAttributeParts(fragment, attributeNames, parts);
     return parts;
   }
 
@@ -363,21 +347,22 @@ class TemplateStrategy implements RenderStrategy {
    */
   private findChildParts(fragment: DocumentFragment, parts: Map<number, RenderPart[]>): void {
     const textNodes: Text[] = [];
-    const textWalker = document.createTreeWalker(fragment, NodeFilter.SHOW_TEXT);
+    const ownerDocument = fragment.ownerDocument;
+    const textWalker = ownerDocument.createTreeWalker(fragment, NodeFilter.SHOW_TEXT);
     let textNode: Node | null;
     while ((textNode = textWalker.nextNode())) textNodes.push(textNode as Text);
 
     for (const text of textNodes) {
-      const matches = [...text.data.matchAll(valueMarkerPattern)];
+      const matches = [...text.data.matchAll(this.markerPattern)];
       if (matches.length === 0) continue;
 
-      const replacement = document.createDocumentFragment();
+      const replacement = ownerDocument.createDocumentFragment();
       let cursor = 0;
       for (const match of matches) {
         const matchIndex = match.index ?? 0;
         replacement.append(text.data.slice(cursor, matchIndex));
-        const start = document.createTextNode('');
-        const end = document.createTextNode('');
+        const start = ownerDocument.createTextNode('');
+        const end = ownerDocument.createTextNode('');
         replacement.append(start, end);
         const index = Number(match[1]);
         text.parentElement?.setAttribute(DYNAMIC_ATTRIBUTE, '');
@@ -390,42 +375,35 @@ class TemplateStrategy implements RenderStrategy {
   }
 
   /**
-   * Marks each element and records parsed attribute, property, boolean, and event parts.
-   * Source names restore casing lost by HTML parsing, while special bindings reject
-   * composite values because their browser mutation has one unambiguous target value.
+   * Marks each element and records quoted attributes containing dynamic values.
+   * Attribute updates always use `setAttribute` so custom elements receive their normal
+   * observed-attribute callback and Dota Core performs configured type conversion.
    * @param fragment Detached fragment whose elements receive renderer metadata.
-   * @param sourceBindingNames Original special-binding names by interpolation index.
+   * @param attributeNames Original names keyed by neutral parser placeholder attributes.
    * @param parts Shared registry receiving each part under all contributing indexes.
-   * @throws Error when a special binding is not one standalone interpolation.
    */
-  private indexElementsAndFindAttributeParts(fragment: DocumentFragment, sourceBindingNames: ReadonlyMap<number, string>, parts: Map<number, RenderPart[]>): void {
+  private indexElementsAndFindAttributeParts(fragment: DocumentFragment, attributeNames: ReadonlyMap<string, string>, parts: Map<number, RenderPart[]>): void {
     const elements = [...fragment.querySelectorAll('*')];
     elements.forEach((element, index) => {
       element.setAttribute(NODE_INDEX_ATTRIBUTE, String(index));
       if (element.localName.includes('-')) element.setAttribute(COMPONENT_ATTRIBUTE, element.localName);
 
       for (const attribute of [...element.attributes]) {
-        const matches = [...attribute.value.matchAll(valueMarkerPattern)];
+        const name = attributeNames.get(attribute.name);
+        if (!name) continue;
+
+        const matches = [...attribute.value.matchAll(this.markerPattern)];
         if (matches.length === 0) continue;
 
         const valueIndexes = matches.map((match) => Number(match[1]));
-        const mode = ATTRIBUTE_MODE_BY_PREFIX[attribute.name[0]] ?? 'attribute';
-        const sourceName = sourceBindingNames.get(valueIndexes[0]) ?? attribute.name;
-        const name = mode === 'attribute' ? attribute.name : sourceName.slice(1);
-        if (mode !== 'attribute' && (valueIndexes.length !== 1 || attribute.value !== valueMarkerFor(valueIndexes[0]))) {
-          throw new Error(`Dynamic ${mode} binding ${attribute.name} must be a standalone interpolation`);
-        }
-
         const part: AttributePart = {
           kind: 'attribute',
           valueIndexes,
           element,
-          mode,
           name,
           templateValue: attribute.value
         };
-        if (mode === 'event') this.eventParts.add(part);
-        if (mode !== 'attribute') element.removeAttribute(attribute.name);
+        element.removeAttribute(attribute.name);
         element.setAttribute(DYNAMIC_ATTRIBUTE, '');
         valueIndexes.forEach((valueIndex) => recordRenderPart(parts, valueIndex, part));
       }
@@ -434,8 +412,8 @@ class TemplateStrategy implements RenderStrategy {
 
   /**
    * Applies every affected runtime part once even when several changed indexes share it.
-   * Deduplication is required for composite attributes and avoids listener churn when
-   * more than one contributing interpolation changes in the same render.
+   * Deduplication keeps a composite attribute to one `setAttribute` call when more
+   * than one contributing interpolation changes in the same render.
    * @param valueIndexes Changed or initially mounted interpolation positions.
    * @param values Complete next value set used to reconstruct shared parts.
    */
@@ -450,45 +428,18 @@ class TemplateStrategy implements RenderStrategy {
   }
 
   /**
-   * Commits one parsed binding using the semantics selected by its source prefix.
-   * Ordinary composite attributes use all next values; event updates remove the old
-   * listener before registering its replacement so disposal always has one owner.
+   * Rebuilds one quoted attribute from its static text and current interpolations.
+   * The serialized value is written through `setAttribute`; native boolean attributes
+   * therefore remain presence-only markup and Dota properties use observed attributes.
    * @param part Attribute-position metadata discovered during mount.
-   * @param values Complete next value set for single or composite reconstruction.
-   * @throws TypeError when a trusted range is used as an attribute or an event value is invalid.
+   * @param values Complete next value set used for composite reconstruction.
+   * @throws TypeError when trusted markup is used outside a child range.
    */
   private applyAttribute(part: AttributePart, values: readonly unknown[]): void {
     if (part.valueIndexes.some((index) => isTrustedHtmlValue(values[index]))) {
       throw new TypeError('trustedHTML() can only be used in a child position');
     }
-    const value = values[part.valueIndexes[0]];
-    if (part.mode === 'boolean') {
-      part.element.toggleAttribute(part.name, value !== nothing && Boolean(value));
-      return;
-    }
-    if (part.mode === 'property') {
-      (part.element as unknown as Record<string, unknown>)[part.name] = value === nothing ? undefined : value;
-      return;
-    }
-    if (part.mode === 'event') {
-      if (part.listener) part.element.removeEventListener(part.name, part.listener);
-      part.listener = undefined;
-      if (typeof value === 'function' || (typeof value === 'object' && value !== null && 'handleEvent' in value)) {
-        part.listener = value as EventListenerOrEventListenerObject;
-        part.element.addEventListener(part.name, part.listener);
-      } else if (value !== nothing && value !== null && value !== undefined && value !== false) {
-        throw new TypeError(`Event binding @${part.name} requires a listener, false, null, undefined, or nothing`);
-      }
-      return;
-    }
-
-    const isSingleValue = part.valueIndexes.length === 1 &&
-      part.templateValue === valueMarkerFor(part.valueIndexes[0]);
-    if (isSingleValue && (value === nothing || value === null || value === undefined || value === false)) {
-      part.element.removeAttribute(part.name);
-      return;
-    }
-    const nextValue = part.templateValue.replace(valueMarkerPattern, (_, markerIndex: string) =>
+    const nextValue = part.templateValue.replace(this.markerPattern, (_, markerIndex: string) =>
       valueText(values[Number(markerIndex)]));
     part.element.setAttribute(part.name, nextValue);
   }
@@ -496,7 +447,7 @@ class TemplateStrategy implements RenderStrategy {
   /**
    * Transitions one child range among scalar text, trusted markup, conditional, and keyed output.
    * Previous nested ownership is disposed and cleared before another representation takes
-   * over, preventing detached listeners or stale nodes from surviving a value-kind change.
+   * over, preventing stale nodes from surviving a value-kind change.
    * @param part Child range receiving the next representation.
    * @param value Dynamic value selected for the part's interpolation index.
    */
@@ -540,7 +491,7 @@ class TemplateStrategy implements RenderStrategy {
     this.clearKeyed(part);
     const text = valueText(value);
     if (!part.text) {
-      part.text = document.createTextNode(text);
+      part.text = part.end.ownerDocument.createTextNode(text);
       part.end.parentNode?.insertBefore(part.text, part.end);
     } else {
       part.text.data = text;
@@ -594,8 +545,9 @@ class TemplateStrategy implements RenderStrategy {
         retainedRange.instance.update(entry.value);
         continue;
       }
-      const start = document.createTextNode('');
-      const end = document.createTextNode('');
+      const ownerDocument = part.end.ownerDocument;
+      const start = ownerDocument.createTextNode('');
+      const end = ownerDocument.createTextNode('');
       part.end.parentNode?.insertBefore(start, part.end);
       part.end.parentNode?.insertBefore(end, part.end);
       rangesByKey.set(entry.key, {start, end, instance: new RenderSession(new RangeRoot(start, end), entry.value)});
@@ -625,15 +577,11 @@ class TemplateStrategy implements RenderStrategy {
   }
 
   /**
-   * Releases event listeners and nested renderer sessions before remount or disposal.
+   * Releases nested renderer sessions before remount or disposal.
    * Parts can appear under several indexes, so child records are deduplicated before
-   * cascading disposal and the registries are cleared only after their resources release.
+   * cascading disposal and clearing the registry.
    */
   private disposeParts(): void {
-    for (const part of this.eventParts) {
-      if (part.listener) part.element.removeEventListener(part.name, part.listener);
-    }
-    this.eventParts.clear();
     const childParts = new Set<ChildPart>();
     for (const indexedParts of this.partsByIndex.values()) {
       indexedParts.forEach((part) => {
@@ -648,26 +596,55 @@ class TemplateStrategy implements RenderStrategy {
   }
 
   /**
-   * Parses static structure, discovers parts, applies initial values, and commits once.
-   * Initial values are written while detached so custom elements connect with final
-   * attributes instead of temporary parser tokens or incomplete property state.
+   * Parses static structure in a detached template.
+   * Parts receive final values before insertion into the live root, preventing temporary
+   * attribute markers from reaching Dota Core or custom-element lifecycle callbacks.
    * @param output Structured template whose static strings define the mounted shape.
+   * @throws Error when a dynamic attribute value is not enclosed in quotes.
    */
   private mount(output: TemplateResult): void {
     const template = document.createElement('template');
     const source = [COMPONENT_START_MARKER];
-    const sourceBindingNames = new Map<number, string>();
     output.strings.forEach((staticSegment, index) => {
       source.push(staticSegment);
       if (index >= output.strings.length - 1) return;
-      const bindingName = SOURCE_BINDING_NAME_PATTERN.exec(staticSegment)?.[1];
-      if (bindingName) sourceBindingNames.set(index, bindingName);
-      source.push(valueMarkerFor(index));
+      source.push(`${this.markerPrefix}${index}`);
     });
     source.push(COMPONENT_END_MARKER);
-    template.innerHTML = source.join('');
+
+    const attributeNames = new Map<string, string>();
+    // Neutral names prevent observed attributes from receiving parser tokens.
+    const quotedAttributePattern = new RegExp(
+      `([^\\s"'<>/=]+)(\\s*=\\s*)(?:"([^"]*${this.markerPrefix}\\d+[^"]*)"|'([^']*${this.markerPrefix}\\d+[^']*)')`,
+      'g'
+    );
+    const templateSource = source.join('').replace(
+      quotedAttributePattern,
+      (match, name: string, assignment: string, doubleQuotedValue: string | undefined,
+        singleQuotedValue: string | undefined, offset: number, complete: string) => {
+        if (complete.lastIndexOf('<', offset) < complete.lastIndexOf('>', offset)) return match;
+        const placeholder = `data-dota-attribute-${this.markerPrefix}${attributeNames.size}`;
+        attributeNames.set(placeholder, name);
+        const quote = doubleQuotedValue === undefined ? "'" : '"';
+        const value = doubleQuotedValue ?? singleQuotedValue;
+        return `${placeholder}${assignment}${quote}${value}${quote}`;
+      }
+    );
+    // Quoted values are required by Dota's existing template contract.
+    const unquotedAttributePattern = new RegExp(
+      `([^\\s"'<>/=]+)\\s*=\\s*[^\\s"'<>]*${this.markerPrefix}\\d+[^\\s"'<>]*`,
+      'g'
+    );
+    for (const match of templateSource.matchAll(unquotedAttributePattern)) {
+      const offset = match.index;
+      if (templateSource.lastIndexOf('<', offset) > templateSource.lastIndexOf('>', offset)) {
+        throw new Error(`Dynamic attribute "${match[1]}" must use a quoted value`);
+      }
+    }
+
+    template.innerHTML = templateSource;
     const fragment = template.content;
-    this.partsByIndex = this.findParts(fragment, sourceBindingNames);
+    this.partsByIndex = this.findParts(fragment, attributeNames);
     this.applyIndexes(output.values.map((_, index) => index), output.values);
     this.root.replaceChildren(fragment);
   }
@@ -726,7 +703,9 @@ function moveInclusiveRange(start: Node, end: Node, before: Node): void {
     return;
   }
 
-  const fragment = document.createDocumentFragment();
+  const ownerDocument = before.ownerDocument;
+  if (!ownerDocument) return;
+  const fragment = ownerDocument.createDocumentFragment();
   let node: Node | null = start;
   while (node) {
     const next: Node | null = node.nextSibling;

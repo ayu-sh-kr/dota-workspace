@@ -1,4 +1,4 @@
-import {html, keyed, nothing, render, trustedHTML, update, when} from '@dota/main';
+import {html, keyed, render, trustedHTML, update, when} from '@dota/main';
 
 describe('renderer advanced contracts', () => {
   it('mounts and patches a root-level text interpolation', () => {
@@ -36,75 +36,65 @@ describe('renderer advanced contracts', () => {
 
   it('reconstructs attributes containing several interpolations', () => {
     const root = document.createElement('div');
-    const view = (size: string, theme: string) => html`<div class="card ${size} theme-${theme}"></div>`;
+    const view = (size: string, theme: string) => html`
+      <div title="it's ${size}" class="card ${size} theme-${theme}"></div>
+    `;
     const instance = render(root, view('small', 'light'));
     const element = root.querySelector('div');
 
+    expect(element?.title).toBe("it's small");
     expect(element?.className).toBe('card small theme-light');
 
     update(instance, view('large', 'dark'));
 
     expect(root.querySelector('div')).toBe(element);
+    expect(element?.title).toBe("it's large");
     expect(element?.className).toBe('card large theme-dark');
   });
 
-  it('applies boolean attributes and DOM properties with their native semantics', () => {
+  it('requires quotes around dynamic attribute values', () => {
     const root = document.createElement('div');
-    const view = (disabled: boolean, value: string) => html`
-      <input ?disabled=${disabled} .value=${value}>
-    `;
-    const instance = render(root, view(false, 'initial'));
+
+    expect(() => render(root, html`<dota-property-target count=${2}></dota-property-target>`))
+      .toThrow('Dynamic attribute "count" must use a quoted value');
+  });
+
+  it('preserves authored text that resembles a public interpolation marker', () => {
+    const root = document.createElement('div');
+
+    render(root, html`<p>dota-value-0 literal</p>`);
+
+    expect(root.querySelector('p')?.textContent).toBe('dota-value-0 literal');
+  });
+
+  it('patches quoted values without changing presence-only boolean attributes', () => {
+    const root = document.createElement('div');
+    const view = (value: string) => html`<input disabled value="${value}">`;
+    const instance = render(root, view('initial'));
     const input = root.querySelector('input');
 
-    expect(input?.disabled).toBe(false);
-    expect(input?.hasAttribute('disabled')).toBe(false);
-    expect(input?.value).toBe('initial');
-    expect(input?.hasAttribute('.value')).toBe(false);
+    expect(input?.getAttribute('disabled')).toBe('');
+    expect(input?.getAttribute('value')).toBe('initial');
 
-    update(instance, view(true, 'updated'));
+    update(instance, view('updated'));
 
     expect(root.querySelector('input')).toBe(input);
     expect(input?.disabled).toBe(true);
-    expect(input?.getAttribute('disabled')).toBe('');
-    expect(input?.value).toBe('updated');
+    expect(input?.getAttribute('value')).toBe('updated');
   });
 
-  it('preserves case-sensitive property names through HTML parsing', () => {
+  it('serializes custom-element values for observed attribute handling', () => {
     const root = document.createElement('div');
-    const view = (value: unknown) => html`<dota-property-target .selectedItem=${value}></dota-property-target>`;
-    const firstValue = {id: 1};
-    const nextValue = {id: 2};
-    const instance = render(root, view(firstValue));
-    const target = root.querySelector('dota-property-target') as (HTMLElement & {selectedItem?: unknown}) | null;
+    const view = (value: number) => html`<dota-property-target count="${value}"></dota-property-target>`;
+    const instance = render(root, view(2));
+    const target = root.querySelector('dota-property-target');
 
-    expect(target?.selectedItem).toBe(firstValue);
-    expect((target as unknown as {selecteditem?: unknown})?.selecteditem).toBeUndefined();
+    expect(target?.getAttribute('count')).toBe('2');
 
-    update(instance, view(nextValue));
+    update(instance, view(3));
 
-    expect(target?.selectedItem).toBe(nextValue);
-  });
-
-  it('updates an innerHTML property range without replacing its owning structure', () => {
-    const root = document.createElement('div');
-    const view = (markup: string) => html`
-      <article>
-        <div class="content" .innerHTML=${markup}></div>
-        <button>Persistent action</button>
-      </article>
-    `;
-    const instance = render(root, view('<p>Before</p>'));
-    const article = root.querySelector('article');
-    const content = root.querySelector('.content');
-    const button = root.querySelector('button');
-
-    const result = update(instance, view('<h2>After</h2>'));
-
-    expect(result).toEqual({kind: 'patch', changedParts: 1, replacedNodes: 0});
-    expect(root.querySelector('article')).toBe(article);
-    expect(root.querySelector('.content')).toBe(content);
-    expect(root.querySelector('button')).toBe(button);
-    expect(content?.innerHTML).toBe('<h2>After</h2>');
+    expect(root.querySelector('dota-property-target')).toBe(target);
+    expect(target?.getAttribute('count')).toBe('3');
   });
 
   it('patches trusted markup inside its child range without replacing surrounding nodes', () => {
@@ -132,28 +122,8 @@ describe('renderer advanced contracts', () => {
   it('rejects trusted markup in attribute positions', () => {
     const root = document.createElement('div');
 
-    expect(() => render(root, html`<div title=${trustedHTML('<strong>invalid</strong>')}></div>`))
+    expect(() => render(root, html`<div title="${trustedHTML('<strong>invalid</strong>')}"></div>`))
       .toThrow('trustedHTML() can only be used in a child position');
-  });
-
-  it('replaces and removes declarative event listeners without remounting', () => {
-    const root = document.createElement('div');
-    const first = vi.fn();
-    const second = vi.fn();
-    const view = (listener: EventListener | typeof nothing) => html`<button @click=${listener}>Run</button>`;
-    const instance = render(root, view(first));
-    const button = root.querySelector('button');
-
-    button?.click();
-    update(instance, view(second));
-    button?.click();
-    update(instance, view(nothing));
-    button?.click();
-
-    expect(root.querySelector('button')).toBe(button);
-    expect(first).toHaveBeenCalledTimes(1);
-    expect(second).toHaveBeenCalledTimes(1);
-    expect(button?.hasAttribute('@click')).toBe(false);
   });
 
   it('changes conditional branches without replacing their parent', () => {
@@ -196,7 +166,7 @@ describe('renderer advanced contracts', () => {
     type Item = {id: number; label: string};
     const root = document.createElement('div');
     const view = (items: Item[]) => html`
-      <ul>${keyed(items, ({id}) => id, ({id, label}) => html`<li data-id=${id}>${label}</li>`)}</ul>
+      <ul>${keyed(items, ({id}) => id, ({id, label}) => html`<li data-id="${id}">${label}</li>`)}</ul>
     `;
     const instance = render(root, view([
       {id: 1, label: 'one'},
@@ -251,7 +221,7 @@ describe('renderer advanced contracts', () => {
   it('keeps component-local indexes isolated between parent and child render roots', () => {
     const parentRoot = document.createElement('div');
     const parentView = (label: string) => html`
-      <section><dota-index-child label=${label}></dota-index-child></section>
+      <section><dota-index-child label="${label}"></dota-index-child></section>
     `;
     const childView = (value: string) => html`<div><span>${value}</span></div>`;
     const parent = render(parentRoot, parentView('parent value'));

@@ -4,16 +4,16 @@ describe('renderer rich behavior', () => {
   it('mounts a complex document and marks its owned structure', () => {
     const root = document.createElement('div');
     const instance = render(root, html`
-      <article class="card" data-theme=${'dark'}>
+      <article class="card" data-theme="${'dark'}">
         <header>
           <h1>${'Rendering'}</h1>
           <p>${'A structured view'}</p>
         </header>
-        <dota-rich-card data-id=${42}>
+        <dota-rich-card data-id="${42}">
           <strong>${'Nested content'}</strong>
         </dota-rich-card>
         <footer>
-          <button disabled=${false} title=${'Save item'}>${'Save'}</button>
+          <button disabled title="${'Save item'}">${'Save'}</button>
         </footer>
       </article>
     `);
@@ -27,7 +27,7 @@ describe('renderer rich behavior', () => {
     expect(article?.hasAttribute('data-dota-dynamic')).toBe(true);
     expect(customCard?.getAttribute('data-dota-component')).toBe('dota-rich-card');
     expect(customCard?.getAttribute('data-id')).toBe('42');
-    expect(button?.hasAttribute('disabled')).toBe(false);
+    expect(button?.getAttribute('disabled')).toBe('');
     expect(button?.getAttribute('title')).toBe('Save item');
     expect(root.querySelector('h1')?.textContent).toBe('Rendering');
     expect(root.querySelector('strong')?.textContent).toBe('Nested content');
@@ -39,7 +39,7 @@ describe('renderer rich behavior', () => {
     const root = document.createElement('div');
     const instance = render(root, html`
       <section>
-        <h2 title=${'before'}>${'Title'}</h2>
+        <h2 title="${'before'}">${'Title'}</h2>
         <p>${'Before description'}</p>
         <button>${'Keep this node'}</button>
       </section>
@@ -51,7 +51,7 @@ describe('renderer rich behavior', () => {
 
     const result = update(instance, html`
       <section>
-        <h2 title=${'after'}>${'Updated title'}</h2>
+        <h2 title="${'after'}">${'Updated title'}</h2>
         <p>${'After description'}</p>
         <button>${'Keep this node'}</button>
       </section>
@@ -79,10 +79,10 @@ describe('renderer rich behavior', () => {
     expect(paragraph?.getAttribute('data-dota-dynamic')).toBe('');
   });
 
-  it('preserves meaningful falsy text values and removes empty attribute values intentionally', () => {
+  it('preserves meaningful falsy text and serializes quoted attribute values', () => {
     const root = document.createElement('div');
     const instance = render(root, html`
-      <output title=${''}>${0}|${false}|${''}|${nothing}</output>
+      <output title="${''}">${0}|${false}|${''}|${nothing}</output>
     `);
     const output = root.querySelector('output');
 
@@ -91,33 +91,35 @@ describe('renderer rich behavior', () => {
     expect(output?.getAttribute('title')).toBe('');
 
     patch(instance, html`
-      <output title=${null}>${undefined}|${nothing}|${false}|${0}</output>
+      <output title="${null}">${undefined}|${nothing}|${false}|${0}</output>
     `);
 
     expect(output?.textContent).toBe('||false|0');
-    expect(output?.hasAttribute('title')).toBe(false);
+    expect(output?.hasAttribute('title')).toBe(true);
+    expect(output?.getAttribute('title')).toBe('');
   });
 
-  it('removes and restores a dynamic boolean-like attribute without remounting', () => {
+  it('serializes ordinary quoted values without inferring attribute types', () => {
     const root = document.createElement('div');
-    const instance = render(root, html`<button disabled=${true}>Submit</button>`);
-    const button = root.querySelector('button');
+    const view = (status: string) => html`<dota-toggle data-status="${status}"></dota-toggle>`;
+    const instance = render(root, view('idle'));
+    const toggle = root.querySelector('dota-toggle');
 
-    patch(instance, html`<button disabled=${false}>Submit</button>`);
-    expect(button?.hasAttribute('disabled')).toBe(false);
+    expect(toggle?.getAttribute('data-status')).toBe('idle');
 
-    patch(instance, html`<button disabled=${true}>Submit</button>`);
-    expect(root.querySelector('button')).toBe(button);
-    expect(button?.getAttribute('disabled')).toBe('true');
+    patch(instance, view('ready'));
+
+    expect(root.querySelector('dota-toggle')).toBe(toggle);
+    expect(toggle?.getAttribute('data-status')).toBe('ready');
   });
 
   it('returns noop and preserves the DOM when all values are unchanged', () => {
     const root = document.createElement('div');
-    const first = html`<p title=${'same'}>${'same text'}</p>`;
+    const first = html`<p title="${'same'}">${'same text'}</p>`;
     const instance = render(root, first);
     const paragraph = root.querySelector('p');
 
-    const result = update(instance, html`<p title=${'same'}>${'same text'}</p>`);
+    const result = update(instance, html`<p title="${'same'}">${'same text'}</p>`);
 
     expect(result).toEqual({kind: 'noop', changedParts: 0, replacedNodes: 0});
     expect(root.querySelector('p')).toBe(paragraph);

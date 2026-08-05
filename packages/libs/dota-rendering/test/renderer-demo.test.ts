@@ -3,11 +3,11 @@ import {diff, html, patch, render, update} from '@dota/main';
 describe('renderer demo', () => {
   it('logs mount, diff, patch, and update behavior', () => {
     const root = document.createElement('div');
-    const initialView = html`<dota-card title=${'before'}>Count: ${1}</dota-card>`;
+    const initialView = html`<dota-card title="${'before'}">Count: ${1}</dota-card>`;
     const instance = render(root, initialView);
     const elementBeforePatch = root.firstElementChild;
 
-    const patchedView = html`<dota-card title=${'after'}>Count: ${2}</dota-card>`;
+    const patchedView = html`<dota-card title="${'after'}">Count: ${2}</dota-card>`;
     const patchDiff = diff(initialView, patchedView);
 
     console.log('[dota-rendering] mount', {
@@ -30,7 +30,7 @@ describe('renderer demo', () => {
       html: root.innerHTML
     });
 
-    const updatedView = html`<dota-card title=${'updated'}>Count: ${3}</dota-card>`;
+    const updatedView = html`<dota-card title="${'updated'}">Count: ${3}</dota-card>`;
     const updateResult = update(instance, updatedView);
     console.log('[dota-rendering] update', {
       result: updateResult,
