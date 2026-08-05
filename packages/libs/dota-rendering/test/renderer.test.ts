@@ -13,15 +13,15 @@ describe('renderer public API', () => {
 
   it('mounts structured output and exposes patch through both public update names', () => {
     const root = document.createElement('div');
-    const instance = render(root, html`<p title=${'before'}>${'Before'}</p>`);
+    const instance = render(root, html`<p title="${'before'}">${'Before'}</p>`);
     const paragraph = root.querySelector('p');
 
-    expect(patch(instance, html`<p title=${'after'}>${'After'}</p>`)).toEqual({
+    expect(patch(instance, html`<p title="${'after'}">${'After'}</p>`)).toEqual({
       kind: 'patch',
       changedParts: 2,
       replacedNodes: 0
     });
-    expect(update(instance, html`<p title=${'final'}>${'Final'}</p>`)).toEqual({
+    expect(update(instance, html`<p title="${'final'}">${'Final'}</p>`)).toEqual({
       kind: 'patch',
       changedParts: 2,
       replacedNodes: 0
@@ -34,7 +34,7 @@ describe('renderer public API', () => {
   it('mounts and patches flattened nested templates without replacing their elements', () => {
     const root = document.createElement('div');
     const view = (values: string[]) => html`
-      <ul>${values.map((value) => html`<li data-value=${value}>${value}</li>`)}</ul>
+      <ul>${values.map((value) => html`<li data-value="${value}">${value}</li>`)}</ul>
     `;
     const instance = render(root, view(['one', 'two']));
     const firstItem = root.querySelector('li');
@@ -49,11 +49,20 @@ describe('renderer public API', () => {
     expect(firstItem?.textContent).toBe('updated');
   });
 
-  it('applies initial attributes before a child custom element connects', () => {
+  it('uses normal observed attributes before connection and during patches', () => {
+    const attributeValues: Array<string | null> = [];
     const connectedValues: Array<string | null> = [];
     const tagName = 'dota-renderer-observed-child';
     if (!customElements.get(tagName)) {
       customElements.define(tagName, class extends HTMLElement {
+        static get observedAttributes(): string[] {
+          return ['count'];
+        }
+
+        attributeChangedCallback(_name: string, _oldValue: string | null, newValue: string | null): void {
+          attributeValues.push(newValue);
+        }
+
         connectedCallback(): void {
           connectedValues.push(this.getAttribute('count'));
         }
@@ -62,8 +71,16 @@ describe('renderer public API', () => {
     const root = document.createElement('div');
     document.body.append(root);
 
-    render(root, html`<dota-renderer-observed-child count=${2}></dota-renderer-observed-child>`);
+    const view = (count: number) => html`
+      <dota-renderer-observed-child count="${count}"></dota-renderer-observed-child>
+    `;
+    const instance = render(root, view(2));
+    const child = root.querySelector(tagName);
 
+    update(instance, view(3));
+
+    expect(root.querySelector(tagName)).toBe(child);
+    expect(attributeValues).toEqual(['2', '3']);
     expect(connectedValues).toEqual(['2']);
     root.remove();
   });
