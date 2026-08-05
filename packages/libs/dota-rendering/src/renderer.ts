@@ -3,6 +3,7 @@ import {
   isConditionalValue,
   isKeyedValue,
   isTemplateResult,
+  isTrustedHtmlValue,
   valueMarkerFor,
   valueMarkerPattern,
   valueText
@@ -68,6 +69,8 @@ type ChildPart = {
   branch?: RenderSession;
   /** Mounted list ranges retained by application key for reconciliation. */
   keyed?: Map<RenderKey, KeyedRange>;
+  /** Last trusted markup committed inside this range, when it owns parsed HTML. */
+  trustedMarkup?: string;
 };
 
 /**
@@ -452,9 +455,12 @@ class TemplateStrategy implements RenderStrategy {
    * listener before registering its replacement so disposal always has one owner.
    * @param part Attribute-position metadata discovered during mount.
    * @param values Complete next value set for single or composite reconstruction.
-   * @throws TypeError when an event value is neither removable nor a valid listener.
+   * @throws TypeError when a trusted range is used as an attribute or an event value is invalid.
    */
   private applyAttribute(part: AttributePart, values: readonly unknown[]): void {
+    if (part.valueIndexes.some((index) => isTrustedHtmlValue(values[index]))) {
+      throw new TypeError('trustedHTML() can only be used in a child position');
+    }
     const value = values[part.valueIndexes[0]];
     if (part.mode === 'boolean') {
       part.element.toggleAttribute(part.name, value !== nothing && Boolean(value));
@@ -488,14 +494,26 @@ class TemplateStrategy implements RenderStrategy {
   }
 
   /**
-   * Transitions one child range between scalar text, a conditional branch, and keyed output.
+   * Transitions one child range among scalar text, trusted markup, conditional, and keyed output.
    * Previous nested ownership is disposed and cleared before another representation takes
    * over, preventing detached listeners or stale nodes from surviving a value-kind change.
    * @param part Child range receiving the next representation.
    * @param value Dynamic value selected for the part's interpolation index.
    */
   private applyChild(part: ChildPart, value: unknown): void {
+    if (isTrustedHtmlValue(value)) {
+      this.clearBranch(part);
+      this.clearKeyed(part);
+      part.text?.remove();
+      part.text = undefined;
+      if (part.trustedMarkup === value.value) return;
+
+      new RangeRoot(part.start, part.end).writeHTML(value.value);
+      part.trustedMarkup = value.value;
+      return;
+    }
     if (isConditionalValue(value)) {
+      this.clearTrustedMarkup(part);
       this.clearKeyed(part);
       part.text?.remove();
       part.text = undefined;
@@ -509,6 +527,7 @@ class TemplateStrategy implements RenderStrategy {
       return;
     }
     if (isKeyedValue(value)) {
+      this.clearTrustedMarkup(part);
       this.clearBranch(part);
       part.text?.remove();
       part.text = undefined;
@@ -516,6 +535,7 @@ class TemplateStrategy implements RenderStrategy {
       return;
     }
 
+    this.clearTrustedMarkup(part);
     this.clearBranch(part);
     this.clearKeyed(part);
     const text = valueText(value);
@@ -525,6 +545,13 @@ class TemplateStrategy implements RenderStrategy {
     } else {
       part.text.data = text;
     }
+  }
+
+  /** Clears parsed trusted markup before the child part changes representation. */
+  private clearTrustedMarkup(part: ChildPart): void {
+    if (part.trustedMarkup === undefined) return;
+    new RangeRoot(part.start, part.end).clear();
+    part.trustedMarkup = undefined;
   }
 
   /**
