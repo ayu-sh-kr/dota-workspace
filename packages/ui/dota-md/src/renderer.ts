@@ -1,5 +1,13 @@
 import type { Theme, ColorName, TagName, ColorToken } from './Types.ts';
 
+const THEMED_MARKDOWN_TAGS: readonly TagName[] = [
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+  'p', 'strong', 'em', 'a', 'pre', 'code',
+  'blockquote', 'hr', 'table', 'th', 'td',
+  'ul', 'ol', 'li',
+];
+const APPLIED_THEME_CLASSES = new WeakMap<Element, readonly string[]>();
+
 /**
  * Resolves the combined Tailwind class string for a given tag by merging:
  *   - `theme.typography[tag]` — structural / layout classes
@@ -86,6 +94,48 @@ export function applyMarkdownTheme(
 }
 
 /**
+ * Applies Markdown theme classes to existing content without recreating its nodes.
+ * Classes previously owned by this function are removed before the next theme is
+ * applied, while parser-authored classes such as syntax-highlighting tokens remain.
+ * @param root Existing Markdown DOM whose descendants receive the selected theme.
+ * @param theme Theme supplying typography and semantic color classes.
+ * @param color Active color entry used to resolve tag-specific color tokens.
+ */
+export function applyMarkdownThemeToElement(
+  root: ParentNode,
+  theme: Theme,
+  color: ColorName,
+): void {
+  for (const tag of THEMED_MARKDOWN_TAGS) {
+    root.querySelectorAll(tag).forEach((element) => {
+      const previousClasses = APPLIED_THEME_CLASSES.get(element) ?? [];
+      if (previousClasses.length > 0) element.classList.remove(...previousClasses);
+
+      const hasParserClasses = element.classList.length > 0;
+      const themeClasses = tag === 'code' && hasParserClasses
+        ? []
+        : resolveClasses(theme, color, tag).split(/\s+/).filter(Boolean);
+      const layoutClasses = tag === 'table' ? ['overflow-x-auto', 'block'] : [];
+      const nextClasses = [...themeClasses, ...layoutClasses];
+
+      if (nextClasses.length > 0) element.classList.add(...nextClasses);
+      APPLIED_THEME_CLASSES.set(element, nextClasses);
+    });
+  }
+
+  root.querySelectorAll('img').forEach((element) => {
+    const previousClasses = APPLIED_THEME_CLASSES.get(element) ?? [];
+    if (previousClasses.length > 0) element.classList.remove(...previousClasses);
+
+    const nextClasses = [
+      'rounded-md', 'sm:rounded-lg', 'shadow-md', 'my-4', 'sm:my-6', 'max-w-full', 'h-auto',
+    ];
+    element.classList.add(...nextClasses);
+    APPLIED_THEME_CLASSES.set(element, nextClasses);
+  });
+}
+
+/**
  * Returns the `selection` CSS string for the given color from a theme.
  * This is the Tailwind `selection:bg-*` utility class stored at the
  * color-entry level (not per-tag).
@@ -96,4 +146,3 @@ export function applyMarkdownTheme(
 export function getSelectionClass(theme: Theme, color: ColorName): string {
   return theme.color[color]?.selection ?? '';
 }
-
