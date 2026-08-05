@@ -170,7 +170,7 @@ describe('BaseElement – connectedCallback', () => {
       constructor() { super(); }
 
       render() {
-        return html`<button title=${this.value}>${this.value}</button>`;
+        return html`<button title="${this.value}">${this.value}</button>`;
       }
     }
 
