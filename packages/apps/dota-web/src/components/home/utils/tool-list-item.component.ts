@@ -1,6 +1,6 @@
-import { ApplicationEventService, BaseElement, Component, HostListener, Property, String } from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, ApplicationEventService, BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import { type ApplicationEvent, OnEvent } from "@ayu-sh-kr/dota-wrap/event";
-import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import { DOTA_TOOLS } from "@dota/components/home/utils/tools.config.ts";
 
 /**
@@ -22,6 +22,17 @@ export class ToolListItemComponent extends BaseElement {
 
   constructor() {
     super();
+  }
+
+  /**
+   * Marks the first configured tool after its button exists.
+   * Active state is a presence-only data attribute maintained by the same event
+   * path used for later selections, keeping boolean state out of interpolation.
+   */
+  @AfterInit()
+  markInitialToolActive() {
+    if (DOTA_TOOLS[0].id !== this.toolId) return;
+    this.querySelector('button')?.setAttribute('data-active', '');
   }
 
   @HostListener({ event: 'click' })
@@ -47,11 +58,8 @@ export class ToolListItemComponent extends BaseElement {
     const tool = DOTA_TOOLS.find(t => t.id === this.toolId);
     if (!tool) return html`<div class="h-[60px]"></div>`;
 
-    const isInitial = DOTA_TOOLS[0].id === this.toolId;
-
     return html`
-        <button data-active=${isInitial ? '' : nothing}
-                class="group flex w-full items-center gap-2 sm:gap-3 rounded-2xl px-4 py-4 text-left
+        <button class="group flex w-full items-center gap-2 sm:gap-3 rounded-2xl px-4 py-4 text-left
                        cursor-pointer transition-all duration-300 backdrop-blur-2xl
                        border border-white/70 dark:border-white/10
                        bg-white/[0.52] dark:bg-white/[0.04]
