@@ -110,6 +110,7 @@ describe('@State – runtime reactive behaviour', () => {
 
     (el as any).label = 'first';
     (el as any).label = 'second';
+    await microtask();
 
     expect((el as any).renderCount).toBeGreaterThan(countAfterConnect);
   });
@@ -212,4 +213,3 @@ describe('@State – runtime reactive behaviour', () => {
     expect(b.score).toBe(20);
   });
 });
-

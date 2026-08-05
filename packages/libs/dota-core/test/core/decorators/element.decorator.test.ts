@@ -308,6 +308,7 @@ describe('@Element decorator – DOM binding on connectedCallback', () => {
 
     const secondRef = (el as any).msgEl as HTMLParagraphElement;
     expect(secondRef.textContent).toBe('updated');
+    expect(secondRef).not.toBe(firstRef);
   });
 
   it('when multiple elements share the same class, binds the first matching one', async () => {
@@ -362,4 +363,3 @@ describe('@Element decorator – DOM binding on connectedCallback', () => {
     expect(el.querySelector<HTMLInputElement>('#search')!.value).toBe('hello');
   });
 });
-
