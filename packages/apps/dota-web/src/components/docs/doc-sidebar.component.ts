@@ -1,4 +1,5 @@
-import {BaseElement, BindEvent, Component, HTML, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, BindEvent, Component, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {docConfigs} from "@dota/configs/doc.config.ts";
 
 /**
@@ -57,23 +58,23 @@ export class DocSidebarComponent extends BaseElement {
         this.updateHTML();
     }
 
-    private buildNavTree(): string {
-        return docConfigs.map(config => `
+    private buildNavTree(): TemplateResult[] {
+        return docConfigs.map(config => html`
             <div class="mb-6">
                 <h2 class="mb-2 px-3 text-[11px] font-bold uppercase tracking-widest
                            text-gray-400 dark:text-gray-500">
                     ${config.category}
                 </h2>
                 <ul class="space-y-0.5">
-                    ${config.paths.map(path => `
-                        <li><doc-path file-path="${path}"></doc-path></li>
-                    `).join('')}
+                    ${config.paths.map(path => html`
+                        <li><doc-path file-path=${path}></doc-path></li>
+                    `)}
                 </ul>
             </div>
-        `).join('');
+        `);
     }
 
-    render(): string {
+    render(): TemplateResult {
         const backdropVis = this.mobileOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none';
@@ -82,7 +83,7 @@ export class DocSidebarComponent extends BaseElement {
             ? 'translate-x-0'
             : '-translate-x-full';
 
-        return HTML`
+        return html`
             <!-- Desktop sidebar — hidden below lg breakpoint -->
             <aside class="hidden lg:flex flex-col
                           w-60 xl:w-64 shrink-0
@@ -154,4 +155,3 @@ export class DocSidebarComponent extends BaseElement {
         `;
     }
 }
-
