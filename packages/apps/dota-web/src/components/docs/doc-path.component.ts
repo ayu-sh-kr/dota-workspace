@@ -1,5 +1,6 @@
 import { BaseElement, Component, HostListener, Property, String } from "@ayu-sh-kr/dota-wrap/core";
 import { RouterUtils } from "@ayu-sh-kr/dota-wrap/router";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import { routerService } from "@dota/main.ts";
 
 /**
@@ -45,7 +46,7 @@ export class DocPathComponent extends BaseElement {
       .replace(/-/g, ' ');
   }
 
-  render(): string {
+  render(): TemplateResult {
     const active = this.isActive;
 
     const base = `
@@ -60,14 +61,10 @@ export class DocPathComponent extends BaseElement {
     const activeC =
       "text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 font-semibold";
 
-    // language=html
-    return `
+    return html`
             <div class="${base} ${active ? activeC : idle}">
-                ${active ? `
-                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500 dark:bg-purple-400 shrink-0"></span>
-                ` : `
-                    <span class="w-1.5 h-1.5 rounded-full shrink-0"></span>
-                `}
+                <span class="w-1.5 h-1.5 rounded-full shrink-0
+                             ${active ? 'bg-purple-500 dark:bg-purple-400' : ''}"></span>
                 <span class="capitalize">${this.label}</span>
             </div>
         `;
