@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import type {AccordionStyleConfig} from "@ayu-sh-kr/dota-ui";
 
 interface FaqItem {
@@ -63,8 +64,8 @@ export class FaqSectionComponent extends BaseElement {
     super();
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
       <section aria-labelledby="faq-heading"
                class="relative isolate overflow-hidden font-dm px-6 py-20 sm:py-28">
         <div aria-hidden="true"
@@ -90,7 +91,7 @@ export class FaqSectionComponent extends BaseElement {
 
           <div class="rounded-3xl border border-white/70 bg-white/70 p-3 shadow-[0_24px_80px_-44px_rgba(76,29,149,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-[0_24px_80px_-44px_rgba(0,0,0,0.9)] sm:p-4">
             <div class="space-y-2" role="list">
-              ${this.faqs.map((faq) => HTML`
+              ${this.faqs.map((faq) => html`
                 <div role="listitem">
                   <dota-accordion
                     header="${faq.question}"
@@ -101,7 +102,7 @@ export class FaqSectionComponent extends BaseElement {
                     config='${JSON.stringify(FAQ_ACCORDION_CONFIG)}'>
                   </dota-accordion>
                 </div>
-              `).join("")}
+              `)}
             </div>
           </div>
         </div>

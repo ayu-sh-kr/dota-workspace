@@ -1,4 +1,5 @@
-import {AfterInit, BaseElement, BindEvent, Component, HTML, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, BindEvent, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {MDService} from "@ayu-sh-kr/dota-md";
 import {notificationService} from "@dota/main.ts";
 
@@ -64,8 +65,8 @@ export class CodeSnippetComponent extends BaseElement {
     });
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
         <div class="rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur-2xl
                     shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_28px_90px_-54px_rgba(15,23,42,0.95)]
                     dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_28px_90px_-52px_rgba(0,0,0,0.96)]

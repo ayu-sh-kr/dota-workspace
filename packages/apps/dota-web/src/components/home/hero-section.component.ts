@@ -1,4 +1,5 @@
-import {BaseElement, BindEvent, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, BindEvent, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 import {notificationService} from "@dota/main.ts";
 
@@ -21,8 +22,8 @@ export class HeroSectionComponent extends BaseElement {
       })
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
         <section class="relative isolate overflow-hidden font-dm min-h-screen flex flex-col justify-center bg-white/[0.44] dark:bg-white/[0.045] backdrop-blur-2xl">
 
             <!-- Central ambient orb glow with orbiting particles -->

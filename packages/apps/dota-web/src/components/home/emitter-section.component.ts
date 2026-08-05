@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: "emitter-section",
@@ -10,8 +11,8 @@ export class EmitterSectionComponent extends BaseElement {
     super();
   }
 
-  render() {
-    return HTML`
+  render(): TemplateResult {
+    return html`
         <section role="region" aria-labelledby="emitter-heading"
                  class="hero-fade-up relative isolate font-dm w-full
                         before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r

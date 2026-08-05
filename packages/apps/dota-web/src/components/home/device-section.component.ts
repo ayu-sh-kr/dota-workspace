@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {FrameworkStyleConfig} from "@dota/components/home/utils/device-preview.component.ts";
 
 
@@ -12,9 +13,9 @@ export class DeviceSectionComponent extends BaseElement {
     super();
   }
 
-  render(): string {
+  render(): TemplateResult {
     // language=html
-    return HTML`
+    return html`
       <section class="relative isolate font-dm mx-auto max-w-7xl px-6 py-20
                       before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
                       before:from-transparent before:via-slate-200/70 before:to-transparent

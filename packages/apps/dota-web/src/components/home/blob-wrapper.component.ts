@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML, Property, String, Number} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, Property, String, Number} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult, unsafeHTML} from "@ayu-sh-kr/dota-wrap/rendering";
 import {BLOB_A, BLOB_B, BLOB_C, BLOB_D} from "@ayu-sh-kr/dota-ui";
 
 const BLOBS = [BLOB_A, BLOB_B, BLOB_C, BLOB_D];
@@ -22,19 +23,19 @@ export class BlobWrapperComponent extends BaseElement {
     this.content = this.innerHTML;
   }
 
-  render(): string {
+  render(): TemplateResult {
     const blob = BLOBS[this.index % BLOBS.length];
     const posClass = this.side === 'left'
       ? '-left-24 top-1/2 -translate-y-1/2'
       : '-right-24 top-1/2 -translate-y-1/2';
 
-    return HTML`
+    return html`
       <div class="relative overflow-visible" style="isolation: isolate;">
         <div class="blob-inner absolute ${posClass} w-[min(800px,90vw)] h-[min(800px,90vw)] pointer-events-none select-none" style="z-index: -1;" aria-hidden="true">
-          ${blob}
+          ${unsafeHTML(blob)}
         </div>
         <div class="relative" style="z-index: 1;">
-          ${this.content}
+          ${unsafeHTML(this.content)}
         </div>
       </div>
     `;

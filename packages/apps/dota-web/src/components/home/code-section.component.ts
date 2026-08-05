@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: "code-section",
@@ -9,9 +10,9 @@ export class CodeSectionComponent extends BaseElement {
     super();
   }
 
-  render(): string {
+  render(): TemplateResult {
     // language=HTML
-    return HTML`
+    return html`
         <section class="hero-fade-up relative isolate font-dm w-full
                         before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
                         before:from-transparent before:via-slate-200/70 before:to-transparent

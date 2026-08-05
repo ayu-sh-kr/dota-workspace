@@ -1,4 +1,5 @@
 import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {testimonials} from "@dota/constants/client.ts";
 
 @Component({
@@ -11,9 +12,8 @@ export class ClientSectionComponent extends BaseElement{
     super();
   }
 
-  render(){
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <section id="clients" class="relative isolate py-24 font-dm
                                    before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
                                    before:from-transparent before:via-slate-200/70 before:to-transparent
@@ -21,8 +21,7 @@ export class ClientSectionComponent extends BaseElement{
         <div class="mt-16 max-w-7xl mx-auto">
           <h1 class="text-3xl sm:text-4xl font-extrabold font-adaptive text-center mb-20"> Trusted by Industry Leaders</h1>
           <div class="grid place-items-center md:grid-cols-3 px-4 gap-14">
-            ${testimonials.map((testimonial, index) => {
-              return `
+            ${testimonials.map((testimonial, index) => html`
               <article
                     class="group flex max-w-sm flex-col gap-5 rounded-2xl border border-white/70 bg-white/[0.58] p-6
                            shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_18px_60px_-46px_rgba(15,23,42,0.88)]
@@ -50,8 +49,7 @@ export class ClientSectionComponent extends BaseElement{
                     </div>
                     <p class="text-sm leading-relaxed text-gray-400 dark:text-gray-500">${testimonial.feedback}</p>
                 </article>
-            `
-            }).join(" ")}
+            `)}
           </div>
         </div>
       </section>

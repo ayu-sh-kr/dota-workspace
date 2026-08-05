@@ -1,4 +1,5 @@
 import {BaseElement, Component, HostListener} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 import {routerService} from "@dota/main.ts";
 
@@ -18,9 +19,8 @@ export class GetStartedButtonComponent extends BaseElement {
     routerService.route("/docs?content=Getting-Started.md");
   }
 
-  render(): string {
-    // language=HTML
-    return `
+  render(): TemplateResult {
+    return html`
       <button
         class="spring-back
                active:translate-y-[2px] active:scale-[0.984]
