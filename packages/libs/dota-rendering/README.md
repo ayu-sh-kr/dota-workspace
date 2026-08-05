@@ -6,10 +6,13 @@ The package keeps legacy string rendering available while providing structured t
 results whose dynamic values can be diffed and patched without replacing unchanged elements.
 
 ```ts
-import { html, keyed, render, update, when } from '@ayu-sh-kr/dota-rendering';
+import { html, keyed, render, trustedHTML, update, when } from '@ayu-sh-kr/dota-rendering';
 
 const view = render(root, html`<p title=${title}>${message}</p>`);
 update(view, html`<p title=${nextTitle}>${nextMessage}</p>`);
+
+const markdownHtml = '<h1>Documentation</h1>';
+const markdownView = html`<article>${trustedHTML(markdownHtml)}</article>`;
 ```
 
 Core owns component lifecycle and scheduling; this package owns render output, part markers,
@@ -25,6 +28,27 @@ The implementation is split into three responsibilities:
 
 This lets Dota Core own lifecycle and scheduling while this package owns the render-to-DOM
 boundary.
+
+## Architecture diagrams
+
+These source-backed SVGs visualize the current implementation. Select a diagram to open the
+full-resolution version under the workspace documentation tree.
+
+### Overall architecture
+
+[![Dota Rendering overall architecture](../../../documentation/packages/libs/dota-rendering/architecture/dota-rendering-architecture.svg)](../../../documentation/packages/libs/dota-rendering/architecture/dota-rendering-architecture.svg)
+
+### Template processing
+
+[![Template normalization and flattening flow](../../../documentation/packages/libs/dota-rendering/architecture/template-flow.svg)](../../../documentation/packages/libs/dota-rendering/architecture/template-flow.svg)
+
+### Diff selection
+
+[![Pure diff decision flow](../../../documentation/packages/libs/dota-rendering/architecture/diff-flow.svg)](../../../documentation/packages/libs/dota-rendering/architecture/diff-flow.svg)
+
+### Renderer lifecycle
+
+[![Renderer session, strategy, mount, and patch flow](../../../documentation/packages/libs/dota-rendering/architecture/renderer-flow.svg)](../../../documentation/packages/libs/dota-rendering/architecture/renderer-flow.svg)
 
 ## Architecture model
 
@@ -112,10 +136,11 @@ send every later output through `patch()` or `update()`.
 
 ### RangeRoot
 
-`RangeRoot` adapts the siblings between two invisible text boundaries. It lets a conditional or
-keyed item mount, patch, replace, and clear only its own section without replacing the parent
-element or adjacent children. Legacy strings rendered inside a range are parsed through an
-inert `HTMLTemplateElement` and then inserted between the boundaries.
+`RangeRoot` adapts the siblings between two invisible text boundaries. It lets trusted markup,
+a conditional branch, or a keyed item mount, patch, replace, and clear only its own section
+without replacing the parent element or adjacent children. Legacy strings and `trustedHTML()`
+values rendered inside a range are parsed through an inert `HTMLTemplateElement` and inserted
+between the boundaries.
 
 Each session owns its own part map and indexing namespace, including sessions nested inside the
 same physical DOM tree. Repeated `data-dota-index="0"` values are therefore expected across a
@@ -186,6 +211,7 @@ This module defines the contracts exchanged by template creation, comparison, an
 - RenderOutput is the accepted output union;
 - TemplateResult carries static strings and dynamic values;
 - UnsafeHtmlValue brands application-owned markup accepted by unsafeHTML();
+- TrustedHtmlValue brands caller-approved markup owned by a dynamic child range;
 - KeyedValue and KeyedTemplate describe child ranges reconciled by stable RenderKey identity;
 - ConditionalValue describes the branch selected by when();
 - PartChange reports one changed interpolation;
@@ -207,6 +233,8 @@ This module creates structured results and defines parsing policies:
   reuse a cached flattening plan and static strings while collecting only the next leaf values;
 - unsafeHTML(value) explicitly merges trusted application-owned HTML or SVG into static
   structure while ordinary strings remain text values;
+- trustedHTML(value) parses caller-approved markup inside a local child range and replaces only
+  that range when the markup changes;
 - keyed(items, getKey, renderItem) retains, inserts, removes, and moves item ranges by stable key;
 - when(condition, truthy, falsy) replaces only its local child range when a branch changes;
 - valueMarkerFor(index) creates the parser-only dota-value-N token;
@@ -259,9 +287,9 @@ public contracts from types.ts.
 #### RenderPart
 
 RenderPart maps dynamic indexes to DOM write operations. ChildPart stores invisible text-node
-range boundaries used for text, conditional branches, and keyed lists. AttributePart stores all
-indexes used by an attribute, its target, binding mode, and tokenized value. The mapping stays in
-memory rather than becoming verbose DOM metadata.
+range boundaries used for text, trusted markup, conditional branches, and keyed lists.
+AttributePart stores all indexes used by an attribute, its target, binding mode, and tokenized
+value. The mapping stays in memory rather than becoming verbose DOM metadata.
 
 #### StringStrategy
 
@@ -296,8 +324,9 @@ findParts() collects text nodes before replacing them because mutating a TreeWal
 while walking can change what the traversal sees.
 
 For each text node containing temporary tokens, it creates invisible empty Text boundaries for
-each dynamic child. ChildPart uses the bounded range for ordinary text, a conditional branch, or
-a keyed list. Empty text boundaries do not appear in serialized innerHTML.
+each dynamic child. ChildPart uses the bounded range for ordinary text, trusted markup, a
+conditional branch, or a keyed list. Empty text boundaries do not appear in serialized
+innerHTML.
 
 For attributes, findParts() scans actual parsed attributes. Each tokenized attribute becomes one
 AttributePart registered under every interpolation index it contains. Any changed interpolation
@@ -335,8 +364,8 @@ an output normalization step only; it does not create DOM, markers, sessions, or
 
 When an `html` call contains only ordinary dynamic values, it returns the original
 `TemplateStringsArray` and values without allocating a flattening plan. Ordinary values include
-strings, numbers, booleans, objects, keyed directives, conditional directives, and arrays that
-contain no nested template or `unsafeHTML()` value.
+strings, numbers, booleans, objects, keyed directives, conditional directives, trusted HTML
+range directives, and arrays that contain no nested template or `unsafeHTML()` value.
 
 An ordinary array is therefore not a retained list. In a normal child position it follows
 JavaScript string conversion. Use `keyed()` when each array item needs independent DOM identity.
@@ -452,6 +481,34 @@ semantics and becomes part of the static template source passed to the browser's
 parser. It does not sanitize, escape, or create a Trusted Types value. Ordinary string
 interpolations remain text and are the correct choice for user-controlled data.
 
+## Trusted dynamic markup
+
+Use `trustedHTML()` when approved markup must update without changing the surrounding template:
+
+~~~ts
+html`<article>${trustedHTML(markdownHtml)}</article>`
+~~~
+
+The renderer parses the value between private text boundaries and replaces only those owned
+nodes when the value changes. The `<article>` and its surrounding component DOM retain identity.
+Like `unsafeHTML()`, this directive does not sanitize input or create a browser `TrustedHTML`
+object; callers must sanitize untrusted content before passing it to the directive.
+
+`trustedHTML()` is valid only in a child position. Passing it to an attribute, property,
+boolean, or event binding throws because those bindings have browser-native value semantics and
+cannot own a parsed sibling range.
+
+### Separating content updates from visual updates
+
+Consumers that render parser-produced documents should retain one `TrustedHtmlValue` until the
+document itself changes. Theme, color, selection, and typography updates should patch wrapper
+bindings or mutate renderer-owned classes on the existing descendants instead of creating a new
+trusted value. This preserves custom elements and browser-managed state inside the document.
+
+`@ayu-sh-kr/dota-md` follows this policy: `md:render` creates the next trusted content range,
+while theme and color events update classes in place. A new content event may reconnect nodes
+inside the owned range; a visual-theme event does not.
+
 ## Architecture decisions
 
 The following decisions describe the current implementation. They are constraints for changes,
@@ -469,6 +526,7 @@ not proposals.
 | Mark custom-element hosts, not rendered internals | Hyphenated hosts receive `data-dota-component`. Content later created by their callback or shadow renderer belongs to a different rendering session and is not traversed by the parent mount. |
 | Flatten composition before comparison | Nested templates expose one patchable interpolation index space. Shape caching avoids rebuilding stable flattened strings. |
 | Require explicit keyed and conditional ranges | Structural collection and branch changes remain local without introducing an implicit whole-tree reconciler. |
+| Keep trusted dynamic markup range-local | `trustedHTML()` can replace parser-produced markup without turning a value change into a component remount. Trust and sanitization remain caller responsibilities. |
 | Replace incompatible static structure | A remount is safer and deterministic when existing part indexes no longer describe the next template. |
 | Apply initial values while detached | Attributes, properties, events, and child values are ready before custom elements connect to the live document. |
 | Dispose renderer-owned resources explicitly | Event listeners and nested sessions are removed before strategy replacement, branch removal, keyed deletion, or public disposal. |
@@ -486,6 +544,30 @@ means a custom element that replaces its own light DOM must not share that regio
 parent-owned dynamic children. Prefer host attributes or properties for input; use a shadow root
 and slots when the parent must retain ownership of projected children.
 
+## Compatibility and downstream integration
+
+The package keeps legacy string output as a supported strategy. Existing `html()`, `render()`,
+`patch()`, `update()`, `keyed()`, `when()`, `nothing`, and `unsafeHTML()` contracts retain their
+behavior; `trustedHTML()` and `TrustedHtmlValue` are additive public APIs.
+
+Structured components require a Dota Core version whose `RenderOutput` and runtime renderer
+understand the directives they produce. Packages such as `@ayu-sh-kr/dota-md` must therefore be
+released with dependency ranges that resolve a compatible `@ayu-sh-kr/dota-core` and
+`@ayu-sh-kr/dota-rendering`. An older renderer treats an unknown directive as an ordinary object
+and cannot provide the expected range behavior.
+
+Normal custom-element consumers that use documented attributes and events do not need to change
+application code. Consumers that call a component's `render()` directly, require a string return
+type, assert exact serialized DOM, or style undocumented internal nodes may observe changes when
+a component migrates from legacy strings to `TemplateResult`.
+
+Coordinate releases in dependency order:
+
+1. Publish the rendering version that defines the new directive.
+2. Publish Dota Core with a compatible rendering dependency and re-exported contracts.
+3. Publish dependent UI libraries against those versions.
+4. Validate packed artifacts in an isolated consumer before release.
+
 ## Current limitations
 
 - Changed legacy strings are replaced as a whole; only exact equality is optimized.
@@ -497,6 +579,7 @@ and slots when the parent must retain ownership of projected children.
 - Atomic keyed moves depend on browser `moveBefore()` support; the fallback preserves node
   identity but may trigger custom-element lifecycle reactions.
 - `unsafeHTML()` does not sanitize input or satisfy Trusted Types by itself.
+- `trustedHTML()` provides local range ownership but likewise requires trusted or sanitized input.
 - Structured `@event` bindings are renderer-owned; decorator-based legacy events remain owned by
   Dota Core.
 
