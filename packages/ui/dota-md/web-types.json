@@ -9,7 +9,7 @@
           "name": "md-toc",
           "source": {
             "file": "./src/components/md-toc.component.ts",
-            "offset": 2034
+            "offset": 2174
           },
           "attributes": [
             {
@@ -21,7 +21,7 @@
               },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2276
+                "offset": 2416
               }
             },
             {
@@ -33,7 +33,7 @@
               },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2607
+                "offset": 2747
               }
             },
             {
@@ -45,7 +45,7 @@
               },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2772
+                "offset": 2912
               }
             },
             {
@@ -57,7 +57,7 @@
               },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2201
+                "offset": 2341
               }
             }
           ],
@@ -69,7 +69,7 @@
                 "default": "indigo",
                 "source": {
                   "file": "./src/components/md-toc.component.ts",
-                  "offset": 2276
+                  "offset": 2416
                 }
               },
               {
@@ -78,7 +78,7 @@
                 "default": "64",
                 "source": {
                   "file": "./src/components/md-toc.component.ts",
-                  "offset": 2607
+                  "offset": 2747
                 }
               },
               {
@@ -87,7 +87,7 @@
                 "default": "On this page",
                 "source": {
                   "file": "./src/components/md-toc.component.ts",
-                  "offset": 2772
+                  "offset": 2912
                 }
               },
               {
@@ -96,7 +96,7 @@
                 "default": "flat",
                 "source": {
                   "file": "./src/components/md-toc.component.ts",
-                  "offset": 2201
+                  "offset": 2341
                 }
               }
             ]
@@ -106,7 +106,7 @@
           "name": "md-view",
           "source": {
             "file": "./src/components/md-view.component.ts",
-            "offset": 472
+            "offset": 609
           },
           "attributes": [
             {
@@ -118,7 +118,7 @@
               },
               "source": {
                 "file": "./src/components/md-view.component.ts",
-                "offset": 629
+                "offset": 766
               }
             },
             {
@@ -130,7 +130,7 @@
               },
               "source": {
                 "file": "./src/components/md-view.component.ts",
-                "offset": 556
+                "offset": 693
               }
             }
           ],
@@ -142,7 +142,7 @@
                 "default": "neutral",
                 "source": {
                   "file": "./src/components/md-view.component.ts",
-                  "offset": 629
+                  "offset": 766
                 }
               },
               {
@@ -151,7 +151,7 @@
                 "default": "flat",
                 "source": {
                   "file": "./src/components/md-view.component.ts",
-                  "offset": 556
+                  "offset": 693
                 }
               }
             ]

@@ -614,6 +614,9 @@ importers:
       '@ayu-sh-kr/dota-event':
         specifier: workspace:*
         version: link:../../libs/dota-event
+      '@ayu-sh-kr/dota-rendering':
+        specifier: workspace:*
+        version: link:../../libs/dota-rendering
       '@ayu-sh-kr/dota-web-type-json':
         specifier: workspace:*
         version: link:../../plugins/web-type-json

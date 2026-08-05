@@ -1506,7 +1506,7 @@
           "name": "color-picker",
           "source": {
             "file": "./src/components/docs/color-picker.component.ts",
-            "offset": 1880
+            "offset": 1948
           },
           "attributes": [
             {
@@ -1518,7 +1518,7 @@
               },
               "source": {
                 "file": "./src/components/docs/color-picker.component.ts",
-                "offset": 1977
+                "offset": 2045
               }
             }
           ],
@@ -1530,7 +1530,7 @@
                 "default": "indigo",
                 "source": {
                   "file": "./src/components/docs/color-picker.component.ts",
-                  "offset": 1977
+                  "offset": 2045
                 }
               }
             ]
@@ -2177,7 +2177,7 @@
           "name": "doc-content",
           "source": {
             "file": "./src/components/docs/doc-content.component.ts",
-            "offset": 366
+            "offset": 440
           },
           "attributes": [
             {
@@ -2189,7 +2189,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-content.component.ts",
-                "offset": 522
+                "offset": 596
               }
             }
           ],
@@ -2201,7 +2201,7 @@
                 "default": "max-w-4xl",
                 "source": {
                   "file": "./src/components/docs/doc-content.component.ts",
-                  "offset": 522
+                  "offset": 596
                 }
               }
             ]
@@ -2211,7 +2211,7 @@
           "name": "doc-header",
           "source": {
             "file": "./src/components/docs/doc-header.component.ts",
-            "offset": 1102
+            "offset": 1168
           },
           "attributes": [
             {
@@ -2223,7 +2223,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-header.component.ts",
-                "offset": 1195
+                "offset": 1261
               }
             },
             {
@@ -2235,7 +2235,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-header.component.ts",
-                "offset": 1357
+                "offset": 1423
               }
             },
             {
@@ -2247,7 +2247,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-header.component.ts",
-                "offset": 1284
+                "offset": 1350
               }
             }
           ],
@@ -2259,7 +2259,7 @@
                 "default": "Getting-Started.md",
                 "source": {
                   "file": "./src/components/docs/doc-header.component.ts",
-                  "offset": 1195
+                  "offset": 1261
                 }
               },
               {
@@ -2268,7 +2268,7 @@
                 "default": "indigo",
                 "source": {
                   "file": "./src/components/docs/doc-header.component.ts",
-                  "offset": 1357
+                  "offset": 1423
                 }
               },
               {
@@ -2277,7 +2277,7 @@
                 "default": "flat",
                 "source": {
                   "file": "./src/components/docs/doc-header.component.ts",
-                  "offset": 1284
+                  "offset": 1350
                 }
               }
             ]
@@ -2287,7 +2287,7 @@
           "name": "doc-page",
           "source": {
             "file": "./src/pages/doc.page.ts",
-            "offset": 720
+            "offset": 788
           },
           "attributes": [],
           "js": {
@@ -2298,7 +2298,7 @@
           "name": "doc-path",
           "source": {
             "file": "./src/components/docs/doc-path.component.ts",
-            "offset": 617
+            "offset": 691
           },
           "attributes": [
             {
@@ -2309,7 +2309,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-path.component.ts",
-                "offset": 718
+                "offset": 792
               }
             }
           ],
@@ -2320,7 +2320,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/docs/doc-path.component.ts",
-                  "offset": 718
+                  "offset": 792
                 }
               }
             ]
@@ -2330,7 +2330,7 @@
           "name": "doc-section",
           "source": {
             "file": "./src/components/docs/doc-section.component.ts",
-            "offset": 835
+            "offset": 909
           },
           "attributes": [],
           "js": {
@@ -2341,7 +2341,7 @@
           "name": "doc-sidebar",
           "source": {
             "file": "./src/components/docs/doc-sidebar.component.ts",
-            "offset": 639
+            "offset": 707
           },
           "attributes": [],
           "js": {
@@ -2352,7 +2352,7 @@
           "name": "doc-toc",
           "source": {
             "file": "./src/components/docs/doc-toc.component.ts",
-            "offset": 1850
+            "offset": 1927
           },
           "attributes": [
             {
@@ -2364,7 +2364,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-toc.component.ts",
-                "offset": 2007
+                "offset": 2084
               }
             },
             {
@@ -2376,7 +2376,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-toc.component.ts",
-                "offset": 1934
+                "offset": 2011
               }
             }
           ],
@@ -2388,7 +2388,7 @@
                 "default": "indigo",
                 "source": {
                   "file": "./src/components/docs/doc-toc.component.ts",
-                  "offset": 2007
+                  "offset": 2084
                 }
               },
               {
@@ -2397,7 +2397,7 @@
                 "default": "flat",
                 "source": {
                   "file": "./src/components/docs/doc-toc.component.ts",
-                  "offset": 1934
+                  "offset": 2011
                 }
               }
             ]
@@ -4225,7 +4225,7 @@
           "name": "md-toc",
           "source": {
             "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-            "offset": 2034
+            "offset": 2174
           },
           "attributes": [
             {
@@ -4237,7 +4237,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                "offset": 2276
+                "offset": 2416
               }
             },
             {
@@ -4249,7 +4249,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                "offset": 2607
+                "offset": 2747
               }
             },
             {
@@ -4261,7 +4261,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                "offset": 2772
+                "offset": 2912
               }
             },
             {
@@ -4273,7 +4273,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                "offset": 2201
+                "offset": 2341
               }
             }
           ],
@@ -4285,7 +4285,7 @@
                 "default": "indigo",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                  "offset": 2276
+                  "offset": 2416
                 }
               },
               {
@@ -4294,7 +4294,7 @@
                 "default": "64",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                  "offset": 2607
+                  "offset": 2747
                 }
               },
               {
@@ -4303,7 +4303,7 @@
                 "default": "On this page",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                  "offset": 2772
+                  "offset": 2912
                 }
               },
               {
@@ -4312,7 +4312,7 @@
                 "default": "flat",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                  "offset": 2201
+                  "offset": 2341
                 }
               }
             ]
@@ -4322,7 +4322,7 @@
           "name": "md-view",
           "source": {
             "file": "../../ui/dota-md/src/components/md-view.component.ts",
-            "offset": 472
+            "offset": 609
           },
           "attributes": [
             {
@@ -4334,7 +4334,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                "offset": 629
+                "offset": 766
               }
             },
             {
@@ -4346,7 +4346,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                "offset": 556
+                "offset": 693
               }
             }
           ],
@@ -4358,7 +4358,7 @@
                 "default": "neutral",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                  "offset": 629
+                  "offset": 766
                 }
               },
               {
@@ -4367,7 +4367,7 @@
                 "default": "flat",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                  "offset": 556
+                  "offset": 693
                 }
               }
             ]
@@ -5161,7 +5161,7 @@
           "name": "theme-picker",
           "source": {
             "file": "./src/components/docs/theme-picker.component.ts",
-            "offset": 763
+            "offset": 840
           },
           "attributes": [
             {
@@ -5173,7 +5173,7 @@
               },
               "source": {
                 "file": "./src/components/docs/theme-picker.component.ts",
-                "offset": 860
+                "offset": 937
               }
             }
           ],
@@ -5185,7 +5185,7 @@
                 "default": "flat",
                 "source": {
                   "file": "./src/components/docs/theme-picker.component.ts",
-                  "offset": 860
+                  "offset": 937
                 }
               }
             ]
