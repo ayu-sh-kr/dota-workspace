@@ -11,7 +11,7 @@ import {nothing} from '@dota/types';
 
 describe('template helpers', () => {
   it('creates a structured result without touching the DOM', () => {
-    const result = html`<p title=${'title'}>${'content'}</p>`;
+    const result = html`<p title="${'title'}">${'content'}</p>`;
 
     expect(result).toEqual({
       kind: 'dota-template',
@@ -22,11 +22,13 @@ describe('template helpers', () => {
   });
 
   it('flattens nested templates and template arrays without turning markup into text', () => {
-    const items = ['one', 'two'].map((item) => html`<li data-value=${item}>${item}</li>`);
+    const items = ['one', 'two'].map((item) => html`<li data-value="${item}">${item}</li>`);
 
     const result = html`<ul>${items}</ul>`;
 
-    expect(result.strings).toEqual(['<ul><li data-value=', '>', '</li><li data-value=', '>', '</li></ul>']);
+    expect(result.strings).toEqual([
+      '<ul><li data-value="', '">', '</li><li data-value="', '">', '</li></ul>'
+    ]);
     expect(result.values).toEqual(['one', 'one', 'two', 'two']);
   });
 

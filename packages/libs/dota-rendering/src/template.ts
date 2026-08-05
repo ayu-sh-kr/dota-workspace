@@ -63,7 +63,7 @@ type FlattenedTemplate = {
 
 const FLATTEN_PLANS_BY_CALL_SITE = new WeakMap<TemplateStringsArray, TemplateFlattenPlan>();
 
-/** Matches temporary interpolation tokens before they become DOM part records. */
+/** Matches the canonical marker format exposed to template-inspection consumers. */
 export const valueMarkerPattern = /dota-value-(\d+)/g;
 
 /**
@@ -72,12 +72,12 @@ export const valueMarkerPattern = /dota-value-(\d+)/g;
  * Nested templates, trusted markup, and arrays containing either are flattened
  * into one string/value sequence. The renderer therefore receives a single
  * interpolation index space while ordinary arrays remain dynamic values for
- * keyed range handling. Compatible call-site shapes reuse their flattened
- * static strings to avoid repeating structural work on subsequent renders.
+ * keyed range handling. Attribute interpolations retain standard quoted HTML
+ * syntax; Dota Core remains responsible for typed property binding.
  *
  * @param strings Static segments supplied by the tagged-template call.
  * @param values Values inserted between the static segments.
- * @returns The normalized result that can be mounted, diffed, or patched.
+ * @returns Normalized output that can be mounted, diffed, or patched.
  */
 export function html(strings: TemplateStringsArray, ...values: unknown[]): TemplateResult {
   if (!values.some(requiresStructuralFlattening)) return {kind: 'dota-template', strings, values};
@@ -267,9 +267,9 @@ export function isAttributePosition(source: string): boolean {
 }
 
 /**
- * Produces the temporary token used while the browser parses a template.
- * The token is removed before the render is committed and never becomes part
- * of the public DOM contract; durable node markers are assigned by the renderer.
+ * Produces the canonical token available to template-inspection consumers.
+ * Mounted renderer sessions use private marker namespaces so authored text cannot
+ * collide with parser tokens; neither form is part of the committed DOM contract.
  * @param index Dynamic value position in the template result.
  * @returns The temporary token associated with that value.
  */
