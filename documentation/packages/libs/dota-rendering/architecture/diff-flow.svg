@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1500" width="1400" height="1500" role="img" aria-labelledby="diagram-title diagram-desc">
+  <title id="diagram-title">Dota Rendering diff flow</title>
+  <desc id="diagram-desc">The exact guard order used by diff to choose mount, no-op, replacement, or indexed part patching without mutating the DOM.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <style><![CDATA[
+      svg { background: #ffffff; text-rendering: geometricPrecision; }
+      text { font-family: "DM Sans", "Poppins", Helvetica, Arial, sans-serif; fill: #1f2937; }
+      .title { font-size: 36px; font-weight: 700; letter-spacing: -0.025em; }
+      .subtitle { font-size: 18px; fill: #526174; }
+      .section { font-size: 18px; font-weight: 700; letter-spacing: 0.05em; fill: #334155; }
+      .label { font-size: 16px; font-weight: 700; }
+      .note { font-size: 14px; fill: #526174; }
+      .branch { font-size: 14px; font-weight: 700; fill: #334155; }
+      .legend { font-size: 14px; fill: #526174; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 10; }
+      .entry { fill: #eef2ff; stroke: #3157c9; }
+      .decision { fill: #fffaf0; stroke: #d6a24e; }
+      .effect { fill: #f0fdf4; stroke: #9ac7a3; }
+      .skip { fill: #f8fafc; stroke: #94a3b8; }
+      .connector { fill: none; stroke: #64748b; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+    ]]></style>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="1500" fill="#ffffff"/>
+  <rect x="60" y="46" width="245" height="34" rx="17" fill="#eef2ff"/>
+  <text x="182" y="69" text-anchor="middle" class="section" fill="#3157c9">PURE COMPARISON FLOW</text>
+  <text x="60" y="128" class="title">diff(previous, next)</text>
+  <text x="60" y="166" class="subtitle">Ordered guards select the smallest safe commit; no branch reads or mutates the DOM.</text>
+
+  <!-- Geometry: primary cards x=500,w=400,h=64 at y=210,360,510,660,810,960,1110,1280. -->
+  <rect x="500" y="210" width="400" height="64" class="card entry"/>
+  <text x="700" y="236" text-anchor="middle" class="label">diff(previous, next)</text>
+  <text x="700" y="260" text-anchor="middle" class="note">RenderOutput | undefined → RenderDiff</text>
+
+  <rect x="500" y="360" width="400" height="64" class="card decision"/>
+  <text x="700" y="399" text-anchor="middle" class="label">previous is undefined?</text>
+  <rect x="1010" y="360" width="300" height="64" class="card effect"/>
+  <text x="1160" y="399" text-anchor="middle" class="label">mount</text>
+  <text x="1160" y="450" text-anchor="middle" class="note">no previous baseline exists</text>
+
+  <rect x="500" y="510" width="400" height="64" class="card decision"/>
+  <text x="700" y="549" text-anchor="middle" class="label">same output identity?</text>
+  <rect x="1010" y="510" width="300" height="64" class="card skip"/>
+  <text x="1160" y="549" text-anchor="middle" class="label">noop</text>
+  <text x="1160" y="600" text-anchor="middle" class="note">the committed object or string is unchanged</text>
+
+  <rect x="500" y="660" width="400" height="64" class="card decision"/>
+  <text x="700" y="699" text-anchor="middle" class="label">both outputs are TemplateResult?</text>
+  <rect x="1010" y="660" width="300" height="64" class="card effect"/>
+  <text x="1160" y="699" text-anchor="middle" class="label">replace</text>
+  <text x="1160" y="750" text-anchor="middle" class="note">legacy or mixed output carries no compatible parts</text>
+
+  <rect x="500" y="810" width="400" height="64" class="card decision"/>
+  <text x="700" y="836" text-anchor="middle" class="label">same static template structure?</text>
+  <text x="700" y="860" text-anchor="middle" class="note">strings identity first, then equal segment comparison</text>
+  <rect x="1010" y="810" width="300" height="64" class="card effect"/>
+  <text x="1160" y="849" text-anchor="middle" class="label">replace</text>
+  <text x="1160" y="900" text-anchor="middle" class="note">existing part indexes are no longer valid</text>
+
+  <rect x="500" y="960" width="400" height="64" class="card"/>
+  <text x="700" y="986" text-anchor="middle" class="label">compare dynamic values by index</text>
+  <text x="700" y="1010" text-anchor="middle" class="note">Object.is preserves NaN equality and object identity</text>
+
+  <rect x="500" y="1110" width="400" height="64" class="card decision"/>
+  <text x="700" y="1149" text-anchor="middle" class="label">any changed parts?</text>
+  <rect x="1010" y="1110" width="300" height="64" class="card skip"/>
+  <text x="1160" y="1149" text-anchor="middle" class="label">noop</text>
+  <text x="1160" y="1200" text-anchor="middle" class="note">compatible values are equal</text>
+
+  <rect x="500" y="1280" width="400" height="64" class="card effect"/>
+  <text x="700" y="1319" text-anchor="middle" class="label">patch</text>
+  <text x="700" y="1370" text-anchor="middle" class="note">PartChange[] carries index, previousValue, and nextValue</text>
+
+  <path d="M 700 274 V 360" class="connector"/>
+  <path d="M 900 392 H 1010" class="connector"/>
+  <text x="928" y="376" class="branch">yes</text>
+  <path d="M 700 424 V 510" class="connector"/>
+  <text x="720" y="472" class="branch">no</text>
+
+  <path d="M 900 542 H 1010" class="connector"/>
+  <text x="928" y="526" class="branch">yes</text>
+  <path d="M 700 574 V 660" class="connector"/>
+  <text x="720" y="622" class="branch">no</text>
+
+  <path d="M 900 692 H 1010" class="connector"/>
+  <text x="928" y="676" class="branch">no</text>
+  <path d="M 700 724 V 810" class="connector"/>
+  <text x="720" y="772" class="branch">yes</text>
+
+  <path d="M 900 842 H 1010" class="connector"/>
+  <text x="928" y="826" class="branch">no</text>
+  <path d="M 700 874 V 960" class="connector"/>
+  <text x="720" y="922" class="branch">yes</text>
+
+  <path d="M 700 1024 V 1110" class="connector"/>
+  <path d="M 900 1142 H 1010" class="connector"/>
+  <text x="928" y="1126" class="branch">no</text>
+  <path d="M 700 1174 V 1280" class="connector"/>
+  <text x="720" y="1232" class="branch">yes</text>
+
+  <rect x="60" y="1420" width="18" height="18" rx="4" class="entry"/>
+  <text x="90" y="1435" class="legend">entry</text>
+  <rect x="180" y="1420" width="18" height="18" rx="4" class="decision"/>
+  <text x="210" y="1435" class="legend">guard</text>
+  <rect x="320" y="1420" width="18" height="18" rx="4" class="effect"/>
+  <text x="350" y="1435" class="legend">mount, patch, or replace result</text>
+  <rect x="650" y="1420" width="18" height="18" rx="4" class="skip"/>
+  <text x="680" y="1435" class="legend">no-op result</text>
+  <path d="M 900 1429 H 960" class="connector"/>
+  <text x="980" y="1435" class="legend">synchronous branch</text>
+</svg>
