@@ -34,8 +34,8 @@ export class ClientSectionComponent extends BaseElement{
                 >
                     <div class="flex items-center gap-4">
                         <img
-                            src=${testimonial.img}
-                            alt=${testimonial.name}
+                            src="${testimonial.img}"
+                            alt="${testimonial.name}"
                             class="h-12 w-12 rounded-full border border-gray-200/70 object-cover dark:border-gray-700/60"
                         />
                         <div class="flex flex-col gap-1">

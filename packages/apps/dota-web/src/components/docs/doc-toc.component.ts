@@ -225,8 +225,8 @@ export class DocTocComponent extends BaseElement {
         <li class="relative">
           <span class="absolute left-0 top-0 bottom-0 w-0.5 rounded-full transition-colors duration-200 ${barClass}"></span>
           <a
-            href=${`#${entry.id}`}
-            data-toc-id=${entry.id}
+            href="${`#${entry.id}`}"
+            data-toc-id="${entry.id}"
             class="block pl-3 pr-1 py-0.5 text-xs leading-5 truncate transition-colors duration-150 ${indent} ${linkClass}"
           >${entry.text}</a>
           ${children}

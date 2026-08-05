@@ -67,7 +67,7 @@ export class DocSidebarComponent extends BaseElement {
                 </h2>
                 <ul class="space-y-0.5">
                     ${config.paths.map(path => html`
-                        <li><doc-path file-path=${path}></doc-path></li>
+                        <li><doc-path file-path="${path}"></doc-path></li>
                     `)}
                 </ul>
             </div>

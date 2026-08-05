@@ -114,7 +114,7 @@ export class MdViewComponent extends BaseElement {
                          py-4 sm:py-6 lg:py-8
                          antialiased text-sm sm:text-base leading-6 sm:leading-7
                          ${selection}"
-                 style=${`font-family: ${theme.fontFamily}`}>
+                 style="${`font-family: ${theme.fontFamily}`}">
                 ${this.contentMarkup}
             </div>
         `;
