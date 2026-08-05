@@ -7,15 +7,15 @@ describe('diff', () => {
   });
 
   it('returns noop for the same output object and equivalent values', () => {
-    const first = html`<p title=${'same'}>${'same'}</p>`;
+    const first = html`<p title="${'same'}">${'same'}</p>`;
 
     expect(diff(first, first)).toEqual({kind: 'noop', changedParts: []});
-    expect(diff(first, html`<p title=${'same'}>${'same'}</p>`)).toEqual({kind: 'noop', changedParts: []});
+    expect(diff(first, html`<p title="${'same'}">${'same'}</p>`)).toEqual({kind: 'noop', changedParts: []});
   });
 
   it('reports each changed dynamic value with its previous and next value', () => {
-    const previous = html`<button title=${'before'}>${1}</button>`;
-    const next = html`<button title=${'after'}>${2}</button>`;
+    const previous = html`<button title="${'before'}">${1}</button>`;
+    const next = html`<button title="${'after'}">${2}</button>`;
 
     expect(diff(previous, next)).toEqual({
       kind: 'patch',
