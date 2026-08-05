@@ -25,6 +25,14 @@ export interface UnsafeHtmlValue {
   readonly value: string;
 }
 
+/** Caller-approved markup rendered inside one dynamic child range. */
+export interface TrustedHtmlValue {
+  /** Selects local trusted-markup handling instead of escaped text rendering. */
+  readonly kind: 'dota-trusted-html';
+  /** Markup parsed within the interpolation's boundaries when its value changes. */
+  readonly value: string;
+}
+
 /** A stable identity accepted by keyed child ranges. */
 export type RenderKey = string | number | symbol;
 
