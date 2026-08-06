@@ -65,7 +65,7 @@ function toSegments(path: string): string[] {
  * @returns Whether the resulting route node must expose `slug: true`.
  */
 function isSlugSegment(segment: string): boolean {
-  return segment.startsWith(":") || /^\[\.\.\.[^\]]+\]$/.test(segment) || /^\[[^\]]+\]$/.test(segment);
+  return segment.startsWith(":") || /^\[\.\.\.[^\]]+]$/.test(segment) || /^\[[^\]]+]$/.test(segment);
 }
 
 /**

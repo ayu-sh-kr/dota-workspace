@@ -346,6 +346,7 @@ class RenderSession implements RenderInstance {
    * Selects and mounts the strategy required by the initial output kind.
    * @param root Native or bounded root whose ownership remains stable for this session.
    * @param output Initial legacy or structured output.
+   * @param mode Initial render mode, either 'mount' or 'hydrate'.
    */
   constructor(private readonly root: RenderRoot, output: RenderOutput, mode: InitialRenderMode = 'mount') {
     if (mode === 'hydrate' && !isTemplateResult(output)) {
@@ -397,6 +398,7 @@ class TemplateStrategy implements RenderStrategy {
    * Parses and commits the first structured template while its nodes are detached.
    * @param root Mutation boundary receiving this template's owned nodes.
    * @param output Initial structured output and value set.
+   * @param mode Initial render mode, either 'mount' or 'hydrate'.
    */
   constructor(private readonly root: RenderRoot, output: TemplateResult, mode: InitialRenderMode = 'mount') {
     this.output = output;

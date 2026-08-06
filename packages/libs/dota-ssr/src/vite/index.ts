@@ -120,6 +120,7 @@ async function resolveDecoratedRoutes(
  * @param config Resolved build configuration whose config file supplies application plugins.
  * @param root Vite application root used for source and alias resolution.
  * @param entry Source application entry expressed as a Vite URL or absolute file.
+ * @param logType Logging level used by the prerender server and route renderer.
  * @returns Middleware-mode server used only for route-isolated build-time execution.
  * @throws Error when the rendering package cannot be resolved in the SSR module graph.
  */
