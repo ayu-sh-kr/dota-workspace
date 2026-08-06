@@ -57,7 +57,7 @@ export const applicationReady = initializeApp({
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},
   root: AppComponent,
-  plugins: [dotaHydration({mismatch: 'recover'})],
+  plugins: [dotaHydration({mismatch: 'warn'})],
   globalHooks: {
     afterEach: [context => {
       if (context.url.hash) return;
