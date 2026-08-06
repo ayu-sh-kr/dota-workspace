@@ -590,6 +590,26 @@ describe('BaseElement – attributeChangedCallback', () => {
     expect((el as any).config).toEqual({ container: 'updated' });
   });
 
+  it('preserves nullable property initializers without reflecting a literal null attribute', async () => {
+    @Component({ selector: 'nullable-property-initializer', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+
+      @Property({ name: 'label', type: String })
+      label: string | null = null;
+
+      render() { return `<span>${this.label === null ? 'decorative' : this.label}</span>`; }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    expect((el as any).label).toBeNull();
+    expect(el.hasAttribute('label')).toBe(false);
+    expect(el.textContent).toBe('decorative');
+  });
+
   it('updates the DOM to reflect the new attribute value', async () => {
     @Component({ selector: 'attr-dom-reflects', shadow: false })
     class TestComponent extends BaseElement {
