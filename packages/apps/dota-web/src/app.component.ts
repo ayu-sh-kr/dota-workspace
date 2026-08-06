@@ -3,6 +3,7 @@ import '@dota/pages/doc.page.ts'
 import '@dota/pages/error.page.ts'
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 import {AfterInit, BaseElement, Component } from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 
 @Component({
@@ -21,8 +22,8 @@ export class AppComponent extends BaseElement {
     GeneralUtils.setBrowserTheme(browserTheme);
   }
 
-  render(): string {
-    return ''
+  render(): TemplateResult {
+    return html``
   }
 
 }
