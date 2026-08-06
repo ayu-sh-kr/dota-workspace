@@ -46,6 +46,7 @@ export function createNavigationContext<T extends HTMLElement>(
   historyState: unknown
 ): NavigationContext<T> {
   return {
+    initial: currentMatch === undefined,
     currentMatch,
     nextMatch,
     signal,
