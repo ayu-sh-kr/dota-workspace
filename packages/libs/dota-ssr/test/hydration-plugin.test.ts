@@ -65,10 +65,12 @@ describe('dotaHydration', () => {
     render(host, html`<p>${'server'}</p>`);
     setHydrationEmit(false);
     const replaceChildren = vi.spyOn(host, 'replaceChildren');
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
     installHydration().mountStrategy(host as never, host, html`<section>${'client'}</section>`);
 
     expect(replaceChildren).toHaveBeenCalledTimes(1);
+    expect(warning).toHaveBeenCalledOnce();
     expect(host.textContent).toBe('client');
     expect(host.hasAttribute(HYDRATION_TEMPLATE_ATTRIBUTE)).toBe(false);
 
