@@ -24,6 +24,7 @@
     "vite": "catalog:"
   },
   "dependencies": {
+    "@ayu-sh-kr/dota-ssr": "workspace:*",
     "@ayu-sh-kr/dota-ui": "workspace:*",
     "@ayu-sh-kr/dota-wrap": "workspace:*",
     "@ayu-sh-kr/dota-md": "workspace:*",
