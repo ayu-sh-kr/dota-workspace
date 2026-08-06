@@ -38,6 +38,8 @@ const HYDRATION_KEYED_END = /^\/dh:k(\d+):(\d+)$/;
 let templateMarkerId = 0;
 /** Enables serialization-safe boundaries only while the build-time renderer is active. */
 let emitDurableMarkers = false;
+/** Keeps applications resilient to stale server HTML unless strict mode is explicitly requested. */
+let hydrationMismatchPolicy: HydrationMismatchPolicy = 'warn';
 
 /** Browser-owned component boundary accepted by render(); both variants support complete DOM replacement. */
 type NativeRenderRoot = Element | ShadowRoot;
@@ -47,6 +49,15 @@ type LegacyRenderOutput = string | typeof nothing;
 
 /** Selects whether a template strategy creates DOM or adopts durable server markers. */
 type InitialRenderMode = 'mount' | 'hydrate';
+
+/** Selects whether hydration mismatches are recovered locally or surfaced to the caller. */
+export type HydrationMismatchPolicy = 'warn' | 'throw';
+
+/** Configures mismatch handling for one hydration attempt. */
+export interface HydrationOptions {
+  /** Overrides the module-level mismatch policy for this hydration attempt. */
+  mismatch?: HydrationMismatchPolicy;
+}
 
 /** Boundary node retained on either side of a dynamic child range. */
 type PartBoundary = Text | Comment;
@@ -1103,11 +1114,35 @@ export function render(root: NativeRenderRoot, output: RenderOutput): RenderInst
  * @param root Component Element or ShadowRoot containing serialized durable markers.
  * @param output Structured client output matching the server template.
  * @returns Stateful renderer session whose later updates use ordinary part patching.
- * @throws TypeError when called with legacy string output or `nothing`.
+ * @param options Mismatch behavior for this call; the module policy applies when omitted.
+ * @throws TypeError when strict mismatch handling rejects legacy string output or `nothing`.
  */
-export function hydrate(root: NativeRenderRoot, output: RenderOutput): RenderInstance {
+export function hydrate(
+  root: NativeRenderRoot,
+  output: RenderOutput,
+  options: HydrationOptions = {}
+): RenderInstance {
   getDotaRenderingLogger().debug('[dota-rendering] adopting hydrated render session');
-  return new RenderSession(new NativeRoot(root), output, 'hydrate');
+  try {
+    return new RenderSession(new NativeRoot(root), output, 'hydrate');
+  } catch (error) {
+    if ((options.mismatch ?? hydrationMismatchPolicy) === 'throw') throw error;
+    warnHydrationMismatch(error);
+    return new RenderSession(new NativeRoot(root), output);
+  }
+}
+
+/**
+ * Sets the default mismatch behavior used by hydrate() calls that do not supply an option.
+ * @param policy `warn` replaces only the affected root; `throw` surfaces the mismatch.
+ */
+export function setHydrationMismatchPolicy(policy: HydrationMismatchPolicy): void {
+  hydrationMismatchPolicy = policy;
+}
+
+/** Reports a recovered hydration mismatch without preventing the affected component from rendering. */
+export function warnHydrationMismatch(error: unknown): void {
+  console.warn('[dota-rendering] hydration mismatch; re-rendering the affected component', error);
 }
 
 /**
