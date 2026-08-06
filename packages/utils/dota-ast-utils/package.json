@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "dota-ast-utils provides AST parsing and transformation utilities for use across dota ecosystem projects and beyond.",
   "author": {
     "name": "ayu-sh-kr",

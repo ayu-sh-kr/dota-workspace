@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "dota-vite-preloader-plugin is a Vite plugin that preloads Web Components for Dota Core Web Apps. It scans the specified directory for Web Component files, generates a preload script, and injects it into the HTML. This ensures that Web Components are loaded and ready to use when the application starts.",
   "author": {
     "name": "ayu-sh-kr",

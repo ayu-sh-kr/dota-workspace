@@ -1,6 +1,6 @@
 {
   "name": "@ayu-sh-kr/dota-rendering",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "publishConfig": {
     "access": "public"
@@ -25,7 +25,11 @@
       "default": "./dist/index.mjs"
     }
   },
-  "files": ["dist/", "README.md", "package.json"],
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ],
   "dependencies": {
     "consola": "catalog:"
   },
