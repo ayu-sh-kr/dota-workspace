@@ -53,6 +53,8 @@ export type RouterConstructor<T extends Router<HTMLElement>> = new (
  */
 export type RouteMeta<T extends HTMLElement = HTMLElement> = {
   path: string;
+  /** Enables build-time prerendering when an SSG integration consumes decorated routes. */
+  ssr?: boolean;
   default?: boolean;
   render?: (path: string) => void;
   beforeEnter?: RouteGuard<T>;
@@ -74,6 +76,8 @@ export type RouteGuardResult = true | false | string;
  * keeps guards portable across history and Navigation API adapters.
  */
 export type NavigationContext<T extends HTMLElement = HTMLElement> = {
+  /** True only when no route has completed before this transition; absent means a later/custom transition. */
+  readonly initial?: boolean;
   /** Last successfully rendered match, absent during initial navigation. */
   currentMatch?: RouteMatch<T>;
   /** Destination match that guards and lifecycle hooks are evaluating. */
@@ -171,6 +175,8 @@ export type RouteRenderer<T extends HTMLElement = HTMLElement> = (
 export type RouteConfig<T extends HTMLElement> = {
   path: string;
   component: ComponentClass;
+  /** Whether this concrete route is eligible for build-time prerendering. */
+  ssr?: boolean;
   default?: boolean;
   slug?: boolean;
   children?: RouteConfig<T>[];
@@ -287,6 +293,8 @@ export interface DefaultRouterConfig<T extends Router<HTMLElement>> {
   components?: ComponentClass[];
   /** Application-wide guards and observers owned by this router instance. */
   globalHooks?: GlobalNavigationHooks<HTMLElement>;
+  /** Optional presentation strategy; omission preserves the built-in component-tag renderer. */
+  renderer?: RouteRenderer<HTMLElement>;
 }
 
 /**
