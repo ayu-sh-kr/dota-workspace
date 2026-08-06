@@ -3,11 +3,13 @@ import {
   HYDRATION_COMPONENT_ATTRIBUTE,
   HYDRATION_TEMPLATE_ATTRIBUTE,
   HYDRATION_VERSION_ATTRIBUTE,
+  type HydrationMismatchPolicy as RenderingHydrationMismatchPolicy,
   MARKER_VERSION,
   hydrate,
   isTemplateResult,
   render as mountRender,
-  templateId
+  templateId,
+  warnHydrationMismatch
 } from '@ayu-sh-kr/dota-rendering';
 import type {
   DotaRuntimePlugin,
@@ -15,12 +17,8 @@ import type {
 } from '@ayu-sh-kr/dota-wrap';
 import type {ComponentClass, NavigationContext, RouteMatch, RouteRenderer} from '@ayu-sh-kr/dota-wrap/router';
 
-/**
- * Selects the response when server markers do not match the client template identity.
- * The runtime defaults to local recovery for production resilience; strict mode is intended
- * to expose deployment skew during development instead of silently remounting a host.
- */
-export type HydrationMismatchPolicy = 'recover' | 'throw';
+/** Selects whether a mismatch warns and remounts the host or stops initialization. */
+export type HydrationMismatchPolicy = RenderingHydrationMismatchPolicy;
 
 /**
  * Configures Dota's opt-in browser hydration plugin.
@@ -28,7 +26,7 @@ export type HydrationMismatchPolicy = 'recover' | 'throw';
  * all other Dota Core and Router behavior continues through the ordinary client render path.
  */
 export interface DotaHydrationOptions {
-  /** `recover` remounts only the mismatched host; `throw` surfaces deploy skew during development. */
+  /** `warn` remounts only the mismatched host; `throw` surfaces deploy skew during development. */
   mismatch?: HydrationMismatchPolicy;
 }
 
@@ -36,11 +34,11 @@ export interface DotaHydrationOptions {
  * Creates the browser half of Dota SSG as an ordinary runtime plugin.
  * It claims Core's mount strategy and decorates only the router's initial paint, allowing
  * server DOM to be adopted when it still represents the selected client template and pathname.
- * @param options Mismatch behavior, defaulting to local component recovery.
+ * @param options Mismatch behavior, defaulting to a warning and local component recovery.
  * @returns Plugin installed explicitly through `initializeApp({plugins})`.
  */
 export function dotaHydration(options: DotaHydrationOptions = {}): DotaRuntimePlugin {
-  const mismatch = options.mismatch ?? 'recover';
+  const mismatch = options.mismatch ?? 'warn';
   return {
     name: 'dota-hydration',
     setup(context) {
@@ -68,13 +66,15 @@ function installMountStrategy(context: DotaRuntimeContext, mismatch: HydrationMi
       serverVersion === String(MARKER_VERSION);
     if (canHydrate) {
       try {
-        return hydrate(root, output);
+        return hydrate(root, output, {mismatch});
       } catch (error) {
-        if (mismatch === 'throw') throw hydrationMismatch(host, error);
+        throw hydrationMismatch(host, error);
       }
-    } else if (mismatch === 'throw') {
-      throw hydrationMismatch(host);
     }
+
+    const error = hydrationMismatch(host);
+    if (mismatch === 'throw') throw error;
+    warnHydrationMismatch(error);
 
     host.removeAttribute(HYDRATION_COMPONENT_ATTRIBUTE);
     host.removeAttribute(HYDRATION_TEMPLATE_ATTRIBUTE);
