@@ -3,6 +3,7 @@ import {Route} from "@ayu-sh-kr/dota-router";
 
 @Route({
   path: "/",
+  ssr: true,
   default: true
 })
 @Component({selector: "home-page"})
