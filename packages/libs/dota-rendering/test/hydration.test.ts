@@ -7,6 +7,7 @@ import {
   keyed,
   render,
   setHydrationEmit,
+  setHydrationMismatchPolicy,
   templateId,
   update,
   when
@@ -14,6 +15,8 @@ import {
 
 afterEach(() => {
   setHydrationEmit(false);
+  setHydrationMismatchPolicy('warn');
+  vi.restoreAllMocks();
 });
 
 describe('durable rendering and hydration', () => {
@@ -27,11 +30,50 @@ describe('durable rendering and hydration', () => {
     expect(root.innerHTML).not.toContain('<!--dh:p');
   });
 
-  it('rejects legacy output before attempting to adopt serialized markers', () => {
+  it('warns and rerenders when legacy output cannot adopt serialized markers', () => {
+    const root = document.createElement('section');
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    hydrate(root, '<p>legacy</p>');
+
+    expect(warning).toHaveBeenCalledWith(
+      '[dota-rendering] hydration mismatch; re-rendering the affected component',
+      expect.any(Error)
+    );
+    expect(root.innerHTML).toBe('<p>legacy</p>');
+  });
+
+  it('warns and remounts when serialized child markers are malformed', () => {
+    const view = (label: string) => html`<p>${label}</p>`;
+    const serverRoot = document.createElement('section');
+    setHydrationEmit(true);
+    render(serverRoot, view('server'));
+
+    const reparsed = document.createElement('div');
+    reparsed.innerHTML = serverRoot.outerHTML;
+    const clientRoot = reparsed.firstElementChild as HTMLElement;
+    clientRoot.querySelector('p')?.firstChild?.remove();
+    setHydrationEmit(false);
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    hydrate(clientRoot, view('client'));
+
+    expect(warning).toHaveBeenCalledWith(
+      '[dota-rendering] hydration mismatch; re-rendering the affected component',
+      expect.any(Error)
+    );
+    expect(clientRoot.textContent).toBe('client');
+  });
+
+  it('can throw hydration mismatches when selected for one call or the module', () => {
     const root = document.createElement('section');
 
-    expect(() => hydrate(root, '<p>legacy</p>')).toThrow('Hydration requires a structured template result');
-    expect(root.innerHTML).toBe('');
+    expect(() => hydrate(root, '<p>legacy</p>', {mismatch: 'throw'}))
+      .toThrow('Hydration requires a structured template result');
+
+    setHydrationMismatchPolicy('throw');
+    expect(() => hydrate(root, '<p>legacy</p>'))
+      .toThrow('Hydration requires a structured template result');
   });
 
   it('adopts serialized attribute and child parts without replacing the root', () => {
