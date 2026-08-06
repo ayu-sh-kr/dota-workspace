@@ -4,6 +4,7 @@ import {fileURLToPath} from "node:url";
 import dotaVitePreloader from "@ayu-sh-kr/dota-wrap/preloader-plugin";
 import eventMapGenerator from "@ayu-sh-kr/dota-wrap/event-map-generator";
 import dotaWebTypeJson from "@ayu-sh-kr/dota-wrap/web-type-json";
+import dotaSsg from "@ayu-sh-kr/dota-ssr/vite";
 
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
@@ -46,6 +47,13 @@ export default defineConfig({
         outFile: 'custom-elements.json',
         updatePackageJson: true,
       },
+    }),
+    dotaSsg({
+      root: projectRoot,
+      entry: '/src/main.ts',
+      autoDetectRoutes: true,
+      logType: 'info',
+      vercel: true,
     }),
   ],
   css: {
