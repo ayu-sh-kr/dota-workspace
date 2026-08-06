@@ -421,7 +421,7 @@
           "name": "app-root",
           "source": {
             "file": "./src/app.component.ts",
-            "offset": 309
+            "offset": 383
           },
           "attributes": [],
           "js": {
@@ -786,7 +786,7 @@
           "name": "blog-page",
           "source": {
             "file": "./src/pages/blog.page.ts",
-            "offset": 241
+            "offset": 252
           },
           "attributes": [],
           "js": {
@@ -1690,7 +1690,7 @@
           "name": "community-page",
           "source": {
             "file": "./src/pages/community.page.ts",
-            "offset": 336
+            "offset": 347
           },
           "attributes": [],
           "js": {
@@ -4093,7 +4093,7 @@
           "name": "home-page",
           "source": {
             "file": "./src/pages/home.page.ts",
-            "offset": 403
+            "offset": 414
           },
           "attributes": [],
           "js": {
