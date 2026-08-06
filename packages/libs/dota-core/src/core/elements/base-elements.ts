@@ -22,6 +22,7 @@ import {
   type RenderInstance,
   type RenderOutput
 } from "@ayu-sh-kr/dota-rendering";
+import {resolveMountStrategy} from "@dota/core/elements/render-strategy.ts";
 
 
 /**
@@ -81,6 +82,7 @@ export abstract class BaseElement extends HTMLElement {
    */
   connectedCallback() {
     this.handleBeforeInit();
+    PropertyUtils.seedInitialValues(this);
 
     // Needs html to be rendered before binding methods and events,
     // so we defer those tasks to the next microtask.
@@ -292,14 +294,22 @@ export abstract class BaseElement extends HTMLElement {
       this.isShadow = isShadow;
     }
 
-    if (this.isShadow) {
-      this.shadowRoot = this.attachShadow({mode: "open"})
-      if (this.shadowRoot) {
-        this.__renderInstance = mountRender(this.shadowRoot, this.render());
-      }
-    } else {
-      this.__renderInstance = mountRender(this, this.render());
-    }
+    const root: Element | ShadowRoot = this.isShadow ? this.resolveRenderRoot() : this;
+    this.__renderInstance = resolveMountStrategy()(this, root, this.render());
+  }
+
+  /**
+   * Preserves a declarative server shadow root when the browser created one.
+   * A new open root is attached only for ordinary client mounts, preventing an
+   * existing prerendered shadow tree from being cleared during component upgrade.
+   * @returns Render root used by either the default mount or an installed strategy.
+   */
+  private resolveRenderRoot(): ShadowRoot {
+    const existingRoot = Object.getOwnPropertyDescriptor(Element.prototype, 'shadowRoot')
+      ?.get?.call(this) as ShadowRoot | null | undefined;
+    const root = existingRoot ?? this.attachShadow({mode: "open"});
+    this.shadowRoot = root;
+    return root;
   }
 
   /**

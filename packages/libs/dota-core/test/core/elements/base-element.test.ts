@@ -217,6 +217,29 @@ describe('BaseElement – connectedCallback', () => {
     expect(el.reactive).toBe(true);
   });
 
+  it('seeds typed attributes before the first render without scheduling a second render', async () => {
+    const renderedValues: unknown[] = [];
+
+    @Component({ selector: 'connected-seeds-first-render', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() { super(); }
+      @Property({ name: 'count', type: Number })
+      count!: number;
+      render() {
+        renderedValues.push(this.count);
+        return `<p>${this.count}</p>`;
+      }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    el.setAttribute('count', '7');
+    document.body.appendChild(el);
+    await microtask();
+
+    expect(renderedValues).toEqual([7]);
+    expect(el.textContent).toBe('7');
+  });
+
   it('emits the CONNECTED lifecycle event after all tasks resolve', async () => {
     const spy = vi.fn();
 
