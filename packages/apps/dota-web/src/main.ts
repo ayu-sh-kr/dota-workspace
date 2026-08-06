@@ -25,6 +25,7 @@ import {NotificationService} from "@dota/components/utils/notification/notificat
 import {DefaultApplicationEventListenerRegistry} from "@ayu-sh-kr/dota-wrap/event";
 import {MdTocComponent, MdViewComponent} from "@ayu-sh-kr/dota-md";
 import {routeConfig} from "virtual:dota-routes";
+import {dotaHydration} from "@ayu-sh-kr/dota-ssr";
 
 const applicationEventService = ApplicationEventService.getInstance();
 const applicationEventPublisher = applicationEventService.getPublisher();
@@ -33,7 +34,7 @@ const applicationEventListener = applicationEventService.getListener();
 let routerService!: RouterService<Router<HTMLElement>>;
 let notificationService!: NotificationService;
 
-initializeApp({
+export const applicationReady = initializeApp({
   modules: components,
   routes: routeConfig,
   externalComponents: [
@@ -56,6 +57,7 @@ initializeApp({
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},
   root: AppComponent,
+  plugins: [dotaHydration({mismatch: 'recover'})],
   globalHooks: {
     afterEach: [context => {
       if (context.url.hash) return;
@@ -73,7 +75,8 @@ initializeApp({
         data: null
       })
   })
-  .catch(error => console.error(error))
+
+applicationReady.catch(error => console.error(error))
 
 
 export {routerService, notificationService, applicationEventService, applicationEventPublisher, applicationEventListener}

@@ -15,6 +15,7 @@ import {
   resolveComponentExport,
   scanDotaComponents,
   type DotaRouteCandidate,
+  prepareRouteMetadataExport,
   prepareRouteConfigExport
 } from "@dota/domain";
 
@@ -75,6 +76,9 @@ export default function dotaVitePreloader({root = process.cwd(), logType = 'info
     const routeModule = server.moduleGraph.getModuleById(VirtualImportID.RESOLVED_DOTA_ROUTES);
     if (routeModule) server.moduleGraph.invalidateModule(routeModule);
 
+    const routeMetadataModule = server.moduleGraph.getModuleById(VirtualImportID.RESOLVED_DOTA_ROUTE_METADATA);
+    if (routeMetadataModule) server.moduleGraph.invalidateModule(routeMetadataModule);
+
     server.ws.send({type: 'full-reload'});
   }
 
@@ -83,6 +87,7 @@ export default function dotaVitePreloader({root = process.cwd(), logType = 'info
     resolveId(id) {
       if (id === VirtualImportID.DOTA_COMPONENTS) return VirtualImportID.RESOLVED_DOTA_COMPONENTS;
       if (id === VirtualImportID.DOTA_ROUTES) return VirtualImportID.RESOLVED_DOTA_ROUTES;
+      if (id === VirtualImportID.DOTA_ROUTE_METADATA) return VirtualImportID.RESOLVED_DOTA_ROUTE_METADATA;
       return null;
     },
 
@@ -95,6 +100,11 @@ export default function dotaVitePreloader({root = process.cwd(), logType = 'info
       if (id === VirtualImportID.RESOLVED_DOTA_ROUTES) {
         const routeCandidates = await ensureRouteCandidatesLoaded();
         return await prepareRouteConfigExport(routeCandidates);
+      }
+
+      if (id === VirtualImportID.RESOLVED_DOTA_ROUTE_METADATA) {
+        const routeCandidates = await ensureRouteCandidatesLoaded();
+        return prepareRouteMetadataExport(routeCandidates);
       }
 
       return null;
