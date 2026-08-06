@@ -4,6 +4,20 @@ This plan prepares Dota components to show useful HTML before browser JavaScript
 
 It focuses only on the shared component foundation in `dota-core`: `@Property`, property types, `HelperUtils`, `BaseElement`, and the closely related `PropertyUtils`. It deliberately does not choose a router, server framework, data-fetching strategy, or deployment platform. Those pieces can be added later once the component foundation can safely work on both the server and in the browser.
 
+> **Update (2026-08-06):** the pieces this plan deferred now exist and are coordinated by the
+> [SSR + hydration implementation plan](../hydration-ssr/ssr-hydration-implementation-plan.md):
+> - a **rendering engine** with targeted DOM patching and mount markers (`@ayu-sh-kr/dota-rendering`),
+>   already consumed by `BaseElement` via `mountRender` — hydration reuses it rather than adding a
+>   parallel renderer;
+> - a **router** that injects a page component tag into the root and overwrites it on first load
+>   (`dota-router` coordinator) — so hydration has a *second* overwrite point to make adopt-aware,
+>   beyond `BaseElement`;
+> - a decided delivery model: **build-time prerender (SSG) first, no runtime server added** (the Vite
+>   dev server is not SSR).
+> The property/value contract below (Phases 0–3) is still the prerequisite that lets server and client
+> agree on initial values; Phase 4's `mountOrHydrate()` is now specified against the shipped
+> `bindHTML()` and `dota-rendering` markers in the coordinating plan.
+
 ## What we are trying to achieve
 
 Today, a page can send this to a browser:
