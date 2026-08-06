@@ -230,7 +230,7 @@ export class PropertyUtils {
 
       // Reflect only when the attribute was not the source of truth. The framework marker
       // lets BaseElement ignore the observed callback during initial state seeding.
-      if (!resolvedInitial.hasAttribute && initial !== undefined) {
+      if (!resolvedInitial.hasAttribute && initial != null) {
         PropertyUtils.reflectAttribute(
           element,
           attrName,
@@ -261,7 +261,7 @@ export class PropertyUtils {
       : fieldValue !== undefined
         ? fieldValue
         : meta.default;
-    if (hasAttribute || resolved === undefined) return {hasAttribute, value: resolved};
+    if (hasAttribute || resolved == null) return {hasAttribute, value: resolved};
 
     const normalized = Sanitizer.sanitize(this.serializeAttributeValue(resolved, meta.type), meta.type);
     return {
