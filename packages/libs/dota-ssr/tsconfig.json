@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noEmit": true,
+    "declaration": true,
+    "rootDir": ".",
+    "types": ["node", "vitest/globals"],
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@dota/*": ["./src/*"],
+      "@test/*": ["./test/*"]
+    }
+  },
+  "include": ["src", "test", "vite.config.ts", "vitest.config.ts"]
+}
