@@ -18,6 +18,7 @@ export type DotaRouteCandidate = {
   name: string;
   filePath: string;
   path: string;
+  ssr?: boolean;
   default?: boolean;
   render?: string;
 }
@@ -96,6 +97,7 @@ function extractRouteCandidateFromClassDeclaration(
     }
 
     const defaultProperty = routeObjectExpression.getProperty(ASTFilterConstants.ROUTE_DEFAULT_NAME_PROPERTY);
+    const ssrProperty = routeObjectExpression.getProperty(ASTFilterConstants.ROUTE_SSR_NAME_PROPERTY);
     const renderProperty = routeObjectExpression.getProperty(ASTFilterConstants.ROUTE_RENDER_NAME_PROPERTY);
     const renderSource = renderProperty ? printExpressionSource(renderProperty.value as Expression) : undefined;
 
@@ -103,6 +105,7 @@ function extractRouteCandidateFromClassDeclaration(
       name: className,
       filePath: "",
       path: pathValue,
+      ssr: ssrProperty ? KeyValuePropertyView.from(ssrProperty).getBoolean() ?? undefined : undefined,
       default: defaultProperty ? KeyValuePropertyView.from(defaultProperty).getBoolean() ?? undefined : undefined,
       render: renderSource
     };
@@ -176,7 +179,7 @@ export async function extractRouteCandidatesFromComponents(
 /**
  * Generates the virtual module source that imports route classes and exports `routeConfig`.
  * Every candidate becomes a named import followed by one object in the config array.
- * The emitted object includes `path`, `component`, and optional `default`/`render` fields.
+ * The emitted object includes `path`, `component`, and optional `ssr`/`default`/`render` fields.
  * Import paths are normalized to be relative so the output works as an ES module string.
  * The output is deterministic, which makes cache invalidation and snapshotting reliable.
  * This function is the final codegen step after route discovery is complete.
@@ -193,6 +196,10 @@ export async function prepareRouteConfigExport(candidates: DotaRouteCandidate[])
       `component: ${candidate.name}`
     ];
 
+    if (candidate.ssr) {
+      properties.push('ssr: true');
+    }
+
     if (candidate.default != null) {
       properties.push(`default: ${candidate.default ? "true" : "false"}`);
     }
@@ -208,9 +215,20 @@ export async function prepareRouteConfigExport(candidates: DotaRouteCandidate[])
 }
 
 /**
+ * Generates route metadata without importing page classes.
+ * SSG discovery consumes this lightweight module to avoid starting an application while it scans.
+ * @param candidates Decorated routes discovered from page source files.
+ * @returns Virtual module source containing only serializable route path and SSG metadata.
+ */
+export function prepareRouteMetadataExport(candidates: DotaRouteCandidate[]): string {
+  const metadata = candidates.map(candidate => ({path: candidate.path, ssr: candidate.ssr === true}));
+  return `export const routeMetadata = ${JSON.stringify(metadata)};`;
+}
+
+/**
  * Compares two ordered candidate lists and reports whether route metadata changed.
  * It first checks list length, then compares candidates by index to keep the diff cheap.
- * Only route fields relevant to generated output are considered: name, path, default, and render.
+ * Only route fields relevant to generated output are considered: name, path, ssr, default, and render.
  * This intentionally ignores unrelated component metadata because it does not affect the route config.
  * Ordering matters here, because the generated module is emitted in declaration order.
  * The result is used to decide whether the route virtual module should be regenerated.
@@ -228,6 +246,7 @@ export function isRouteMetadataChanged(
     return !prev
       || next.name !== prev.name
       || next.path !== prev.path
+      || next.ssr !== prev.ssr
       || next.default !== prev.default
       || next.render !== prev.render;
   });
