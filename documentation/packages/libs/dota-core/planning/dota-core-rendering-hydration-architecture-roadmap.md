@@ -1,9 +1,19 @@
 # Dota Core rendering, hydration, and patching architecture roadmap
 
 **Status:** Proposed next-step architecture; no runtime code in this document is implemented  
-**Reviewed:** 2026-08-05  
+**Reviewed:** 2026-08-05 · **Updated:** 2026-08-06  
 **Scope:** `@ayu-sh-kr/dota-core` rendering, reactivity, hydration, DOM patching, and lifecycle boundaries  
 **Primary implementation:** [`BaseElement`](../../../../../packages/libs/dota-core/src/core/elements/base-elements.ts)
+
+> **Update (2026-08-06):** Phases 6–7 (hydration + server/build rendering) are sequenced against the
+> shipped code by the [SSR + hydration implementation plan](../../../../standards/hydration-ssr/ssr-hydration-implementation-plan.md).
+> Two grounding facts refine this roadmap: (1) `@ayu-sh-kr/dota-rendering` already provides the
+> structured-part engine and `BaseElement` already delegates to it via `mountRender`, so hydration
+> reuses that engine rather than introducing a new one; (2) the **router** overwrites the app root on
+> first load (`dota-router` coordinator injects a page tag), so "Router-owned outlet content" in the
+> correctness matrix is a *second* hydration overwrite point that must adopt server markup — not just
+> `BaseElement`. Delivery is **build-time prerender (SSG) first**; no runtime server is added (the Vite
+> dev server is not SSR).
 
 ## Executive summary
 
