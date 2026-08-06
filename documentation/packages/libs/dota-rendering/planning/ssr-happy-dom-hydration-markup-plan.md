@@ -1,9 +1,24 @@
 # SSR generation and hydration-marker plan (happy-dom prerender + attribute markers)
 
 **Status:** Proposed. No runtime SSR code is implemented yet.
-**Reviewed:** 2026-08-05
+**Reviewed:** 2026-08-05 · **Updated:** 2026-08-06
 **Scope:** `@ayu-sh-kr/dota-rendering` serialization + `@ayu-sh-kr/dota-core` hydration attachment.
 **Depends on:** the [rendering/hydration architecture roadmap](../../dota-core/planning/dota-core-rendering-hydration-architecture-roadmap.md) Phases 6–7.
+**Coordinated by:** the [SSR + hydration implementation plan](../../../../standards/hydration-ssr/ssr-hydration-implementation-plan.md),
+which sequences this marker/emitter work with the required `dota-core` and `dota-router` changes and
+decides the SSG-first delivery model. Read that plan first for the end-to-end picture.
+
+> **Update (2026-08-06):** two facts sharpen the scope below.
+> 1. **There are two client overwrite points, not one.** Besides `BaseElement` re-rendering on connect,
+>    the router also overwrites the root on first load: `renderRoute()` sets
+>    `rootElement.innerHTML = <page-tag path="…">` (`dota-router/src/coordinator/route-renderer.ts:53`),
+>    driven at startup by `coordinator.navigate(location.href, {commit:false})`
+>    (`dota-router/src/router/dom-history.router.ts:50`). Hydration must make the router *adopt* server
+>    markup on initial load; core adoption alone is insufficient.
+> 2. **Prerender vs. request-time is now decided: build-time prerender (SSG) first.** The Vite dev
+>    server does not do SSR — it serves the SPA and runs the bundle in the browser. SSG reuses Vite's
+>    `build` plus a happy-dom step and needs no runtime server (fits the current static Vercel deploy);
+>    request-time SSR stays a later, separate entry point behind the same marker contract.
 
 ## Purpose
 
@@ -246,5 +261,9 @@ discipline.
 - **Text marker style**: comment anchors (recommended) vs. parent-attribute text ownership.
 - **Marker attribute names**: `data-dh-*` (proposed, terse) vs. the roadmap's `data-dota-part`.
   Pick one and make client + server share the constant.
-- **Prerender vs. request-time**: this plan targets build-time prerender first; request-time SSR
-  is a later, separate entry point (roadmap non-goal for first implementation).
+- **Prerender vs. request-time**: **decided — build-time prerender (SSG) first**; request-time SSR is
+  a later, separate entry point behind the same marker contract (see the
+  [SSR + hydration implementation plan](../../../../standards/hydration-ssr/ssr-hydration-implementation-plan.md)).
+- **Router initial-load adoption**: the emitter is not enough on its own — the router must skip its
+  first-load `innerHTML` tag injection when the root already holds marked page HTML, and only inject a
+  tag for later client navigations. Tracked as Step 4 of the coordinating plan.

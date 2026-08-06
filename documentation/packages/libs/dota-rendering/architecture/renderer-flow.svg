@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 2860" width="2400" height="2860" role="img" aria-labelledby="diagram-title diagram-desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 3700" width="2400" height="3700" role="img" aria-labelledby="diagram-title diagram-desc">
   <title id="diagram-title">Dota Rendering renderer flow</title>
-  <desc id="diagram-desc">The renderer lifecycle from public render and update entry points through stable sessions, legacy and template strategies, diff outcomes, detached part discovery, nested ranges, and root-bounded DOM commits.</desc>
+  <desc id="diagram-desc">The renderer lifecycle from public render and update entry points through stable sessions, legacy and template strategies, diff outcomes, durable marker emission, hydration adoption, detached part discovery, nested ranges, and root-bounded DOM commits.</desc>
 
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
@@ -30,11 +30,11 @@
     ]]></style>
   </defs>
 
-  <rect x="0" y="0" width="2400" height="2860" fill="#ffffff"/>
+  <rect x="0" y="0" width="2400" height="3700" fill="#ffffff"/>
   <rect x="70" y="48" width="300" height="34" rx="17" fill="#eef2ff"/>
   <text x="220" y="71" text-anchor="middle" class="section" fill="#3157c9">RENDERER LIFECYCLE FLOW</text>
   <text x="70" y="130" class="title">Stable sessions, selected strategies, bounded DOM ownership</text>
-  <text x="70" y="168" class="subtitle">Mount and update paths converge on the same strategy contracts while structured output retains in-memory browser parts.</text>
+  <text x="70" y="168" class="subtitle">Mount, hydration adoption, and updates converge on stable strategy contracts while structured output retains browser parts.</text>
 
   <!-- 01: Public entries and session routing. -->
   <line x1="50" y1="220" x2="50" y2="920" class="rail-blue"/>
@@ -240,4 +240,49 @@
   <text x="1340" y="2805" class="legend">synchronous control flow</text>
   <path d="M 1690 2799 H 1750" class="fanin"/>
   <text x="1770" y="2805" class="legend">part-discovery fan-in</text>
+
+  <!-- 04: Durable markers and hydration adoption. -->
+  <line x1="50" y1="2900" x2="50" y2="3540" class="rail-violet"/>
+  <path d="M 50 2900 H 2350 M 50 3540 H 2350" class="group"/>
+  <text x="75" y="2894" class="section">04 / DURABLE MARKERS AND HYDRATION ADOPTION</text>
+  <text x="75" y="2924" class="note">Build-time marker emission is opt-in. Hydration reconstructs in-memory parts over validated server DOM without replacing the owned root.</text>
+
+  <rect x="140" y="3000" width="380" height="64" class="card entry"/>
+  <text x="330" y="3039" text-anchor="middle" class="label">setHydrationEmit(true)</text>
+  <rect x="140" y="3170" width="380" height="64" class="card effect"/>
+  <text x="330" y="3196" text-anchor="middle" class="label">TemplateStrategy.mount</text>
+  <text x="330" y="3220" text-anchor="middle" class="note">durable child/keyed comments + attribute part tokens</text>
+  <rect x="620" y="3170" width="380" height="64" class="card effect"/>
+  <text x="810" y="3196" text-anchor="middle" class="label">stamp host template identity</text>
+  <text x="810" y="3220" text-anchor="middle" class="note">data-dh-c · data-dh-t · data-dh-v</text>
+
+  <rect x="1180" y="3000" width="380" height="64" class="card entry"/>
+  <text x="1370" y="3039" text-anchor="middle" class="label">hydrate(root, TemplateResult)</text>
+  <rect x="1180" y="3170" width="380" height="64" class="card decision"/>
+  <text x="1370" y="3209" text-anchor="middle" class="label">structured output?</text>
+  <rect x="1180" y="3340" width="380" height="64" class="card"/>
+  <text x="1370" y="3366" text-anchor="middle" class="label">TemplateStrategy.adopt</text>
+  <text x="1370" y="3390" text-anchor="middle" class="note">parse plan + bind durable live markers to retained parts</text>
+  <rect x="1700" y="3170" width="380" height="64" class="card skip"/>
+  <text x="1890" y="3209" text-anchor="middle" class="label">throw TypeError</text>
+  <text x="1890" y="3258" text-anchor="middle" class="note">legacy output cannot hydrate</text>
+  <rect x="1700" y="3340" width="380" height="64" class="card effect"/>
+  <text x="1890" y="3366" text-anchor="middle" class="label">ordinary later patch()</text>
+  <text x="1890" y="3390" text-anchor="middle" class="note">adopted DOM nodes retain identity</text>
+
+  <rect x="620" y="3470" width="380" height="64" class="card"/>
+  <text x="810" y="3509" text-anchor="middle" class="label">setHydrationEmit(false)</text>
+  <text x="810" y="3558" text-anchor="middle" class="note">later structural mount clears stale host identity</text>
+
+  <path d="M 330 3064 V 3170" class="connector"/>
+  <path d="M 520 3202 H 620" class="connector"/>
+  <path d="M 1370 3064 V 3170" class="connector"/>
+  <path d="M 1560 3202 H 1700" class="connector"/>
+  <text x="1585" y="3186" class="branch">no</text>
+  <path d="M 1370 3234 V 3340" class="connector"/>
+  <text x="1390" y="3292" class="branch">yes</text>
+  <path d="M 1560 3372 H 1700" class="connector"/>
+  <path d="M 810 3234 V 3470" class="connector"/>
+
+  <text x="75" y="3630" class="source">Hydration source: packages/libs/dota-rendering/src/renderer.ts · template-id.ts</text>
 </svg>

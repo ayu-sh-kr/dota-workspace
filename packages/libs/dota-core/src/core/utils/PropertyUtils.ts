@@ -1,6 +1,13 @@
 import {HelperUtils, Sanitizer} from "@dota/core";
 import type {BaseElement, PropertyDetails, PropertyType, WatcherOptionMeta} from "@dota/core";
 
+/** Carries the quietly resolved property value and whether markup supplied it. */
+type InitialPropertyValue = {
+  /** True when the component host owns the configured attribute, including an empty one. */
+  hasAttribute: boolean;
+  /** Typed value selected by attribute, JavaScript field, decorator default, then undefined. */
+  value: any;
+};
 
 export class PropertyUtils {
   private static readonly reflectingAttributes = new WeakMap<BaseElement, Set<string>>();
@@ -99,6 +106,21 @@ export class PropertyUtils {
   }
 
   /**
+   * Resolves attribute and field values before the component's first render.
+   * The operation deliberately avoids accessors, reflection, watchers, and scheduling;
+   * `bindReactive` later installs the existing runtime behavior over the seeded value.
+   * @param element Component about to perform its initial mount or hydration attempt.
+   */
+  static seedInitialValues(element: BaseElement): void {
+    const properties = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property');
+    properties.forEach((meta) => {
+      const resolved = this.resolveInitialValue(element, meta).value;
+      if (resolved === undefined || this.isEquivalentValue(element[meta.prototype], resolved, meta.type)) return;
+      element[meta.prototype] = resolved;
+    });
+  }
+
+  /**
    * Establishes reactive property bindings on an element instance by installing getter/setter pairs
    * that maintain bidirectional synchronization between JavaScript properties and DOM attributes.
    *
@@ -161,10 +183,6 @@ export class PropertyUtils {
       const backingKey = `_${publicKey}`;      // e.g. "_duration"
       const attrName = meta.name;       // from the decorator options, e.g. "duration"
 
-      // --- Capture JS-initialized value (before we install accessor) ---
-      // Prefer already-existing backing field, else capture an own data property.
-      let jsValue = element[backingKey];
-
       const ownDesc = Object.getOwnPropertyDescriptor(element, publicKey);
       const hasOwnDataProp =
         !!ownDesc &&
@@ -172,43 +190,14 @@ export class PropertyUtils {
         typeof ownDesc.get !== "function" &&
         typeof ownDesc.set !== "function";
 
-      if (jsValue === undefined && hasOwnDataProp) {
-        jsValue = ownDesc!.value;
-      }
+      const resolvedInitial = this.resolveInitialValue(element, meta);
 
       // Remove conflicting own data property so defineProperty installs cleanly.
       if (hasOwnDataProp) {
         delete element[publicKey];
       }
 
-      // --- Capture attribute value (attribute wins over JS/default) ---
-      let attrValue: any = undefined;
-      const hasAttr = element.hasAttribute?.(attrName);
-      if (hasAttr) {
-        const raw = element.getAttribute(attrName);
-        // Note: raw can be "" (empty string) and that's still a real attribute value.
-        if (raw !== null) {
-          attrValue = Sanitizer.sanitize(raw, meta.type);
-        }
-      }
-
-      // --- Compute initial value using precedence: attr > js > default ---
-      const defaultValue = meta.default;
-      const resolvedInitial =
-        attrValue !== undefined ? attrValue :
-          jsValue !== undefined ? jsValue :
-            defaultValue !== undefined ? defaultValue :
-              undefined;
-      const reflectedInitial = !hasAttr && resolvedInitial !== undefined
-        ? Sanitizer.sanitize(
-          PropertyUtils.serializeAttributeValue(resolvedInitial, meta.type),
-          meta.type,
-        )
-        : resolvedInitial;
-      const initial = reflectedInitial !== undefined
-        && PropertyUtils.isEquivalentValue(resolvedInitial, reflectedInitial, meta.type)
-        ? resolvedInitial
-        : reflectedInitial;
+      const initial = resolvedInitial.value;
 
       // Seed backing field BEFORE installing accessor (preserves initial).
       // We intentionally seed even if initial is undefined? No—avoid clobbering.
@@ -241,7 +230,7 @@ export class PropertyUtils {
 
       // Reflect only when the attribute was not the source of truth. The framework marker
       // lets BaseElement ignore the observed callback during initial state seeding.
-      if (!hasAttr && initial !== undefined) {
+      if (!resolvedInitial.hasAttribute && initial != null) {
         PropertyUtils.reflectAttribute(
           element,
           attrName,
@@ -251,6 +240,34 @@ export class PropertyUtils {
     });
 
     element.reactive = true;
+  }
+
+  /**
+   * Applies the established attribute > JavaScript > default precedence in one place.
+   * Values not sourced from markup pass through their normal serialization contract so
+   * seeding and later reactive binding agree on the exact typed initial representation.
+   * @param element Component whose pre-reactive values are being inspected.
+   * @param meta Decorator metadata defining the public field and attribute codec.
+   * @returns Quiet initial value plus the source flag needed by reflection policy.
+   */
+  private static resolveInitialValue(element: BaseElement, meta: PropertyDetails): InitialPropertyValue {
+    const hasAttribute = element.hasAttribute(meta.name);
+    const rawAttribute = hasAttribute ? element.getAttribute(meta.name) : null;
+    const attributeValue = rawAttribute === null ? undefined : Sanitizer.sanitize(rawAttribute, meta.type);
+    const backingValue = element[`_${meta.prototype}`];
+    const fieldValue = backingValue !== undefined ? backingValue : element[meta.prototype];
+    const resolved = attributeValue !== undefined
+      ? attributeValue
+      : fieldValue !== undefined
+        ? fieldValue
+        : meta.default;
+    if (hasAttribute || resolved == null) return {hasAttribute, value: resolved};
+
+    const normalized = Sanitizer.sanitize(this.serializeAttributeValue(resolved, meta.type), meta.type);
+    return {
+      hasAttribute,
+      value: this.isEquivalentValue(resolved, normalized, meta.type) ? resolved : normalized
+    };
   }
 
   static bindWatchers(element: BaseElement, prototype: string) {

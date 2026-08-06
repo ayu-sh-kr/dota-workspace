@@ -65,7 +65,7 @@ function toSegments(path: string): string[] {
  * @returns Whether the resulting route node must expose `slug: true`.
  */
 function isSlugSegment(segment: string): boolean {
-  return segment.startsWith(":") || /^\[\.\.\.[^\]]+\]$/.test(segment) || /^\[[^\]]+\]$/.test(segment);
+  return segment.startsWith(":") || /^\[\.\.\.[^\]]+]$/.test(segment) || /^\[[^\]]+]$/.test(segment);
 }
 
 /**
@@ -93,6 +93,7 @@ function copyRoute<T extends HTMLElement>(route: RouteConfig<T>, path: string): 
     path,
     component: route.component
   };
+  if (route.ssr) configuredRoute.ssr = true;
   if (route.default != null) configuredRoute.default = route.default;
   if (route.slug != null) configuredRoute.slug = route.slug;
   if (route.render != null) configuredRoute.render = route.render;
@@ -118,6 +119,7 @@ function replaceRoute<T extends HTMLElement>(target: RouteConfig<T>, source: Rou
   const configuredRoute = copyRoute(source, path);
   target.path = configuredRoute.path;
   target.component = configuredRoute.component;
+  delete target.ssr;
   delete target.default;
   delete target.slug;
   delete target.render;
@@ -125,6 +127,7 @@ function replaceRoute<T extends HTMLElement>(target: RouteConfig<T>, source: Rou
   delete target.beforeLeave;
   delete target.afterEnter;
   delete target.afterLeave;
+  if (configuredRoute.ssr) target.ssr = true;
   if (configuredRoute.default != null) target.default = configuredRoute.default;
   if (configuredRoute.slug != null) target.slug = configuredRoute.slug;
   if (configuredRoute.render != null) target.render = configuredRoute.render;

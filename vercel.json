@@ -1,6 +1,21 @@
 {
+  "redirects": [
+    {
+      "source": "/blogs",
+      "destination": "/blogs/",
+      "permanent": true
+    },
+    {
+      "source": "/community",
+      "destination": "/community/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {

@@ -16,6 +16,7 @@ function RouteDecorator(config: RouteMeta) {
     const routeConfig: RouteConfig<HTMLElement> = {
       path: config.path,
       component: target,
+      ssr: config.ssr === true,
       default: config.default,
       render: config.render,
       beforeEnter: config.beforeEnter,

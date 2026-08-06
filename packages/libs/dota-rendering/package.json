@@ -26,6 +26,9 @@
     }
   },
   "files": ["dist/", "README.md", "package.json"],
+  "dependencies": {
+    "consola": "catalog:"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

@@ -10,7 +10,10 @@ export default defineConfig({
       formats: ['cjs', 'es'],
       fileName: (format) => format === 'es' ? 'index.mjs' : 'index.cjs'
     },
-    minify: false
+    minify: false,
+    rolldownOptions: {
+      external: ['consola']
+    }
   },
   resolve: {
     alias: {

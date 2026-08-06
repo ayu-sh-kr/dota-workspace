@@ -4,8 +4,17 @@ import {Route} from "@dota/route.decorator";
 import {NavigationContext, RouteConfig} from "@dota/Types";
 
 class GuardedComponent extends HTMLElement {}
+class StaticComponent extends HTMLElement {}
 
 describe("Route", () => {
+  it("keeps static generation disabled unless explicitly enabled", () => {
+    Route({path: "/client"})(GuardedComponent);
+    Route({path: "/static", ssr: true})(StaticComponent);
+
+    expect(Reflect.getOwnMetadata("Route", GuardedComponent)).toMatchObject({ssr: false});
+    expect(Reflect.getOwnMetadata("Route", StaticComponent)).toMatchObject({ssr: true});
+  });
+
   it("keeps declared guards and lifecycle hooks in route metadata", () => {
     const beforeEnter = (_context: NavigationContext) => true as const;
     const beforeLeave = (_context: NavigationContext) => "/sign-in";

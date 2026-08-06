@@ -201,6 +201,9 @@ importers:
       '@ayu-sh-kr/dota-md':
         specifier: workspace:*
         version: link:../../ui/dota-md
+      '@ayu-sh-kr/dota-ssr':
+        specifier: workspace:*
+        version: link:../../libs/dota-ssr
       '@ayu-sh-kr/dota-ui':
         specifier: workspace:*
         version: link:../../ui/dota-ui
@@ -326,6 +329,10 @@ importers:
         version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/libs/dota-rendering:
+    dependencies:
+      consola:
+        specifier: 'catalog:'
+        version: 3.4.2
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
@@ -391,6 +398,43 @@ importers:
       '@types/dom-navigation':
         specifier: 'catalog:'
         version: 1.0.6
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.9.0
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 4.1.10(vitest@4.1.10)
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.0.7
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1)
+      vite-plugin-dts:
+        specifier: 'catalog:'
+        version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+
+  packages/libs/dota-ssr:
+    dependencies:
+      '@ayu-sh-kr/dota-core':
+        specifier: workspace:*
+        version: link:../dota-core
+      '@ayu-sh-kr/dota-rendering':
+        specifier: workspace:*
+        version: link:../dota-rendering
+      '@ayu-sh-kr/dota-wrap':
+        specifier: workspace:*
+        version: link:../dota-wrap
+      consola:
+        specifier: 'catalog:'
+        version: 3.4.2
+    devDependencies:
       '@types/node':
         specifier: 'catalog:'
         version: 24.9.0

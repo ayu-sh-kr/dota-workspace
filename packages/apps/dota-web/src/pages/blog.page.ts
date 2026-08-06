@@ -2,7 +2,7 @@ import {Component, AfterInit, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 
 
-@Route({path: '/blogs'})
+@Route({path: '/blogs', ssr: true})
 @Component({
   selector: 'blog-page',
   shadow: false

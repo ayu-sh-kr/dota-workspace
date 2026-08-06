@@ -1,6 +1,29 @@
-import {html, patch, render, update} from '@dota/main';
+import {
+  configureDotaRenderingLogger,
+  getDotaRenderingLogger,
+  html,
+  patch,
+  render,
+  update
+} from '@dota/main';
+
+afterEach(() => {
+  configureDotaRenderingLogger('silent');
+});
 
 describe('renderer public API', () => {
+  it('emits diagnostics through the logger configured by its host integration', () => {
+    configureDotaRenderingLogger('debug');
+    const debug = vi.spyOn(getDotaRenderingLogger(), 'debug');
+
+    render(document.createElement('div'), '<p>legacy</p>');
+
+    expect(debug).toHaveBeenCalledWith('[dota-rendering] mounting render session', {
+      output: 'legacy',
+      hydrationMarkers: false
+    });
+  });
+
   it('mounts legacy output and skips an equal string update', () => {
     const root = document.createElement('div');
     const instance = render(root, '<p>legacy</p>');

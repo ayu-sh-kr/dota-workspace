@@ -4,7 +4,7 @@ import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
-@Route({path: '/'})
+@Route({path: '/', ssr: true})
 @Component({
   selector: 'home-page',
   shadow: false

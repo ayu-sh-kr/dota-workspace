@@ -12,6 +12,7 @@ export class ASTFilterConstants {
   static CLASS_RENDER_METHOD_NAME = 'render';
   static COMPONENT_TAG_NAME_PROPERTY = 'selector';
   static ROUTE_PATH_NAME_PROPERTY = 'path';
+  static ROUTE_SSR_NAME_PROPERTY = 'ssr';
   static ROUTE_DEFAULT_NAME_PROPERTY = 'default';
   static ROUTE_RENDER_NAME_PROPERTY = 'render';
 }
@@ -25,4 +26,6 @@ export class VirtualImportID {
   static RESOLVED_DOTA_COMPONENTS = "\0virtual:dota-components";
   static DOTA_ROUTES = "virtual:dota-routes";
   static RESOLVED_DOTA_ROUTES = "\0virtual:dota-routes";
+  static DOTA_ROUTE_METADATA = "virtual:dota-route-metadata";
+  static RESOLVED_DOTA_ROUTE_METADATA = "\0virtual:dota-route-metadata";
 }

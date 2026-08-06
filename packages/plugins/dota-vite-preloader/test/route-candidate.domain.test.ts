@@ -6,6 +6,7 @@ import {
   extractRouteCandidatesFromAst,
   extractRouteCandidatesFromComponents,
   isRouteMetadataChanged,
+  prepareRouteMetadataExport,
   prepareRouteConfigExport,
   type DotaRouteCandidate
 } from "@dota/domain";
@@ -41,6 +42,7 @@ describe("route-candidate.domain", () => {
       name: "HomePage",
       filePath: "test/fixtures/route.page.ts",
       path: "/",
+      ssr: true,
       default: true
     });
   });
@@ -53,6 +55,7 @@ describe("route-candidate.domain", () => {
     expect(candidates[0]).toMatchObject({
       name: "HomePage",
       path: "/",
+      ssr: true,
       default: true
     });
     expect(candidates[1]).toMatchObject({
@@ -69,6 +72,7 @@ describe("route-candidate.domain", () => {
         name: "HomePage",
         filePath: "test/fixtures/route.page.ts",
         path: "/",
+        ssr: true,
         default: true
       },
       {
@@ -85,9 +89,16 @@ describe("route-candidate.domain", () => {
         "import { HomePage } from './test/fixtures/route.page.ts';",
         "import { DocsPage } from './test/fixtures/route.page.ts';",
         "",
-        "export const routeConfig = [{ path: '/', component: HomePage, default: true }, { path: '/docs', component: DocsPage }];"
+        "export const routeConfig = [{ path: '/', component: HomePage, ssr: true, default: true }, { path: '/docs', component: DocsPage }];"
       ].join("\n")
     );
+  });
+
+  it("emits serializable route metadata without page imports", () => {
+    expect(prepareRouteMetadataExport([
+      {name: "HomePage", filePath: "test/fixtures/route.page.ts", path: "/", ssr: true},
+      {name: "DocsPage", filePath: "test/fixtures/route.page.ts", path: "/docs"}
+    ])).toBe('export const routeMetadata = [{"path":"/","ssr":true},{"path":"/docs","ssr":false}];');
   });
 
   it("detects route metadata changes correctly", () => {
@@ -96,6 +107,7 @@ describe("route-candidate.domain", () => {
         name: "HomePage",
         filePath: "test/fixtures/route.page.ts",
         path: "/",
+        ssr: true,
         default: true
       }
     ];
@@ -105,6 +117,7 @@ describe("route-candidate.domain", () => {
         name: "HomePage",
         filePath: "test/fixtures/route.page.ts",
         path: "/",
+        ssr: true,
         default: true
       }
     ];
@@ -114,6 +127,7 @@ describe("route-candidate.domain", () => {
         name: "HomePage",
         filePath: "test/fixtures/route.page.ts",
         path: "/home",
+        ssr: true,
         default: true
       }
     ];

@@ -69,6 +69,14 @@ describe("route transition helpers", () => {
     expect(context.url.href).toBe(destination.href);
     expect(context.nextMatch).toBe(nextMatch);
     expect(context.historyState).toEqual({source: "test"});
+    expect(context.initial).toBe(true);
+    expect(createNavigationContext(
+      destination,
+      nextMatch,
+      nextMatch,
+      new AbortController().signal,
+      undefined
+    ).initial).toBe(false);
   });
 
   it("orders leaving routes deepest-first and entering routes parent-first", () => {

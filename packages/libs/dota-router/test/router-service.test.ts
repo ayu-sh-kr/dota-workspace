@@ -47,6 +47,23 @@ describe('RouterService', () => {
     expect(routerService.renderer).toEqual(expect.any(Function));
   });
 
+  it('uses an injected route renderer without changing default service wiring', () => {
+    const renderer = vi.fn();
+    const routerService = DotaRouterService.fromComponents({
+      router: MockRouter,
+      components,
+      defaultRoute,
+      errorRoute,
+      root: AppComponent,
+      renderer
+    });
+
+    routerService.init();
+
+    expect(routerService.renderer).toBe(renderer);
+    expect(routerService.instance.renderer).toBe(renderer);
+  });
+
   it('should have the correct routes after initialization', () => {
     const routerService = DotaRouterService.fromComponents({
       router: DomHistoryRouter,

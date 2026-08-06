@@ -38,6 +38,7 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
    * @param defaultRoute - Application default route retained by the adapter.
    * @param root - Component that owns the route output host.
    * @param globalHooks - Optional application-wide navigation callbacks.
+   * @param renderer - Optional presentation strategy replacing the default root renderer.
    */
   constructor(
     router: RouterConstructor<T>,
@@ -45,14 +46,15 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
     errorRoute: RouteConfig<HTMLElement>,
     defaultRoute: RouteConfig<HTMLElement>,
     root: ComponentClass,
-    globalHooks?: GlobalNavigationHooks
+    globalHooks?: GlobalNavigationHooks,
+    renderer?: RouteRenderer
   ) {
     this._router = router;
     this._routes = routes;
     this._errorRoute = errorRoute;
     this._defaultRoute = defaultRoute;
     this._root = root;
-    this.renderer = createRouteRenderer(root);
+    this.renderer = renderer ?? createRouteRenderer(root);
     this.globalHooks = globalHooks;
   }
 
@@ -79,7 +81,8 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
       config.errorRoute,
       config.defaultRoute,
       config.root,
-      config.globalHooks
+      config.globalHooks,
+      config.renderer
     )
   }
 
