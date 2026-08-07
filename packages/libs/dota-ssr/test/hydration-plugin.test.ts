@@ -10,12 +10,12 @@ import {
 import type {
   DotaRuntimeContext,
   RouteRendererWrapper
-} from '@ayu-sh-kr/dota-wrap';
+} from '@ayu-sh-kr/dota-runtime';
 import type {
   NavigationContext,
   RouteMatch,
   RouteRenderer
-} from '@ayu-sh-kr/dota-wrap/router';
+} from '@ayu-sh-kr/dota-router';
 import {dotaHydration, type DotaHydrationOptions} from '@dota/index';
 
 type InstalledHydration = {
