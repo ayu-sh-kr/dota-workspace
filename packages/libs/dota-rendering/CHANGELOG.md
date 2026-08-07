@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-rendering
 
+## 0.1.3
+
+### Patch Changes
+
+- 22c3f24: Update the SSR module to support fetch during build for static content download and rendering
+
 ## 0.1.2
 
 ### Patch Changes

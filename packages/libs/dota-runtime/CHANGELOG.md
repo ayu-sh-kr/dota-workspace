@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-runtime
 
+## 0.0.2
+
+### Patch Changes
+
+- 22c3f24: Update the SSR module to support fetch during build for static content download and rendering
+  - @ayu-sh-kr/dota-core@1.9.10
+  - @ayu-sh-kr/dota-router@0.0.33
+
 ## 0.0.1
 
 ### Patch Changes
