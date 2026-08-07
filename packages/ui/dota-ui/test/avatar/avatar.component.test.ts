@@ -17,7 +17,8 @@ describe('AvatarComponent', () => {
   it('prefers an escaped image over initials and icon content', () => {
     const element = render({img: '/avatar?name=<x>', imgAlt: 'A & B'});
     const image = element.querySelector('avatar-wrapper img')!;
-    expect(image.getAttribute('src')).toBe('/avatar?name=&lt;x&gt;');
+    expect(element.render()).toContain('src="/avatar?name=&lt;x&gt;"');
+    expect(image.getAttribute('src')).toBe('/avatar?name=<x>');
     expect(image.getAttribute('alt')).toBe('A & B');
     expect(element.querySelector('avatar-wrapper span')).toBeNull();
   });

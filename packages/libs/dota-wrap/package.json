@@ -63,6 +63,27 @@
       "require": "./dist/rest/index.cjs",
       "default": "./dist/rest/index.mjs"
     },
+    "./ssr": {
+      "types": "./dist/ssr/index.d.ts",
+      "module": "./dist/ssr/index.mjs",
+      "import": "./dist/ssr/index.mjs",
+      "require": "./dist/ssr/index.cjs",
+      "default": "./dist/ssr/index.mjs"
+    },
+    "./ssg": {
+      "types": "./dist/ssg/index.d.ts",
+      "module": "./dist/ssg/index.mjs",
+      "import": "./dist/ssg/index.mjs",
+      "require": "./dist/ssg/index.cjs",
+      "default": "./dist/ssg/index.mjs"
+    },
+    "./vite": {
+      "types": "./dist/vite/index.d.ts",
+      "module": "./dist/vite/index.mjs",
+      "import": "./dist/vite/index.mjs",
+      "require": "./dist/vite/index.cjs",
+      "default": "./dist/vite/index.mjs"
+    },
     "./preloader-plugin": {
       "types": "./dist/preloader-plugin/index.d.ts",
       "module": "./dist/preloader-plugin/index.mjs",
@@ -97,12 +118,15 @@
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-event": "workspace:*",
+    "@ayu-sh-kr/dota-ssr": "workspace:*",
     "@ayu-sh-kr/dota-rendering": "workspace:*",
     "@ayu-sh-kr/dota-rest": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
+    "@ayu-sh-kr/dota-runtime": "workspace:*",
     "@swc/core": "catalog:",
     "consola": "catalog:",
-    "fast-glob": "catalog:"
+    "fast-glob": "catalog:",
+    "happy-dom": "catalog:"
   },
   "devDependencies": {
     "@ayu-sh-kr/dota-preloader-plugin": "workspace:*",
@@ -110,7 +134,6 @@
     "@ayu-sh-kr/dota-web-type-json": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "happy-dom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",

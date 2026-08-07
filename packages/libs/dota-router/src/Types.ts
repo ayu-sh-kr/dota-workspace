@@ -1,3 +1,5 @@
+import type {SEO} from "@ayu-sh-kr/dota-core";
+
 /**
  * Common runtime contract implemented by browser-specific router adapters.
  * The service supplies the compiled route tree and fallback routes; each adapter owns
@@ -53,6 +55,8 @@ export type RouterConstructor<T extends Router<HTMLElement>> = new (
  */
 export type RouteMeta<T extends HTMLElement = HTMLElement> = {
   path: string;
+  /** Head metadata applied as soon as this route becomes active. */
+  seo?: SEO;
   /** Enables build-time prerendering when an SSG integration consumes decorated routes. */
   ssr?: boolean;
   default?: boolean;
@@ -175,6 +179,8 @@ export type RouteRenderer<T extends HTMLElement = HTMLElement> = (
 export type RouteConfig<T extends HTMLElement> = {
   path: string;
   component: ComponentClass;
+  /** Head metadata declared by `@Route` and applied by the default route renderer. */
+  seo?: SEO;
   /** Whether this concrete route is eligible for build-time prerendering. */
   ssr?: boolean;
   default?: boolean;

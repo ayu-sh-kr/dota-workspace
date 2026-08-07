@@ -1,6 +1,85 @@
 import { BaseElement } from "@dota/core/elements";
 import {type SEO} from "@dota/core/types";
 
+/**
+ * Synchronizes framework-managed page metadata with the current document head.
+ * A missing optional value removes its existing tag so a previous route cannot leak
+ * metadata into the next page.
+ * @param seo Complete metadata to expose for the active page or route.
+ */
+export function updateDocumentSEO(seo: SEO): void {
+  document.title = seo.title;
+  upsertMeta('name', 'description', seo.description);
+  upsertMeta('name', 'keywords', normalizeKeywords(seo.keywords));
+  upsertMeta('name', 'robots', seo.robots);
+  upsertLink('icon', seo.favicon ?? seo.image);
+  upsertLink('canonical', seo.canonical);
+
+  upsertMeta('property', 'og:title', seo.og?.title);
+  upsertMeta('property', 'og:description', seo.og?.description);
+  upsertMeta('property', 'og:image', seo.og?.image);
+  upsertMeta('property', 'og:type', seo.og?.type);
+  upsertMeta('property', 'og:url', seo.og?.url);
+  upsertMeta('property', 'og:site_name', seo.og?.siteName);
+
+  upsertMeta('name', 'twitter:card', seo.twitter?.card);
+  upsertMeta('name', 'twitter:title', seo.twitter?.title);
+  upsertMeta('name', 'twitter:description', seo.twitter?.description);
+  upsertMeta('name', 'twitter:image', seo.twitter?.image);
+  upsertMeta('name', 'twitter:site', seo.twitter?.site);
+  upsertMeta('name', 'twitter:creator', seo.twitter?.creator);
+}
+
+/**
+ * Converts supported keyword input into the content value accepted by a meta tag.
+ * Array entries are trimmed and empty values are discarded so pages cannot emit
+ * blank comma-separated terms.
+ * @param keywords Search terms supplied by a page or route.
+ * @returns A normalized comma-separated value, or `undefined` when no term remains.
+ */
+function normalizeKeywords(keywords: SEO['keywords']): string | undefined {
+  if (Array.isArray(keywords)) return keywords.filter(Boolean).map(keyword => keyword.trim()).filter(Boolean).join(', ');
+  return typeof keywords === 'string' ? keywords.trim() : undefined;
+}
+
+/**
+ * Keeps one framework-managed meta tag aligned with an optional SEO value.
+ * Removing an omitted value is necessary because routes share one document head.
+ * @param attr Attribute namespace used to identify the tag.
+ * @param key Metadata name or Open Graph property to update.
+ * @param value Content to write; an empty value removes the matching tag.
+ */
+function upsertMeta(attr: 'name' | 'property', key: string, value: string | undefined): void {
+  const selector = `meta[${attr}="${key}"]`;
+  const existing = document.head.querySelector(selector) as HTMLMetaElement | null;
+  if (!value) {
+    existing?.remove();
+    return;
+  }
+  const element = existing ?? document.createElement('meta');
+  element.setAttribute(attr, key);
+  element.content = value;
+  if (!existing) document.head.appendChild(element);
+}
+
+/**
+ * Keeps one framework-managed link element aligned with an optional SEO URL.
+ * Removing an omitted URL prevents a favicon or canonical link from a prior route
+ * from remaining active.
+ * @param rel Link relationship that identifies the managed element.
+ * @param href URL to write; an empty value removes the matching link.
+ */
+function upsertLink(rel: string, href: string | undefined): void {
+  const existing = document.head.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement | null;
+  if (!href) {
+    existing?.remove();
+    return;
+  }
+  const element = existing ?? document.createElement('link');
+  element.rel = rel;
+  element.href = href;
+  if (!existing) document.head.appendChild(element);
+}
 
 export abstract class DotaPageElement extends BaseElement {
 
@@ -9,7 +88,7 @@ export abstract class DotaPageElement extends BaseElement {
    * This includes essential information such as page title, description, keywords, and Open Graph data.
    * The returned SEO object is used by updateSEO() to populate document head with appropriate meta tags.
    *
-   * @returns {SEO} An object containing title, description, keywords, image, and optional Open Graph properties.
+   * @returns {SEO} An object containing title, description, search metadata, canonical URLs, and optional social-card data.
    * @example
    * get seo(): SEO {
    *   return { title: 'Home Page', description: 'Welcome to our site', keywords: ['home', 'welcome'] }
@@ -36,90 +115,15 @@ export abstract class DotaPageElement extends BaseElement {
 
   /**
    * Updates the document head with SEO metadata from the seo getter.
-   * Sets the page title, meta description, favicon, keywords, and Open Graph tags for social media sharing.
+   * Sets the page title, standard SEO tags, canonical and favicon links, and Open Graph/Twitter card tags.
    * Keywords can be provided as an array or string and are automatically formatted as comma-separated values.
    *
    * This method handles conditional updates - only adds tags when values are present and removes them when empty.
-   * Open Graph metadata enhances how the page appears when shared on social platforms like Facebook and LinkedIn.
+   * Social metadata enhances how the page appears when shared on compatible platforms.
    * Called automatically during handleBeforeInit() but can be invoked manually to refresh SEO data dynamically.
    */
   updateSEO() {
-    document.title = this.seo.title;
-    this.upsertMeta('name', 'description', this.seo.description);
-
-    if (this.seo.image) {
-      this.upsertLink('icon', this.seo.image);
-    }
-
-    if (this.seo.keywords) {
-      const keywordsValue = Array.isArray(this.seo.keywords)
-        ? (this.seo.keywords as string[]).filter(Boolean).map(k => k.trim()).join(', ')
-        : String(this.seo.keywords).trim();
-      this.upsertMeta('name', 'keywords', keywordsValue);
-    }
-
-    if (this.seo.og) {
-      this.upsertMeta('property', 'og:title', this.seo.og.title);
-      this.upsertMeta('property', 'og:description', this.seo.og.description);
-
-      if (this.seo.og.image) {
-        this.upsertMeta('property', 'og:image', this.seo.og.image);
-      }
-
-    }
-  }
-
-  /**
-   * Creates or updates a meta tag in the document head with the specified attribute, key, and value.
-   * Removes the meta tag if value is empty or falsy, ensuring clean document head without stale metadata.
-   * Uses either 'name' or 'property' attribute to identify the meta tag (property is used for Open Graph tags).
-   *
-   * If the meta tag doesn't exist, creates a new one and appends it to document.head.
-   * If it exists, updates the 'content' attribute with the new value.
-   *
-   * @param attr - The attribute type to identify the meta tag ('name' for standard meta, 'property' for OG tags)
-   * @param key - The identifier value for the attribute (e.g., 'description' or 'og:title')
-   * @param value - The content value to set; removes tag if empty
-   */
-  private upsertMeta(attr: 'name' | 'property', key: string, value: string) {
-    const selector = `meta[${attr}="${key}"]`;
-    let el = document.head.querySelector(selector) as HTMLMetaElement | null;
-    if (!value) {
-      el?.remove();
-      return;
-    }
-    if (!el) {
-      el = document.createElement('meta');
-      el.setAttribute(attr, key);
-      document.head.appendChild(el);
-    }
-    el.setAttribute('content', value);
-  }
-
-  /**
-   * Creates or updates a link tag in the document head with the specified rel and href attributes.
-   * Commonly used for setting favicons, stylesheets, or other linked resources in the page head.
-   * Removes the link tag if href is empty or falsy to prevent broken references.
-   *
-   * If the link element doesn't exist, creates a new one and appends it to document.head.
-   * If it exists, updates the href attribute with the new URL value.
-   *
-   * @param rel - The relationship attribute for the link (e.g., 'icon', 'stylesheet', 'canonical')
-   * @param href - The URL to link to; removes tag if empty
-   */
-  private upsertLink(rel: string, href: string) {
-    if (!href) {
-      const existing = document.head.querySelector(`link[rel="${rel}"]`);
-      existing?.remove();
-      return;
-    }
-    let link = document.head.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = rel;
-      document.head.appendChild(link);
-    }
-    link.href = href;
+    updateDocumentSEO(this.seo);
   }
 
 }

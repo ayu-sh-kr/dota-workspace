@@ -24,6 +24,7 @@ const matchFor = (route: RouteConfig<HTMLElement>, matched: boolean, pathname: s
 
 afterEach(() => {
   document.body.innerHTML = "";
+  document.head.innerHTML = "";
   vi.restoreAllMocks();
 });
 
@@ -77,5 +78,40 @@ describe("createRouteRenderer", () => {
 
     expect(root.innerHTML).toContain("dota-error");
     expect(root.innerHTML).toContain("Path not found");
+  });
+
+  it("applies route SEO before mounting the component", () => {
+    const root = document.createElement("app-root");
+    root.id = "app-root";
+    document.body.appendChild(root);
+    const renderer = createRouteRenderer(AppComponent);
+    const seo = {
+      title: "Contact",
+      description: "Contact the Dota team",
+      keywords: ["dota", "contact"],
+      canonical: "https://dota.example/contact",
+      robots: "index,follow",
+      og: {
+        title: "Contact Dota",
+        type: "website"
+      },
+      twitter: {
+        card: "summary",
+        title: "Contact Dota"
+      }
+    };
+    const match = matchFor(
+      {path: "/contact", component: ContactComponent, seo},
+      true,
+      "/contact"
+    );
+
+    renderer(match, context("/contact"));
+
+    expect(document.title).toBe("Contact");
+    expect(document.head.querySelector('meta[name="keywords"]')?.getAttribute("content")).toBe("dota, contact");
+    expect(document.head.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe("https://dota.example/contact");
+    expect(document.head.querySelector('meta[property="og:type"]')?.getAttribute("content")).toBe("website");
+    expect(document.head.querySelector('meta[name="twitter:card"]')?.getAttribute("content")).toBe("summary");
   });
 });

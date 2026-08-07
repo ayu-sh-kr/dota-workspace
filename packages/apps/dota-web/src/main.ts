@@ -25,7 +25,7 @@ import {NotificationService} from "@dota/components/utils/notification/notificat
 import {DefaultApplicationEventListenerRegistry} from "@ayu-sh-kr/dota-wrap/event";
 import {MdTocComponent, MdViewComponent} from "@ayu-sh-kr/dota-md";
 import {routeConfig} from "virtual:dota-routes";
-import {dotaHydration} from "@ayu-sh-kr/dota-ssr";
+import {dotaHydration} from "@ayu-sh-kr/dota-wrap/ssr";
 
 const applicationEventService = ApplicationEventService.getInstance();
 const applicationEventPublisher = applicationEventService.getPublisher();

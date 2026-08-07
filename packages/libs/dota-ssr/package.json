@@ -50,7 +50,8 @@
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-rendering": "workspace:*",
-    "@ayu-sh-kr/dota-wrap": "workspace:*",
+    "@ayu-sh-kr/dota-router": "workspace:*",
+    "@ayu-sh-kr/dota-runtime": "workspace:*",
     "consola": "catalog:"
   },
   "devDependencies": {
@@ -63,7 +64,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "happy-dom": "^20.0.0",
+    "happy-dom": "^20.8.8",
     "vite": "catalog:peer-vite"
   },
   "peerDependenciesMeta": {

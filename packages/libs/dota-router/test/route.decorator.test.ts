@@ -39,4 +39,17 @@ describe("Route", () => {
       afterLeave
     });
   });
+
+  it("keeps declared SEO metadata in the route configuration", () => {
+    const seo = {
+      title: "Account",
+      description: "Manage your account",
+      keywords: "account, profile"
+    };
+
+    Route({path: "/account", seo})(GuardedComponent);
+
+    const route = Reflect.getOwnMetadata("Route", GuardedComponent) as RouteConfig<HTMLElement>;
+    expect(route.seo).toBe(seo);
+  });
 });

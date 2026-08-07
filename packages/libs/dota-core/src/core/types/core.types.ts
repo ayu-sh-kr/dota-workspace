@@ -503,14 +503,60 @@ export type DotaElementConstructor = CustomElementConstructor & {
   __dotaShadow?: boolean;
 }
 
-export type SEO = {
-  title: string;
-  description: string;
+/** Metadata used to build Open Graph tags for compatible social platforms. */
+export type OpenGraphSEO = {
+  /** Share-card title. */
+  title?: string;
+  /** Share-card summary. */
+  description?: string;
+  /** Share-card image URL. */
   image?: string;
-  keywords?: string[];
-  og?: {
-    title: string;
-    description: string;
-    image?: string;
-  }
+  /** Open Graph object type, such as `website` or `article`. */
+  type?: string;
+  /** Canonical page URL used by the share card. */
+  url?: string;
+  /** Publisher or application name shown by compatible platforms. */
+  siteName?: string;
+};
+
+/** Metadata used to build Twitter/X card tags independently of Open Graph data. */
+export type TwitterSEO = {
+  /** Card presentation, for example `summary_large_image`. */
+  card?: string;
+  /** Card title. */
+  title?: string;
+  /** Card summary. */
+  description?: string;
+  /** Card image URL. */
+  image?: string;
+  /** Site account handle. */
+  site?: string;
+  /** Content creator account handle. */
+  creator?: string;
+};
+
+/**
+ * Metadata that describes a page in the document head and on social platforms.
+ * Pages expose it through `DotaPageElement.seo`; routes may declare the same object
+ * so non-page components and custom renderers receive equivalent head metadata.
+ */
+export type SEO = {
+  /** Text written to the document title. */
+  title: string;
+  /** Summary exposed through the standard `description` meta tag. */
+  description: string;
+  /** Search terms written to `meta[name="keywords"]`. */
+  keywords?: string | readonly string[];
+  /** URL used by the favicon link. Takes precedence over the legacy `image` field. */
+  favicon?: string;
+  /** Canonical URL written to `link[rel="canonical"]`. */
+  canonical?: string;
+  /** Search-engine directives written to `meta[name="robots"]`. */
+  robots?: string;
+  /** @deprecated Use `favicon` for the page icon or `og.image` for a social image. */
+  image?: string;
+  /** Open Graph metadata used when the page is shared on compatible platforms. */
+  og?: OpenGraphSEO;
+  /** Twitter/X card metadata. */
+  twitter?: TwitterSEO;
 }

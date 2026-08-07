@@ -68,7 +68,13 @@ export default function dotaSsg(options: DotaSsgOptions): Plugin {
       const outputDirectory = resolve(root, config.build.outDir);
       const templateFile = resolve(outputDirectory, options.template ?? 'index.html');
       const template = await readFile(templateFile, 'utf8');
-      const server = await createPrerenderServer(config, root, options.entry ?? '/src/main.ts', logType);
+      const server = await createPrerenderServer(
+        config,
+        root,
+        options.entry ?? '/src/main.ts',
+        options.renderingModule ?? '@ayu-sh-kr/dota-rendering',
+        logType
+      );
       try {
         const routes = options.autoDetectRoutes
           ? await resolveDecoratedRoutes(server, options.routes)
@@ -120,6 +126,7 @@ async function resolveDecoratedRoutes(
  * @param config Resolved build configuration whose config file supplies application plugins.
  * @param root Vite application root used for source and alias resolution.
  * @param entry Source application entry expressed as a Vite URL or absolute file.
+ * @param renderingModule Rendering package or wrapper surface used for the SSG logger bridge.
  * @param logType Logging level used by the prerender server and route renderer.
  * @returns Middleware-mode server used only for route-isolated build-time execution.
  * @throws Error when the rendering package cannot be resolved in the SSR module graph.
@@ -128,6 +135,7 @@ async function createPrerenderServer(
   config: ResolvedConfig,
   root: string,
   entry: string,
+  renderingModule: string,
   logType: DotaSsgOptions['logType']
 ): Promise<ViteDevServer> {
   const entryFile = isAbsolute(entry) && entry.startsWith(root)
@@ -161,14 +169,10 @@ async function createPrerenderServer(
     ssr: {noExternal: [/^@ayu-sh-kr\/dota-/]},
     plugins: [virtualEntryPlugin]
   });
-  const ssrPackage = await server.pluginContainer.resolveId(
-    '@ayu-sh-kr/dota-ssr',
-    resolve(root, 'src/main.ts'),
-    {ssr: true}
-  );
-  const renderingPackage = ssrPackage && await server.pluginContainer.resolveId(
-    '@ayu-sh-kr/dota-rendering',
-    ssrPackage.id,
+  const importer = resolve(root, 'src/main.ts');
+  const renderingPackage = await server.pluginContainer.resolveId(
+    renderingModule,
+    importer,
     {ssr: true}
   );
   if (!renderingPackage) {

@@ -18,7 +18,7 @@ catalog:
   custom-elements-manifest: 2.1.0
   esbuild: 0.28.1
   fast-glob: 3.3.3
-  happy-dom: 20.0.7
+  happy-dom: 20.10.6
   highlight.js: 11.11.1
   jiti: 2.6.1
   markdown-it: 14.3.0

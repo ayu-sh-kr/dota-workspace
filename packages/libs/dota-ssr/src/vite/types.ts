@@ -55,6 +55,8 @@ export interface DotaSsgOptions {
   root?: string;
   /** Source application entry loaded in Vite's SSR module runner. Defaults to `/src/main.ts`. */
   entry?: string;
+  /** Rendering module resolved from the consuming package; defaults to `@ayu-sh-kr/dota-rendering`. */
+  renderingModule?: string;
   /** Name of the entry export awaited before serialization. Defaults to `applicationReady`. */
   readyExport?: string;
   /** Built HTML shell relative to the output directory. Defaults to `index.html`. */

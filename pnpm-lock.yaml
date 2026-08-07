@@ -55,8 +55,8 @@ catalogs:
       specifier: 3.3.3
       version: 3.3.3
     happy-dom:
-      specifier: 20.0.7
-      version: 20.0.7
+      specifier: 20.10.6
+      version: 20.10.6
     highlight.js:
       specifier: 11.11.1
       version: 11.11.1
@@ -155,7 +155,7 @@ importers:
         version: 3.3.3
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       highlight.js:
         specifier: 'catalog:'
         version: 11.11.1
@@ -194,16 +194,13 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/apps/dota-web:
     dependencies:
       '@ayu-sh-kr/dota-md':
         specifier: workspace:*
         version: link:../../ui/dota-md
-      '@ayu-sh-kr/dota-ssr':
-        specifier: workspace:*
-        version: link:../../libs/dota-ssr
       '@ayu-sh-kr/dota-ui':
         specifier: workspace:*
         version: link:../../ui/dota-ui
@@ -283,7 +280,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -295,7 +292,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/libs/dota-event:
     dependencies:
@@ -314,7 +311,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -326,7 +323,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/libs/dota-rendering:
     dependencies:
@@ -342,7 +339,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -354,7 +351,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/libs/dota-rest:
     devDependencies:
@@ -369,7 +366,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -381,7 +378,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/libs/dota-router:
     dependencies:
@@ -406,7 +403,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -418,7 +415,20 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+
+  packages/libs/dota-runtime:
+    dependencies:
+      '@ayu-sh-kr/dota-core':
+        specifier: workspace:*
+        version: link:../dota-core
+      '@ayu-sh-kr/dota-router':
+        specifier: workspace:*
+        version: link:../dota-router
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/libs/dota-ssr:
     dependencies:
@@ -428,9 +438,12 @@ importers:
       '@ayu-sh-kr/dota-rendering':
         specifier: workspace:*
         version: link:../dota-rendering
-      '@ayu-sh-kr/dota-wrap':
+      '@ayu-sh-kr/dota-router':
         specifier: workspace:*
-        version: link:../dota-wrap
+        version: link:../dota-router
+      '@ayu-sh-kr/dota-runtime':
+        specifier: workspace:*
+        version: link:../dota-runtime
       consola:
         specifier: 'catalog:'
         version: 3.4.2
@@ -443,7 +456,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -455,7 +468,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/libs/dota-wrap:
     dependencies:
@@ -474,6 +487,12 @@ importers:
       '@ayu-sh-kr/dota-router':
         specifier: workspace:*
         version: link:../dota-router
+      '@ayu-sh-kr/dota-runtime':
+        specifier: workspace:*
+        version: link:../dota-runtime
+      '@ayu-sh-kr/dota-ssr':
+        specifier: workspace:*
+        version: link:../dota-ssr
       '@swc/core':
         specifier: 'catalog:'
         version: 1.13.5
@@ -483,6 +502,9 @@ importers:
       fast-glob:
         specifier: 'catalog:'
         version: 3.3.3
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.10.6
       reflect-metadata:
         specifier: catalog:peer-reflect-metadata
         version: 0.2.2
@@ -502,9 +524,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.0.7
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -516,7 +535,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/plugins/dota-vite-preloader:
     dependencies:
@@ -550,7 +569,7 @@ importers:
         version: 24.9.0
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -562,7 +581,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/plugins/event-map-generator:
     dependencies:
@@ -590,7 +609,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -602,7 +621,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/plugins/web-type-json:
     dependencies:
@@ -636,7 +655,7 @@ importers:
         version: 2.1.0
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -648,7 +667,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/ui/dota-md:
     dependencies:
@@ -740,7 +759,7 @@ importers:
         version: 10.4.24(postcss@8.5.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       postcss:
         specifier: 'catalog:'
         version: 8.5.10
@@ -758,7 +777,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/utils/dota-ast-utils:
     dependencies:
@@ -780,7 +799,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -792,7 +811,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/utils/dota-common-utils:
     devDependencies:
@@ -807,7 +826,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       happy-dom:
         specifier: 'catalog:'
-        version: 20.0.7
+        version: 20.10.6
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -819,7 +838,7 @@ importers:
         version: 5.0.3(@microsoft/api-extractor@7.58.9(@types/node@24.9.0))(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.52.5)(typescript@6.0.3)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
 packages:
 
@@ -1560,9 +1579,6 @@ packages:
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
-  '@types/node@20.19.23':
-    resolution: {integrity: sha512-yIdlVVVHXpmqRhtyovZAcSy0MiPcYWGkoO4CGe/+jpP0hmNuihm4XhHbADpK++MsiLHP5MVlv+bcgdF99kSiFQ==}
-
   '@types/node@24.9.0':
     resolution: {integrity: sha512-MKNwXh3seSK8WurXF7erHPJ2AONmMwkI7zAMrXZDPIru8jRqkk6rGDBVbw4mLwfqA+ZZliiDPg05JQ3uW66tKQ==}
 
@@ -1571,6 +1587,9 @@ packages:
 
   '@types/whatwg-mimetype@3.0.2':
     resolution: {integrity: sha512-c2AKvDT8ToxLIOUlN51gTiHXflsfIFisS4pO7pDPoKouJCESkhZnEy623gwP9laCy5lnLDAw1vAzu2vM2YLOrA==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   '@vitest/coverage-v8@4.1.10':
     resolution: {integrity: sha512-IM49HmthevbgAO4anp1hwtoT9wYe59w0LR00gr+eagHE+ZJ5lK4sLPeO0ubgoJcwLk6dehU3R24N+FbEEKDc8g==}
@@ -1735,6 +1754,10 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
+  buffer-image-size@0.6.4:
+    resolution: {integrity: sha512-nEh+kZOPY1w+gcCMobZ6ETUp9WfibndnosbpwB1iJk/8Gt5ZF2bhS6+B6bPYz424KtwsR6Rflc3tCz1/ghX2dQ==}
+    engines: {node: '>=4.0'}
+
   camelcase-css@2.0.1:
     resolution: {integrity: sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==}
     engines: {node: '>= 6'}
@@ -1862,6 +1885,10 @@ packages:
     resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
     engines: {node: '>=0.12'}
 
+  entities@7.0.1:
+    resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
+    engines: {node: '>=0.12'}
+
   es-module-lexer@2.3.1:
     resolution: {integrity: sha512-shc1dbU90Yl/xq1QrC7QRtfcwURZuVRfPhZbDoldJ1cn1gzDvBaBWlv0eFolj5+0znnPJz5TXLxsN77X/12KTA==}
 
@@ -1972,8 +1999,8 @@ packages:
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
 
-  happy-dom@20.0.7:
-    resolution: {integrity: sha512-CywLfzmYxP5OYpuAG0usFY0CpxJtwYR+w8Mms5J8W29Y2Pzf6rbfQS2M523tRZTb0oLA+URopPtnAQX2fupHZQ==}
+  happy-dom@20.10.6:
+    resolution: {integrity: sha512-6QD0ilzDDt93tX44y8tbmZdAcdTRYDhUP+Asgi6pC8Pp5IA3cvaZGyoVN/EGtlq9ziT65iPuBBn3ASLr6hCgVw==}
     engines: {node: '>=20.0.0'}
 
   has-flag@4.0.0:
@@ -2694,9 +2721,6 @@ packages:
   ufo@1.6.1:
     resolution: {integrity: sha512-9a4/uxlTWJ4+a5i0ooc1rU7C7YOw3wT+UGqdeNNHWnOF9qcMBgLRS+4IYUqbczewFx4mLEig6gawh7X6mFlEkA==}
 
-  undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
@@ -2901,8 +2925,8 @@ packages:
     resolution: {integrity: sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ==}
     engines: {node: '>=12'}
 
-  ws@8.18.3:
-    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==}
+  ws@8.21.2:
+    resolution: {integrity: sha512-54dMVAo4WIe6SKy3vBgN+9bJZqqQ8IMRevAkOLQALhi49qkkQDQfWdAZ8KQlXiEabw88ARXXdUrlvtbKQX+aKw==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -3585,10 +3609,6 @@ snapshots:
 
   '@types/node@12.20.55': {}
 
-  '@types/node@20.19.23':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@24.9.0':
     dependencies:
       undici-types: 7.16.0
@@ -3596,6 +3616,10 @@ snapshots:
   '@types/web@0.0.281': {}
 
   '@types/whatwg-mimetype@3.0.2': {}
+
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 24.9.0
 
   '@vitest/coverage-v8@4.1.10(vitest@4.1.10)':
     dependencies:
@@ -3609,7 +3633,7 @@ snapshots:
       obug: 2.1.4
       std-env: 4.2.0
       tinyrainbow: 3.1.1
-      vitest: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
+      vitest: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   '@vitest/expect@4.1.10':
     dependencies:
@@ -3767,6 +3791,10 @@ snapshots:
       node-releases: 2.0.27
       update-browserslist-db: 1.2.3(browserslist@4.28.1)
 
+  buffer-image-size@0.6.4:
+    dependencies:
+      '@types/node': 24.9.0
+
   camelcase-css@2.0.1: {}
 
   caniuse-lite@1.0.30001769: {}
@@ -3867,6 +3895,8 @@ snapshots:
 
   entities@6.0.1:
     optional: true
+
+  entities@7.0.1: {}
 
   es-module-lexer@2.3.1: {}
 
@@ -4006,11 +4036,18 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  happy-dom@20.0.7:
+  happy-dom@20.10.6:
     dependencies:
-      '@types/node': 20.19.23
+      '@types/node': 24.9.0
       '@types/whatwg-mimetype': 3.0.2
+      '@types/ws': 8.18.1
+      buffer-image-size: 0.6.4
+      entities: 7.0.1
       whatwg-mimetype: 3.0.0
+      ws: 8.21.2
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   has-flag@4.0.0: {}
 
@@ -4139,7 +4176,7 @@ snapshots:
       whatwg-encoding: 3.1.1
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.2.0
-      ws: 8.18.3
+      ws: 8.21.2
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -4709,8 +4746,6 @@ snapshots:
 
   ufo@1.6.1: {}
 
-  undici-types@6.21.0: {}
-
   undici-types@7.16.0: {}
 
   universalify@0.1.2: {}
@@ -4785,7 +4820,7 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.6.1
 
-  vitest@4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1)):
+  vitest@4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1)):
     dependencies:
       '@vitest/expect': 4.1.10
       '@vitest/mocker': 4.1.10(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
@@ -4810,7 +4845,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.9.0
       '@vitest/coverage-v8': 4.1.10(vitest@4.1.10)
-      happy-dom: 20.0.7
+      happy-dom: 20.10.6
       jsdom: 26.1.0
     transitivePeerDependencies:
       - msw
@@ -4864,8 +4899,7 @@ snapshots:
       string-width: 5.1.2
       strip-ansi: 7.1.2
 
-  ws@8.18.3:
-    optional: true
+  ws@8.21.2: {}
 
   xml-name-validator@5.0.0:
     optional: true
