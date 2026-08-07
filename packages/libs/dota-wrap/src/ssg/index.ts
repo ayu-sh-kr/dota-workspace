@@ -2,12 +2,8 @@ import type {Plugin} from 'vite';
 import dotaSsgImplementation, {
   resolveDecoratedSsgRoutes,
   resolveSsgRoutes,
-  type DotaDecoratedRoute,
   type DotaSsgOptions,
-  type DotaSsgRoute,
-  type DotaSsgRouteInput,
-  type DotaSsgVercelOptions,
-  type ResolvedDotaSsgRoute,
+
 } from '@ayu-sh-kr/dota-ssr/vite';
 
 export type {
