@@ -743,7 +743,7 @@
           "name": "blog-content",
           "source": {
             "file": "./src/pages/blog-content.page.ts",
-            "offset": 421
+            "offset": 509
           },
           "attributes": [],
           "js": {
@@ -1036,7 +1036,7 @@
           "name": "blog-view",
           "source": {
             "file": "./src/components/blogs/blog-view.component.ts",
-            "offset": 364
+            "offset": 429
           },
           "attributes": [
             {
@@ -1048,7 +1048,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 759
+                "offset": 824
               }
             },
             {
@@ -1060,7 +1060,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 490
+                "offset": 555
               }
             },
             {
@@ -1072,7 +1072,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 906
+                "offset": 971
               }
             },
             {
@@ -1084,7 +1084,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 624
+                "offset": 689
               }
             }
           ],
@@ -1096,7 +1096,7 @@
                 "default": "lime",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 759
+                  "offset": 824
                 }
               },
               {
@@ -1105,7 +1105,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 490
+                  "offset": 555
                 }
               },
               {
@@ -1114,7 +1114,7 @@
                 "default": "max-w-3xl",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 906
+                  "offset": 971
                 }
               },
               {
@@ -1123,7 +1123,7 @@
                 "default": "apple",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 624
+                  "offset": 689
                 }
               }
             ]

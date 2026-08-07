@@ -6,6 +6,76 @@
       "permanent": true
     },
     {
+      "source": "/blogs/content/News/Next-in-Dota-Core.md",
+      "destination": "/blogs/content/News/Next-in-Dota-Core.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Rant/Window-Port-Exclusion-Issue.md",
+      "destination": "/blogs/content/Rant/Window-Port-Exclusion-Issue.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tools/Kotlin-For-Scripting.md",
+      "destination": "/blogs/content/Tools/Kotlin-For-Scripting.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tools/Scripting-Languages.md",
+      "destination": "/blogs/content/Tools/Scripting-Languages.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/AES.md",
+      "destination": "/blogs/content/Tutorial/AES.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/Chat-Memory.md",
+      "destination": "/blogs/content/Tutorial/Chat-Memory.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/Component-Basic.md",
+      "destination": "/blogs/content/Tutorial/Component-Basic.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/DES.md",
+      "destination": "/blogs/content/Tutorial/DES.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/LangChain-Foundations.md",
+      "destination": "/blogs/content/Tutorial/LangChain-Foundations.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/LangGraph-Stateful-Workflows.md",
+      "destination": "/blogs/content/Tutorial/LangGraph-Stateful-Workflows.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/Multi-Tenant-Identity-Architecture.md",
+      "destination": "/blogs/content/Tutorial/Multi-Tenant-Identity-Architecture.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/RAG-Grounded-Answers.md",
+      "destination": "/blogs/content/Tutorial/RAG-Grounded-Answers.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/Towards-Cryptography.md",
+      "destination": "/blogs/content/Tutorial/Towards-Cryptography.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/Web-Component.md",
+      "destination": "/blogs/content/Tutorial/Web-Component.md/",
+      "permanent": true
+    },
+    {
       "source": "/community",
       "destination": "/community/",
       "permanent": true
