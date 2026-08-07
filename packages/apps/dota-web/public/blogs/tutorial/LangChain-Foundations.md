@@ -2,7 +2,7 @@
 
 Large language models are very capable text generators, but a production application usually needs more than a single prompt and response. It may need to follow a prompt policy, call an API, search company documentation, preserve conversational state, and produce an answer in a dependable shape. [LangChain](https://docs.langchain.com/oss/python/langchain/overview) is an open-source framework that supplies the application-layer pieces for doing that work.
 
-This is the first article in a three-part path. Start here to understand the building blocks around a model, continue with [RAG: Grounding Answers In Your Data](/blogs/content?category=Tutorial&blog=RAG-Grounded-Answers.md) to give an application trustworthy context, and then read [LangGraph: Reliable Stateful AI Workflows](/blogs/content?category=Tutorial&blog=LangGraph-Stateful-Workflows.md) when the flow needs explicit branching, retries, or approval.
+This is the first article in a three-part path. Start here to understand the building blocks around a model, continue with [RAG: Grounding Answers In Your Data](/blogs/content/Tutorial/RAG-Grounded-Answers.md) to give an application trustworthy context, and then read [LangGraph: Reliable Stateful AI Workflows](/blogs/content/Tutorial/LangGraph-Stateful-Workflows.md) when the flow needs explicit branching, retries, or approval.
 
 > **Note:** LangChain is not a model, a vector database, or a hosting service. You can call an LLM without it. Its value is a set of consistent abstractions and integrations that reduce the plumbing required to build an LLM application.
 
@@ -147,4 +147,4 @@ This sequence forces a valuable separation: retrieval supplies facts, the model 
 
 LangChain is the application framework around a language model, not the model itself. Prompts provide repeatable instructions, tools expose bounded capabilities, agents coordinate a model-and-tool loop, and middleware provides a place for policy and operational behavior. These pieces are useful even before an application needs a complex workflow.
 
-To make the assistant answer from knowledge that is current and specific to your organization, continue with [RAG: Grounding Answers In Your Data](/blogs/content?category=Tutorial&blog=RAG-Grounded-Answers.md). When that RAG flow needs conditional retrieval, validation, retries, or human approval, [LangGraph: Reliable Stateful AI Workflows](/blogs/content?category=Tutorial&blog=LangGraph-Stateful-Workflows.md) completes the series.
+To make the assistant answer from knowledge that is current and specific to your organization, continue with [RAG: Grounding Answers In Your Data](/blogs/content/Tutorial/RAG-Grounded-Answers.md). When that RAG flow needs conditional retrieval, validation, retries, or human approval, [LangGraph: Reliable Stateful AI Workflows](/blogs/content/Tutorial/LangGraph-Stateful-Workflows.md) completes the series.

@@ -2,7 +2,7 @@
 
 An LLM can write a plausible answer even when it does not have the fact required to answer correctly. Retrieval-Augmented Generation (RAG) addresses that limitation by finding relevant information at request time and giving it to the model as context. The model still generates the wording, but the application gives it evidence from documents, databases, or other approved knowledge sources.
 
-This is the second article in the series. [LangChain Foundations](/blogs/content?category=Tutorial&blog=LangChain-Foundations.md) introduced prompts, tools, and agents. This article builds the predictable retrieval layer that can feed those components. [LangGraph: Reliable Stateful AI Workflows](/blogs/content?category=Tutorial&blog=LangGraph-Stateful-Workflows.md) then shows how to add explicit decisions, retries, and review around a more advanced RAG system.
+This is the second article in the series. [LangChain Foundations](/blogs/content/Tutorial/LangChain-Foundations.md) introduced prompts, tools, and agents. This article builds the predictable retrieval layer that can feed those components. [LangGraph: Reliable Stateful AI Workflows](/blogs/content/Tutorial/LangGraph-Stateful-Workflows.md) then shows how to add explicit decisions, retries, and review around a more advanced RAG system.
 
 > **Note:** RAG reduces unsupported answers; it does not guarantee truth. Retrieval can return the wrong passage, documents can be stale, and a model can still misread or overstate the supplied context. Quality comes from retrieval, prompt design, evaluation, and safeguards working together.
 
@@ -158,10 +158,10 @@ Useful operational signals include retrieval hit rate, source freshness, no-answ
 
 RAG gives an LLM evidence, but a production flow may need more control. Imagine a support assistant that first classifies a question, retrieves policy text, checks whether the retrieved passages answer it, rewrites a weak query once, and pauses before any account-changing action. This is no longer a single fixed chain; it is a stateful workflow with branches and a bounded loop.
 
-That is the problem [LangGraph: Reliable Stateful AI Workflows](/blogs/content?category=Tutorial&blog=LangGraph-Stateful-Workflows.md) is designed to make explicit. It can use the same retriever and prompt from this article while making the decisions, state updates, and recovery behavior inspectable.
+That is the problem [LangGraph: Reliable Stateful AI Workflows](/blogs/content/Tutorial/LangGraph-Stateful-Workflows.md) is designed to make explicit. It can use the same retriever and prompt from this article while making the decisions, state updates, and recovery behavior inspectable.
 
 ## Summary
 
 RAG retrieves relevant, authorized evidence at request time and adds it to a model prompt. Its quality depends on careful ingestion, meaningful chunks, correct access filtering, retrieval and ranking, grounded prompting, and evaluation—not on the vector database alone. A deterministic two-step RAG pipeline is an excellent baseline for knowledge-grounded Q&A.
 
-Return to [LangChain Foundations](/blogs/content?category=Tutorial&blog=LangChain-Foundations.md) for the surrounding agent components, or continue to [LangGraph: Reliable Stateful AI Workflows](/blogs/content?category=Tutorial&blog=LangGraph-Stateful-Workflows.md) to orchestrate a more adaptive RAG process safely.
+Return to [LangChain Foundations](/blogs/content/Tutorial/LangChain-Foundations.md) for the surrounding agent components, or continue to [LangGraph: Reliable Stateful AI Workflows](/blogs/content/Tutorial/LangGraph-Stateful-Workflows.md) to orchestrate a more adaptive RAG process safely.
