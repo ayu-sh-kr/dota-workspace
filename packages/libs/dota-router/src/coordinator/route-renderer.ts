@@ -1,4 +1,4 @@
-import {HelperUtils, ComponentConfig} from "@ayu-sh-kr/dota-core";
+import {HelperUtils, ComponentConfig, updateDocumentSEO} from "@ayu-sh-kr/dota-core";
 import {ComponentClass, NavigationContext, RouteMatch, RouteRenderer} from "@dota/Types";
 
 /**
@@ -14,8 +14,9 @@ export function createRouteRenderer<T extends HTMLElement = HTMLElement>(root: C
 
 /**
  * Mounts a resolved route into the application's root host.
- * Missing root or component metadata is reported and leaves the existing DOM intact;
- * this keeps rendering failures observable without making browser transitions throw.
+ * It synchronizes declared route SEO first, so default and custom renderers observe
+ * the active document head. Missing root or component metadata leaves existing DOM
+ * intact, keeping rendering failures observable without making transitions throw.
  * @param root - Root component whose decorated selector identifies the host element.
  * @param match - Resolved route and match state supplied by a coordinator.
  * @param context - Transition context carrying the destination URL for custom renderers.
@@ -25,6 +26,9 @@ export function renderRoute<T extends HTMLElement>(
   match: RouteMatch<T>,
   context: NavigationContext<T>
 ): void {
+  const route = match.route;
+  if (route.seo) updateDocumentSEO(route.seo);
+
   const rootConfig = getComponentConfig(root);
   if (!rootConfig?.selector) {
     console.error("Root component metadata not found");
@@ -37,7 +41,6 @@ export function renderRoute<T extends HTMLElement>(
     return;
   }
 
-  const route = match.route;
   if (route.render) {
     route.render(context.url.pathname);
     return;
