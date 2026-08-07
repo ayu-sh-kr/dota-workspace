@@ -19,7 +19,8 @@ export default defineConfig({
         /^node:.*/,
         '@ayu-sh-kr/dota-core',
         '@ayu-sh-kr/dota-rendering',
-        '@ayu-sh-kr/dota-wrap',
+        '@ayu-sh-kr/dota-router',
+        '@ayu-sh-kr/dota-runtime',
         'consola',
         'happy-dom',
         'vite'
