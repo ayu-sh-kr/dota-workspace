@@ -36,6 +36,12 @@ waits for happy-dom's pending work, renders every configured route in a fresh wi
 route-specific HTML below Vite's output directory. Use the optional `settle` callback when a static
 route has an additional application-specific data-readiness barrier.
 
+During prerendering, `fetch()` is available to application code. Relative same-origin requests are
+served from Vite's built output first, so files copied from `public/` (for example,
+`fetch('/blogs/tutorial/Component-Basic.md')`) can be loaded without a web server. Cross-origin
+absolute URLs use Happy DOM's normal network fetch. Set `fetchBaseUrl` when a missing relative path
+should be forwarded to an API origin; every request is awaited before that route's HTML is serialized.
+
 Vercel routing updates are opt-in. Set `vercel: true` to update the nearest `vercel.json` with
 redirects from generated route paths to their static output documents while preserving other
 configuration. Pass `{vercel: {configFile: '../vercel.json'}}` when the project configuration
