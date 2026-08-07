@@ -14,6 +14,8 @@ const internalPackages = [
   '@ayu-sh-kr/dota-rendering',
   '@ayu-sh-kr/dota-rest',
   '@ayu-sh-kr/dota-router',
+  '@ayu-sh-kr/dota-runtime',
+  '@ayu-sh-kr/dota-ssr',
   '@ayu-sh-kr/dota-web-type-json',
 ];
 
@@ -33,6 +35,33 @@ const entries = [
   { name: 'core', source: 'src/core/index.ts', outDir: 'dist/core' },
   { name: 'event', source: 'src/event/index.ts', outDir: 'dist/event' },
   { name: 'rendering', source: 'src/rendering/index.ts', outDir: 'dist/rendering' },
+  {
+    name: 'ssr',
+    source: 'src/ssr/index.ts',
+    outDir: 'dist/ssr',
+    bundleInternal: true,
+    external: [
+      ...nodePluginExternal,
+      '@ayu-sh-kr/dota-core',
+      '@ayu-sh-kr/dota-rendering',
+      '@ayu-sh-kr/dota-router',
+      '@ayu-sh-kr/dota-runtime',
+    ],
+  },
+  {
+    name: 'ssg',
+    source: 'src/ssg/index.ts',
+    outDir: 'dist/ssg',
+    bundleInternal: true,
+    external: [...nodePluginExternal, 'happy-dom'],
+  },
+  {
+    name: 'vite',
+    source: 'src/vite/index.ts',
+    outDir: 'dist/vite',
+    bundleInternal: true,
+    external: [...nodePluginExternal, '@ayu-sh-kr/dota-ssr/vite'],
+  },
   { name: 'event-map-generator', source: 'src/event-map-generator/index.ts', outDir: 'dist/event-map-generator', bundleInternal: true, external: nodePluginExternal },
   { name: 'router', source: 'src/router/index.ts', outDir: 'dist/router' },
   { name: 'rest', source: 'src/rest/index.ts', outDir: 'dist/rest' },
