@@ -1,6 +1,6 @@
-# @ayu-sh-kr/dota-ssr
+# @ayu-sh-kr/dota-runtime
 
-## 0.0.3
+## 0.0.1
 
 ### Patch Changes
 
@@ -51,22 +51,5 @@
     vulnerable `20.0.7` release while retaining the existing v20 runtime line.
 
 - Updated dependencies [a0fc7fe]
-  - @ayu-sh-kr/dota-runtime@0.0.1
   - @ayu-sh-kr/dota-router@0.0.32
   - @ayu-sh-kr/dota-core@1.9.9
-  - @ayu-sh-kr/dota-rendering@0.1.2
-
-## 0.0.2
-
-### Patch Changes
-
-- 9bcf04a: Introduce opt-in static site generation and hydration for Dota applications, backed by a new rendering package with structured templates and targeted DOM updates.
-
-  - `@ayu-sh-kr/dota-rendering` now provides template rendering, DOM diffing and patching, template identity markers, hydration support, and configurable rendering diagnostics.
-  - `@ayu-sh-kr/dota-ssr` adds the `dotaSsg` Vite plugin for prerendering configured or decorated routes, plus the `dotaHydration` runtime plugin for safely adopting matching server-rendered markup. Hydration mismatches warn and remount the affected host by default, with a strict throw mode available for development.
-  - Dota Core, Router, Wrap, and the Vite preloader now expose the compatible mount-strategy, runtime-plugin, route metadata, and initial-navigation hooks required for this opt-in SSR/SSG workflow. Existing client-only rendering remains the default.
-
-- Updated dependencies [9bcf04a]
-  - @ayu-sh-kr/dota-rendering@0.1.1
-  - @ayu-sh-kr/dota-core@1.9.8
-  - @ayu-sh-kr/dota-wrap@0.0.27

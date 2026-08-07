@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Opt-in static generation and hydration extensions for Dota web applications.",
   "keywords": [
     "dota",
