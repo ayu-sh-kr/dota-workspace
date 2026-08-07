@@ -48,3 +48,7 @@ libraries retain direct ownership of their runtime and type dependencies.
   browser runtime entry. The SSG and Vite subpaths remain opt-in, while the
   wrapper continues to expose the ordinary Core, Router, Rendering, and event
   runtime surfaces.
+- Updated the workspace `happy-dom` catalog to `20.10.6` and raised the
+  `dota-ssr` peer minimum to `^20.8.8`, the first fixed range for
+  CVE-2026-33943. This prevents the SSG dependency from resolving to the
+  vulnerable `20.0.7` release while retaining the existing v20 runtime line.
