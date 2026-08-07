@@ -59,6 +59,8 @@ export interface DotaSsgOptions {
   renderingModule?: string;
   /** Name of the entry export awaited before serialization. Defaults to `applicationReady`. */
   readyExport?: string;
+  /** Base URL used when a relative fetch misses the built public files and represents an API request. */
+  fetchBaseUrl?: string;
   /** Built HTML shell relative to the output directory. Defaults to `index.html`. */
   template?: string;
   /** Optional application-specific barrier run after happy-dom's pending work has settled. */

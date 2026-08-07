@@ -1,6 +1,6 @@
 # Designing Web Components
 If you don't know about web components, you can read about them [here](https://developer.mozilla.org/en-US/docs/Web/Web_Components) or follow my previous
-blog [Web Components](/blogs/content?blog=tutorials/Web-Component.md). In abstract
+blog [Web Components](/blogs/content/Tutorial/Web-Component.md). In abstract
 web components are custom HTML elements that can be reused any time and in any framework.
 
 ## Understanding Requirements

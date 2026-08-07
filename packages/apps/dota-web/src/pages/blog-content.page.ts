@@ -2,20 +2,15 @@ import {Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core"
 import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import { GeneralUtils } from "@dota/utils/GeneralUtils.ts";
+import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 
-@Route({path: '/blogs/content'})
+@Route({path: '/blogs/content/:category/:blog'})
 @Component({
   selector: "blog-content",
   shadow: false
 })
 export class BlogContentPage extends DotaPageElement {
-
-  @Param('blog')
-  blog!: string;
-
-  @Param('category')
-  category!: string;
 
   @Param('theme')
   theme: ThemeName = 'apple';
@@ -27,10 +22,12 @@ export class BlogContentPage extends DotaPageElement {
     super();
   }
 
+  /** Builds SEO metadata from the path or legacy query parameters for this article. */
   get seo(): SEO {
-    const blogTitle = this.blog && this.category ?
-      this.blog.replaceAll("-", " ")
-        .replace(".md", "") + ` | ${this.category}` :
+    const {blog, category} = resolveBlogRouteParams(window.location.pathname, window.location.search);
+    const blogTitle = blog && category ?
+      blog.replaceAll("-", " ")
+        .replace(".md", "") + ` | ${category}` :
       'Blog Content';
 
     return {

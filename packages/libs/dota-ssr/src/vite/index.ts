@@ -4,6 +4,7 @@ import {Window} from 'happy-dom';
 import {createConsola, LogLevels} from 'consola';
 import type {Plugin, ResolvedConfig, ViteDevServer} from 'vite';
 import {createServer} from 'vite';
+import {installPrerenderFetch} from './prerender-fetch';
 import {resolveDecoratedSsgRoutes, resolveSsgRoutes} from './route-output';
 import type {DotaDecoratedRoute, DotaSsgOptions, DotaSsgRouteInput, ResolvedDotaSsgRoute} from './types';
 import {updateVercelConfig} from './vercel-config';
@@ -82,7 +83,7 @@ export default function dotaSsg(options: DotaSsgOptions): Plugin {
         logger.start(`[dota-ssr] prerendering ${routes.length} route${routes.length === 1 ? '' : 's'}`);
         for (const route of routes) {
           logger.debug('[dota-ssr] prerendering route', route.path);
-          const html = await prerenderRoute(server, template, route, options);
+          const html = await prerenderRoute(server, template, route, outputDirectory, options);
           const outputFile = resolve(outputDirectory, route.output);
           await mkdir(dirname(outputFile), {recursive: true});
           await writeFile(outputFile, html, 'utf8');
@@ -190,6 +191,7 @@ async function createPrerenderServer(
  * @param server Vite SSR module runner configured with the application's transforms.
  * @param template Built client HTML shell containing production asset references.
  * @param route Normalized route and safe output mapping.
+ * @param outputDirectory Built client directory used to resolve same-origin fetch requests.
  * @param options Plugin options containing readiness and optional settle policy.
  * @returns Complete deterministic HTML document for the route.
  * @throws Error when the configured application readiness export is not a promise.
@@ -198,9 +200,11 @@ async function prerenderRoute(
   server: ViteDevServer,
   template: string,
   route: ResolvedDotaSsgRoute,
+  outputDirectory: string,
   options: DotaSsgOptions
 ): Promise<string> {
   const window = createPrerenderWindow(route.path);
+  const waitForFetches = installPrerenderFetch(window, outputDirectory, options.fetchBaseUrl);
   const restoreGlobals = installWindowGlobals(window);
   window.document.write(template);
   window.document.close();
@@ -217,11 +221,9 @@ async function prerenderRoute(
       throw new Error(`SSG entry must export a Promise named "${readyExport}"`);
     }
     await ready;
-    await Promise.resolve();
-    await Promise.resolve();
-    await window.happyDOM.waitUntilComplete();
+    await settlePrerenderWindow(window, waitForFetches);
     await options.settle?.(window, route);
-    await window.happyDOM.waitUntilComplete();
+    await settlePrerenderWindow(window, waitForFetches);
     return `<!doctype html>\n${window.document.documentElement.outerHTML}\n`;
   } finally {
     try {
@@ -231,6 +233,23 @@ async function prerenderRoute(
       restoreGlobals();
     }
   }
+}
+
+/**
+ * Re-checks both Happy DOM tasks and tracked fetches before serialization.
+ * Fetches can enqueue DOM work after the first task barrier, so each pass waits
+ * for both queues twice to include content rendered by asynchronous loaders.
+ * @param window Route-isolated Happy DOM window whose task queue is settling.
+ * @param waitForFetches Barrier returned by the route fetch adapter.
+ */
+async function settlePrerenderWindow(window: Window, waitForFetches: () => Promise<void>): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
+  await window.happyDOM.waitUntilComplete();
+  await waitForFetches();
+  await Promise.resolve();
+  await window.happyDOM.waitUntilComplete();
+  await waitForFetches();
 }
 
 /**

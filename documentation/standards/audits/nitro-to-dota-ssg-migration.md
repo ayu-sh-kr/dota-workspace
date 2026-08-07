@@ -1,5 +1,12 @@
 # Nitro and `dotaSsg` integration audit
 
+> Version note (2026-08-07): this audit describes the integration boundary
+> before Nitro v3's native Vite multi-environment plugin. Its output ownership,
+> nested-config, routing, and build-time API warnings still apply to the current
+> `dotaSsg()` implementation. The proposed v3-aware one-build integration and
+> the Dota changes it requires are documented in the
+> [Dota full-stack API preset proposal](../planning/dota-full-stack-api-preset.md).
+
 ## Finding
 
 The client’s architecture is valid: Nitro can serve the frontend and expose

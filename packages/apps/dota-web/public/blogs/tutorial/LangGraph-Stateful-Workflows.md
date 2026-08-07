@@ -2,7 +2,7 @@
 
 An agent loop is useful when a model can choose a tool and continue until it has an answer. Some applications need a stronger guarantee about what happens next: validate retrieved evidence, retry a failed operation, wait for a person to approve an action, or resume a long-running job after an interruption. [LangGraph](https://docs.langchain.com/oss/python/langgraph/overview) is a low-level orchestration framework and runtime for expressing those stateful workflows as graphs.
 
-This completes the series. [LangChain Foundations](/blogs/content?category=Tutorial&blog=LangChain-Foundations.md) introduced the model, prompt, tool, and agent building blocks. [RAG: Grounding AI Answers In Your Data](/blogs/content?category=Tutorial&blog=RAG-Grounded-Answers.md) supplied a dependable knowledge-retrieval pattern. Here, those pieces become nodes in an explicitly controlled workflow.
+This completes the series. [LangChain Foundations](/blogs/content/Tutorial/LangChain-Foundations.md) introduced the model, prompt, tool, and agent building blocks. [RAG: Grounding AI Answers In Your Data](/blogs/content/Tutorial/RAG-Grounded-Answers.md) supplied a dependable knowledge-retrieval pattern. Here, those pieces become nodes in an explicitly controlled workflow.
 
 > **Note:** LangGraph does not make an LLM deterministic. A model response can still vary. LangGraph makes the *application control flow* explicit: which node runs, what state it receives, what it updates, where it can branch, and where it can pause or resume.
 
@@ -182,4 +182,4 @@ This is an architecture choice, not a maturity ladder. The best design is the sm
 
 LangGraph expresses an AI application as state plus nodes plus edges. That model is especially useful when a workflow has conditional routes, bounded loops, approvals, persistence, or recovery requirements. It works alongside LangChain components and can orchestrate the RAG pipeline from the previous article without giving up application control.
 
-For the prerequisites, revisit [LangChain Foundations](/blogs/content?category=Tutorial&blog=LangChain-Foundations.md). For the knowledge-grounding layer that powers the example graph, see [RAG: Grounding AI Answers In Your Data](/blogs/content?category=Tutorial&blog=RAG-Grounded-Answers.md).
+For the prerequisites, revisit [LangChain Foundations](/blogs/content/Tutorial/LangChain-Foundations.md). For the knowledge-grounding layer that powers the example graph, see [RAG: Grounding AI Answers In Your Data](/blogs/content/Tutorial/RAG-Grounded-Answers.md).
