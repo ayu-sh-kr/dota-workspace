@@ -8,7 +8,7 @@ import {RouteConfig, RouteMeta} from "@dota/Types";
  * has rendered, so a page can keep navigation policy next to its route declaration
  * without depending on a browser-specific router adapter.
  *
- * @param config - Path, fallback behavior, renderer, and optional transition hooks.
+ * @param config - Path, head metadata, fallback behavior, renderer, and optional transition hooks.
  * @returns A class decorator that stores the route configuration on the component.
  */
 function RouteDecorator(config: RouteMeta) {
@@ -16,6 +16,7 @@ function RouteDecorator(config: RouteMeta) {
     const routeConfig: RouteConfig<HTMLElement> = {
       path: config.path,
       component: target,
+      seo: config.seo,
       ssr: config.ssr === true,
       default: config.default,
       render: config.render,
