@@ -93,6 +93,7 @@ function copyRoute<T extends HTMLElement>(route: RouteConfig<T>, path: string): 
     path,
     component: route.component
   };
+  if (route.seo != null) configuredRoute.seo = route.seo;
   if (route.ssr) configuredRoute.ssr = true;
   if (route.default != null) configuredRoute.default = route.default;
   if (route.slug != null) configuredRoute.slug = route.slug;
@@ -108,7 +109,7 @@ function copyRoute<T extends HTMLElement>(route: RouteConfig<T>, path: string): 
 /**
  * Applies a configured parent route after descendants have already created its node.
  * Route order must not decide whether children survive, so the existing child array
- * is retained while the page-level component, flags, renderer, and declared lifecycle
+ * is retained while the page-level component, SEO, flags, renderer, and declared lifecycle
  * hooks are replaced by the explicit route configuration.
  * @param target - Existing output node, potentially containing generated descendants.
  * @param source - Flat route that now owns the node's segment.
@@ -120,6 +121,7 @@ function replaceRoute<T extends HTMLElement>(target: RouteConfig<T>, source: Rou
   target.path = configuredRoute.path;
   target.component = configuredRoute.component;
   delete target.ssr;
+  delete target.seo;
   delete target.default;
   delete target.slug;
   delete target.render;
@@ -128,6 +130,7 @@ function replaceRoute<T extends HTMLElement>(target: RouteConfig<T>, source: Rou
   delete target.afterEnter;
   delete target.afterLeave;
   if (configuredRoute.ssr) target.ssr = true;
+  if (configuredRoute.seo != null) target.seo = configuredRoute.seo;
   if (configuredRoute.default != null) target.default = configuredRoute.default;
   if (configuredRoute.slug != null) target.slug = configuredRoute.slug;
   if (configuredRoute.render != null) target.render = configuredRoute.render;

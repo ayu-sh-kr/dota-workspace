@@ -193,4 +193,15 @@ describe("configure", () => {
       afterLeave
     });
   });
+
+  it("retains SEO metadata on compiled route nodes", () => {
+    const seo = {
+      title: "Profile",
+      description: "Manage your profile",
+      keywords: ["profile", "account"]
+    };
+    const routes = configure([{path: "/account/profile", component: ContentComponent, seo}], errorRoute);
+
+    expect(routes[0].children?.[0].seo).toBe(seo);
+  });
 });
