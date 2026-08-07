@@ -96,7 +96,7 @@ export class BlogPreviewComponent extends BaseElement {
   }
 
   private get blogUrl(): string {
-    return `/blogs/content?blog=${encodeURIComponent(this.path)}&category=${encodeURIComponent(this.category)}`;
+    return `/blogs/content/${encodeURIComponent(this.category)}/${encodeURIComponent(this.path)}`;
   }
 
   render(): string {

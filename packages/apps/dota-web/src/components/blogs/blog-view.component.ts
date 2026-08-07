@@ -1,7 +1,8 @@
-import {BaseElement, Component, Param, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {MDService, type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
+import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
 
 @Component({
   selector: "blog-view",
@@ -26,22 +27,18 @@ export class BlogViewComponent extends BaseElement {
   @Property({name: 'max-width', type: String})
   maxWidth: string = 'max-w-3xl';
 
-  @Param('blog')
-  blog!: string;
-
-  @Param('category')
-  category!: string;
-
   constructor() {
     super();
     this.docLoader = new DocLoaderService();
   }
 
+  /** Loads the route's Markdown document and renders it after the component connects. */
   @OnEvent('connected', true)
   async afterViewInit() {
-    if (this.blog && this.category) {
-      this.currentBlog = this.blog.trim();
-      const raw = await this.docLoader.loadBlog(`${this.category.toLowerCase()}/${this.blog}`);
+    const {blog, category} = resolveBlogRouteParams(window.location.pathname, window.location.search);
+    if (blog && category) {
+      this.currentBlog = blog.trim();
+      const raw = await this.docLoader.loadBlog(`${category.toLowerCase()}/${blog}`);
       MDService.render(raw, { publish: true })
     }
   }
