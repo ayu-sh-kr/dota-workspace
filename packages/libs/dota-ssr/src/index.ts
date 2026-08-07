@@ -14,8 +14,8 @@ import {
 import type {
   DotaRuntimePlugin,
   DotaRuntimeContext
-} from '@ayu-sh-kr/dota-wrap';
-import type {ComponentClass, NavigationContext, RouteMatch, RouteRenderer} from '@ayu-sh-kr/dota-wrap/router';
+} from '@ayu-sh-kr/dota-runtime';
+import type {ComponentClass, NavigationContext, RouteMatch, RouteRenderer} from '@ayu-sh-kr/dota-router';
 
 /** Selects whether a mismatch warns and remounts the host or stops initialization. */
 export type HydrationMismatchPolicy = RenderingHydrationMismatchPolicy;
