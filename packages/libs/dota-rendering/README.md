@@ -5,18 +5,162 @@ Rendering primitives for Dota Core.
 The package keeps legacy string rendering available while providing structured template
 results whose dynamic values can be diffed and patched without replacing unchanged elements.
 
+It is useful when a component has a stable HTML shape but changing values: text, attributes,
+conditional sections, or keyed collections. `html()` describes the output, `render()` mounts it,
+and `update()` or `patch()` commits later output through the smallest safe operation.
+
+## Installation
+
+```sh
+pnpm add @ayu-sh-kr/dota-rendering
+```
+
+## Quick start
+
 ```ts
-import { html, keyed, render, trustedHTML, update, when } from '@ayu-sh-kr/dota-rendering';
+import {html, render, update} from '@ayu-sh-kr/dota-rendering';
 
 const view = render(root, html`<p title="${title}">${message}</p>`);
-update(view, html`<p title="${nextTitle}">${nextMessage}</p>`);
+const result = update(view, html`<p title="${nextTitle}">${nextMessage}</p>`);
 
-const markdownHtml = '<h1>Documentation</h1>';
-const markdownView = html`<article>${trustedHTML(markdownHtml)}</article>`;
+console.log(result.kind); // "patch" when only values changed
 ```
 
 Core owns component lifecycle and scheduling; this package owns render output, part markers,
 diffing, and DOM commits.
+
+## Install once, update many times
+
+Keep one `RenderInstance` for the root owned by a component. Reusing the instance lets the
+renderer compare the previous output with the next output and keep unchanged elements alive.
+The public handle remains valid even if a later update changes from structured output to a legacy
+string and back.
+
+```ts
+import {html, render, nothing, update} from '@ayu-sh-kr/dota-rendering';
+
+const card = (title: string, count: number) => html`
+  <article class="card">
+    <h2>${title}</h2>
+    <strong>${count}</strong>
+  </article>
+`;
+
+const view = render(root, card('Inbox', 1));
+update(view, card('Inbox', 2)); // patches text nodes
+update(view, nothing);           // clears the owned root
+```
+
+When static elements and interpolation positions stay compatible, `update()` reports `patch` and
+writes only changed parts. Equal values report `noop`. A changed static structure reports
+`replace`, which reparses and remounts the owned root. This explicit fallback keeps the renderer
+predictable instead of attempting an incomplete general-purpose tree diff.
+
+## Compose practical views
+
+### Conditions own a local range
+
+Use `when()` when a branch should be replaced without replacing its parent element. The branch
+can contain its own structured template and can later be removed with `nothing`.
+
+```ts
+import {html, nothing, when} from '@ayu-sh-kr/dota-rendering';
+
+const accountView = (loading: boolean, user?: {name: string}) => html`
+  <section class="account">
+    ${when(
+      loading,
+      html`<p aria-live="polite">Loading…</p>`,
+      user ? html`<p>Welcome, ${user.name}</p>` : nothing
+    )}
+  </section>
+`;
+```
+
+### Lists retain identity by key
+
+Use `keyed()` when items can be inserted, removed, or reordered. A retained key keeps its DOM
+range and renderer session; duplicate keys throw before the current list is mutated.
+
+```ts
+import {html, keyed} from '@ayu-sh-kr/dota-rendering';
+
+const todoView = (items: readonly {id: string; label: string}[]) => html`
+  <ul>
+    ${keyed(items, item => item.id, item => html`
+      <li data-id="${item.id}">${item.label}</li>
+    `)}
+  </ul>
+`;
+```
+
+An ordinary array is not a keyed list. Use `keyed()` whenever item identity matters, especially
+when an item owns focus, input state, or a nested component.
+
+### Choose the correct HTML trust boundary
+
+Ordinary interpolated strings are rendered as text. Use `trustedHTML()` only for sanitized or
+application-authored markup that should be replaced inside one dynamic child range. Use
+`unsafeHTML()` only when trusted markup is intentionally part of the parent template structure;
+it is merged into HTML and is not sanitized by this package.
+
+```ts
+import {html, trustedHTML} from '@ayu-sh-kr/dota-rendering';
+
+const markdown = '<h2>Release notes</h2>'; // sanitized by the application first
+const view = html`<article>${trustedHTML(markdown)}</article>`;
+```
+
+Never pass user-controlled HTML directly to either trust directive. If content is not already
+trusted, interpolate it as a normal value so it remains text.
+
+## Attributes and Dota Core components
+
+Use normal quoted HTML attributes for dynamic values:
+
+```ts
+const view = html`
+  <user-card
+    user-id="${user.id}"
+    theme="${theme}"
+    hidden="${!user.active}">
+  </user-card>
+`;
+```
+
+The renderer reconstructs serialized attributes with `setAttribute()`. Dota Core remains
+responsible for converting observed attributes into typed properties and for handling component
+events. Rendering does not install event listeners or reinterpret attributes as DOM properties.
+
+## Legacy strings and structured templates
+
+Existing components can continue returning a string:
+
+```ts
+const legacy = render(root, '<p>Existing component output</p>');
+update(legacy, '<p>Updated output</p>');
+```
+
+Structured templates are the better choice when independent values should update without replacing
+the whole root. Moving between the two forms is supported; the same public `RenderInstance`
+switches strategy and keeps Core's integration simple.
+
+## Hydration support
+
+`hydrate()` adopts server-rendered structured output when the caller has already validated that
+the host's template identity and marker version match the client output. It returns the same
+`RenderInstance` contract used by `render()`.
+
+```ts
+import {hydrate, html, update} from '@ayu-sh-kr/dota-rendering';
+
+const view = hydrate(root, html`<h1>${title}</h1>`, {mismatch: 'warn'});
+update(view, html`<h1>${nextTitle}</h1>`);
+```
+
+`warn` remounts the affected root when adoption fails; `throw` surfaces the mismatch. The Dota
+SSR package owns the application-level marker checks and initial route adoption, so most
+applications should install `dotaHydration()` rather than calling `hydrate()` directly.
 
 ## Maintainer guide
 
