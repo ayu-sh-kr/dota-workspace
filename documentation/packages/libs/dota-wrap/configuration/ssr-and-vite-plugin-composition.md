@@ -308,3 +308,7 @@ separate from Node/SSG code.
 - [`dota-runtime` shared contract](../../../../../packages/libs/dota-runtime/src/index.ts)
 - [`dota-wrap` Vite composition](../../../../../packages/libs/dota-wrap/src/vite/index.ts)
 - [`dota-wrap` build script](../../../../../packages/libs/dota-wrap/scripts/build.mjs)
+
+## Related planning
+
+- [Streamlining the Dota SSG build](../../dota-ssr/planning/streamlining-ssg-build.md)
