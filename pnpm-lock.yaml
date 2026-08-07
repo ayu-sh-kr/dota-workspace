@@ -201,9 +201,6 @@ importers:
       '@ayu-sh-kr/dota-md':
         specifier: workspace:*
         version: link:../../ui/dota-md
-      '@ayu-sh-kr/dota-ssr':
-        specifier: workspace:*
-        version: link:../../libs/dota-ssr
       '@ayu-sh-kr/dota-ui':
         specifier: workspace:*
         version: link:../../ui/dota-ui
@@ -420,6 +417,19 @@ importers:
         specifier: 'catalog:'
         version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.0.7)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
+  packages/libs/dota-runtime:
+    dependencies:
+      '@ayu-sh-kr/dota-core':
+        specifier: workspace:*
+        version: link:../dota-core
+      '@ayu-sh-kr/dota-router':
+        specifier: workspace:*
+        version: link:../dota-router
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   packages/libs/dota-ssr:
     dependencies:
       '@ayu-sh-kr/dota-core':
@@ -428,9 +438,12 @@ importers:
       '@ayu-sh-kr/dota-rendering':
         specifier: workspace:*
         version: link:../dota-rendering
-      '@ayu-sh-kr/dota-wrap':
+      '@ayu-sh-kr/dota-router':
         specifier: workspace:*
-        version: link:../dota-wrap
+        version: link:../dota-router
+      '@ayu-sh-kr/dota-runtime':
+        specifier: workspace:*
+        version: link:../dota-runtime
       consola:
         specifier: 'catalog:'
         version: 3.4.2
@@ -474,6 +487,12 @@ importers:
       '@ayu-sh-kr/dota-router':
         specifier: workspace:*
         version: link:../dota-router
+      '@ayu-sh-kr/dota-runtime':
+        specifier: workspace:*
+        version: link:../dota-runtime
+      '@ayu-sh-kr/dota-ssr':
+        specifier: workspace:*
+        version: link:../dota-ssr
       '@swc/core':
         specifier: 'catalog:'
         version: 1.13.5
@@ -483,6 +502,9 @@ importers:
       fast-glob:
         specifier: 'catalog:'
         version: 3.3.3
+      happy-dom:
+        specifier: 'catalog:'
+        version: 20.0.7
       reflect-metadata:
         specifier: catalog:peer-reflect-metadata
         version: 0.2.2
@@ -502,9 +524,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 4.1.10(vitest@4.1.10)
-      happy-dom:
-        specifier: 'catalog:'
-        version: 20.0.7
       typescript:
         specifier: 'catalog:'
         version: 6.0.3

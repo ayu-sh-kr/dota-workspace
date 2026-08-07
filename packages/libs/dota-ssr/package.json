@@ -50,7 +50,8 @@
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-rendering": "workspace:*",
-    "@ayu-sh-kr/dota-wrap": "workspace:*",
+    "@ayu-sh-kr/dota-router": "workspace:*",
+    "@ayu-sh-kr/dota-runtime": "workspace:*",
     "consola": "catalog:"
   },
   "devDependencies": {
