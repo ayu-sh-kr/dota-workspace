@@ -3,6 +3,7 @@ import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {MDService, type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: "blog-view",
@@ -35,6 +36,8 @@ export class BlogViewComponent extends BaseElement {
   /** Loads the route's Markdown document and renders it after the component connects. */
   @OnEvent('connected', true)
   async afterViewInit() {
+    if (this.querySelector('[data-md-content]')?.textContent?.trim()) return;
+
     const {blog, category} = resolveBlogRouteParams(window.location.pathname, window.location.search);
     if (blog && category) {
       this.currentBlog = blog.trim();
@@ -43,9 +46,9 @@ export class BlogViewComponent extends BaseElement {
     }
   }
 
-  render() {
+  render(): TemplateResult {
     // language=html
-    return `
+    return html`
       <section class="mx-auto w-full max-w-screen-2xl px-3 py-12 sm:px-5 lg:px-8">
         <div class="flex w-full flex-col xl:flex-row xl:items-start xl:gap-8">
           <div class="min-w-0 flex-1 ${this.maxWidth}" style="overflow-anchor: none;">
