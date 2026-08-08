@@ -1,5 +1,6 @@
 import {
   configureDotaRenderingLogger,
+  deferRender,
   getDotaRenderingLogger,
   html,
   patch,
@@ -12,6 +13,26 @@ afterEach(() => {
 });
 
 describe('renderer public API', () => {
+  it('defers DOM ownership until the first update and disposes without clearing adopted DOM', () => {
+    const root = document.createElement('div');
+    root.innerHTML = '<p>server</p>';
+    const instance = deferRender(html``, output => render(root, output));
+    const serverParagraph = root.firstElementChild;
+
+    instance.dispose();
+    expect(root.firstElementChild).toBe(serverParagraph);
+
+    expect(instance.update(html`<p>${'client'}</p>`)).toEqual({
+      kind: 'noop',
+      changedParts: 0,
+      replacedNodes: 0
+    });
+
+    const activeInstance = deferRender(html``, output => render(root, output));
+    activeInstance.update(html`<p>${'client'}</p>`);
+    expect(root.textContent).toBe('client');
+  });
+
   it('emits diagnostics through the logger configured by its host integration', () => {
     configureDotaRenderingLogger('debug');
     const debug = vi.spyOn(getDotaRenderingLogger(), 'debug');
