@@ -35,6 +35,18 @@ import {
 export type HydrationMismatchPolicy = RenderingHydrationMismatchPolicy;
 
 /**
+ * Highest template marker version the route layer accepts without a `data-dh-route`
+ * marker present. This is a fixed sentinel pinned to the last template version emitted
+ * before route markers existed — deliberately **not** `MARKER_VERSION` itself, since that
+ * import tracks whatever version `dota-rendering` currently emits. If it tracked the live
+ * version, this "legacy" fallback would silently re-open for every future marker bump
+ * instead of covering only the one v1→v2 transition it was built for (see S3 in the
+ * lifecycle consistency audit). A future intentional widening of legacy acceptance must
+ * bump this constant explicitly, not by relying on `MARKER_VERSION` moving.
+ */
+const LEGACY_ROUTE_TEMPLATE_VERSION = 2;
+
+/**
  * Configures Dota's opt-in browser hydration plugin.
  * The plugin changes only marked initial component mounts and initial marked route presentation;
  * all other Dota Core and Router behavior continues through the ordinary client render path.
@@ -76,7 +88,7 @@ export function dotaHydration(options: DotaHydrationOptions = {}): DotaRuntimePl
       installMountStrategy(context, mismatch, () => handoff);
       context.wrapRouteRenderer((next, root) => {
         handoff = captureInitialRoute(root);
-        return createHydrationRouteRenderer(next, root, handoff);
+        return createHydrationRouteRenderer(next, root, mismatch, handoff);
       });
     }
   };
@@ -115,7 +127,7 @@ function installMountStrategy(
       serverScope !== null;
     if (canHydrate) {
       try {
-        return hydrate(root, output, {mismatch});
+        return Object.assign(hydrate(root, output, {mismatch}), { hydrated: true as const });
       } catch (error) {
         throw hydrationMismatch(host, error);
       }
@@ -137,13 +149,17 @@ function installMountStrategy(
  * Wraps route presentation so the initial transition retains a marked page host.
  * A missing marker, custom route render, path disagreement, or later navigation delegates
  * unchanged to the router renderer, which keeps route customization authoritative.
+ * A captured route host that fails adoption is reported per `mismatch`, the same policy
+ * used for component-level hydration, instead of falling through silently (former S2 gap).
  * @param next Renderer used for all non-hydration route transitions.
  * @param root Root component whose id identifies the route outlet host.
+ * @param mismatch Policy applied when a captured route host cannot be adopted.
  * @returns Decorated renderer with one initial-load adoption branch.
  */
 function createHydrationRouteRenderer(
   next: RouteRenderer<HTMLElement>,
   root: ComponentClass,
+  mismatch: HydrationMismatchPolicy,
   handoff?: InitialRouteHandoff
 ): RouteRenderer<HTMLElement> {
   return (match, context) => {
@@ -152,10 +168,30 @@ function createHydrationRouteRenderer(
       handoff.state = 'adopted';
       return;
     }
-    if (context.initial && handoff?.state === 'captured') handoff.state = 'invalid';
+    if (context.initial && handoff?.state === 'captured') {
+      handoff.state = 'invalid';
+      // A custom route render always owns presentation intentionally; that is a valid
+      // bypass, not a mismatch, and must not be reported as one.
+      if (!match.route.render) reportRouteMismatch(handoff, mismatch);
+    }
     if (!context.initial && handoff?.state === 'captured') handoff.state = 'released';
     return next(match, context);
   };
+}
+
+/**
+ * Surfaces a captured server route that could not be adopted for the initial client match.
+ * Mirrors the component-level mismatch contract (`installMountStrategy`) so route-marker
+ * failures are observable the same way instead of silently falling through to `next()`.
+ * @param handoff Captured route boundary that failed adoption.
+ * @param mismatch `warn` logs and lets the router renderer proceed; `throw` surfaces the failure to the caller.
+ */
+function reportRouteMismatch(handoff: InitialRouteHandoff, mismatch: HydrationMismatchPolicy): void {
+  const error = new Error(
+    `Route-marker hydration mismatch: captured server route "${handoff.pathname}" was not adopted for the initial client match.`
+  );
+  if (mismatch === 'throw') throw error;
+  warnHydrationMismatch(error);
 }
 
 /**
@@ -184,7 +220,8 @@ function rootHasMarkedPage(
 
   const hasRouteMarker = page.getAttribute(HYDRATION_ROUTE_ATTRIBUTE) === 'true' &&
     page.getAttribute(HYDRATION_ROUTE_VERSION_ATTRIBUTE) === HYDRATION_ROUTE_VERSION;
-  const hasLegacyTemplateMarker = page.getAttribute(HYDRATION_TEMPLATE_ATTRIBUTE) !== null;
+  const hasLegacyTemplateMarker = page.getAttribute(HYDRATION_TEMPLATE_ATTRIBUTE) !== null &&
+    page.getAttribute(HYDRATION_VERSION_ATTRIBUTE) === String(LEGACY_ROUTE_TEMPLATE_VERSION);
   return (hasRouteMarker || hasLegacyTemplateMarker) &&
     normalizePath(page.getAttribute('path')) === normalizePath(context.url.pathname) &&
     normalizePath(handoff.pathname) === normalizePath(match.pathname);

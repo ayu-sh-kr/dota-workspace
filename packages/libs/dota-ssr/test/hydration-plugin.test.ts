@@ -46,6 +46,7 @@ function installHydration(options?: DotaHydrationOptions): InstalledHydration {
 afterEach(() => {
   setHydrationEmit(false);
   document.body.innerHTML = '';
+  vi.restoreAllMocks();
 });
 
 describe('dotaHydration', () => {
@@ -126,6 +127,33 @@ describe('dotaHydration', () => {
     expect(paragraph?.textContent).toBe('client');
   });
 
+  it('sets hydrated:true on the mount result only when server DOM is adopted', () => {
+    const view = (label: string) => html`<p>${label}</p>`;
+    const {mountStrategy} = installHydration();
+
+    // Case 1: host has server markers → successful adoption → hydrated flag present
+    const markedHost = document.createElement('hydrated-flag-host');
+    setHydrationEmit(true);
+    render(markedHost, view('server'));
+    setHydrationEmit(false);
+    const adoptedResult = mountStrategy(markedHost as never, markedHost, view('server'));
+    expect(adoptedResult.hydrated).toBe(true);
+
+    // Case 2: host has no markers → fresh mount → hydrated flag absent
+    const freshHost = document.createElement('fresh-flag-host');
+    const freshResult = mountStrategy(freshHost as never, freshHost, view('client'));
+    expect(freshResult.hydrated).toBeUndefined();
+
+    // Case 3: marker present but template mismatch → fallback fresh mount → hydrated flag absent
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const mismatchHost = document.createElement('mismatch-flag-host');
+    setHydrationEmit(true);
+    render(mismatchHost, html`<p>${'server'}</p>`);
+    setHydrationEmit(false);
+    const mismatchResult = mountStrategy(mismatchHost as never, mismatchHost, html`<section>${'client'}</section>`);
+    expect(mismatchResult.hydrated).toBeUndefined();
+  });
+
   it('recovers only the mismatched host by default and can throw instead', () => {
     const host = document.createElement('mismatch-host');
     setHydrationEmit(true);
@@ -175,7 +203,7 @@ describe('dotaHydration', () => {
     Reflect.defineMetadata('Component', {selector: 'hydration-route-page'}, Page);
     const root = document.createElement('hydration-route-root');
     root.id = 'hydration-route-root';
-    root.innerHTML = `<hydration-route-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template"></hydration-route-page>`;
+    root.innerHTML = `<hydration-route-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template" ${HYDRATION_VERSION_ATTRIBUTE}="2"></hydration-route-page>`;
     document.body.append(root);
 
     const route = {path: '/', component: Page};
@@ -251,7 +279,7 @@ describe('dotaHydration', () => {
     Reflect.defineMetadata('Component', {selector: 'custom-render-page'}, Page);
     const root = document.createElement('custom-render-root');
     root.id = 'custom-render-root';
-    root.innerHTML = `<custom-render-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template"></custom-render-page>`;
+    root.innerHTML = `<custom-render-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template" ${HYDRATION_VERSION_ATTRIBUTE}="2"></custom-render-page>`;
     document.body.append(root);
     const route = {path: '/', component: Page, render: () => undefined};
     const match: RouteMatch<HTMLElement> = {
@@ -330,5 +358,149 @@ describe('dotaHydration', () => {
     expect(next).not.toHaveBeenCalled();
     expect(clientRoot.firstElementChild).toBe(clientPage);
     expect(clientPage.textContent).toBe('server content');
+  });
+
+  it('warns on a captured route that disagrees with the initial client match, then delegates to next', async () => {
+    class Root extends HTMLElement {}
+    class Page extends HTMLElement {}
+    Reflect.defineMetadata('Component', {selector: 'mismatched-route-root'}, Root);
+    Reflect.defineMetadata('Component', {selector: 'mismatched-route-page'}, Page);
+    const root = document.createElement('mismatched-route-root');
+    root.id = 'mismatched-route-root';
+    root.innerHTML = `<mismatched-route-page path="/article" ${HYDRATION_ROUTE_ATTRIBUTE}="true" ${HYDRATION_ROUTE_VERSION_ATTRIBUTE}="1"></mismatched-route-page>`;
+    document.body.append(root);
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    const route = {path: '/other', component: Page};
+    const match: RouteMatch<HTMLElement> = {
+      route,
+      branch: [route],
+      matched: true,
+      params: {},
+      pathname: '/other',
+      searchParams: new URLSearchParams(),
+      hash: ''
+    };
+    const next = vi.fn<RouteRenderer<HTMLElement>>();
+    const renderer = installHydration().routeWrapper(next, Root);
+
+    await renderer(match, {
+      initial: true,
+      nextMatch: match,
+      signal: new AbortController().signal,
+      params: {},
+      url: new URL('/other', window.location.origin),
+      historyState: undefined
+    });
+
+    expect(warning).toHaveBeenCalledOnce();
+    expect(next).toHaveBeenCalledOnce();
+  });
+
+  it('throws on a captured route mismatch when configured with the strict policy', async () => {
+    class Root extends HTMLElement {}
+    class Page extends HTMLElement {}
+    Reflect.defineMetadata('Component', {selector: 'strict-mismatched-route-root'}, Root);
+    Reflect.defineMetadata('Component', {selector: 'strict-mismatched-route-page'}, Page);
+    const root = document.createElement('strict-mismatched-route-root');
+    root.id = 'strict-mismatched-route-root';
+    root.innerHTML = `<strict-mismatched-route-page path="/article" ${HYDRATION_ROUTE_ATTRIBUTE}="true" ${HYDRATION_ROUTE_VERSION_ATTRIBUTE}="1"></strict-mismatched-route-page>`;
+    document.body.append(root);
+
+    const route = {path: '/other', component: Page};
+    const match: RouteMatch<HTMLElement> = {
+      route,
+      branch: [route],
+      matched: true,
+      params: {},
+      pathname: '/other',
+      searchParams: new URLSearchParams(),
+      hash: ''
+    };
+    const next = vi.fn<RouteRenderer<HTMLElement>>();
+    const renderer = installHydration({mismatch: 'throw'}).routeWrapper(next, Root);
+    const context: NavigationContext<HTMLElement> = {
+      initial: true,
+      nextMatch: match,
+      signal: new AbortController().signal,
+      params: {},
+      url: new URL('/other', window.location.origin),
+      historyState: undefined
+    };
+
+    expect(() => renderer(match, context)).toThrow('Route-marker hydration mismatch');
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('does not report a mismatch when the route intentionally owns custom rendering', async () => {
+    class Root extends HTMLElement {}
+    class Page extends HTMLElement {}
+    Reflect.defineMetadata('Component', {selector: 'no-warn-custom-render-root'}, Root);
+    Reflect.defineMetadata('Component', {selector: 'no-warn-custom-render-page'}, Page);
+    const root = document.createElement('no-warn-custom-render-root');
+    root.id = 'no-warn-custom-render-root';
+    root.innerHTML = `<no-warn-custom-render-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template" ${HYDRATION_VERSION_ATTRIBUTE}="2"></no-warn-custom-render-page>`;
+    document.body.append(root);
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const route = {path: '/', component: Page, render: () => undefined};
+    const match: RouteMatch<HTMLElement> = {
+      route,
+      branch: [route],
+      matched: true,
+      params: {},
+      pathname: '/',
+      searchParams: new URLSearchParams(),
+      hash: ''
+    };
+    const renderer = installHydration().routeWrapper(vi.fn(), Root);
+
+    await renderer(match, {
+      initial: true,
+      nextMatch: match,
+      signal: new AbortController().signal,
+      params: {},
+      url: new URL('/', window.location.origin),
+      historyState: undefined
+    });
+
+    expect(warning).not.toHaveBeenCalled();
+  });
+
+  it('does not silently accept a future template-marker version with no route marker', async () => {
+    class Root extends HTMLElement {}
+    class Page extends HTMLElement {}
+    Reflect.defineMetadata('Component', {selector: 'future-marker-root'}, Root);
+    Reflect.defineMetadata('Component', {selector: 'future-marker-page'}, Page);
+    const root = document.createElement('future-marker-root');
+    root.id = 'future-marker-root';
+    // Simulates output from a future template-marker version bump that shipped
+    // without a `data-dh-route` marker — the exact regression S3 closes.
+    root.innerHTML = `<future-marker-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template" ${HYDRATION_VERSION_ATTRIBUTE}="3"></future-marker-page>`;
+    document.body.append(root);
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const route = {path: '/', component: Page};
+    const match: RouteMatch<HTMLElement> = {
+      route,
+      branch: [route],
+      matched: true,
+      params: {},
+      pathname: '/',
+      searchParams: new URLSearchParams(),
+      hash: ''
+    };
+    const next = vi.fn<RouteRenderer<HTMLElement>>();
+    const renderer = installHydration().routeWrapper(next, Root);
+
+    await renderer(match, {
+      initial: true,
+      nextMatch: match,
+      signal: new AbortController().signal,
+      params: {},
+      url: new URL('/', window.location.origin),
+      historyState: undefined
+    });
+
+    expect(warning).toHaveBeenCalledOnce();
+    expect(next).toHaveBeenCalledOnce();
   });
 });

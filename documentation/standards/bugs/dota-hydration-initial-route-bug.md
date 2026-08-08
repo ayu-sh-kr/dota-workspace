@@ -2,10 +2,14 @@
 
 ## Status
 
-Partially resolved. The Dota SSR initial-route handoff now preserves the prerendered
-route host through the application's first mount. Nested structured components can
-still remount after startup because durable hydration markers have no component
-ownership scope.
+Resolved. The Dota SSR initial-route handoff preserves the prerendered route host through
+the application's first mount, and the scoped-marker fix below closes the nested-component
+remount as well: `data-dh-s` scopes every marker kind (child, keyed, attribute-part) so a
+parent's hydration scan can no longer pair its part with a nested custom element's marker.
+Verified against `packages/libs/dota-rendering/src/renderer.ts:37,952-953,1023-1030` and
+`packages/libs/dota-rendering/test/hydration.test.ts:167-189` — see
+[Hydration/SSR lifecycle consistency audit](../audits/hydration-ssr-lifecycle-consistency-audit.md#22-dota-rendering)
+finding R2.
 
 ## Observed behavior
 
@@ -49,13 +53,17 @@ only the application's first root mount, and adopts a matching initial route. Th
 prevents the root from removing the prerendered route host before the router's
 initial transition. It does not change the marker contract for nested components.
 
-## Required fix
+## Fix shipped
 
-Adopt the scoped-marker design in [Scoped hydration marker ownership](../../packages/libs/dota-rendering/planning/scoped-hydration-marker-ownership.md).
-Until that is implemented and regenerated static output is deployed, nested
-template hydration is not reliable.
+The scoped-marker design landed in commit `28b42b1` (opt-in hydration handoff patch,
+`.changeset/four-monkeys-type.md`): every marker kind gets a `data-dh-s` scope attribute,
+required by every parser, so a parent's hydration scan never adopts a nested component's
+marker. Regenerated static output must carry the scoped markers for this fix to apply;
+output produced before this change does not have them.
 
 ## Related documentation
 
-- [Initial route hydration roadmap](../../packages/libs/dota-ssr/planning/initial-route-hydration-roadmap.md)
-- [Dota Rendering marker proposal](../../packages/libs/dota-rendering/planning/scoped-hydration-marker-ownership.md)
+- [Hydration/SSR lifecycle consistency audit](../audits/hydration-ssr-lifecycle-consistency-audit.md) —
+  the follow-up audit that verified this fix in code and identified the remaining router,
+  terminology, and legacy-fallback gaps it doesn't cover.
+- [Hydration + SSR overview](../hydration-ssr/README.md)

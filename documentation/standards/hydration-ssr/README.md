@@ -76,6 +76,24 @@ These are the facts the coordinating plan is built on. File references are curre
   final marker names (`data-dh-*` vs `data-dota-part`); text anchor style (comment vs wrapper); which
   routes to prerender first. Tracked in the [implementation plan](./ssr-hydration-implementation-plan.md#open-decisions-to-confirm-before-step-5).
 
+## Glossary
+
+The same idea — "let existing DOM survive instead of re-rendering it" — is named differently
+at every layer. This is the canonical mapping; prefer these terms in new code and docs.
+
+| Term | Layer | Canonical concept |
+| --- | --- | --- |
+| **Mount strategy** | `dota-core` | The single exclusive extension seam (`setMountStrategy`) a hydration integration installs to decide, per host, whether to hydrate, defer, or fresh-render. `dota-core` itself has no opinion. |
+| **Hydrate** (`hydrate()`) | `dota-rendering` | Adopt existing server-rendered DOM for one host by matching its markers against a template, instead of replacing its children. |
+| **Defer** (`deferRender()`, docstring says "retain") | `dota-rendering` | Skip a render entirely and keep a host's current DOM as-is, for exactly one call. Used by the initial-route handoff, not general hydration. |
+| **Handoff** | `dota-ssr` | The end-to-end startup transfer of ownership of the server-rendered route host from static HTML to the client router, spanning root capture through route adoption. |
+| **Captured / adopted / released / invalid** | `dota-ssr` | The one-way states of a single handoff: `captured` (server route host found before upgrade) → `adopted` (client router accepted it) or `invalid` (mismatch) or `released` (a later navigation superseded it). |
+| **Marker** | `dota-rendering` / `dota-ssr` | Any `data-dh-*` attribute or comment anchor written by prerendering and read by the client to identify hydratable content. Component markers (`data-dh-t`/`-v`/`-s`/`-c`) and route markers (`data-dh-route`/`-version`) are separately versioned — see finding S4 in the [lifecycle consistency audit](../audits/hydration-ssr-lifecycle-consistency-audit.md#24-dota-ssr).
+
+Terms to avoid introducing further: "capture" as a synonym for "hydrate" (it means something
+narrower — see `captureInitialRoute`), and "release" for anything other than the handoff
+state above.
+
 ## Supporting background (context, not required reading)
 
 - [BaseElement rendering/hydration audit](../audits/dota-core-base-element-rendering-hydration-audit.md) — the original evidence behind the roadmap.

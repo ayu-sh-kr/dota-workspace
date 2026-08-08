@@ -19,6 +19,7 @@ import {LifecycleEventConstants} from "@dota/core/constants";
 import {
   render as mountRender,
   update as updateRender,
+  type MountResult,
   type RenderInstance,
   type RenderOutput
 } from "@ayu-sh-kr/dota-rendering";
@@ -50,6 +51,7 @@ export abstract class BaseElement extends HTMLElement {
   private __updateScheduled = false;
   private __pendingAttributeChanges: PendingAttributeChange[] = [];
   private __renderInstance?: RenderInstance;
+  private __wasHydrated = false;
 
   private __eventManagerService: EventManagerService<BaseElement>;
   private __applicationEventService = ApplicationEventService.getInstance();
@@ -109,6 +111,11 @@ export abstract class BaseElement extends HTMLElement {
     ])
       .then(() => {
         this.__initialized = true;
+        if (this.__wasHydrated) {
+          this.__eventChannel.emit({
+            name: LifecycleEventConstants.HYDRATED
+          });
+        }
         this.__eventChannel.emit({
           name: LifecycleEventConstants.CONNECTED
         })
@@ -120,6 +127,7 @@ export abstract class BaseElement extends HTMLElement {
   disconnectedCallback() {
     this.__initialized = false;
     this.__updateScheduled = false;
+    this.__wasHydrated = false;
     this.__pendingAttributeChanges.length = 0;
     this.__renderInstance?.dispose();
     this.__renderInstance = undefined;
@@ -295,7 +303,9 @@ export abstract class BaseElement extends HTMLElement {
     }
 
     const root: Element | ShadowRoot = this.isShadow ? this.resolveRenderRoot() : this;
-    this.__renderInstance = resolveMountStrategy()(this, root, this.render());
+    const mountResult: MountResult = resolveMountStrategy()(this, root, this.render());
+    this.__renderInstance = mountResult;
+    this.__wasHydrated = mountResult.hydrated === true;
   }
 
   /**

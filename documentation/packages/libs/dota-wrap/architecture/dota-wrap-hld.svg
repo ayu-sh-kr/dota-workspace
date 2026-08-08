@@ -2,7 +2,7 @@
   <title>dota-wrap High-Level Design</title>
   <desc>
     Light-mode high-level design for dota-wrap. The diagram shows public entry points,
-    build dependency resolution, and runtime application initialization with plugin setup before custom-element upgrade. All connectors
+    build dependency resolution, and runtime application initialization with plugin setup before custom-element upgrade, and enforces single-mount-strategy exclusivity during plugin setup. All connectors
     use horizontal and vertical segments; numbered markers identify dense branch points.
   </desc>
 
@@ -136,6 +136,8 @@
   <path class="connector" d="M1190,791 H1230 V841 H1300"/>
   <path class="connector" d="M1190,926 H1230 V841 H1300"/>
   <path class="connector" d="M1400,867 V920"/>
+  <text style="font-family:'DM Sans','Poppins',Helvetica,Arial,sans-serif;font-size:13px;fill:#495057;" x="1400" y="890" text-anchor="middle">setMountStrategy: exclusive slot</text>
+  <text style="font-family:'DM Sans','Poppins',Helvetica,Arial,sans-serif;font-size:12px;fill:#868e96;" x="1400" y="908" text-anchor="middle">2nd claim → clear error naming both plugins</text>
   <circle cx="950" cy="745" r="14" fill="#343a40"/>
   <text class="marker-text" x="950" y="745">5</text>
   <circle cx="950" cy="880" r="14" fill="#343a40"/>

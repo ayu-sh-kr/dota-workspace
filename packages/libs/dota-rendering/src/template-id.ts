@@ -1,4 +1,11 @@
-/** Version of the durable marker format understood by the renderer and hydration plugin. */
+/**
+ * Version of the durable marker format understood by the renderer and hydration plugin.
+ * Versions the *template-identity contract* — whether a component's serialized parts
+ * can be adopted node-for-node — independently from `@ayu-sh-kr/dota-ssr`'s
+ * `HYDRATION_ROUTE_VERSION` (`data-dh-route-version`), which versions the separate
+ * *route-boundary contract*. The two counters are intentionally not unified; see S4 in
+ * `documentation/standards/audits/hydration-ssr-lifecycle-consistency-audit.md`.
+ */
 export const MARKER_VERSION = 2;
 
 /** Attribute carrying the content-derived template identity on a rendered component host. */

@@ -64,24 +64,32 @@ what allows several extensions to compose without replacing one another.
 
 `MountStrategy` is the initial component-render boundary from Dota Core. A
 strategy receives the component host, its `Element` or `ShadowRoot`, and the
-component's first `RenderOutput`; it returns the normal `RenderInstance` used
-for later updates.
+component's first `RenderOutput`; it returns a `MountResult` (a `RenderInstance`
+extended with an optional `hydrated?: true` flag).
+
+Setting `hydrated: true` on the returned result signals to Dota Core that the
+strategy adopted existing server DOM. Core reads this flag and emits the `HYDRATED`
+lifecycle event before `CONNECTED`. Strategies that return an ordinary `RenderInstance`
+(i.e. without the flag) produce only a `CONNECTED` event, which is the behavior of
+the default `render()` mount and the `deferRender()` path.
 
 An extension can use this socket to adopt a compatible representation that is
 already in the DOM. The hydration package uses exactly this pattern: it checks
 the serialized template identity and marker version, calls `hydrate()` when
-they match, and falls back to ordinary `render()` when they do not.
+they match, wraps the result with `{ hydrated: true as const }`, and falls back
+to ordinary `render()` when they do not.
 
 ```ts
-import {render} from '@ayu-sh-kr/dota-rendering';
+import {render, type MountResult} from '@ayu-sh-kr/dota-rendering';
 import type {DotaRuntimePlugin} from '@ayu-sh-kr/dota-runtime';
 
 export const loggingMounts: DotaRuntimePlugin = {
   name: 'logging-mounts',
   setup(context) {
-    context.setMountStrategy((host, root, output) => {
+    context.setMountStrategy((host, root, output): MountResult => {
       console.debug('[mount]', host.localName);
       return render(root, output);
+      // To signal adoption, return Object.assign(render(root, output), { hydrated: true as const })
     });
   }
 };
@@ -122,6 +130,7 @@ coupling the application to Core or Router internals.
 | `DotaRuntimePlugin` | Describes an opt-in extension installed by the composition root. |
 | `DotaRuntimeContext` | Provides the mount and route-renderer sockets. |
 | `RouteRendererWrapper` | Types a decorator that preserves a route renderer fallback. |
+| `MountStrategy` | The initial-mount function type; its return value is `MountResult` from `@ayu-sh-kr/dota-rendering`. |
 
 ## Boundaries and related packages
 

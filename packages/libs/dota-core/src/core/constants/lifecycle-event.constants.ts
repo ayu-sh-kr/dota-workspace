@@ -28,6 +28,9 @@ export const LifecycleEventConstants = {
   /** Emitted when one of the component's observed attributes changes value */
   ATTRIBUTE_CHANGED: 'attribute-changed',
 
+  /** Emitted when the component's initial mount adopted existing server DOM instead of a fresh paint */
+  HYDRATED: 'hydrated',
+
   /** Emitted when the component's internal DOM structure has been updated or re-rendered */
   DOM_UPDATED: 'dom-updated',
 }
