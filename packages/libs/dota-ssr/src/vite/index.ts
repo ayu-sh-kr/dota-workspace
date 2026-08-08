@@ -9,11 +9,15 @@ import {resolveDecoratedSsgRoutes, resolveSsgRoutes} from './route-output';
 import type {DotaDecoratedRoute, DotaSsgOptions, DotaSsgRouteInput, ResolvedDotaSsgRoute} from './types';
 import {updateVercelConfig} from './vercel-config';
 import {installWindowGlobals} from './window-globals';
+import {
+  HYDRATION_ROUTE_ATTRIBUTE,
+  HYDRATION_ROUTE_VERSION_ATTRIBUTE,
+  HYDRATION_ROUTE_VERSION
+} from '../route-marker';
 
 const VIRTUAL_SSG_ENTRY = 'virtual:dota-ssg-entry';
 const RESOLVED_VIRTUAL_SSG_ENTRY = `\0${VIRTUAL_SSG_ENTRY}`;
 const VIRTUAL_DOTA_ROUTE_METADATA = 'virtual:dota-route-metadata';
-
 /** Runtime shape exported by the preloader's metadata-only virtual module. */
 type RouteMetadataModule = {
   /** Unvalidated route metadata checked before it enters SSG route resolution. */
@@ -224,6 +228,7 @@ async function prerenderRoute(
     await settlePrerenderWindow(window, waitForFetches);
     await options.settle?.(window, route);
     await settlePrerenderWindow(window, waitForFetches);
+    markPrerenderedRoute(window, route.path);
     return `<!doctype html>\n${window.document.documentElement.outerHTML}\n`;
   } finally {
     try {
@@ -233,6 +238,22 @@ async function prerenderRoute(
       restoreGlobals();
     }
   }
+}
+
+/**
+ * Marks the route host after application rendering has settled so startup can adopt
+ * string-rendered pages that do not carry a template hydration identity.
+ * @param window Prerender browser realm containing the settled document.
+ * @param pathname Normalized route path represented by the generated document.
+ */
+function markPrerenderedRoute(window: Window, pathname: string): void {
+  const routeHost = Array.from(window.document.querySelectorAll('[path]'))
+    .map(element => element as unknown as HTMLElement)
+    .find(element => element.getAttribute('path') === pathname && element.parentElement?.localName.includes('-'));
+  if (!routeHost) return;
+
+  routeHost.setAttribute(HYDRATION_ROUTE_ATTRIBUTE, 'true');
+  routeHost.setAttribute(HYDRATION_ROUTE_VERSION_ATTRIBUTE, HYDRATION_ROUTE_VERSION);
 }
 
 /**
