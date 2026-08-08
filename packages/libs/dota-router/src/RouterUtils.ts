@@ -1,7 +1,6 @@
-import {ComponentClass, RenderConfig, RouteConfig, Router} from "@dota/Types";
-import {matchRoute} from "@dota/route/route-matcher";
+import {ComponentClass, RouteConfig, Router} from "@dota/Types";
 import 'reflect-metadata';
-import {HelperUtils, ComponentConfig} from "@ayu-sh-kr/dota-core";
+import {HelperUtils} from "@ayu-sh-kr/dota-core";
 
 /** Preserves legacy path, rendering, and route-metadata helpers for applications. */
 export class RouterUtils {
@@ -65,56 +64,6 @@ export class RouterUtils {
   static isParent(path: string): boolean {
     const segments = path.split('/').filter(segment => segment.length > 0);
     return segments.length <= 1;
-  }
-
-  /**
-   * Renders a legacy route configuration into the router's root host.
-   * This preserves custom render callbacks and the historical `/error` redirect;
-   * coordinator adapters use `createRouteRenderer` for new transitions.
-   * @param config - Legacy path, route tree, options, and router context.
-   * @deprecated Use a coordinator with a `RouteRenderer` callback for new integrations.
-   */
-  static render<T extends HTMLElement>(config: RenderConfig<T>): void {
-    const {path, routes, options} = config;
-    const router = config.router as Router<T>;
-    const rootConfig: ComponentConfig = HelperUtils.getComponentMetadata(router.root, 'Component');
-    const rootElement = document.querySelector(`#${rootConfig.selector}`)
-    if (!rootElement) {
-      console.error(`Root element not found for selector: ${rootConfig.selector}`);
-      return;
-    }
-
-    if (path === '/error') {
-      if (Reflect.hasOwnMetadata('Component', router.errorRoute.component)) {
-        const config: ComponentConfig = Reflect.getOwnMetadata('Component', router.errorRoute.component);
-        rootElement.innerHTML = `
-            <${config.selector} message="${options?.message || 'Path not found'}"></${config.selector}>
-        `;
-        return;
-      }
-      console.error(`Error route component not found for path: ${path}`);
-    }
-
-    const route = matchRoute(path, routes, router.errorRoute);
-    if (route === router.errorRoute) {
-      console.warn(`Route not found for path: ${path}`);
-      RouterUtils.route(router, '/error');
-      return;
-    }
-
-    if (route.render) {
-      console.info(`Using custom render for path: ${path}`);
-      route.render(path);
-      return;
-    }
-
-    if (Reflect.hasOwnMetadata('Component', route.component)) {
-      const config: ComponentConfig = Reflect.getOwnMetadata('Component', route.component);
-      rootElement.innerHTML = `<${config.selector} path="${path}"></${config.selector}>`;
-      return;
-    }
-
-    console.error(`Component not found for path: ${path}`);
   }
 
   /**
