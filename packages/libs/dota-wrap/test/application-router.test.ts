@@ -3,6 +3,11 @@ import {initializeApp, registerRoutes} from "../src";
 import {RouteConfig} from "../src/router";
 import {BaseElement, Component} from "../src/core";
 
+vi.mock('@ayu-sh-kr/dota-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@ayu-sh-kr/dota-core')>();
+  return { ...actual, setMountStrategy: vi.fn() };
+});
+
 class AppRoot extends HTMLElement {}
 class HomePage extends HTMLElement {}
 class ErrorPage extends HTMLElement {}
@@ -101,5 +106,29 @@ describe("application router setup", () => {
     });
 
     expect(order.slice(0, 2)).toEqual(['setup', 'connected']);
+  });
+
+  it("throws a clear diagnostic when two plugins both claim the mount strategy slot", async () => {
+    const noop = () => ({} as any);
+    const pluginA = {
+      name: 'hydration-a',
+      setup(ctx: any) { ctx.setMountStrategy(noop); }
+    };
+    const pluginB = {
+      name: 'hydration-b',
+      setup(ctx: any) { ctx.setMountStrategy(noop); }
+    };
+
+    await expect(
+      initializeApp({
+        modules: [],
+        defaultRoute: { path: '/', component: class extends HTMLElement {} },
+        errorRoute: { path: '/error', component: class extends HTMLElement {} },
+        root: class extends HTMLElement {},
+        plugins: [pluginA, pluginB]
+      })
+    ).rejects.toThrow(
+      /two hydration-capable plugins both claim the exclusive mount strategy slot: "hydration-a".*"hydration-b"/
+    );
   });
 });

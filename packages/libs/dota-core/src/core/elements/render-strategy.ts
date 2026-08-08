@@ -3,7 +3,7 @@ import {
   type MountResult,
   type RenderOutput
 } from '@ayu-sh-kr/dota-rendering';
-import type {BaseElement} from './base-elements';
+import type {BaseElement} from '@dota/core';
 
 /**
  * Selects how a component's initial output becomes associated with its render root.
