@@ -149,6 +149,25 @@ version, or part structure does not match. `throw` is useful in development or
 CI when deployment skew must fail loudly. Missing markers are treated as an
 ordinary client-rendered mount, so static HTML is never adopted accidentally.
 
+### HYDRATED lifecycle event
+
+When a component's server DOM is successfully adopted, `dotaHydration()` tags the returned
+`MountResult` with `hydrated: true`. Dota Core reads this flag and emits the `HYDRATED`
+lifecycle event — distinct from `CONNECTED` — before the component's normal `CONNECTED` event
+fires. Consumers and telemetry can listen for `HYDRATED` to observe "this host was adopted from
+server DOM" without inspecting markers:
+
+```ts
+import {LifecycleEventConstants} from '@ayu-sh-kr/dota-core';
+
+channel.on(LifecycleEventConstants.HYDRATED, () => {
+  // Fires only for hosts that adopted server DOM; never for fresh mounts or mismatch fallbacks.
+});
+```
+
+Fresh mounts, deferred-ownership mounts, and mismatch-recovery mounts all follow the ordinary
+`render()` path, so `CONNECTED` remains the only lifecycle event for those cases.
+
 ### Initial route handoff
 
 The browser plugin captures the configured root and its direct route host while
@@ -176,9 +195,31 @@ pages. `data-dh-t` and `data-dh-v` continue to establish fine-grained template
 hydration eligibility. The route marker does not make string content patchable;
 the page enters ordinary rendering on its first update.
 
+A page with no `data-dh-route` is still accepted as a **legacy** route host, but
+only when its `data-dh-v` equals the fixed sentinel `LEGACY_ROUTE_TEMPLATE_VERSION`
+(currently `2`) — the last template version emitted before route markers existed.
+That sentinel does not track `MARKER_VERSION` as it changes in future releases, so
+a page emitted under a later template version with no route marker is no longer
+silently adopted; it's captured, fails adoption, and is reported through `mismatch`
+like any other route-marker mismatch above. This closes what would otherwise be an
+open-ended legacy fallback.
+
 The handoff is one-time. Initial mismatches, custom route renderers, redirects,
 and later navigations release it and call the normal router renderer. This keeps
 stale static DOM from suppressing a legitimate route transition.
+
+A captured route that fails to match the initial client route (wrong path, missing
+marker, mismatched component) is now reported through the same `mismatch` policy
+passed to `dotaHydration()` — `warn` logs it and falls through to the router
+renderer; `throw` surfaces it as a rejected navigation. A route intentionally using
+a custom `render` callback is never reported this way, since that's a deliberate
+bypass rather than a mismatch.
+
+`setHydrationMismatchPolicy` (from `@ayu-sh-kr/dota-rendering`) is deprecated on
+this path: `dotaHydration()` always calls `hydrate()` with its own resolved
+`mismatch` option, so the module-level default has no effect here. It only still
+matters for code calling `dota-rendering`'s `hydrate()` directly, outside of this
+plugin.
 
 ## Deployment redirects
 

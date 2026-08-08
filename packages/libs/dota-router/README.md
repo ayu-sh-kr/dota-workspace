@@ -147,6 +147,45 @@ const previousPath = RouterUtils.getPreviousPath();
 const currentPath = RouterUtils.getCurrentPath();
 ```
 
+## SSR / SSG output on first render
+
+`dota-router` renders every route — including the very first one — by writing the matched
+component's tag into the root element's `innerHTML`. Used standalone, this **always**
+overwrites whatever markup is already inside the root, including server- or build-time
+prerendered HTML.
+
+If the root still contains marked prerendered output (`data-dh-route` or `data-dh-t`) when
+the initial route renders, `dota-router` now logs a `console.warn` before overwriting it, so
+the loss is visible instead of silent. It does not, on its own, preserve that output — router
+package has no dependency on the hydration marker contract and stays usable outside of an
+SSR/SSG setup.
+
+To keep prerendered HTML on the initial load, wrap the app with `dota-wrap`'s
+`initializeApp()` and its `dotaHydration()` plugin (see
+`documentation/standards/hydration-ssr/README.md`), which intercepts the first route render
+before `dota-router`'s own overwrite runs. Without that plugin, treat `dota-router` as **not
+SSR-safe** for the initial paint.
+
+## Render-time error policy
+
+`createRouteRenderer` accepts an optional second argument to control what happens when the
+root component or route component is missing decorated metadata, or the root element isn't
+in the DOM:
+
+```typescript
+import { createRouteRenderer } from '@ayu-sh-kr/dota-router';
+
+// Default: warn — log via console.error and leave existing DOM untouched.
+const renderer = createRouteRenderer(AppRoot);
+
+// Strict: throw — the failure surfaces through the coordinator's navigate() result
+// instead of being swallowed, matching how bad router construction already fails hard.
+const strictRenderer = createRouteRenderer(AppRoot, { onError: 'throw' });
+```
+
+The default (`warn`) preserves the router's original behavior exactly — this option is
+additive and opt-in.
+
 ## Contributing
 
 1. Fork the repository

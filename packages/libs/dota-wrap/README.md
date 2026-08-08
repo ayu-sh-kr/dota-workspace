@@ -216,6 +216,23 @@ Keep the renderer returned by the wrapper as the fallback. This allows multiple
 runtime extensions to compose and leaves route-specific custom renderers under
 Router's control.
 
+### Mount strategy exclusivity
+
+The mount strategy slot is exclusive: at most one plugin in the `plugins` array may call
+`context.setMountStrategy()` during its `setup()`. If two plugins both claim it,
+`initializeApp` throws before registering components, naming both conflicting plugins so the
+misconfiguration is immediately visible:
+
+```
+dota-wrap: two hydration-capable plugins both claim the exclusive mount strategy slot:
+"hydration-a" (already registered) and "hydration-b" (attempted).
+Remove one from the plugins array — they cannot coexist.
+```
+
+This guard is enforced at the `runtimeContext` level by `initializeApp`, so the error names
+the plugins rather than surfacing `dota-core`'s generic internal throw. Plugins that only call
+`context.wrapRouteRenderer()` are not affected — only `setMountStrategy()` is exclusive.
+
 ## Package boundary
 
 The public contract is the `@ayu-sh-kr/dota-wrap` package and its documented

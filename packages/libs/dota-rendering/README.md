@@ -148,14 +148,19 @@ switches strategy and keeps Core's integration simple.
 ## Hydration support
 
 `hydrate()` adopts server-rendered structured output when the caller has already validated that
-the host's template identity and marker version match the client output. It returns the same
-`RenderInstance` contract used by `render()`.
+the host's template identity and marker version match the client output. It returns a
+`MountResult` — the same `RenderInstance` contract used by `render()`, extended with an
+optional `hydrated: true` flag that signals successful adoption to `dota-core`'s lifecycle
+machinery. Dota Core reads that flag on the value returned by the active mount strategy and
+emits the `HYDRATED` lifecycle event before `CONNECTED` when it is set.
 
 ```ts
-import {hydrate, html, update} from '@ayu-sh-kr/dota-rendering';
+import {hydrate, html, update, type MountResult} from '@ayu-sh-kr/dota-rendering';
 
-const view = hydrate(root, html`<h1>${title}</h1>`, {mismatch: 'warn'});
-update(view, html`<h1>${nextTitle}</h1>`);
+const result: MountResult = hydrate(root, html`<h1>${title}</h1>`, {mismatch: 'warn'});
+// result.hydrated is absent here — hydrate() returns a plain RenderInstance.
+// dota-ssr's mount strategy wraps the result with { hydrated: true } after a successful adopt.
+update(result, html`<h1>${nextTitle}</h1>`);
 ```
 
 `warn` remounts the affected root when adoption fails; `throw` surfaces the mismatch. The Dota
@@ -225,7 +230,10 @@ main architectural boundary maintainers should preserve.
 | Render strategy | Last output, parts, nested sessions | Translate a diff decision into browser mutations. |
 | Render root | Native root or sibling-range boundary | Limit where a strategy may replace or insert nodes. |
 
-`RenderInstance` is intentionally the only stateful renderer contract exposed to Core. The
+`RenderInstance` is the core stateful renderer contract, and `MountResult` (`RenderInstance & { hydrated?: true }`)
+is the extended type returned by mount strategies. `hydrated: true` is set only by strategies that
+successfully adopted server DOM; the flag is absent for all ordinary `render()` and `deferRender()` paths.
+Dota Core reads this flag and emits the `HYDRATED` lifecycle event when it is present. The
 concrete session, strategies, roots, and part records remain internal so their implementation
 can evolve without changing the Core integration.
 

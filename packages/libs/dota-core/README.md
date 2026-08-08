@@ -352,6 +352,43 @@ export class NeatPotsBeam extends BaseElement {
 
 This guide provides a basic example of creating and using a web component with `dota-core`. For more advanced usage and features, refer to the library's API documentation.
 
+## Lifecycle events
+
+Every `BaseElement` instance emits named lifecycle events through its `EventChannel`
+(`@ayu-sh-kr/dota-event`). Subscribe from another component or service using the channel's
+`on()` method.
+
+| Constant | Value | When it fires |
+| --- | --- | --- |
+| `CONSTRUCTED` | `'constructed'` | Instance is created; not yet in the DOM. |
+| `CONNECTED` | `'connected'` | Component is in the DOM and all bindings have resolved. Always fires on every mount path. |
+| `HYDRATED` | `'hydrated'` | Component adopted existing server DOM instead of performing a fresh paint. Fires **before** `CONNECTED` on the same microtask cycle, only when a hydration-capable mount strategy (e.g. `dotaHydration()`) successfully adopted the server markup. Never fires for fresh mounts or deferred-ownership mounts. |
+| `DISCONNECTED` | `'disconnected'` | Component is removed from the DOM and all bindings have been cleaned up. |
+| `ATTRIBUTE_CHANGED` | `'attribute-changed'` | One of the component's observed attributes changed value. |
+| `DOM_UPDATED` | `'dom-updated'` | The component's internal DOM was re-rendered by `updateHTML()`. |
+
+### Observing hydration vs. fresh mount
+
+`HYDRATED` lets telemetry or feature code distinguish the two initial-mount paths without
+inspecting DOM attributes:
+
+```typescript
+import {LifecycleEventConstants} from '@ayu-sh-kr/dota-core';
+
+// Inside another component or a service that has access to the channel
+channel.on(LifecycleEventConstants.HYDRATED, () => {
+  console.log('component adopted server DOM');
+});
+channel.on(LifecycleEventConstants.CONNECTED, () => {
+  console.log('component fully initialized');
+});
+```
+
+`HYDRATED` fires only when a strategy installed through `context.setMountStrategy()`
+returns a `MountResult` with `hydrated: true`. The default `render()` mount and the
+`deferRender()` ownership-handoff path both leave the flag absent, so `CONNECTED`
+remains the only lifecycle event for those paths.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.

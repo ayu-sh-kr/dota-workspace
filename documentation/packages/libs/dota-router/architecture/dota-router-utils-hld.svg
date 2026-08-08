@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 3000" width="1600" height="3000" role="img" aria-labelledby="diagram-title diagram-desc">
-  <title id="diagram-title">RouterUtils high-level design</title>
-  <desc id="diagram-desc">RouterUtils builds hierarchical routes from component metadata, resolves a pathname, handles error and custom-render branches, and renders a component into the root element.</desc>
+  <title id="diagram-title">Route Renderer · RouterUtils high-level design</title>
+  <desc id="diagram-desc">createRouteRenderer creates a coordinator-compatible RouteRenderer; renderRoute resolves root metadata, handles route.render, SSR warn on initial overwrite, and writes the matched component tag.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
@@ -54,83 +54,99 @@
   <path d="M 800 404 V 495" class="connector"/>
   <path d="M 800 559 V 650" class="connector"/>
 
-  <rect x="50" y="880" width="1500" height="1840" rx="18" class="frame"/>
-  <rect x="50" y="880" width="6" height="1840" rx="3" fill="#0f766e"/>
-  <text x="85" y="925" class="section">02 / RESOLVE AND RENDER</text>
-  <text x="85" y="953" class="note">The adapter supplies pathname, routes, router context, and optional render settings.</text>
+  <rect x=”50” y=”880” width=”1500” height=”1840” rx=”18” class=”frame”/>
+  <rect x=”50” y=”880” width=”6” height=”1840” rx=”3” fill=”#0f766e”/>
+  <text x=”85” y=”925” class=”section”>02 / RESOLVE AND RENDER</text>
+  <text x=”85” y=”953” class=”note”>The coordinator calls createRouteRenderer once, then renderRoute per navigation supplying root, match, and context.</text>
 
-  <rect x="500" y="1010" width="360" height="64" class="card entry"/>
-  <text x="680" y="1050" text-anchor="middle" class="label entry-label">RouterUtils.render(config)</text>
-  <rect x="500" y="1165" width="360" height="64" class="card decision"/>
-  <text x="680" y="1205" text-anchor="middle" class="label">root element found?</text>
-  <rect x="1000" y="1165" width="360" height="64" class="card skip"/>
-  <text x="1180" y="1205" text-anchor="middle" class="label">log error → return</text>
-  <text x="1180" y="1254" text-anchor="middle" class="note">root metadata selector not found</text>
+  <!-- Entry cards -->
+  <rect x=”500” y=”990” width=”360” height=”64” class=”card entry”/>
+  <text x=”680” y=”1030” text-anchor=”middle” class=”label entry-label”>createRouteRenderer(root)</text>
+  <text x=”680” y=”1070” text-anchor=”middle” class=”note”>returns RouteRenderer for coordinator</text>
 
-  <rect x="500" y="1320" width="360" height="64" class="card decision"/>
-  <text x="680" y="1360" text-anchor="middle" class="label">path === “/error”?</text>
-  <rect x="1000" y="1320" width="360" height="64" class="card decision"/>
-  <text x="1180" y="1360" text-anchor="middle" class="label">error component metadata?</text>
-  <rect x="1000" y="1475" width="360" height="64" class="card effect"/>
-  <text x="1180" y="1515" text-anchor="middle" class="label">render error element</text>
-  <text x="1180" y="1564" text-anchor="middle" class="note">message option or “Path not found”</text>
+  <rect x=”500” y=”1100” width=”360” height=”64” class=”card entry”/>
+  <text x=”680” y=”1140” text-anchor=”middle” class=”label entry-label”>renderRoute(root, match, ctx)</text>
+  <text x=”680” y=”1180” text-anchor=”middle” class=”note”>called per navigation by coordinator</text>
 
-  <rect x="500" y="1475" width="360" height="64" class="card process"/>
-  <text x="680" y="1515" text-anchor="middle" class="label">findRoute(path, routes)</text>
-  <text x="480" y="1564" text-anchor="end" class="note">exact → prefix + children → getChildPath</text>
-  <text x="480" y="1588" text-anchor="end" class="note">recursive lookup → parent fallback</text>
+  <!-- Decision 1: root metadata found? -->
+  <rect x=”500” y=”1220” width=”360” height=”64” class=”card decision”/>
+  <text x=”680” y=”1260” text-anchor=”middle” class=”label”>root metadata found?</text>
+  <rect x=”1000” y=”1220” width=”360” height=”64” class=”card skip”/>
+  <text x=”1180” y=”1260” text-anchor=”middle” class=”label”>reportRenderError → return</text>
+  <text x=”1180” y=”1300” text-anchor=”middle” class=”note”>warn or throw per options.onError</text>
 
-  <rect x="500" y="1630" width="360" height="64" class="card decision"/>
-  <text x="680" y="1670" text-anchor="middle" class="label">route found?</text>
-  <rect x="1000" y="1630" width="360" height="64" class="card effect"/>
-  <text x="1180" y="1670" text-anchor="middle" class="label">route(router, “/error”)</text>
-  <text x="1180" y="1719" text-anchor="middle" class="note">normalize slash → adapter.route(path)</text>
+  <!-- Decision 2: root element in DOM? -->
+  <rect x=”500” y=”1380” width=”360” height=”64” class=”card decision”/>
+  <text x=”680” y=”1420” text-anchor=”middle” class=”label”>root element in DOM?</text>
+  <rect x=”1000” y=”1380” width=”360” height=”64” class=”card skip”/>
+  <text x=”1180” y=”1420” text-anchor=”middle” class=”label”>reportRenderError → return</text>
+  <text x=”1180” y=”1460” text-anchor=”middle” class=”note”>root element not mounted</text>
 
-  <rect x="500" y="1785" width="360" height="64" class="card decision"/>
-  <text x="680" y="1825" text-anchor="middle" class="label">route.render exists?</text>
-  <rect x="1000" y="1785" width="360" height="64" class="card effect"/>
-  <text x="1180" y="1825" text-anchor="middle" class="label">route.render(path)</text>
-  <text x="1180" y="1874" text-anchor="middle" class="note">custom rendering owns the DOM effect</text>
+  <!-- Decision 3: initial + marked server output? -->
+  <rect x=”500” y=”1540” width=”360” height=”64” class=”card decision”/>
+  <text x=”680” y=”1580” text-anchor=”middle” class=”label”>initial + marked server output?</text>
+  <rect x=”1000” y=”1540” width=”360” height=”64” class=”card skip”/>
+  <text x=”1180” y=”1580” text-anchor=”middle” class=”label”>console.warn</text>
+  <text x=”1180” y=”1620” text-anchor=”middle” class=”note”>SSR output will be overwritten</text>
 
-  <rect x="500" y="1940" width="360" height="64" class="card decision"/>
-  <text x="680" y="1980" text-anchor="middle" class="label">component metadata exists?</text>
-  <rect x="1000" y="1940" width="360" height="64" class="card effect"/>
-  <text x="1180" y="1980" text-anchor="middle" class="label">replace root.innerHTML</text>
-  <text x="1180" y="2029" text-anchor="middle" class="note">&lt;component-selector path="path"&gt;</text>
-  <rect x="1000" y="2095" width="360" height="64" class="card skip"/>
-  <text x="1180" y="2135" text-anchor="middle" class="label">log component error</text>
+  <!-- route.seo side branch -->
+  <rect x=”500” y=”1700” width=”360” height=”64” class=”card decision”/>
+  <text x=”680” y=”1740” text-anchor=”middle” class=”label”>route.seo?</text>
+  <rect x=”1000” y=”1700” width=”360” height=”64” class=”card effect”/>
+  <text x=”1180” y=”1740” text-anchor=”middle” class=”label”>updateDocumentSEO(seo)</text>
+  <text x=”1180” y=”1780” text-anchor=”middle” class=”note”>sets title, meta tags</text>
 
-  <path d="M 680 1074 V 1165" class="connector"/>
-  <path d="M 860 1197 H 1000" class="connector"/>
-  <text x="882" y="1181" class="branch">no</text>
-  <path d="M 680 1229 V 1320" class="connector"/>
-  <text x="700" y="1275" class="branch">yes</text>
-  <path d="M 860 1352 H 1000" class="connector"/>
-  <text x="882" y="1336" class="branch">yes</text>
-  <path d="M 1180 1384 V 1475" class="connector"/>
-  <text x="1200" y="1432" class="branch">yes</text>
-  <path d="M 1000 1352 H 940 V 1507 H 860" class="connector"/>
-  <text x="948" y="1434" class="branch">no: log + continue</text>
-  <path d="M 680 1384 V 1475" class="connector"/>
-  <text x="700" y="1432" class="branch">no</text>
-  <path d="M 680 1539 V 1630" class="connector"/>
-  <path d="M 860 1662 H 1000" class="connector"/>
-  <text x="882" y="1646" class="branch">no</text>
-  <path d="M 680 1694 V 1785" class="connector"/>
-  <text x="700" y="1740" class="branch">yes</text>
-  <path d="M 860 1817 H 1000" class="connector"/>
-  <text x="882" y="1801" class="branch">yes</text>
-  <path d="M 680 1849 V 1940" class="connector"/>
-  <text x="700" y="1895" class="branch">no</text>
-  <path d="M 860 1972 H 1000" class="connector"/>
-  <text x="882" y="1956" class="branch">yes</text>
-  <path d="M 680 2004 V 2060 H 940 V 2127 H 1000" class="connector"/>
-  <text x="700" y="2050" class="branch">no</text>
+  <!-- Decision 4: route.render? -->
+  <rect x=”500” y=”1860” width=”360” height=”64” class=”card decision”/>
+  <text x=”680” y=”1900” text-anchor=”middle” class=”label”>route.render?</text>
+  <rect x=”1000” y=”1860” width=”360” height=”64” class=”card effect”/>
+  <text x=”1180” y=”1900” text-anchor=”middle” class=”label”>route.render(pathname)</text>
+  <text x=”1180” y=”1940” text-anchor=”middle” class=”note”>custom rendering owns the DOM effect → return</text>
 
-  <rect x="85" y="2240" width="1430" height="125" rx="12" class="lane"/>
-  <text x="115" y="2282" class="section">PATH HELPERS</text>
-  <text x="260" y="2282" class="note">getCurrentPath() reads window.location.pathname.</text>
-  <text x="260" y="2310" class="note">getPreviousPath() reads the Navigation API entry list; getNextPath(), getParentPath(), and isParent() support path calculations.</text>
-  <text x="85" y="2410" class="source">Source: packages/libs/dota-router/src/RouterUtils.ts · Types.ts</text>
-  <text x="85" y="2437" class="source">Related: dota-router-service-hld.svg · dota-router-adapters-hld.svg</text>
+  <!-- Decision 5: component metadata? -->
+  <rect x=”500” y=”2020” width=”360” height=”64” class=”card decision”/>
+  <text x=”680” y=”2060” text-anchor=”middle” class=”label”>component metadata?</text>
+  <rect x=”1000” y=”2020” width=”360” height=”64” class=”card skip”/>
+  <text x=”1180” y=”2060” text-anchor=”middle” class=”label”>reportRenderError → return</text>
+  <text x=”1180” y=”2100” text-anchor=”middle” class=”note”>no component for matched route</text>
+
+  <!-- Final effect -->
+  <rect x=”500” y=”2180” width=”360” height=”64” class=”card effect”/>
+  <text x=”680” y=”2220” text-anchor=”middle” class=”label”>rootElement.innerHTML =</text>
+  <text x=”680” y=”2256” text-anchor=”middle” class=”note”>&lt;selector path=”...”&gt;</text>
+
+  <!-- Connectors Section 02 -->
+  <path d=”M 680 1054 V 1100” class=”connector”/>
+  <path d=”M 680 1164 V 1220” class=”connector”/>
+  <path d=”M 860 1252 H 1000” class=”connector”/>
+  <text x=”882” y=”1236” class=”branch”>no</text>
+  <path d=”M 680 1284 V 1380” class=”connector”/>
+  <text x=”700” y=”1334” class=”branch”>yes</text>
+  <path d=”M 860 1412 H 1000” class=”connector”/>
+  <text x=”882” y=”1396” class=”branch”>no</text>
+  <path d=”M 680 1444 V 1540” class=”connector”/>
+  <text x=”700” y=”1494” class=”branch”>yes</text>
+  <path d=”M 860 1572 H 1000” class=”connector”/>
+  <text x=”882” y=”1556” class=”branch”>yes</text>
+  <path d=”M 680 1604 V 1700” class=”connector”/>
+  <text x=”700” y=”1654” class=”branch”>no</text>
+  <path d=”M 860 1732 H 1000” class=”connector”/>
+  <text x=”882” y=”1716” class=”branch”>yes</text>
+  <path d=”M 680 1764 V 1860” class=”connector”/>
+  <text x=”700” y=”1814” class=”branch”>no / after SEO</text>
+  <path d=”M 860 1892 H 1000” class=”connector”/>
+  <text x=”882” y=”1876” class=”branch”>yes</text>
+  <path d=”M 680 1924 V 2020” class=”connector”/>
+  <text x=”700” y=”1974” class=”branch”>no</text>
+  <path d=”M 860 2052 H 1000” class=”connector”/>
+  <text x=”882” y=”2036” class=”branch”>no</text>
+  <path d=”M 680 2084 V 2180” class=”connector”/>
+  <text x=”700” y=”2134” class=”branch”>yes</text>
+
+  <rect x=”85” y=”2360” width=”1430” height=”125” rx=”12” class=”lane”/>
+  <text x=”115” y=”2402” class=”section”>PATH HELPERS</text>
+  <text x=”260” y=”2402” class=”note”>getCurrentPath() reads window.location.pathname.</text>
+  <text x=”260” y=”2430” class=”note”>getPreviousPath() reads the Navigation API entry list; getNextPath(), getParentPath(), and isParent() support path calculations.</text>
+  <text x=”85” y=”2530” class=”source”>Source: packages/libs/dota-router/src/coordinator/route-renderer.ts · Types.ts</text>
+  <text x=”85” y=”2557” class=”source”>Related: dota-router-service-hld.svg · dota-router-adapters-hld.svg</text>
 </svg>
