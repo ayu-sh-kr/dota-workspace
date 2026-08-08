@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 3700" width="2400" height="3700" role="img" aria-labelledby="diagram-title diagram-desc">
   <title id="diagram-title">Dota Rendering renderer flow</title>
-  <desc id="diagram-desc">The renderer lifecycle from public render and update entry points through stable sessions, legacy and template strategies, diff outcomes, durable marker emission, hydration adoption, detached part discovery, nested ranges, and root-bounded DOM commits.</desc>
+  <desc id="diagram-desc">The renderer lifecycle from public render and update entry points through stable sessions, legacy and template strategies, deferred ownership, diff outcomes, durable marker emission, hydration adoption, detached part discovery, nested ranges, and root-bounded DOM commits.</desc>
 
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
@@ -246,6 +246,11 @@
   <path d="M 50 2900 H 2350 M 50 3540 H 2350" class="group"/>
   <text x="75" y="2894" class="section">04 / DURABLE MARKERS AND HYDRATION ADOPTION</text>
   <text x="75" y="2924" class="note">Build-time marker emission is opt-in. Hydration reconstructs in-memory parts over validated server DOM without replacing the owned root.</text>
+
+  <rect x="140" y="3340" width="380" height="64" class="card entry"/>
+  <text x="330" y="3366" text-anchor="middle" class="label">deferRender(initial output)</text>
+  <text x="330" y="3390" text-anchor="middle" class="note">no DOM mutation until first update</text>
+  <path d="M 520 3372 V 3440 H 1650 V 3404 H 1700" class="connector"/>
 
   <rect x="140" y="3000" width="380" height="64" class="card entry"/>
   <text x="330" y="3039" text-anchor="middle" class="label">setHydrationEmit(true)</text>
