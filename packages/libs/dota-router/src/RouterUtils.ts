@@ -1,6 +1,5 @@
 import {ComponentClass, RouteConfig, Router} from "@dota/Types";
 import 'reflect-metadata';
-import {HelperUtils} from "@ayu-sh-kr/dota-core";
 
 /** Preserves legacy path, rendering, and route-metadata helpers for applications. */
 export class RouterUtils {
