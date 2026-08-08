@@ -2,7 +2,7 @@
   <title>dota-wrap High-Level Design</title>
   <desc>
     Light-mode high-level design for dota-wrap. The diagram shows public entry points,
-    build dependency resolution, and runtime application initialization. All connectors
+    build dependency resolution, and runtime application initialization with plugin setup before custom-element upgrade. All connectors
     use horizontal and vertical segments; numbered markers identify dense branch points.
   </desc>
 
@@ -108,7 +108,7 @@
 
   <!-- RUNTIME INITIALIZATION -->
   <rect class="lane" x="40" y="700" width="1520" height="285" rx="16"/>
-  <text class="lane-label" x="800" y="728">RUNTIME INITIALIZATION</text>
+  <text class="lane-label" x="800" y="728">RUNTIME INITIALIZATION · PLUGINS BEFORE BOOTSTRAP</text>
 
   <rect class="card entry" x="100" y="805" width="260" height="52"/>
   <text class="label" x="230" y="831">initializeApp</text>
@@ -126,7 +126,7 @@
   <text class="annotation" x="1060" y="973">async module map</text>
 
   <rect class="card ready" x="1300" y="815" width="200" height="52"/>
-  <text class="label" x="1400" y="841">append + bootstrap</text>
+  <text class="label" x="1400" y="841">plugins + bootstrap</text>
   <rect class="card ready" x="1300" y="920" width="200" height="52"/>
   <text class="label" x="1400" y="946">routes + ready</text>
 
