@@ -105,3 +105,15 @@ export interface RenderInstance {
   /** Releases nested range instances without clearing committed DOM. */
   dispose(): void;
 }
+
+/**
+ * Result returned by a `MountStrategy`.
+ * When the strategy adopted existing server DOM instead of performing a fresh paint it
+ * sets `hydrated: true`; `dota-core` reads this flag to emit the `HYDRATED` lifecycle
+ * event so consumers and telemetry can observe "this host was hydrated from server DOM."
+ * Strategies that do not set the flag (the default mount and `deferRender`) leave the
+ * property absent — `dota-core` treats absent and `false` identically.
+ */
+export type MountResult = RenderInstance & {
+  readonly hydrated?: true;
+};
