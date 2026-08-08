@@ -41,7 +41,15 @@ export type AppConfig = {
   root: ComponentClass;
   /** Application-wide guards and lifecycle observers. */
   globalHooks?: GlobalNavigationHooks<HTMLElement>;
-  /** Ordered opt-in runtime extensions; omission preserves all built-in defaults. */
+  /**
+   * Ordered opt-in runtime extensions; omission preserves all built-in defaults.
+   *
+   * **Constraint:** at most one plugin in this array may call `context.setMountStrategy()`
+   * during its `setup()`. The mount strategy slot is exclusive — a second claim crashes the
+   * application at startup. If two hydration-capable plugins are both listed here, remove one;
+   * they cannot coexist. `initializeApp` throws a clear error naming both conflicting plugins
+   * so the misconfiguration is immediately identifiable in the console.
+   */
   plugins?: readonly DotaRuntimePlugin[];
 }
 
@@ -152,13 +160,33 @@ export async function initializeApp(config: AppConfig): Promise<{
   routerService: RouterService<Router<HTMLElement>>
 }> {
   let routeRenderer = createRouteRenderer(config.root);
+
+  // Track which plugin owns the mount strategy slot so a double-registration
+  // surfaces a diagnostic naming both plugins instead of dota-core's generic throw.
+  let mountStrategyOwner: string | null = null;
+  let currentPlugin = '<unknown>';
+
   const runtimeContext: DotaRuntimeContext = {
-    setMountStrategy,
+    setMountStrategy(strategy) {
+      if (mountStrategyOwner !== null) {
+        throw new Error(
+          `dota-wrap: two hydration-capable plugins both claim the exclusive mount strategy slot: ` +
+          `"${mountStrategyOwner}" (already registered) and "${currentPlugin}" (attempted). ` +
+          `Remove one from the plugins array — they cannot coexist.`
+        );
+      }
+      mountStrategyOwner = currentPlugin;
+      setMountStrategy(strategy);
+    },
     wrapRouteRenderer(wrapper) {
       routeRenderer = wrapper(routeRenderer, config.root);
     }
   };
-  config.plugins?.forEach((plugin) => plugin.setup?.(runtimeContext));
+
+  config.plugins?.forEach((plugin) => {
+    currentPlugin = plugin.name;
+    plugin.setup?.(runtimeContext);
+  });
 
   const components = await registerComponents(config.modules, config.externalComponents);
   console.info(`${components.length} Components registered.`);
