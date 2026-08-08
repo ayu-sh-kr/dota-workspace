@@ -1280,6 +1280,10 @@ export function hydrate(
 /**
  * Sets the default mismatch behavior used by hydrate() calls that do not supply an option.
  * @param policy `warn` replaces only the affected root; `throw` surfaces the mismatch.
+ * @deprecated Has no effect on `hydrate()` calls that pass an explicit `{mismatch}` option —
+ * which includes every call made through `dota-ssr`'s `dotaHydration()` plugin, since it
+ * always passes its own resolved policy. This only still applies to code calling `hydrate()`
+ * directly, outside of `dota-ssr`, without an explicit option.
  */
 export function setHydrationMismatchPolicy(policy: HydrationMismatchPolicy): void {
   hydrationMismatchPolicy = policy;
