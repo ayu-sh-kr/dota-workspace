@@ -4,6 +4,7 @@ export {DotaRouterService} from "@dota/DotaRouterService";
 export {configure, matchRoute, resolveRoute} from "@dota/route";
 export {NavigationCoordinator, HistoryCoordinator} from "@dota/coordinator";
 export {createRouteRenderer, renderRoute} from "@dota/coordinator";
+export type {RouteRenderErrorPolicy, RouteRendererOptions} from "@dota/coordinator";
 export type {Coordinator} from "@dota/coordinator";
 export {runRouteGuards, runRouteLifecycleHooks} from "@dota/coordinator/navigation-lifecycle";
 export {Route} from "@dota/route.decorator";
