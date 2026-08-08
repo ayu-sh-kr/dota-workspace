@@ -1,5 +1,14 @@
 # @ayu-sh-kr/dota-md
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [fba2a36]
+  - @ayu-sh-kr/dota-rendering@0.1.4
+  - @ayu-sh-kr/dota-core@1.9.11
+  - @ayu-sh-kr/dota-web-type-json@0.0.14
+
 ## 0.0.14
 
 ### Patch Changes
