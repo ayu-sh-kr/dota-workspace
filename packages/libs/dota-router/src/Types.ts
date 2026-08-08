@@ -246,15 +246,6 @@ export type PreparedNavigation<T extends HTMLElement = HTMLElement> = {
 }
 
 /**
- * Represents the result of the coordinator's precommit preparation phase.
- * A prepared result is handed to postcommit rendering; any other result terminates
- * preparation with the same cancellation, redirect, or failure contract used by adapters.
- */
-export type NavigationPreparationResult<T extends HTMLElement = HTMLElement> =
-  | {status: "prepared"; prepared: PreparedNavigation<T>}
-  | NavigationResult<T>;
-
-/**
  * Legacy string options accepted by the static adapter navigation methods.
  * New coordinator callers should use `NavigationOptions` so state and history policy
  * have explicit meanings instead of an unvalidated key/value map.
@@ -264,20 +255,13 @@ export type NavigationOption = {
 }
 
 /**
- * Input retained by the compatibility renderer while navigation moves to a coordinator.
- * It carries the old pathname-based shape so existing adapter and application callers
- * can continue rendering during the transition to `RouteMatch`.
+ * Represents the result of the coordinator's precommit preparation phase.
+ * A prepared result is handed to postcommit rendering; any other result terminates
+ * preparation with the same cancellation, redirect, or failure contract used by adapters.
  */
-export type RenderConfig<T extends HTMLElement> = {
-  /** Requested pathname passed to the legacy renderer. */
-  path: string;
-  /** Configured route tree from the service. */
-  routes: RouteConfig<T>[];
-  /** Legacy message or rendering options consumed by the current renderer. */
-  options?: NavigationOption;
-  /** Adapter instance providing root and error route metadata. */
-  router: Router<T>;
-}
+export type NavigationPreparationResult<T extends HTMLElement = HTMLElement> =
+  | {status: "prepared"; prepared: PreparedNavigation<T>}
+  | NavigationResult<T>;
 
 /**
  * Construction input used when a service is created from explicit routes or decorated
