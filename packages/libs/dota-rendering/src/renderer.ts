@@ -6,14 +6,14 @@ import {
   isTrustedHtmlValue,
   valueText
 } from './template';
-import {
+import {nothing} from './types';
+import type {
   CommitResult,
   KeyedTemplate,
   RenderInstance,
   RenderKey,
   RenderOutput,
-  TemplateResult,
-  nothing
+  TemplateResult
 } from './types';
 import {
   HYDRATION_ATTRIBUTE_PART,
@@ -116,7 +116,11 @@ interface RenderRoot {
   writeHTML(value: string): void;
   /** Returns element and comment descendants in document order for marker adoption. */
   hydrationNodes(): Node[];
-  /** Stamps a component host when durable build-time output is requested. */
+  /**
+   * Stamps a component host when durable build-time output is requested.
+   * @param id Static template identity used to validate later hydration.
+   * @param scope Component-owned marker namespace shared by the rendered tree.
+   */
   stampHydrationIdentity(id: string, scope: string): void;
   /** Removes stale host identity after a hydrated template changes structure. */
   clearHydrationIdentity(): void;
@@ -245,7 +249,11 @@ class NativeRoot implements RenderRoot {
     return collectDescendants(this.root);
   }
 
-  /** Writes template identity to the light-DOM host or a shadow root's host. */
+  /**
+   * Writes template identity to the light-DOM host or a shadow root's host.
+   * @param id Static template identity used to validate later hydration.
+   * @param scope Component-owned marker namespace shared by the rendered tree.
+   */
   stampHydrationIdentity(id: string, scope: string): void {
     const host = this.root instanceof ShadowRoot ? this.root.host : this.root;
     host.setAttribute(HYDRATION_COMPONENT_ATTRIBUTE, host.localName);
@@ -324,7 +332,11 @@ class RangeRoot implements RenderRoot {
     return nodes;
   }
 
-  /** Nested ranges do not own a component host identity. */
+  /**
+   * Nested ranges do not own a component host identity.
+   * @param _id Ignored because nested ranges have no host identity.
+   * @param _scope Ignored because nested ranges reuse their parent marker scope.
+   */
   stampHydrationIdentity(_id: string, _scope: string): void {}
 
   /** Nested ranges do not own a component host identity. */
@@ -382,6 +394,7 @@ class RenderSession implements RenderInstance {
    * @param root Native or bounded root whose ownership remains stable for this session.
    * @param output Initial legacy or structured output.
    * @param mode Initial render mode, either 'mount' or 'hydrate'.
+   * @param hydrationScope Existing durable marker namespace when adopting server-rendered output.
    */
   constructor(
     private readonly root: RenderRoot,
@@ -440,6 +453,7 @@ class TemplateStrategy implements RenderStrategy {
    * @param root Mutation boundary receiving this template's owned nodes.
    * @param output Initial structured output and value set.
    * @param mode Initial render mode, either 'mount' or 'hydrate'.
+   * @param hydrationScope Existing durable marker namespace when hydrating nested output.
    */
   constructor(
     private readonly root: RenderRoot,
@@ -936,6 +950,7 @@ function recordRenderPart(parts: Map<number, RenderPart[]>, index: number, part:
  * @param element Static template element that owns one or more attribute parts.
  * @param attribute Durable marker attribute updated by this operation.
  * @param indexes Interpolation indexes contributing to the discovered attribute part.
+ * @param scope Component-owned durable-marker namespace shared by the template.
  */
 function appendMarkerTokens(element: Element, attribute: string, indexes: readonly number[], scope: string): void {
   const markers = new Set(element.getAttribute(attribute)?.split(/\s+/).filter(Boolean) ?? []);
@@ -1034,6 +1049,7 @@ function collectDescendants(root: Node): Node[] {
  * Elements inside child or keyed ranges belong to recursively adopted sessions and
  * are excluded so repeated node indexes cannot bind to the wrong template level.
  * @param nodes Element and comment traversal for the strategy's owned root.
+ * @param scope Marker namespace used to exclude nested renderer-owned elements.
  * @returns Static elements eligible to satisfy this strategy's attribute parts.
  */
 function collectTopLevelHydrationElements(nodes: readonly Node[], scope: string): Element[] {
@@ -1055,6 +1071,7 @@ function collectTopLevelHydrationElements(nodes: readonly Node[], scope: string)
  * Stack validation rejects crossed or missing boundaries before any later patch can
  * mutate an incorrectly attributed server range.
  * @param nodes Element and comment traversal for the strategy's owned root.
+ * @param scope Marker namespace used to pair this renderer's child boundaries.
  * @returns Ordered child indexes and their durable live boundaries.
  * @throws Error when marker nesting is malformed or incomplete.
  */
@@ -1083,6 +1100,7 @@ function collectHydrationChildParts(nodes: readonly Node[], scope: string): Hydr
  * Positions are paired with the current keyed entries while application keys remain
  * the runtime identity used for all later reconciliation and reordering.
  * @param part Outer child range containing the serialized keyed entries.
+ * @param scope Marker namespace used to pair keyed boundaries for this renderer.
  * @returns Positional live boundaries indexed in their emitted order.
  * @throws Error when keyed boundaries are crossed or do not agree.
  */
@@ -1258,8 +1276,8 @@ export function deferRender(
  * function performs no root replacement and returns the normal update session.
  * @param root Component Element or ShadowRoot containing serialized durable markers.
  * @param output Structured client output matching the server template.
- * @returns Stateful renderer session whose later updates use ordinary part patching.
  * @param options Mismatch behavior for this call; the module policy applies when omitted.
+ * @returns Stateful renderer session whose later updates use ordinary part patching.
  * @throws TypeError when strict mismatch handling rejects legacy string output or `nothing`.
  */
 export function hydrate(
@@ -1289,7 +1307,10 @@ export function setHydrationMismatchPolicy(policy: HydrationMismatchPolicy): voi
   hydrationMismatchPolicy = policy;
 }
 
-/** Reports a recovered hydration mismatch without preventing the affected component from rendering. */
+/**
+ * Reports a recovered hydration mismatch without preventing the affected component from rendering.
+ * @param error Failure captured while adopting the serialized component output.
+ */
 export function warnHydrationMismatch(error: unknown): void {
   console.warn('[dota-rendering] hydration mismatch; re-rendering the affected component', error);
 }
