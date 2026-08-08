@@ -1,5 +1,5 @@
 /** Version of the durable marker format understood by the renderer and hydration plugin. */
-export const MARKER_VERSION = 1;
+export const MARKER_VERSION = 2;
 
 /** Attribute carrying the content-derived template identity on a rendered component host. */
 export const HYDRATION_TEMPLATE_ATTRIBUTE = 'data-dh-t';
@@ -9,6 +9,9 @@ export const HYDRATION_VERSION_ATTRIBUTE = 'data-dh-v';
 
 /** Attribute identifying component hosts emitted during static rendering. */
 export const HYDRATION_COMPONENT_ATTRIBUTE = 'data-dh-c';
+
+/** Attribute carrying the unique durable marker scope owned by a component host. */
+export const HYDRATION_SCOPE_ATTRIBUTE = 'data-dh-s';
 
 /** Attribute listing dynamic attribute-part indexes owned by an element. */
 export const HYDRATION_ATTRIBUTE_PART = 'data-dh-a';

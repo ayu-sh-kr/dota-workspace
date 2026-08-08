@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import type {MountStrategy} from '@ayu-sh-kr/dota-core';
 import {
   HYDRATION_TEMPLATE_ATTRIBUTE,
+  HYDRATION_VERSION_ATTRIBUTE,
   html,
   render,
   setHydrationEmit,
@@ -16,7 +17,12 @@ import type {
   RouteMatch,
   RouteRenderer
 } from '@ayu-sh-kr/dota-router';
-import {dotaHydration, type DotaHydrationOptions} from '@dota/index';
+import {
+  dotaHydration,
+  HYDRATION_ROUTE_ATTRIBUTE,
+  HYDRATION_ROUTE_VERSION_ATTRIBUTE,
+  type DotaHydrationOptions
+} from '@dota/index';
 
 type InstalledHydration = {
   mountStrategy: MountStrategy;
@@ -41,6 +47,53 @@ afterEach(() => {
 });
 
 describe('dotaHydration', () => {
+  it('captures the route before the root mount and preserves its node identity', async () => {
+    class Root extends HTMLElement {}
+    class Page extends HTMLElement {}
+    Reflect.defineMetadata('Component', {selector: 'ordered-route-root'}, Root);
+    Reflect.defineMetadata('Component', {selector: 'ordered-route-page'}, Page);
+
+    const root = document.createElement('ordered-route-root');
+    root.id = 'ordered-route-root';
+    root.innerHTML = `<ordered-route-page path="/article" ${HYDRATION_ROUTE_ATTRIBUTE}="true" ${HYDRATION_ROUTE_VERSION_ATTRIBUTE}="1"></ordered-route-page>`;
+    const page = root.firstElementChild as HTMLElement;
+    document.body.append(root);
+
+    let mountStrategy!: MountStrategy;
+    let composedRenderer!: RouteRenderer<HTMLElement>;
+    const context: DotaRuntimeContext = {
+      setMountStrategy(strategy) { mountStrategy = strategy; },
+      wrapRouteRenderer(wrapper) {
+        composedRenderer = wrapper(vi.fn<RouteRenderer<HTMLElement>>(), Root);
+      }
+    };
+    dotaHydration().setup?.(context);
+
+    mountStrategy(root as never, root, html``);
+
+    const route = {path: '/article', component: Page};
+    const match: RouteMatch<HTMLElement> = {
+      route,
+      branch: [route],
+      matched: true,
+      params: {},
+      pathname: '/article',
+      searchParams: new URLSearchParams(),
+      hash: ''
+    };
+    await composedRenderer(match, {
+      initial: true,
+      nextMatch: match,
+      signal: new AbortController().signal,
+      params: {},
+      url: new URL('/article', window.location.origin),
+      historyState: undefined
+    });
+
+    expect(root.firstElementChild).toBe(page);
+    expect(page.getAttribute('path')).toBe('/article');
+  });
+
   it('adopts matching marked output and keeps server node identity', () => {
     const view = (label: string) => html`<p>${label}</p>`;
     const host = document.createElement('hydration-host');
@@ -85,6 +138,22 @@ describe('dotaHydration', () => {
     )).toThrow('Hydration mismatch on <strict-mismatch-host>');
   });
 
+  it('rejects version-one markers instead of adopting ambiguous local part indexes', () => {
+    const view = () => html`<p>${'server'}</p>`;
+    const host = document.createElement('version-one-host');
+    setHydrationEmit(true);
+    render(host, view());
+    setHydrationEmit(false);
+    host.setAttribute(HYDRATION_VERSION_ATTRIBUTE, '1');
+    const replaceChildren = vi.spyOn(host, 'replaceChildren');
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    installHydration().mountStrategy(host as never, host, view());
+
+    expect(replaceChildren).toHaveBeenCalledOnce();
+    expect(host.hasAttribute(HYDRATION_TEMPLATE_ATTRIBUTE)).toBe(false);
+  });
+
   it('skips only the initial route injection when the matching page is marked', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
@@ -121,6 +190,44 @@ describe('dotaHydration', () => {
     await renderer(match, {...context, initial: false});
 
     expect(next).toHaveBeenCalledTimes(1);
+  });
+
+  it('applies route SEO when the initial marked page is adopted', async () => {
+    class Root extends HTMLElement {}
+    class Page extends HTMLElement {}
+    Reflect.defineMetadata('Component', {selector: 'seo-route-root'}, Root);
+    Reflect.defineMetadata('Component', {selector: 'seo-route-page'}, Page);
+    const root = document.createElement('seo-route-root');
+    root.id = 'seo-route-root';
+    root.innerHTML = `<seo-route-page path="/article" ${HYDRATION_ROUTE_ATTRIBUTE}="true" ${HYDRATION_ROUTE_VERSION_ATTRIBUTE}="1"></seo-route-page>`;
+    document.body.append(root);
+
+    const route = {
+      path: '/article',
+      component: Page,
+      seo: {title: 'Article', description: 'Article description'}
+    };
+    const match: RouteMatch<HTMLElement> = {
+      route,
+      branch: [route],
+      matched: true,
+      params: {},
+      pathname: '/article',
+      searchParams: new URLSearchParams(),
+      hash: ''
+    };
+    const renderer = installHydration().routeWrapper(vi.fn(), Root);
+
+    await renderer(match, {
+      initial: true,
+      nextMatch: match,
+      signal: new AbortController().signal,
+      params: {},
+      url: new URL('/article', window.location.origin),
+      historyState: undefined
+    });
+
+    expect(document.title).toBe('Article');
   });
 
   it('delegates an initial marked route when the route owns custom rendering', async () => {
