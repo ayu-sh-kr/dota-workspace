@@ -50,9 +50,13 @@ export interface DotaHydrationOptions {
  * authoritative after the one startup handoff has completed.
  */
 type InitialRouteHandoff = {
+  /** Root host that owns the server-rendered route outlet. */
   root: HTMLElement;
+  /** Page host retained until the router completes its initial transition. */
   page: HTMLElement;
+  /** Normalized server path used to reject a client route mismatch. */
   pathname: string;
+  /** One-way startup ownership state shared by Core mounting and routing. */
   state: 'captured' | 'adopted' | 'released' | 'invalid';
 };
 
@@ -84,6 +88,7 @@ export function dotaHydration(options: DotaHydrationOptions = {}): DotaRuntimePl
  * configured policy so stale static HTML is never adopted under a mismatched template identity.
  * @param context Runtime sockets supplied by Dota Wrap.
  * @param mismatch Policy selected for invalid identity, version, or part markers.
+ * @param getHandoff Reads the route boundary captured before custom-element upgrade.
  */
 function installMountStrategy(
   context: DotaRuntimeContext,
@@ -92,13 +97,7 @@ function installMountStrategy(
 ): void {
   context.setMountStrategy((host, root, output) => {
     const handoff = getHandoff();
-    if (handoff?.state === 'captured' && host === handoff.root) {
-      if (handoff.page.isConnected && handoff.page.parentElement === handoff.root) {
-        return deferRender(output, (nextOutput: RenderOutput) => mountRender(root, nextOutput));
-      }
-      handoff.state = 'invalid';
-    }
-    if (handoff?.state === 'captured' && host === handoff.page) {
+    if (handoff?.state === 'captured' && (host === handoff.root || host === handoff.page)) {
       if (handoff.page.isConnected && handoff.page.parentElement === handoff.root) {
         return deferRender(output, (nextOutput: RenderOutput) => mountRender(root, nextOutput));
       }

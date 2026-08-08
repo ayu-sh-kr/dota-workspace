@@ -13,10 +13,11 @@ afterEach(() => {
 });
 
 describe('renderer public API', () => {
-  it('defers DOM ownership until the first update and disposes without clearing adopted DOM', () => {
+  it('does not clear adopted DOM when a deferred session is disposed before updating', () => {
     const root = document.createElement('div');
     root.innerHTML = '<p>server</p>';
-    const instance = deferRender(html``, output => render(root, output));
+    const createSession = vi.fn((output) => render(root, output));
+    const instance = deferRender(html``, createSession);
     const serverParagraph = root.firstElementChild;
 
     instance.dispose();
@@ -27,10 +28,28 @@ describe('renderer public API', () => {
       changedParts: 0,
       replacedNodes: 0
     });
+    expect(createSession).not.toHaveBeenCalled();
+  });
 
-    const activeInstance = deferRender(html``, output => render(root, output));
-    activeInstance.update(html`<p>${'client'}</p>`);
+  it('creates one session from the first deferred update and delegates later updates', () => {
+    const root = document.createElement('div');
+    root.innerHTML = '<p>server</p>';
+    const createSession = vi.fn((output) => render(root, output));
+    const instance = deferRender(html``, createSession);
+    const firstOutput = html`<p>${'client'}</p>`;
+
+    expect(instance.update(firstOutput)).toEqual({kind: 'mount', changedParts: 0, replacedNodes: 0});
+    expect(createSession).toHaveBeenCalledOnce();
+    expect(createSession).toHaveBeenCalledWith(firstOutput);
     expect(root.textContent).toBe('client');
+
+    expect(instance.update(html`<p>${'updated'}</p>`)).toEqual({
+      kind: 'patch',
+      changedParts: 1,
+      replacedNodes: 0
+    });
+    expect(createSession).toHaveBeenCalledOnce();
+    expect(root.textContent).toBe('updated');
   });
 
   it('emits diagnostics through the logger configured by its host integration', () => {

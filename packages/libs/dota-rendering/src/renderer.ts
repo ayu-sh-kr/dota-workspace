@@ -69,6 +69,27 @@ type ParsedTemplate = {
   attributeNames: ReadonlyMap<string, string>;
 };
 
+/** Paired durable child boundaries recovered from one component-owned marker scope. */
+type HydrationChildRange = {
+  /** Interpolation index represented by the paired boundaries. */
+  index: number;
+  /** Opening durable comment retained in the serialized DOM. */
+  start: Comment;
+  /** Closing durable comment retained in the serialized DOM. */
+  end: Comment;
+};
+
+/** Position identifies one keyed range within its owning child interpolation. */
+type HydrationKeyedAddress = {
+  /** Child interpolation that owns the keyed list. */
+  partIndex: number;
+  /** Render-order position used to pair one keyed range's markers. */
+  position: number;
+};
+
+/** Paired durable boundaries that preserve a keyed entry during hydration. */
+type HydrationKeyedRange = Pick<HydrationChildRange, 'start' | 'end'>;
+
 /**
  * Internal mutation boundary shared by full component roots and child ranges.
  * Rendering strategies depend on this contract so they can commit output without
@@ -922,12 +943,24 @@ function appendMarkerTokens(element: Element, attribute: string, indexes: readon
   element.setAttribute(attribute, [...markers].join(' '));
 }
 
-/** Allocates one scope for a statically rendered component and omits it for client-only mounts. */
+/**
+ * Allocates a component-owned durable-marker namespace for a build-time mount.
+ * Client-only mounts deliberately receive no scope so they cannot emit markup that
+ * another renderer could mistake for serializable hydration state.
+ * @returns A unique scope while durable output is enabled, otherwise undefined.
+ */
 function createHydrationScope(): string | undefined {
   return emitDurableMarkers ? `h${hydrationScopeId++}` : undefined;
 }
 
-/** Reads the durable scope stamped on a component host before marker adoption begins. */
+/**
+ * Reads and validates the durable-marker namespace stamped on a component host.
+ * Hydration is limited to this value so nested component markers cannot be adopted
+ * by their ancestor's renderer.
+ * @param root Native component boundary being hydrated.
+ * @returns The validated component-owned marker scope.
+ * @throws Error when a non-component root or invalid serialized scope is supplied.
+ */
 function readHydrationScope(root: RenderRoot): string {
   if (!(root instanceof NativeRoot)) throw new Error('Hydration scope is required for a component root');
   const host = root.root instanceof ShadowRoot ? root.root.host : root.root;
@@ -936,26 +969,46 @@ function readHydrationScope(root: RenderRoot): string {
   return scope;
 }
 
-/** Returns the child index encoded by one scope-owned start boundary. */
+/**
+ * Parses one component-owned child start boundary without accepting nested scopes.
+ * @param marker Durable comment text encountered during DOM traversal.
+ * @param scope Marker namespace stamped on the component currently hydrating.
+ * @returns The child interpolation index, or undefined when the marker belongs elsewhere.
+ */
 function parseHydrationChildStart(marker: string, scope: string): number | undefined {
   const match = marker.match(new RegExp(`^dh:${scope}:p(\\d+)$`));
   return match ? Number(match[1]) : undefined;
 }
 
-/** Returns the child index encoded by one scope-owned end boundary. */
+/**
+ * Parses one component-owned child end boundary without accepting nested scopes.
+ * @param marker Durable comment text encountered during DOM traversal.
+ * @param scope Marker namespace stamped on the component currently hydrating.
+ * @returns The child interpolation index, or undefined when the marker belongs elsewhere.
+ */
 function parseHydrationChildEnd(marker: string, scope: string): number | undefined {
   const match = marker.match(new RegExp(`^/dh:${scope}:p(\\d+)$`));
   return match ? Number(match[1]) : undefined;
 }
 
-/** Returns the keyed range address encoded by one scope-owned start boundary. */
-function parseHydrationKeyedStart(marker: string, scope: string): {partIndex: number; position: number} | undefined {
+/**
+ * Parses a keyed start boundary so list adoption can retain its emitted order.
+ * @param marker Durable comment text encountered during DOM traversal.
+ * @param scope Marker namespace stamped on the component currently hydrating.
+ * @returns The keyed range address, or undefined when the marker belongs elsewhere.
+ */
+function parseHydrationKeyedStart(marker: string, scope: string): HydrationKeyedAddress | undefined {
   const match = marker.match(new RegExp(`^dh:${scope}:k(\\d+):(\\d+)$`));
   return match ? {partIndex: Number(match[1]), position: Number(match[2])} : undefined;
 }
 
-/** Returns the keyed range address encoded by one scope-owned end boundary. */
-function parseHydrationKeyedEnd(marker: string, scope: string): {partIndex: number; position: number} | undefined {
+/**
+ * Parses a keyed end boundary and leaves validation to the pairing traversal.
+ * @param marker Durable comment text encountered during DOM traversal.
+ * @param scope Marker namespace stamped on the component currently hydrating.
+ * @returns The keyed range address, or undefined when the marker belongs elsewhere.
+ */
+function parseHydrationKeyedEnd(marker: string, scope: string): HydrationKeyedAddress | undefined {
   const match = marker.match(new RegExp(`^/dh:${scope}:k(\\d+):(\\d+)$`));
   return match ? {partIndex: Number(match[1]), position: Number(match[2])} : undefined;
 }
@@ -1005,9 +1058,9 @@ function collectTopLevelHydrationElements(nodes: readonly Node[], scope: string)
  * @returns Ordered child indexes and their durable live boundaries.
  * @throws Error when marker nesting is malformed or incomplete.
  */
-function collectHydrationChildParts(nodes: readonly Node[], scope: string): Array<{index: number; start: Comment; end: Comment}> {
-  const parts: Array<{index: number; start: Comment; end: Comment}> = [];
-  const stack: Array<{index: number; start: Comment}> = [];
+function collectHydrationChildParts(nodes: readonly Node[], scope: string): HydrationChildRange[] {
+  const parts: HydrationChildRange[] = [];
+  const stack: Array<Pick<HydrationChildRange, 'index' | 'start'>> = [];
   for (const node of nodes) {
     if (!(node instanceof Comment)) continue;
     const startIndex = parseHydrationChildStart(node.data, scope);
@@ -1033,9 +1086,9 @@ function collectHydrationChildParts(nodes: readonly Node[], scope: string): Arra
  * @returns Positional live boundaries indexed in their emitted order.
  * @throws Error when keyed boundaries are crossed or do not agree.
  */
-function collectHydrationKeyedRanges(part: ChildPart, scope: string): Array<{start: Comment; end: Comment}> {
-  const ranges: Array<{start: Comment; end: Comment}> = [];
-  const stack: Array<{partIndex: number; position: number; start: Comment}> = [];
+function collectHydrationKeyedRanges(part: ChildPart, scope: string): HydrationKeyedRange[] {
+  const ranges: HydrationKeyedRange[] = [];
+  const stack: Array<HydrationKeyedAddress & Pick<HydrationChildRange, 'start'>> = [];
   for (const node of nodesBetween(part.start, part.end).flatMap((owned) => [owned, ...collectDescendants(owned)])) {
     if (!(node instanceof Comment)) continue;
     const startMarker = parseHydrationKeyedStart(node.data, scope);

@@ -25,7 +25,9 @@ import {
 } from '@dota/index';
 
 type InstalledHydration = {
+  /** Core mount hook installed by the hydration runtime plugin. */
   mountStrategy: MountStrategy;
+  /** Router renderer decorator installed by the hydration runtime plugin. */
   routeWrapper: RouteRendererWrapper;
 };
 
@@ -47,6 +49,18 @@ afterEach(() => {
 });
 
 describe('dotaHydration', () => {
+  it('registers Core mounting and route-presentation hooks during plugin setup', () => {
+    const setMountStrategy = vi.fn();
+    const wrapRouteRenderer = vi.fn();
+
+    dotaHydration().setup?.({setMountStrategy, wrapRouteRenderer});
+
+    expect(setMountStrategy).toHaveBeenCalledOnce();
+    expect(setMountStrategy).toHaveBeenCalledWith(expect.any(Function));
+    expect(wrapRouteRenderer).toHaveBeenCalledOnce();
+    expect(wrapRouteRenderer).toHaveBeenCalledWith(expect.any(Function));
+  });
+
   it('captures the route before the root mount and preserves its node identity', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
