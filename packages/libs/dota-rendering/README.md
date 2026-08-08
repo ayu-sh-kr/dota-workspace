@@ -162,6 +162,24 @@ update(view, html`<h1>${nextTitle}</h1>`);
 SSR package owns the application-level marker checks and initial route adoption, so most
 applications should install `dotaHydration()` rather than calling `hydrate()` directly.
 
+### Deferred ownership for server DOM
+
+`deferRender()` is the lifecycle primitive used when another integration already owns the
+committed DOM for the first paint. It returns a normal `RenderInstance`, performs no initial DOM
+mutation, and creates the ordinary render session on its first update. Disposing before that
+update releases the deferred instance without clearing adopted DOM.
+
+```ts
+import {deferRender, html, render} from '@ayu-sh-kr/dota-rendering';
+
+const view = deferRender(html``, output => render(root, output));
+// Existing server children remain untouched here.
+view.update(html`<article>${message}</article>`); // ownership transfers to render()
+```
+
+This primitive does not validate markers or decide whether server DOM belongs to the current
+route; `@ayu-sh-kr/dota-ssr` owns those checks.
+
 ## Maintainer guide
 
 The implementation is split into three responsibilities:

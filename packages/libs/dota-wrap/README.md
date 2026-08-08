@@ -55,6 +55,11 @@ helpers without affecting registration. Runtime plugin setup runs before custom
 elements are defined, which is important for hydration and other initial-mount
 policies.
 
+The ordering is part of the runtime contract: plugins receive their sockets first,
+then `registerComponents()` calls Core's `bootstrap()`, and only afterward does
+`initializeApp()` construct and initialize the router. A hydration plugin can
+therefore capture an existing static route host before `app-root` is upgraded.
+
 ## Use the public subpaths
 
 The wrapper keeps related APIs discoverable and lets application code state
@@ -181,6 +186,11 @@ export default {
 application needs only the SSG plugin. The wrapper points its rendering bridge
 at `@ayu-sh-kr/dota-wrap/rendering`, keeping all application imports within the
 wrapper surface.
+
+During startup, `dotaHydration()` uses that ordering to preserve the first root
+mount while the router validates the initial pathname. A later navigation, a
+custom route renderer, or a validation mismatch delegates to ordinary rendering;
+the wrapper does not permanently change Router ownership of route presentation.
 
 ## Extending application setup
 

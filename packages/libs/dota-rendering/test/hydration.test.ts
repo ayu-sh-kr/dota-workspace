@@ -1,5 +1,6 @@
 import {
   HYDRATION_TEMPLATE_ATTRIBUTE,
+  HYDRATION_SCOPE_ATTRIBUTE,
   HYDRATION_VERSION_ATTRIBUTE,
   MARKER_VERSION,
   html,
@@ -135,7 +136,7 @@ describe('durable rendering and hydration', () => {
     Object.defineProperty(second, 'raw', {value: [...second]});
 
     expect(templateId(first)).toBe(templateId(second));
-    expect(MARKER_VERSION).toBe(1);
+    expect(MARKER_VERSION).toBe(2);
 
     const boundaryFirst = ['a\0b', 'c'] as unknown as TemplateStringsArray;
     const boundarySecond = ['a', 'b\0c'] as unknown as TemplateStringsArray;
@@ -145,6 +146,7 @@ describe('durable rendering and hydration', () => {
     setHydrationEmit(true);
     render(root, html`<p>${'value'}</p>`);
     expect(root.getAttribute(HYDRATION_VERSION_ATTRIBUTE)).toBe(String(MARKER_VERSION));
+    expect(root.getAttribute(HYDRATION_SCOPE_ATTRIBUTE)).toMatch(/^h\d+$/);
   });
 
   it('clears build-only host identity when a later structural remount is client-rendered', () => {
@@ -157,7 +159,39 @@ describe('durable rendering and hydration', () => {
 
     expect(root.hasAttribute(HYDRATION_TEMPLATE_ATTRIBUTE)).toBe(false);
     expect(root.hasAttribute(HYDRATION_VERSION_ATTRIBUTE)).toBe(false);
+    expect(root.hasAttribute(HYDRATION_SCOPE_ATTRIBUTE)).toBe(false);
     expect(root.innerHTML).not.toContain('<!--dh:p');
     expect(root.textContent).toBe('client');
+  });
+
+  it('adopts only the durable markers owned by a component scope', () => {
+    const parentView = (label: string) => html`<nested-view data-label="${label}"></nested-view><p>${label}</p>`;
+    const childView = (label: string) => html`<article data-label="${label}">${label}</article>`;
+    const serverRoot = document.createElement('section');
+    setHydrationEmit(true);
+    render(serverRoot, parentView('parent server'));
+    const serverChild = serverRoot.querySelector('nested-view') as HTMLElement;
+    render(serverChild, childView('child server'));
+
+    const shell = document.createElement('div');
+    shell.innerHTML = serverRoot.outerHTML;
+    const clientRoot = shell.firstElementChild as HTMLElement;
+    const clientChild = clientRoot.querySelector('nested-view') as HTMLElement;
+    const childArticle = clientChild.querySelector('article');
+    const parentParagraph = clientRoot.querySelector('p');
+    setHydrationEmit(false);
+
+    const parent = hydrate(clientRoot, parentView('parent server'));
+    const child = hydrate(clientChild, childView('child server'));
+    update(parent, parentView('parent client'));
+    update(child, childView('child client'));
+
+    expect(clientRoot.querySelector('nested-view')).toBe(clientChild);
+    expect(clientChild.querySelector('article')).toBe(childArticle);
+    expect(clientRoot.querySelector('p')).toBe(parentParagraph);
+    expect(clientChild.getAttribute('data-label')).toBe('parent client');
+    expect(childArticle?.getAttribute('data-label')).toBe('child client');
+    expect(parentParagraph?.textContent).toBe('parent client');
+    expect(childArticle?.textContent).toBe('child client');
   });
 });

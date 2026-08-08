@@ -149,6 +149,37 @@ version, or part structure does not match. `throw` is useful in development or
 CI when deployment skew must fail loudly. Missing markers are treated as an
 ordinary client-rendered mount, so static HTML is never adopted accidentally.
 
+### Initial route handoff
+
+The browser plugin captures the configured root and its direct route host while
+runtime plugins are being composed, before Dota Core upgrades custom elements.
+This protects a prerendered page from an empty or shell-only root render. The
+handoff is adopted only when the initial transition still has:
+
+- the same connected root and direct route-host relationship;
+- the expected route component selector;
+- the same normalized pathname; and
+- a valid route marker or a legacy template marker.
+
+SSG emits route-level metadata independently of template metadata:
+
+```html
+<article-page
+  path="/articles/intro"
+  data-dh-route="true"
+  data-dh-route-version="1">
+</article-page>
+```
+
+`data-dh-route` establishes route-host ownership, including for string-rendered
+pages. `data-dh-t` and `data-dh-v` continue to establish fine-grained template
+hydration eligibility. The route marker does not make string content patchable;
+the page enters ordinary rendering on its first update.
+
+The handoff is one-time. Initial mismatches, custom route renderers, redirects,
+and later navigations release it and call the normal router renderer. This keeps
+stale static DOM from suppressing a legitimate route transition.
+
 ## Deployment redirects
 
 Set `vercel: true` to add redirects from generated route paths to their static
@@ -160,8 +191,19 @@ preserved. If discovery cannot find the intended file, use
 
 | Entry point | Main exports | Use |
 | --- | --- | --- |
-| `@ayu-sh-kr/dota-ssr` | `dotaHydration`, `DotaHydrationOptions` | Browser-side adoption of compatible static markup. |
+| `@ayu-sh-kr/dota-ssr` | `dotaHydration`, `DotaHydrationOptions`, route-marker constants | Browser-side adoption of compatible static markup and initial route hosts. |
 | `@ayu-sh-kr/dota-ssr/vite` | `dotaSsg`, route types and route resolvers | Build-time route rendering and output mapping. |
 
 The package is opt-in by design: adding it as a dependency does not change
 rendering until one of these functions is installed.
+
+## Architecture diagrams
+
+[![Hydration runtime and initial route handoff](../../../documentation/packages/libs/dota-ssr/architecture/hydration-runtime-flow.svg)](../../../documentation/packages/libs/dota-ssr/architecture/hydration-runtime-flow.svg)
+
+[![SSG route output flow](../../../documentation/packages/libs/dota-ssr/architecture/route-output-flow.svg)](../../../documentation/packages/libs/dota-ssr/architecture/route-output-flow.svg)
+
+Related package flows:
+
+- [Rendering lifecycle](../../../documentation/packages/libs/dota-rendering/architecture/renderer-flow.svg)
+- [Dota Wrap startup](../../../documentation/packages/libs/dota-wrap/architecture/dota-wrap-hld.svg)

@@ -1036,7 +1036,7 @@
           "name": "blog-view",
           "source": {
             "file": "./src/components/blogs/blog-view.component.ts",
-            "offset": 429
+            "offset": 503
           },
           "attributes": [
             {
@@ -1048,7 +1048,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 824
+                "offset": 898
               }
             },
             {
@@ -1060,7 +1060,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 555
+                "offset": 629
               }
             },
             {
@@ -1072,7 +1072,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 971
+                "offset": 1045
               }
             },
             {
@@ -1084,7 +1084,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 689
+                "offset": 763
               }
             }
           ],
@@ -1096,7 +1096,7 @@
                 "default": "lime",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 824
+                  "offset": 898
                 }
               },
               {
@@ -1105,7 +1105,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 555
+                  "offset": 629
                 }
               },
               {
@@ -1114,7 +1114,7 @@
                 "default": "max-w-3xl",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 971
+                  "offset": 1045
                 }
               },
               {
@@ -1123,7 +1123,7 @@
                 "default": "apple",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 689
+                  "offset": 763
                 }
               }
             ]
