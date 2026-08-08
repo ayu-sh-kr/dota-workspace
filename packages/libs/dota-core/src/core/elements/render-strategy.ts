@@ -1,6 +1,6 @@
 import {
   render as mountRender,
-  type RenderInstance,
+  type MountResult,
   type RenderOutput
 } from '@ayu-sh-kr/dota-rendering';
 import type {BaseElement} from './base-elements';
@@ -9,12 +9,14 @@ import type {BaseElement} from './base-elements';
  * Selects how a component's initial output becomes associated with its render root.
  * Dota Core supplies the ordinary client mount; opt-in runtime plugins may replace
  * it once during application setup to adopt an existing representation.
+ * Returning `{ hydrated: true }` on the result signals that server DOM was adopted;
+ * `dota-core` uses that flag to emit the `HYDRATED` lifecycle event.
  */
 export type MountStrategy = (
   host: BaseElement,
   root: Element | ShadowRoot,
   output: RenderOutput
-) => RenderInstance;
+) => MountResult;
 
 const defaultMountStrategy: MountStrategy = (_host, root, output) => mountRender(root, output);
 let activeMountStrategy = defaultMountStrategy;
