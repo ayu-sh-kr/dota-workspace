@@ -129,6 +129,22 @@ export const getSuggestedBlogPosts = (currentPath: string, limit: number = 3): B
 
 export const blogPosts: Blog[] = [
   {
+    date: "2026-08-12",
+    writer: "Ayush Jaiswal",
+    header: "Meet dota-alert Through an Interactive Lab",
+    description: "An interactive showcase of dota-alert covering confirmations, guarded prompts, async work, cancellation, and caller-owned custom content.",
+    category: "Tutorial",
+    path: "Dota-Alert.md",
+  },
+  {
+    date: "2026-08-12",
+    writer: "Ayush Jaiswal",
+    header: "Building a Useful Breadcrumb With dota-breadcrumb",
+    description: "A live tutorial for dota-breadcrumb covering semantic article trails, folded long paths, keyboard disclosure, native links, and complete per-instance visual overrides.",
+    category: "Tutorial",
+    path: "Dota-Breadcrumb.md",
+  },
+  {
     date: "2026-07-17",
     writer: "Ayush Jaiswal",
     header: "LangChain Foundations: From Model Calls To Useful Agents",
