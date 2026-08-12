@@ -6,6 +6,7 @@ import {
   BlobSeparatorComponent,
   AvatarComponent,
   AvatarWrapper,
+  BreadcrumbComponent,
   ButtonComponent,
   CloudChamberComponent,
   CursorDisplacementComponent,
@@ -15,7 +16,8 @@ import {
   IconsComponent,
   OrbBackgroundComponent,
   PopoverComponent,
-  ScrollDeckComponent
+  ScrollDeckComponent,
+  DotaAlertComponent
 } from "@ayu-sh-kr/dota-ui";
 import {initializeApp} from "@ayu-sh-kr/dota-wrap";
 import {Router, RouterService} from "@ayu-sh-kr/dota-wrap/router";
@@ -53,6 +55,8 @@ export const applicationReady = initializeApp({
     AccordionComponent,
     AvatarComponent,
     AvatarWrapper,
+    BreadcrumbComponent,
+    DotaAlertComponent,
   ],
   errorRoute: {path: '/error', component: ErrorPage},
   defaultRoute: {path: '/', component: HomePage},

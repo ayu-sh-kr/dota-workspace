@@ -41,15 +41,31 @@ export class BlogViewComponent extends BaseElement {
     const {blog, category} = resolveBlogRouteParams(window.location.pathname, window.location.search);
     if (blog && category) {
       this.currentBlog = blog.trim();
+      this.updateHTML();
       const raw = await this.docLoader.loadBlog(`${category.toLowerCase()}/${blog}`);
       MDService.render(raw, { publish: true })
     }
   }
 
   render(): TemplateResult {
+    const routeBlog = resolveBlogRouteParams(window.location.pathname, window.location.search).blog;
+    const blogLabel = (this.currentBlog || routeBlog || 'Blog')
+      .replace(/\.md$/i, '')
+      .replace(/-/g, ' ');
+    const breadcrumbPath = JSON.stringify([
+      {id: 'home', label: 'Home', href: '/'},
+      {id: 'blogs', label: 'Blogs', href: '/blogs'},
+      {id: 'current-blog', label: blogLabel},
+    ]);
+
     // language=html
     return html`
       <section class="mx-auto w-full max-w-screen-2xl px-3 py-12 sm:px-5 lg:px-8">
+        <dota-breadcrumb
+          path='${breadcrumbPath}'
+          label="Blog breadcrumb"
+          class="mb-8 block">
+        </dota-breadcrumb>
         <div class="flex w-full flex-col xl:flex-row xl:items-start xl:gap-8">
           <div class="min-w-0 flex-1 ${this.maxWidth}" style="overflow-anchor: none;">
             <md-view theme="${this.theme}" color="${this.color}"></md-view>

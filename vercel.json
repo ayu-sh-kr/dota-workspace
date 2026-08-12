@@ -46,6 +46,16 @@
       "permanent": true
     },
     {
+      "source": "/blogs/content/Tutorial/Dota-Alert.md",
+      "destination": "/blogs/content/Tutorial/Dota-Alert.md/",
+      "permanent": true
+    },
+    {
+      "source": "/blogs/content/Tutorial/Dota-Breadcrumb.md",
+      "destination": "/blogs/content/Tutorial/Dota-Breadcrumb.md/",
+      "permanent": true
+    },
+    {
       "source": "/blogs/content/Tutorial/LangChain-Foundations.md",
       "destination": "/blogs/content/Tutorial/LangChain-Foundations.md/",
       "permanent": true
