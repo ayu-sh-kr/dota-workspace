@@ -513,6 +513,39 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/blogs/examples/alert-playground.component.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "AlertPlaygroundComponent",
+          "customElement": true,
+          "tagName": "alert-playground",
+          "superclass": {
+            "name": "BaseElement"
+          },
+          "members": [],
+          "attributes": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "AlertPlaygroundComponent",
+          "declaration": {
+            "name": "AlertPlaygroundComponent"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "alert-playground",
+          "declaration": {
+            "name": "AlertPlaygroundComponent"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/blogs/examples/chat-memory-map.component.js",
       "declarations": [
         {
