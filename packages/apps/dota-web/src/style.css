@@ -51,4 +51,7 @@
     code { @apply custom-scrollbar; }
 }
 
-body { overflow-x: hidden; }
+body {
+    overflow-x: hidden;
+    font-family: "DM Sans", sans-serif;
+}
