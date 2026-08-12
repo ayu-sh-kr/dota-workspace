@@ -60,6 +60,17 @@
           }
         },
         {
+          "name": "alert-playground",
+          "source": {
+            "file": "./src/components/blogs/examples/alert-playground.component.ts",
+            "offset": 366
+          },
+          "attributes": [],
+          "js": {
+            "properties": []
+          }
+        },
+        {
           "name": "app-error",
           "source": {
             "file": "./src/pages/error.page.ts",
@@ -2569,6 +2580,17 @@
           }
         },
         {
+          "name": "dota-alert",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/alert/alert.component.ts",
+            "offset": 2503
+          },
+          "attributes": [],
+          "js": {
+            "properties": []
+          }
+        },
+        {
           "name": "dota-badge",
           "source": {
             "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
@@ -2721,6 +2743,141 @@
                 "source": {
                   "file": "../../ui/dota-ui/src/components/badge/badge.component.ts",
                   "offset": 1942
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "dota-breadcrumb",
+          "source": {
+            "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+            "offset": 13616
+          },
+          "attributes": [
+            {
+              "name": "budget",
+              "default": "null",
+              "required": false,
+              "value": {
+                "type": "number"
+              },
+              "source": {
+                "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                "offset": 13940
+              }
+            },
+            {
+              "name": "classname",
+              "default": "",
+              "required": false,
+              "value": {
+                "type": "string"
+              },
+              "source": {
+                "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                "offset": 14370
+              }
+            },
+            {
+              "name": "config",
+              "required": false,
+              "value": {
+                "type": "ObjectType"
+              },
+              "source": {
+                "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                "offset": 14518
+              }
+            },
+            {
+              "name": "fold-min",
+              "default": "2",
+              "required": false,
+              "value": {
+                "type": "number"
+              },
+              "source": {
+                "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                "offset": 14099
+              }
+            },
+            {
+              "name": "label",
+              "default": "Breadcrumb",
+              "required": false,
+              "value": {
+                "type": "string"
+              },
+              "source": {
+                "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                "offset": 14228
+              }
+            },
+            {
+              "name": "path",
+              "required": false,
+              "value": {
+                "type": "ObjectType"
+              },
+              "source": {
+                "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                "offset": 13788
+              }
+            }
+          ],
+          "js": {
+            "properties": [
+              {
+                "name": "budget",
+                "type": "number",
+                "default": "null",
+                "source": {
+                  "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                  "offset": 13940
+                }
+              },
+              {
+                "name": "className",
+                "type": "string",
+                "default": "",
+                "source": {
+                  "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                  "offset": 14370
+                }
+              },
+              {
+                "name": "config",
+                "type": "ObjectType",
+                "source": {
+                  "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                  "offset": 14518
+                }
+              },
+              {
+                "name": "foldMin",
+                "type": "number",
+                "default": "2",
+                "source": {
+                  "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                  "offset": 14099
+                }
+              },
+              {
+                "name": "label",
+                "type": "string",
+                "default": "Breadcrumb",
+                "source": {
+                  "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                  "offset": 14228
+                }
+              },
+              {
+                "name": "path",
+                "type": "ObjectType",
+                "source": {
+                  "file": "../../ui/dota-ui/src/components/breadcrumb/breadcrumb.component.ts",
+                  "offset": 13788
                 }
               }
             ]
