@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-rest
 
+## 1.1.6
+
+### Patch Changes
+
+- c5fa794: fix esm support
+
 ## 1.1.5
 
 ### Patch Changes
