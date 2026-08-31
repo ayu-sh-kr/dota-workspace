@@ -1,4 +1,5 @@
 import {RequestBuilder, RestRequestBuilder} from "@dota/RequestBuilder.ts";
+import type {RequestInterceptor} from "@dota/RequestInterceptor.ts";
 import {Header, ResponseHandler} from "@dota/Types.ts";
 
 
@@ -27,6 +28,15 @@ export interface ClientBuilder {
    * @param handler - Function to resolve response.
    */
   handler(handler: ResponseHandler): ClientBuilder;
+
+  /**
+   * Adds a request interceptor that runs before every request made by this client.
+   * Repeated calls register an ordered pipeline, which supports synchronous and
+   * asynchronous changes such as adding authorization headers.
+   * @param interceptor Function that inspects or changes the final request.
+   * @returns The current builder for method chaining.
+   */
+  requestInterceptor(interceptor: RequestInterceptor): ClientBuilder;
 
   /**
    * Use this to set a timeout period after which the `fetch` call will be aborted.
@@ -84,6 +94,9 @@ export type RestClientConfig = {
    * @param response - The response returned by the fetch API after the API call.
    */
   handler?: ResponseHandler
+
+  /** Interceptors applied in registration order before each request is sent. */
+  requestInterceptors?: readonly RequestInterceptor[];
 }
 
 
@@ -135,6 +148,7 @@ export class RestClient {
       _headers!: Header;
       _timout: number = 10000;
       _handler!: ResponseHandler;
+      _requestInterceptors: RequestInterceptor[] = [];
 
       public baseUrl(url: string) {
         this._baseurl = url;
@@ -157,12 +171,19 @@ export class RestClient {
         return this;
       }
 
+      /** Adds an interceptor to the ordered pipeline shared by this client. */
+      public requestInterceptor(interceptor: RequestInterceptor) {
+        this._requestInterceptors.push(interceptor);
+        return this;
+      }
+
       public build() {
         return new RestClient({
           baseUrl: this._baseurl,
           headers: this._headers,
           timout: this._timout,
-          handler: this._handler
+          handler: this._handler,
+          requestInterceptors: [...this._requestInterceptors]
         });
       }
     }
@@ -183,7 +204,8 @@ export class RestClient {
       headers: {'Content-type': 'application/json', ...this.config.headers},
       baseUri: this.config.baseUrl,
       timeout: this.config.timout,
-      handler: this.config.handler
+      handler: this.config.handler,
+      requestInterceptors: this.config.requestInterceptors
     })
   }
 
@@ -200,7 +222,8 @@ export class RestClient {
       headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
       timeout: this.config.timout,
-      handler: this.config.handler
+      handler: this.config.handler,
+      requestInterceptors: this.config.requestInterceptors
     })
   }
 
@@ -217,7 +240,8 @@ export class RestClient {
       headers: {'Content-type': 'application/json', ...this.config.headers},
       baseUri: this.config.baseUrl,
       timeout: this.config.timout,
-      handler: this.config.handler
+      handler: this.config.handler,
+      requestInterceptors: this.config.requestInterceptors
     })
   }
 
@@ -234,7 +258,8 @@ export class RestClient {
       headers: {'Content-type': 'application/json', ...this.config.headers},
       baseUri: this.config.baseUrl,
       timeout: this.config.timout,
-      handler: this.config.handler
+      handler: this.config.handler,
+      requestInterceptors: this.config.requestInterceptors
     })
   }
 
@@ -251,7 +276,8 @@ export class RestClient {
       headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
       timeout: this.config.timout,
-      handler: this.config.handler
+      handler: this.config.handler,
+      requestInterceptors: this.config.requestInterceptors
     })
   }
 }
