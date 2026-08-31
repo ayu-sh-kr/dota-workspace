@@ -1,2 +1,2 @@
-export {DomHistoryRouter} from "@dota/router/dom-history.router";
+export {DomHistoryRouter} from "@dota/router/history";
 export {DomNavigationRouter} from "@dota/router/dom-navigation.router";
