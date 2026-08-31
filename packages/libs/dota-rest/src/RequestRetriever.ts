@@ -1,4 +1,5 @@
 import {RestRequestBuilder} from "@dota/RequestBuilder.ts";
+import {RequestInterceptorProcessor} from "@dota/RequestInterceptor.ts";
 import {HttpRequestBody, RestUtils} from "@dota/RestUtils.ts";
 import {ResponseResolver, RestResponseResolver} from "@dota/ResponseResolver.ts";
 import {ResponseHandler} from "@dota/Types.ts";
@@ -36,6 +37,13 @@ export class RestRequestRetriever implements RequestRetriever {
   constructor(private _handler: ResponseHandler | undefined) {
   }
 
+  /**
+   * Builds the final request and applies client interceptors in registration order.
+   * Each interceptor observes the previous interceptor's result, and `fetch` only
+   * starts after the complete synchronous or asynchronous pipeline succeeds.
+   * @param builder Request configuration collected by the fluent API.
+   * @returns A resolver backed by the intercepted request's response promise.
+   */
   retrieve<T extends any>(builder: RestRequestBuilder<T>): ResponseResolver<T> {
     const uri = RestUtils.createURI({
       baseURI: builder.getBaseUri(),
@@ -47,14 +55,18 @@ export class RestRequestRetriever implements RequestRetriever {
       uri: uri,
       method: builder.getMethod(),
       headers: {...builder.getDefaultHeaders(), ...builder.getHeaders()},
-      timeout: builder.getTimeout()
+      timeout: builder.getTimeout(),
+      abortController: builder.getAbortController()
     };
 
     if (builder.getBody()) {
       requestBody.body = JSON.stringify(builder.getBody());
     }
 
-    const response = RestUtils.performFetch(requestBody);
+    const interceptorProcessor = new RequestInterceptorProcessor(builder.getRequestInterceptors());
+    const response = interceptorProcessor
+      .process(requestBody)
+      .then(RestUtils.performFetch);
 
     return new RestResponseResolver<T>(response, this._handler);
   }
