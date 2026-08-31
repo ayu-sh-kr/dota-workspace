@@ -1,6 +1,5 @@
 import {
   GlobalNavigationHooks,
-  NavigationContext,
   NavigationOptions,
   NavigationPreparationResult,
   NavigationResult,
@@ -61,10 +60,10 @@ export class NavigationCoordinator<T extends HTMLElement = HTMLElement> implemen
 
     const interceptOptions: NavigationInterceptWithPrecommit = {
       async precommitHandler(controller) {
-        const result = await coordinator.prepare(destination, event.signal, history.state);
+        const result = await coordinator.prepare(destination, event.signal, event.destination.getState());
 
         if (result.status !== "prepared") {
-          if (result.status === "redirected" && result.redirectTo) {
+          if (result.status === "redirected") {
             controller.redirect(result.redirectTo.href);
             return;
           }
@@ -73,14 +72,16 @@ export class NavigationCoordinator<T extends HTMLElement = HTMLElement> implemen
             throw new DOMException("Navigation canceled by route guard", "AbortError");
           }
 
-          throw result.error;
+          if (result.status === "failed") throw result.error;
+          throw new Error(`Unexpected navigation preparation result: ${result.status}`);
         }
 
         prepared = result.prepared;
       },
       async handler() {
         if (!prepared) throw new Error("Navigation completed without a prepared route");
-        await coordinator.complete(prepared);
+        const result = await coordinator.complete(prepared);
+        if (result.status === "failed") throw result.error;
       }
     };
 
@@ -115,7 +116,7 @@ export class NavigationCoordinator<T extends HTMLElement = HTMLElement> implemen
       return {status: "prepared", prepared: {match, context, branchDelta}};
     } catch (error) {
       if (signal.aborted) return {status: "cancelled"};
-      return {status: "failed", match, error};
+      return {status: "failed", match, phase: "guards", error};
     }
   }
 
@@ -125,16 +126,26 @@ export class NavigationCoordinator<T extends HTMLElement = HTMLElement> implemen
    * @returns Completed navigation result, or a failed result when rendering rejects.
    */
   async complete(prepared: PreparedNavigation<T>): Promise<NavigationResult<T>> {
+    if (prepared.context.signal.aborted) return {status: "cancelled", match: prepared.match};
+
     try {
       await this.renderer(prepared.match, prepared.context);
-      this.currentMatch = prepared.match;
+    } catch (error) {
+      return {status: "failed", match: prepared.match, phase: "render", error};
+    }
+
+    if (prepared.context.signal.aborted) return {status: "cancelled", match: prepared.match};
+    this.currentMatch = prepared.match;
+
+    try {
       await runRouteLifecycleHooks(prepared.branchDelta.leaving, "afterLeave", prepared.context);
       await runRouteLifecycleHooks(prepared.branchDelta.entering, "afterEnter", prepared.context);
       await runGlobalLifecycleHooks(this.globalHooks.afterEach ?? [], prepared.context);
-      return {status: "completed", match: prepared.match};
     } catch (error) {
-      return {status: "failed", match: prepared.match, error};
+      return {status: "failed", match: prepared.match, phase: "lifecycle", error};
     }
+
+    return {status: "completed", match: prepared.match};
   }
 
   /**

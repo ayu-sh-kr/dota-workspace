@@ -20,7 +20,7 @@ describe("NavigationCoordinator", () => {
       canIntercept: true,
       hashChange: false,
       downloadRequest: null,
-      destination: {url: "http://dota-router.local/account"},
+      destination: {url: "http://dota-router.local/account", getState: () => undefined},
       signal: new AbortController().signal,
       intercept
     } as unknown as NavigateEvent;
@@ -55,7 +55,7 @@ describe("NavigationCoordinator", () => {
       canIntercept: true,
       hashChange: false,
       downloadRequest: null,
-      destination: {url: "http://dota-router.local/account"},
+      destination: {url: "http://dota-router.local/account", getState: () => undefined},
       signal: new AbortController().signal,
       intercept
     } as unknown as NavigateEvent;
@@ -145,9 +145,67 @@ describe("NavigationCoordinator", () => {
 
     const result = await coordinator.navigate("/account");
 
-    expect(result.status).toBe("redirected");
-    expect(result.redirectTo?.pathname).toBe("/sign-in");
+    expect(result).toMatchObject({
+      status: "redirected",
+      redirectTo: expect.objectContaining({pathname: "/sign-in"})
+    });
     expect(render).not.toHaveBeenCalled();
+  });
+
+  it("passes destination entry state to intercepted navigation callbacks", async () => {
+    const historyState = {source: "destination"};
+    const beforeEnter = vi.fn(() => true as const);
+    const intercept = vi.fn();
+    const coordinator = new NavigationCoordinator([
+      {path: "/account", component: AccountPage, beforeEnter}
+    ], errorRoute, vi.fn());
+    const event = {
+      canIntercept: true,
+      hashChange: false,
+      downloadRequest: null,
+      destination: {
+        url: "http://dota-router.local/account",
+        getState: () => historyState
+      },
+      signal: new AbortController().signal,
+      intercept
+    } as unknown as NavigateEvent;
+
+    coordinator.handleNavigateEvent(event);
+    const options = intercept.mock.calls[0][0] as {
+      precommitHandler(controller: {redirect(url: string): void}): Promise<void>;
+    };
+    await options.precommitHandler({redirect: vi.fn()});
+
+    expect(beforeEnter).toHaveBeenCalledWith(expect.objectContaining({historyState}));
+  });
+
+  it("surfaces intercepted render failures through the Navigation API handler", async () => {
+    const error = new Error("render failed");
+    const intercept = vi.fn();
+    const coordinator = new NavigationCoordinator([
+      {path: "/account", component: AccountPage}
+    ], errorRoute, vi.fn().mockRejectedValue(error));
+    const event = {
+      canIntercept: true,
+      hashChange: false,
+      downloadRequest: null,
+      destination: {
+        url: "http://dota-router.local/account",
+        getState: () => undefined
+      },
+      signal: new AbortController().signal,
+      intercept
+    } as unknown as NavigateEvent;
+
+    coordinator.handleNavigateEvent(event);
+    const options = intercept.mock.calls[0][0] as {
+      precommitHandler(controller: {redirect(url: string): void}): Promise<void>;
+      handler(): Promise<void>;
+    };
+    await options.precommitHandler({redirect: vi.fn()});
+
+    await expect(options.handler()).rejects.toBe(error);
   });
 });
 
