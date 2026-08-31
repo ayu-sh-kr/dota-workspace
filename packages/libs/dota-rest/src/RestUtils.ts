@@ -1,4 +1,4 @@
-import {Header} from "./index.ts";
+import type {Header} from "@dota/Types.ts";
 
 export class RestUtils {
 
@@ -30,17 +30,14 @@ export class RestUtils {
 
 
   /**
-   * Make a fetch call based on the {@link HttpRequestBody} and return the response object as a promise.
-   *
-   * A `RequestInit` and `AbortController` is set up to make the fetch call with ability to abort once the specified
-   * time is passed. Specified time can be user provided or default.
-   *
-   * @param requestBody - {@link HttpRequestBody} object containing required field to construct a `RequestInit` for `fetch` call.
-   * @return Promise<Response> - Promise resolving to the `Response` object
+   * Executes a prepared request with its request-scoped abort controller.
+   * Sharing the controller with the interceptor chain ensures manual cancellation
+   * and timeout cancellation act on the same signal passed to `fetch`.
+   * @param requestBody Final request produced by the client and its interceptors.
+   * @returns The response returned by `fetch`.
    */
   static performFetch = async (requestBody: HttpRequestBody) => {
-    const abortController = new AbortController();
-    const {uri, method, headers, body} = requestBody;
+    const {uri, method, headers, body, abortController} = requestBody;
     const requestInit: RequestInit = {
       method: method,
       signal: abortController.signal
@@ -68,5 +65,7 @@ export interface HttpRequestBody {
   method: string,
   headers?: Header,
   body?: string,
-  timeout?: number
+  timeout?: number,
+  /** Controller shared by interceptors, timeout handling, and the fetch signal. */
+  abortController: AbortController
 }
