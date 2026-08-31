@@ -137,6 +137,60 @@ const response = await client.get<User>()
     .toResponse()
 ```
 
+#### Request Interceptors
+
+Register request interceptors while building a client to inspect or modify every request before it is sent. Interceptors
+run in registration order and may mutate the supplied request, return a replacement request, or resolve either behavior
+asynchronously.
+
+```typescript
+const client = RestClient.builder()
+    .baseUrl('https://api.example.com')
+    .requestInterceptor(async (request) => {
+        const token = await getAccessToken();
+
+        return {
+            ...request,
+            headers: {
+                ...request.headers,
+                Authorization: `Bearer ${token}`
+            }
+        };
+    })
+    .requestInterceptor((request) => {
+        request.headers = {
+            ...request.headers,
+            'X-Trace-Id': crypto.randomUUID()
+        };
+    })
+    .build();
+```
+
+If an interceptor throws or returns a rejected promise, the request rejects through the response resolver and `fetch`
+is not called.
+
+Each request builder creates its own `AbortController` by default. Supply a caller-owned controller with
+`abortController()` when the application needs to cancel the request. Interceptors receive that same controller, and
+its signal is passed to `fetch`.
+
+```typescript
+const client = RestClient.builder()
+    .requestInterceptor((request) => {
+        console.debug('Request uses signal', request.abortController.signal);
+    })
+    .build();
+
+const abortController = new AbortController();
+const response = client.get()
+    .uri('/reports')
+    .abortController(abortController)
+    .retrieve()
+    .toResponse();
+
+abortController.abort();
+await response;
+```
+
 #### Response Handler
 `RestClient` provide ability to set response handler which can be used to process response before resolving to
 `toEntity`, `toVoid` or `toReponse`. Response handler is function with one parameter `response` object should be 

@@ -182,6 +182,16 @@ export default {
 };
 ```
 
+Run the configured SSG integration by forwarding `--ssg` to the build:
+
+```sh
+pnpm run build --ssg
+```
+
+Keep Vite's separator in the package script (`"build": "tsc && vite build --"`)
+so callers do not have to provide it. Without `--ssg`, the same command produces
+the ordinary client-only build.
+
 `dotaSsg()` is available directly from `@ayu-sh-kr/dota-wrap/ssg` when an
 application needs only the SSG plugin. The wrapper points its rendering bridge
 at `@ayu-sh-kr/dota-wrap/rendering`, keeping all application imports within the

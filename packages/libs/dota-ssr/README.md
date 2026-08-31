@@ -47,6 +47,21 @@ export default defineConfig({
 });
 ```
 
+The configured plugin keeps ordinary builds client-only. Add a separate SSG
+script when static pages should be generated:
+
+```json
+{
+  "scripts": {
+    "build": "tsc && vite build",
+    "build:ssg": "tsc && vite build -- --ssg"
+  }
+}
+```
+
+Run `pnpm run build:ssg` to generate static pages. The separator forwards the
+custom `--ssg` flag without asking Vite to parse it as one of its own options.
+
 ## Selecting routes
 
 Mark a concrete page route with `ssr: true` to include it in autodetection.
