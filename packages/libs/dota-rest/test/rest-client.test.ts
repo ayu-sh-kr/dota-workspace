@@ -45,6 +45,111 @@ describe('RestClient', () => {
     expect(response.data).toEqual({key: 'value'});
   });
 
+  it('should apply request interceptors in registration order before fetch', async () => {
+    const interceptorOrder: string[] = [];
+    const mockResponse = new Response(null, {status: 204});
+    vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse);
+
+    const client = RestClient.builder()
+      .baseUrl('https://api.example.com')
+      .requestInterceptor((request) => {
+        interceptorOrder.push('authorization');
+        request.headers = {
+          ...request.headers,
+          Authorization: 'Bearer token'
+        };
+      })
+      .requestInterceptor(async (request) => {
+        interceptorOrder.push('trace');
+        return {
+          ...request,
+          uri: `${request.uri}?trace=true`,
+          headers: {
+            ...request.headers,
+            'X-Trace-Id': 'trace-id'
+          }
+        };
+      })
+      .build();
+
+    const response = await client.get()
+      .uri('/users')
+      .retrieve()
+      .toResponse();
+
+    expect(response).toBe(mockResponse);
+    expect(interceptorOrder).toEqual(['authorization', 'trace']);
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://api.example.com/users?trace=true',
+      expect.objectContaining({
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer token',
+          'X-Trace-Id': 'trace-id'
+        }
+      })
+    );
+  });
+
+  it('should run a client request interceptor for every request', async () => {
+    const interceptor = vi.fn();
+    vi.mocked(global.fetch).mockResolvedValue(new Response(null, {status: 204}));
+
+    const client = RestClient.builder()
+      .baseUrl('https://api.example.com')
+      .requestInterceptor(interceptor)
+      .build();
+
+    await client.get().uri('/users').retrieve().toResponse();
+    await client.delete().uri('/users/1').retrieve().toResponse();
+
+    expect(interceptor).toHaveBeenCalledTimes(2);
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('should reject without calling fetch when a request interceptor fails', async () => {
+    const interceptorError = new Error('Could not obtain access token');
+    const client = RestClient.builder()
+      .baseUrl('https://api.example.com')
+      .requestInterceptor(async () => {
+        throw interceptorError;
+      })
+      .build();
+
+    const response = client.get()
+      .uri('/users')
+      .retrieve()
+      .toResponse();
+
+    await expect(response).rejects.toBe(interceptorError);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('should share the request abort controller between interceptors and fetch', async () => {
+    let requestAbortController: AbortController | undefined;
+    const callerAbortController = new AbortController();
+    vi.mocked(global.fetch).mockResolvedValueOnce(new Response(null, {status: 204}));
+
+    const client = RestClient.builder()
+      .baseUrl('https://api.example.com')
+      .requestInterceptor((request) => {
+        requestAbortController = request.abortController;
+      })
+      .build();
+
+    await client.get()
+      .uri('/users')
+      .abortController(callerAbortController)
+      .retrieve()
+      .toResponse();
+
+    expect(requestAbortController).toBe(callerAbortController);
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://api.example.com/users',
+      expect.objectContaining({signal: callerAbortController.signal})
+    );
+  });
+
   it('should create a RestRequestMaker with method GET, header, baseUrl and timeout', () => {
     const client = RestClient.builder()
       .baseUrl('https://api.example.com')

@@ -48,8 +48,9 @@ export {resolveDecoratedSsgRoutes, resolveSsgRoutes} from './route-output';
 /**
  * Creates the build-only happy-dom prerender extension for a Dota application.
  * It runs only after Vite produces the client bundle, preserving the normal SPA build
- * unless callers explicitly install it. Each resolved route receives an isolated window
- * so application globals and component registrations cannot leak between HTML outputs.
+ * unless callers configure it and pass `--ssg` to the build command. Each resolved route
+ * receives an isolated window so application globals and component registrations cannot
+ * leak between HTML outputs.
  * @param options Route selection, entry, readiness, shell, and optional Vercel configuration.
  * @returns A post-build Vite plugin that writes marked static route documents.
  */
@@ -63,7 +64,9 @@ export default function dotaSsg(options: DotaSsgOptions): Plugin {
 
   return {
     name: 'vite-plugin-dota-ssg',
-    apply: 'build',
+    apply(_config, environment) {
+      return environment.command === 'build' && process.argv.includes('--ssg');
+    },
     enforce: 'post',
     configResolved(resolvedConfig) {
       config = resolvedConfig;

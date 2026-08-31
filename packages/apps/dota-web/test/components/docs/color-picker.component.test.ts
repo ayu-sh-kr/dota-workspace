@@ -60,7 +60,9 @@ describe('ColorPickerComponent', () => {
   });
 
   it('updates the retained header icon host after a color selection', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('<svg><path/></svg>', {status: 200}));
+    vi.spyOn(globalThis, 'fetch').mockImplementation(
+      async () => new Response('<svg><path/></svg>', {status: 200}),
+    );
     const header = document.createElement('doc-header-test') as DocHeaderComponent;
     const picker = document.createElement('color-picker-test') as ColorPickerComponent;
     document.body.append(header, picker);

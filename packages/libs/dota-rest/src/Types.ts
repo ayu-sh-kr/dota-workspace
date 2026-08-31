@@ -1,5 +1,7 @@
 
 
+import type {RequestInterceptor} from "@dota/RequestInterceptor.ts";
+
 /**
  * The `Header` type represents a collection of HTTP headers as key-value pairs.
  *
@@ -87,7 +89,11 @@ export interface RequestSetup {
   baseUri?: string,
   headers?: Header,
   timeout: number,
-  handler?: ResponseHandler
+  handler?: ResponseHandler,
+  /** Interceptors inherited from the client and applied before request execution. */
+  requestInterceptors?: readonly RequestInterceptor[],
+  /** Optional caller-owned controller; a new controller is created when omitted. */
+  abortController?: AbortController
 }
 
 /**
