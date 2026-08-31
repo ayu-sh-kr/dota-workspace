@@ -1,6 +1,6 @@
 import {
   GlobalNavigationHooks,
-  NavigationContext,
+  HistoryTraversalOptions,
   NavigationOptions,
   NavigationResult,
   RouteConfig,
@@ -57,30 +57,44 @@ export class HistoryCoordinator<T extends HTMLElement = HTMLElement> implements 
       const enterResult = await runRouteGuards(branchDelta.entering, "beforeEnter", context);
       if (enterResult !== true) return toNavigationResult(enterResult, match, context);
       if (signal.aborted) return {status: "cancelled"};
+    } catch (error) {
+      if (signal.aborted) return {status: "cancelled", match};
+      return {status: "failed", match, phase: "guards", error};
+    }
 
-      if (options.commit !== false) this.commit(destination, options);
+    if (options.commit !== false) this.commit(destination, options);
+
+    try {
       await this.renderer(match, context);
-      this.currentMatch = match;
+    } catch (error) {
+      return {status: "failed", match, phase: "render", error};
+    }
+
+    if (signal.aborted) return {status: "cancelled", match};
+    this.currentMatch = match;
+
+    try {
       await runRouteLifecycleHooks(branchDelta.leaving, "afterLeave", context);
       await runRouteLifecycleHooks(branchDelta.entering, "afterEnter", context);
       await runGlobalLifecycleHooks(this.globalHooks.afterEach ?? [], context);
-
-      return {status: "completed", match};
     } catch (error) {
-      if (signal.aborted) return {status: "cancelled"};
-      return {status: "failed", match, error};
+      return {status: "failed", match, phase: "lifecycle", error};
     }
+
+    return {status: "completed", match};
   }
 
   /**
    * Handles a browser-selected history entry without pushing a duplicate entry.
-   * @param event - Popstate event carrying the browser entry state.
+   * @param event - Popstate event identifying the browser-selected entry.
+   * @param options - Optional adapter-owned state and signal for traversal processing.
    * @returns The transition result after resolving and rendering the selected entry.
    */
-  handlePopState(event: PopStateEvent): Promise<NavigationResult<T>> {
+  handlePopState(event: PopStateEvent, options?: HistoryTraversalOptions): Promise<NavigationResult<T>> {
     return this.navigate(window.location.href, {
       commit: false,
-      historyState: event.state
+      signal: options?.signal,
+      historyState: options ? options.historyState : event.state
     });
   }
 
@@ -92,7 +106,7 @@ export class HistoryCoordinator<T extends HTMLElement = HTMLElement> implements 
    * @param options - State and replace policy supplied by the navigation caller.
    */
   public commit(url: URL, options: NavigationOptions): void {
-    const state = options.historyState ?? null;
+    const state = "commitState" in options ? options.commitState : options.historyState ?? null;
     if (options.replace) {
       window.history.replaceState(state, "", url.href);
     } else {

@@ -94,7 +94,7 @@ describe("HistoryCoordinator", () => {
 
     const result = await coordinator.navigate("/account");
 
-    expect(result).toMatchObject({status: "failed", error});
+    expect(result).toMatchObject({status: "failed", phase: "render", error});
     expect(pushState).toHaveBeenCalledTimes(1);
     expect(afterEach).not.toHaveBeenCalled();
   });
@@ -115,8 +115,48 @@ describe("HistoryCoordinator", () => {
     const result = await coordinator.navigate("/account");
     await coordinator.navigate("/account");
 
-    expect(result).toMatchObject({status: "failed", error});
+    expect(result).toMatchObject({status: "failed", phase: "lifecycle", error});
     expect(window.location.pathname).toBe("/account");
     expect(beforeEach.mock.calls[1][0].currentMatch?.pathname).toBe("/account");
+  });
+
+  it("separates committed router state from callback-visible application state", async () => {
+    const applicationState = {source: "application"};
+    const commitState = {source: "adapter"};
+    const beforeEnter = vi.fn(() => true as const);
+    const coordinator = new HistoryCoordinator(
+      [{path: "/account", component: AccountPage, beforeEnter}],
+      errorRoute,
+      vi.fn()
+    );
+
+    const result = await coordinator.navigate("/account", {historyState: applicationState, commitState});
+
+    expect(result.status).toBe("completed");
+    expect(window.history.state).toBe(commitState);
+    expect(beforeEnter).toHaveBeenCalledWith(expect.objectContaining({historyState: applicationState}));
+  });
+
+  it("uses adapter state and signal for an already-committed popstate entry", async () => {
+    const applicationState = {source: "selected-entry"};
+    const controller = new AbortController();
+    const beforeEnter = vi.fn(() => true as const);
+    const coordinator = new HistoryCoordinator(
+      [{path: "/account", component: AccountPage, beforeEnter}],
+      errorRoute,
+      vi.fn()
+    );
+    window.history.replaceState(null, "", "/account");
+
+    const result = await coordinator.handlePopState(
+      new PopStateEvent("popstate", {state: {source: "browser-envelope"}}),
+      {signal: controller.signal, historyState: applicationState}
+    );
+
+    expect(result.status).toBe("completed");
+    expect(beforeEnter).toHaveBeenCalledWith(expect.objectContaining({
+      signal: controller.signal,
+      historyState: applicationState
+    }));
   });
 });
