@@ -1,4 +1,5 @@
 import {RestRequestRetriever} from "@dota/RequestRetriever.ts";
+import type {RequestInterceptor} from "@dota/RequestInterceptor.ts";
 import {Header, HttpMethod, RequestSetup, ResponseHandler} from "@dota/Types.ts";
 import {ResponseResolver} from "@dota/ResponseResolver.ts";
 
@@ -35,6 +36,14 @@ export interface RequestBuilder<T> {
    * @returns The current instance of `RequestBuilder` for method chaining.
    */
   timeout(timeout: number): RequestBuilder<T>;
+
+  /**
+   * Replaces the controller used to cancel this request.
+   * The controller is exposed to interceptors and its signal is passed to `fetch`.
+   * @param controller Controller owned by the caller for manual cancellation.
+   * @returns The current request builder for method chaining.
+   */
+  abortController(controller: AbortController): RequestBuilder<T>;
 
   /**
    * Sets multiple headers for the HTTP request.
@@ -107,6 +116,8 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
   private _params: URLSearchParams;
   private _body: any;
   private readonly _handler: ResponseHandler | undefined;
+  private readonly _requestInterceptors: readonly RequestInterceptor[];
+  private _abortController: AbortController;
 
   constructor(requestSetup: RequestSetup) {
     this._baseUri = requestSetup.baseUri || '';
@@ -116,6 +127,8 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
     this._headers = {}
     this._params = new URLSearchParams();
     this._handler = requestSetup.handler;
+    this._requestInterceptors = requestSetup.requestInterceptors || [];
+    this._abortController = requestSetup.abortController || new AbortController();
   }
 
 
@@ -154,6 +167,12 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
     return this;
   }
 
+  /** Replaces the request-scoped controller used by interceptors and `fetch`. */
+  abortController(controller: AbortController): RequestBuilder<T> {
+    this._abortController = controller;
+    return this;
+  }
+
   body(item: any): RequestBuilder<T> {
     this._body = item;
     return this;
@@ -184,6 +203,11 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
     return this._timeout;
   }
 
+  /** Returns the request-scoped controller selected by the caller or builder. */
+  getAbortController(): AbortController {
+    return this._abortController;
+  }
+
   getHeaders(): Header {
     return this._headers;
   }
@@ -194,6 +218,11 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
 
   getBody(): any {
     return this._body;
+  }
+
+  /** Returns the client-wide interceptor pipeline for request execution. */
+  getRequestInterceptors(): readonly RequestInterceptor[] {
+    return this._requestInterceptors;
   }
 
 }
