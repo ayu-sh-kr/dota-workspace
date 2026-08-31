@@ -7,18 +7,27 @@ import {AppComponent} from "@test/setup/Components";
 
 describe('DomNavigationRouter', () => {
 
+  const createBrowserNavigationResult = (): NavigationResult => ({
+    committed: Promise.resolve({} as NavigationHistoryEntry),
+    finished: Promise.resolve({} as NavigationHistoryEntry)
+  });
+
   // Mock window.navigation for Navigation API
   const mockNavigation = {
+    canGoBack: true,
+    canGoForward: true,
     addEventListener: vi.fn(),
-    navigate: vi.fn().mockResolvedValue(undefined)
+    navigate: vi.fn(() => createBrowserNavigationResult()),
+    back: vi.fn(() => createBrowserNavigationResult()),
+    forward: vi.fn(() => createBrowserNavigationResult())
   };
 
   // Mock NavigateEvent for testing
-  const createMockNavigateEvent = (url: string, canIntercept = true, hashChange = false) => ({
+  const createMockNavigateEvent = (url: string, canIntercept = true, hashChange = false, state: unknown = undefined) => ({
     canIntercept,
     hashChange,
     downloadRequest: null,
-    destination: { url },
+    destination: {url, getState: () => state},
     signal: new AbortController().signal,
     intercept: vi.fn()
   });
@@ -46,6 +55,8 @@ describe('DomNavigationRouter', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockNavigation.canGoBack = true;
+    mockNavigation.canGoForward = true;
   });
 
   it('should create an instance of DomNavigationRouter and render through its coordinator', async () => {
@@ -312,5 +323,110 @@ describe('DomNavigationRouter', () => {
     router.route('/products');
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith('http://localhost/products');
+  });
+
+  it('should request the preceding Navigation API entry when available', () => {
+    const router = new DomNavigationRouter<BaseElement>(
+      RouterUtils.prepareConfig(components),
+      errorRoute,
+      defaultRoute,
+      AppComponent,
+      vi.fn()
+    );
+    vi.clearAllMocks();
+
+    router.back();
+
+    expect(mockNavigation.back).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not request a preceding entry at the history boundary', () => {
+    const router = new DomNavigationRouter<BaseElement>(
+      RouterUtils.prepareConfig(components),
+      errorRoute,
+      defaultRoute,
+      AppComponent,
+      vi.fn()
+    );
+    mockNavigation.canGoBack = false;
+    vi.clearAllMocks();
+
+    router.back();
+
+    expect(mockNavigation.back).not.toHaveBeenCalled();
+  });
+
+  it('should request the succeeding Navigation API entry when available', () => {
+    const router = new DomNavigationRouter<BaseElement>(
+      RouterUtils.prepareConfig(components),
+      errorRoute,
+      defaultRoute,
+      AppComponent,
+      vi.fn()
+    );
+    vi.clearAllMocks();
+
+    router.forth();
+
+    expect(mockNavigation.forward).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not request a succeeding entry at the history boundary', () => {
+    const router = new DomNavigationRouter<BaseElement>(
+      RouterUtils.prepareConfig(components),
+      errorRoute,
+      defaultRoute,
+      AppComponent,
+      vi.fn()
+    );
+    mockNavigation.canGoForward = false;
+    vi.clearAllMocks();
+
+    router.forth();
+
+    expect(mockNavigation.forward).not.toHaveBeenCalled();
+  });
+
+  it('should report an unexpected traversal failure', async () => {
+    const error = new Error('traversal failed');
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockNavigation.back.mockReturnValueOnce({
+      committed: Promise.resolve({} as NavigationHistoryEntry),
+      finished: Promise.reject(error)
+    });
+    const router = new DomNavigationRouter<BaseElement>(
+      RouterUtils.prepareConfig(components),
+      errorRoute,
+      defaultRoute,
+      AppComponent,
+      vi.fn()
+    );
+
+    router.back();
+    await new Promise<void>(resolve => queueMicrotask(resolve));
+
+    expect(consoleError).toHaveBeenCalledWith('[dota-router] History traversal failed.', error);
+    consoleError.mockRestore();
+  });
+
+  it('should ignore the expected abort rejection from a cancelled guard', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockNavigation.back.mockReturnValueOnce({
+      committed: Promise.resolve({} as NavigationHistoryEntry),
+      finished: Promise.reject(new DOMException('cancelled', 'AbortError'))
+    });
+    const router = new DomNavigationRouter<BaseElement>(
+      RouterUtils.prepareConfig(components),
+      errorRoute,
+      defaultRoute,
+      AppComponent,
+      vi.fn()
+    );
+
+    router.back();
+    await new Promise<void>(resolve => queueMicrotask(resolve));
+
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
   });
 });
