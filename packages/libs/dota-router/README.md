@@ -24,8 +24,12 @@ yarn add @ayu-sh-kr/dota-router
 ## Basic Usage
 
 ```typescript
-import { DomNavigationRouter, RouteConfig } from '@ayu-sh-kr/dota-router';
-import { HomePage, AboutPage, NotFoundPage } from './components';
+import {
+  DotaRouterService,
+  DomHistoryRouter,
+  RouteConfig
+} from '@ayu-sh-kr/dota-router';
+import { AppRoot, HomePage, AboutPage, NotFoundPage } from './components';
 
 // Define your routes
 const routes: RouteConfig[] = [
@@ -40,29 +44,58 @@ const routes: RouteConfig[] = [
   }
 ];
 
-// Create and initialize router
-const router = new DomNavigationRouter({
+const errorRoute: RouteConfig = {
+  path: '/error',
+  component: NotFoundPage
+};
+const defaultRoute = routes[0];
+
+const router = DotaRouterService.fromComponents({
+  router: DomHistoryRouter,
   routes,
-  errorRoute: {
-    path: '/error',
-    component: NotFoundPage
-  }
-});
+  errorRoute,
+  defaultRoute,
+  root: AppRoot
+}).init();
 ```
 
 ## Navigation
 
-Navigate between pages using the static route method:
+Prefer the initialized router service for application navigation:
 
 ```typescript
-// Navigate to a path
-DomNavigationRouter.route('/about');
+router.route('/about');
+router.back();
+router.forth();
+```
 
-// Navigate with options
-DomNavigationRouter.route('/products', {
-  category: 'electronics',
-  sort: 'price'
-});
+`back()` requests the preceding browser-history entry and `forth()` requests the
+succeeding entry. Both are fire-and-forget commands: the browser event raised by the
+selected adapter runs route resolution, guards, rendering, and lifecycle hooks.
+
+For an accepted traversal, callbacks run in this order:
+
+1. Global `beforeEach` guards.
+2. Route `beforeLeave` guards, deepest route first.
+3. Route `beforeEnter` guards, parent route first.
+4. Rendering.
+5. Route `afterLeave` hooks, deepest route first.
+6. Route `afterEnter` hooks, parent route first.
+7. Global `afterEach` hooks.
+
+`DomNavigationRouter` evaluates guards before the browser commits a traversal.
+`DomHistoryRouter` receives `popstate` after commit, so it stores a router position
+inside an envelope around application history state. A cancelled router-owned traversal
+returns to the last accepted entry without rerunning lifecycle hooks. Entries created by
+another history owner have no position metadata and can still render, but a rejected
+external traversal cannot be restored automatically because the router will not guess
+a history distance.
+
+The legacy static route helpers remain available for callers without a service instance:
+
+```typescript
+DomNavigationRouter.route('/about');
+DomHistoryRouter.route('/about');
 ```
 
 ## Advanced Routing
