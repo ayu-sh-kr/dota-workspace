@@ -32,6 +32,7 @@ describe('RequestBuilder', () => {
     expect(requestBuilder).toHaveProperty('_params', new URLSearchParams());
     expect(requestBuilder).toHaveProperty('_body', undefined);
     expect(requestBuilder).toHaveProperty('_handler', undefined);
+    expect(requestBuilder.getAbortController()).toBeInstanceOf(AbortController);
   });
 
   it('should set baseURI correctly', () => {
@@ -91,6 +92,16 @@ describe('RequestBuilder', () => {
 
     requestBuilder.timeout(10000);
     expect(requestBuilder).toHaveProperty('_timeout', 10000);
+  });
+
+  it('should use a caller-provided abort controller', () => {
+    const requestBuilder = createRequestBuilder();
+    const abortController = new AbortController();
+
+    const result = requestBuilder.abortController(abortController);
+
+    expect(result).toBe(requestBuilder);
+    expect(requestBuilder.getAbortController()).toBe(abortController);
   });
 
   it('should set body correctly', () => {
