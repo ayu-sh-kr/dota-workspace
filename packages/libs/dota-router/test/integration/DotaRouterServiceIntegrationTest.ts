@@ -399,7 +399,8 @@ describe("DotaRouterService happy-dom integration", () => {
         hashChange: false,
         downloadRequest: null,
         destination: {
-          url: new URL("/workspace/projects/slow/settings", window.location.origin).href
+          url: new URL("/workspace/projects/slow/settings", window.location.origin).href,
+          getState: () => undefined
         },
         signal: abortController.signal,
         intercept

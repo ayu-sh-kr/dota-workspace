@@ -111,7 +111,23 @@ export class DotaRouterService<T extends Router<HTMLElement>> implements RouterS
    * @param path - Application path requested by the caller.
    */
   route(path: string): void {
-    this.instance.route(path)
+    this.instance.route(path);
+  }
+
+  /**
+   * Delegates traversal to the preceding entry through the selected browser adapter.
+   * Browser events raised by the adapter run guards and lifecycle hooks asynchronously.
+   */
+  back(): void {
+    this.instance.back();
+  }
+
+  /**
+   * Delegates traversal to the succeeding entry through the selected browser adapter.
+   * Browser events raised by the adapter run guards and lifecycle hooks asynchronously.
+   */
+  forth(): void {
+    this.instance.forth();
   }
 
 }
