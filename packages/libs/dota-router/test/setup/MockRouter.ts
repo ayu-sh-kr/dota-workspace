@@ -17,6 +17,8 @@ export class MockRouter implements Router<HTMLElement> {
   globalHooks?: GlobalNavigationHooks<HTMLElement>;
   init: () => void = vi.fn();
   route: (path: string) => void = vi.fn();
+  back: () => void = vi.fn();
+  forth: () => void = vi.fn();
 
   constructor(
     routes: RouteConfig<HTMLElement>[],

@@ -9,10 +9,13 @@ import {
 import {NavigationCoordinator} from "@dota/coordinator/NavigationCoordinator";
 import {createRouteRenderer} from "@dota/coordinator/route-renderer";
 
+/** Native Navigation API result tracked by fire-and-forget traversal commands. */
+type BrowserTraversalResult = ReturnType<Navigation["back"]>;
+
 /** Connects the Navigation API event source to guarded route transitions. */
 export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
 
-  public readonly routes: RouteConfig<T>[]
+  public readonly routes: RouteConfig<T>[];
   public readonly errorRoute: RouteConfig<T>;
   public readonly defaultRoute: RouteConfig<T>;
   public readonly root: ComponentClass;
@@ -59,7 +62,7 @@ export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
       }
 
       this.coordinator.handleNavigateEvent(event);
-    })
+    });
   }
 
   /**
@@ -73,25 +76,50 @@ export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
   }
 
   /**
-   * Navigate to a specified path using the Navigation API.
-   * This method is responsible for navigating to a new path using the Navigation API.
-   * It ensures that the path starts with a slash and creates a navigation destination object.
-   * Finally, it triggers the navigation using the Navigation API.
-   *
-   * @param path - The path to navigate to.
-   * @param options - Optional navigation options.
-   * @returns void
+   * Requests the preceding Navigation API entry when one is available.
+   * The resulting `navigate` event runs guards before commit and lifecycle hooks
+   * after the browser accepts the traversal.
+   */
+  back(): void {
+    if (!window.navigation.canGoBack) return;
+    this.observeTraversal(window.navigation.back());
+  }
+
+  /**
+   * Requests the succeeding Navigation API entry when one is available.
+   * The resulting `navigate` event runs guards before commit and lifecycle hooks
+   * after the browser accepts the traversal.
+   */
+  forth(): void {
+    if (!window.navigation.canGoForward) return;
+    this.observeTraversal(window.navigation.forward());
+  }
+
+  /**
+   * Prevents expected guard cancellation from becoming an unhandled rejection.
+   * Unexpected browser or lifecycle failures remain visible through a scoped error.
+   * @param traversal - Native result whose completion represents the full traversal.
+   */
+  private observeTraversal(traversal: BrowserTraversalResult): void {
+    if (!traversal.finished) return;
+
+    void traversal.finished.catch(error => {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      console.error("[dota-router] History traversal failed.", error);
+    });
+  }
+
+  /**
+   * Preserves the legacy static Navigation API helper for instance-free callers.
+   * The browser-generated `navigate` event remains responsible for interception.
+   * @param path - Application path normalized against the current origin.
+   * @param options - Retained legacy options; currently ignored.
    */
   static route(path: string, options?: NavigationOption): void {
-    // Make sure path starts with a slash
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-
-    // Create a navigation destination object
     const navigationDestination = {
       url: new URL(normalizedPath, window.location.origin).toString()
     };
-
-    // Trigger navigation using the Navigation API
     window.navigation.navigate(navigationDestination.url);
   }
 }

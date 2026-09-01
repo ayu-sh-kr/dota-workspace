@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2200 2200" width="2200" height="2200" role="img" aria-labelledby="diagram-title diagram-desc">
   <title id="diagram-title">Dota Router navigation adapters high-level design</title>
-  <desc id="diagram-desc">Alternative History API and Navigation API router adapters normalize navigation, respond to browser events, and converge on RouterUtils.render.</desc>
+  <desc id="diagram-desc">Alternative History API and Navigation API router adapters normalize navigation, respond to browser events, and converge on shared coordinator route-transition semantics and rendering.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto" markerUnits="userSpaceOnUse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
@@ -106,9 +106,10 @@
   <text x="1460" y="1094" class="branch">yes</text>
 
   <text x="85" y="1465" class="section">02 / SHARED RENDER BOUNDARY</text>
-  <text x="85" y="1493" class="note">Initial loads and accepted navigation events converge at RouterUtils.render(config).</text>
+  <text x="85" y="1493" class="note">Initial loads and accepted navigation events converge at coordinator transition semantics and rendering.</text>
   <rect x="920" y="1580" width="360" height="64" class="card entry"/>
-  <text x="1100" y="1620" text-anchor="middle" class="label entry-label">RouterUtils.render(config)</text>
+  <text x="1100" y="1612" text-anchor="middle" class="label entry-label">coordinator transition</text>
+  <text x="1100" y="1635" text-anchor="middle" class="label entry-label">+ render approved route</text>
 
   <path d="M 920 822 H 950 V 1390 H 1100 V 1580" class="plain"/>
   <path d="M 280 1034 V 1430 H 1100 V 1580" class="plain"/>
@@ -121,6 +122,6 @@
   <text x="115" y="1772" class="section">READING NOTE</text>
   <text x="285" y="1772" class="note">History always dispatches popstate after pushState. Navigation intercepts only safe, interceptable events.</text>
   <text x="285" y="1800" class="note">Dashed purple control is the async Navigation API handler; all four paths end at the shared renderer.</text>
-  <text x="85" y="1895" class="source">Source: packages/libs/dota-router/src/dom-history.router.ts · dom-navigation.router.ts · Types.ts</text>
-  <text x="85" y="1922" class="source">Related: dota-router-service-hld.svg · dota-router-utils-hld.svg</text>
+  <text x="85" y="1895" class="source">Source: packages/libs/dota-router/src/router/history/dom-history.router.ts · router/dom-navigation.router.ts · coordinator/route-transition.ts</text>
+  <text x="85" y="1922" class="source">Related: transition-layer-comparison.svg · dota-router-service-hld.svg · dota-router-utils-hld.svg</text>
 </svg>

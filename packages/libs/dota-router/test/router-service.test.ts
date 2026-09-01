@@ -1,5 +1,5 @@
 import {DotaRouterService} from "@dota/DotaRouterService";
-import {DomHistoryRouter} from "@dota/router/dom-history.router";
+import {DomHistoryRouter} from "@dota/router/history";
 import {expect, vi} from "vitest";
 import {RouterUtils} from "@dota/RouterUtils";
 import {configure} from "@dota/route/route-configurer";
@@ -161,6 +161,36 @@ describe('RouterService', () => {
 
     expect(routerService.instance.route).toHaveBeenCalledTimes(1);
     expect(routerService.instance.route).toHaveBeenCalledWith(testPath);
+  });
+
+  it('should delegate back traversal to the initialized router', () => {
+    const routerService = DotaRouterService.fromComponents({
+      router: MockRouter,
+      components,
+      defaultRoute,
+      errorRoute,
+      root: AppComponent
+    });
+    routerService.init();
+
+    routerService.back();
+
+    expect(routerService.instance.back).toHaveBeenCalledTimes(1);
+  });
+
+  it('should delegate forth traversal to the initialized router', () => {
+    const routerService = DotaRouterService.fromComponents({
+      router: MockRouter,
+      components,
+      defaultRoute,
+      errorRoute,
+      root: AppComponent
+    });
+    routerService.init();
+
+    routerService.forth();
+
+    expect(routerService.instance.forth).toHaveBeenCalledTimes(1);
   });
 
 });

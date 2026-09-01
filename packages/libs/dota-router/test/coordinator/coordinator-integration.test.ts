@@ -138,8 +138,10 @@ describe("coordinator transition integration", () => {
 
     const result = await coordinator.navigate("/private");
 
-    expect(result.status).toBe("redirected");
-    expect(result.redirectTo?.pathname).toBe("/sign-in");
+    expect(result).toMatchObject({
+      status: "redirected",
+      redirectTo: expect.objectContaining({pathname: "/sign-in"})
+    });
     expect(renderer).not.toHaveBeenCalled();
     expect(pushState).not.toHaveBeenCalled();
   });

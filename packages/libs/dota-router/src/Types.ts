@@ -31,6 +31,12 @@ export interface Router<T extends HTMLElement> {
    * @param path - Application pathname; adapters normalize a missing leading slash.
    */
   route(path: string): void;
+
+  /** Requests traversal to the immediately preceding browser-history entry. */
+  back(): void;
+
+  /** Requests traversal to the immediately succeeding browser-history entry. */
+  forth(): void;
 }
 
 /**
@@ -126,24 +132,48 @@ export type GlobalNavigationHooks<T extends HTMLElement = HTMLElement> = {
   readonly afterEach?: readonly RouteLifecycleHook<T>[];
 }
 
-/** Names the terminal state reported by a browser-independent route transition. */
-export type NavigationStatus = "completed" | "cancelled" | "redirected" | "failed";
+/** Identifies the transition phase that produced a failed navigation result. */
+export type NavigationFailurePhase = "guards" | "render" | "lifecycle";
 
 /**
  * Describes the browser-independent outcome of one coordinator transition.
  * Adapters translate this result into their browser API without duplicating route
  * lifecycle policy or making callers inspect thrown control-flow errors.
  */
-export type NavigationResult<T extends HTMLElement = HTMLElement> = {
-  /** Terminal transition state used by the adapter or application. */
-  status: NavigationStatus;
-  /** Destination match when resolution or transition work reached a route. */
-  match?: RouteMatch<T>;
-  /** Absolute redirect target when a guard returned a redirect path. */
-  redirectTo?: URL;
-  /** Original failure when transition work rejected unexpectedly. */
-  error?: unknown;
-}
+export type NavigationResult<T extends HTMLElement = HTMLElement> =
+  | {
+      /** Indicates that rendering and every lifecycle observer completed. */
+      status: "completed";
+      /** Destination retained as the coordinator's current successful match. */
+      match: RouteMatch<T>;
+    }
+  | {
+      /** Indicates that a guard or abort signal stopped the transition. */
+      status: "cancelled";
+      /** Destination considered by the cancelled transition, when resolution completed. */
+      match?: RouteMatch<T>;
+    }
+  | {
+      /** Indicates that a guard selected another destination. */
+      status: "redirected";
+      /** Destination rejected in favor of the redirect. */
+      match: RouteMatch<T>;
+      /** Absolute target the browser adapter must navigate to next. */
+      redirectTo: URL;
+    }
+  | {
+      /** Indicates that transition work threw or rejected unexpectedly. */
+      status: "failed";
+      /** Destination involved when route resolution completed. */
+      match: RouteMatch<T>;
+      /** Phase used by history adapters to decide whether an entry was accepted. */
+      phase: NavigationFailurePhase;
+      /** Original error reported by the failed transition phase. */
+      error: unknown;
+    };
+
+/** Names every terminal status exposed by `NavigationResult`. */
+export type NavigationStatus = NavigationResult["status"];
 
 /**
  * Controls a coordinator transition without coupling route hooks to a browser adapter.
@@ -153,12 +183,126 @@ export type NavigationResult<T extends HTMLElement = HTMLElement> = {
 export type NavigationOptions = {
   /** Signal supplied by a browser event to cancel stale asynchronous work. */
   signal?: AbortSignal;
-  /** State to associate with a newly committed history entry. */
+  /** Application state exposed to callbacks and committed when `commitState` is absent. */
   historyState?: unknown;
+  /** Adapter-owned state written to history while `historyState` remains callback-visible. */
+  commitState?: unknown;
   /** Replace the current history entry instead of pushing a new one. */
   replace?: boolean;
   /** Skip a history commit when handling an already-committed popstate entry. */
   commit?: boolean;
+}
+
+/**
+ * Supplies destination state and cancellation to an already-committed popstate transition.
+ * History adapters use it to hide router bookkeeping from application callbacks.
+ */
+export type HistoryTraversalOptions = {
+  /** Signal aborted when a newer browser traversal supersedes this transition. */
+  signal: AbortSignal;
+  /** Application state recovered from the selected browser-history entry. */
+  historyState: unknown;
+}
+
+/**
+ * Keeps router recovery metadata beside the application state stored for one browser entry.
+ * The DOM History adapter consumes the position while navigation callbacks receive only
+ * the application-owned state.
+ */
+export type DotaHistoryEntry = {
+  /** Monotonic router position used to recover the last accepted entry. */
+  position: number;
+  /** State exposed to guards, renderers, and lifecycle hooks. */
+  applicationState: unknown;
+}
+
+/** Wraps router-owned metadata written to a browser history entry. */
+export type DotaHistoryState = {
+  /** Namespaced metadata that distinguishes router entries from external entries. */
+  __dotaRouter: DotaHistoryEntry;
+}
+
+/**
+ * Describes a browser recovery waiting for its matching `popstate` event.
+ * It preserves a pending redirect until the last accepted entry has been restored.
+ */
+export type HistoryRestoration = {
+  /** Router-owned position that remains the accepted destination. */
+  targetPosition: number;
+  /** Guard redirect followed after recovery, when the rejected traversal redirected. */
+  redirectTo?: URL;
+  /** Redirect count carried across the recovery event. */
+  redirectCount: number;
+}
+
+/**
+ * Defines the coordinator operations required by browser-history transition policy.
+ * The adapter depends on this smaller boundary instead of a concrete coordinator.
+ * @typeParam T - Route element produced by the coordinator's renderer.
+ */
+export type HistoryTransitionCoordinator<T extends HTMLElement> = {
+  /**
+   * Runs a programmatic transition that may commit a new indexed entry.
+   * @param url - Destination resolved by the history adapter.
+   * @param options - State, commit behavior, and cancellation for the transition.
+   * @returns The outcome used to accept, redirect, or recover browser history.
+   */
+  navigate(url: string | URL, options?: NavigationOptions): Promise<NavigationResult<T>>;
+  /**
+   * Processes an entry selected by the browser before router policy ran.
+   * @param event - Popstate event for the browser-selected entry.
+   * @param options - Callback-visible state and cancellation for the traversal.
+   * @returns The outcome used to accept or recover the selected entry.
+   */
+  handlePopState(event: PopStateEvent, options?: HistoryTraversalOptions): Promise<NavigationResult<T>>;
+}
+
+/** Defines browser-history operations used for entry indexing and traversal recovery. */
+export type HistoryTransitionBrowser = {
+  /** State belonging to the currently selected browser entry. */
+  readonly state: unknown;
+  /**
+   * Replaces the current entry when the router first assigns its position.
+   * @param data - Router envelope stored with the entry.
+   * @param unused - Browser API title argument, retained for platform compatibility.
+   * @param url - Optional URL assigned without creating another history entry.
+   */
+  replaceState(data: unknown, unused: string, url?: string | URL | null): void;
+  /**
+   * Moves by a relative entry delta when a rejected traversal must be restored.
+   * @param delta - Signed offset from the currently selected browser entry.
+   */
+  go(delta?: number): void;
+}
+
+/**
+ * Holds mutable state shared by the DOM History adapter's transition functions.
+ * The contract keeps recovery policy independently testable while the adapter owns
+ * browser event wiring.
+ * @typeParam T - Route element produced during transitions.
+ */
+export type HistoryTransitionRuntime<T extends HTMLElement> = {
+  /** Coordinator that runs guards, rendering, and lifecycle hooks. */
+  coordinator: HistoryTransitionCoordinator<T>;
+  /** Browser history receiving indexed entries and recovery deltas. */
+  history: HistoryTransitionBrowser;
+  /** Last router-owned position accepted by guards and rendering. */
+  acceptedPosition?: number;
+  /** Controller used to cancel a transition superseded by a newer request. */
+  activeTransition?: AbortController;
+  /** Recovery awaiting the browser's matching `popstate` event. */
+  restoration?: HistoryRestoration;
+}
+
+/**
+ * Carries the runtime and callback-visible state needed for initial history navigation.
+ * @typeParam T - Route element produced during transitions.
+ */
+export type PreparedHistoryTransition<T extends HTMLElement> = {
+  /** Mutable runtime passed to the history transition functions. */
+  runtime: HistoryTransitionRuntime<T>;
+  /** Current entry state exposed to the initial navigation callbacks. */
+  applicationState: unknown;
 }
 
 /**
@@ -313,6 +457,12 @@ export interface RouterService<T extends Router<HTMLElement>> {
 
   /** Delegates one pathname request to the initialized adapter. */
   route(path: string): void;
+
+  /** Delegates traversal to the preceding history entry. */
+  back(): void;
+
+  /** Delegates traversal to the succeeding history entry. */
+  forth(): void;
 }
 
 /**
