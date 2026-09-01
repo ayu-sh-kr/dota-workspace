@@ -1,84 +1,17 @@
-import {HistoryTraversalOptions, NavigationOptions, NavigationResult} from "@dota/Types";
+import type {
+  DotaHistoryEntry,
+  DotaHistoryState,
+  HistoryTransitionBrowser,
+  HistoryTransitionCoordinator,
+  HistoryTransitionRuntime,
+  NavigationResult,
+  PreparedHistoryTransition
+} from "@dota/Types";
 
 const DOTA_HISTORY_STATE_KEY = "__dotaRouter";
 
 /** Maximum guard redirects followed before a programmatic transition is stopped. */
 export const HISTORY_REDIRECT_LIMIT = 10;
-
-/**
- * Keeps recovery metadata beside the application state stored for one browser entry.
- * The adapter uses `position` internally while callbacks continue to receive only
- * `applicationState` through their navigation context.
- */
-export type DotaHistoryEntry = {
-  /** Monotonic router position used to recover the last accepted entry. */
-  position: number;
-  /** State exposed to guards, renderers, and lifecycle hooks. */
-  applicationState: unknown;
-}
-
-/** Browser-history envelope written by the DOM History adapter. */
-export type DotaHistoryState = {
-  /** Namespaced metadata that distinguishes router entries from external entries. */
-  [DOTA_HISTORY_STATE_KEY]: DotaHistoryEntry;
-}
-
-/**
- * Describes a browser-generated recovery that is waiting for its `popstate` event.
- * A delayed redirect is retained so it starts only after the accepted entry returns.
- */
-export type HistoryRestoration = {
-  /** Router-owned position that remains the accepted destination. */
-  targetPosition: number;
-  /** Guard redirect to follow after recovery, when the rejected traversal redirected. */
-  redirectTo?: URL;
-  /** Redirect count carried across the recovery event. */
-  redirectCount: number;
-}
-
-/** Coordinator operations required by browser-history transition policy. */
-export type HistoryTransitionCoordinator<T extends HTMLElement> = {
-  /** Runs a programmatic transition that may commit a new indexed entry. */
-  navigate(url: string | URL, options?: NavigationOptions): Promise<NavigationResult<T>>;
-  /** Processes an entry that the browser selected before router policy ran. */
-  handlePopState(event: PopStateEvent, options?: HistoryTraversalOptions): Promise<NavigationResult<T>>;
-}
-
-/** Browser-history operations required for entry indexing and traversal recovery. */
-export type HistoryTransitionBrowser = {
-  /** State belonging to the currently selected browser entry. */
-  readonly state: unknown;
-  /** Replaces the current entry when the router first assigns its position. */
-  replaceState(data: unknown, unused: string, url?: string | URL | null): void;
-  /** Moves by a relative entry delta when a rejected traversal must be restored. */
-  go(delta?: number): void;
-}
-
-/**
- * Holds the mutable browser-history state shared by reusable transition functions.
- * Keeping it outside the router class makes recovery policy directly testable while
- * the adapter remains responsible for wiring browser events to the coordinator.
- */
-export type HistoryTransitionRuntime<T extends HTMLElement> = {
-  /** Coordinator that runs guards, rendering, and lifecycle hooks. */
-  coordinator: HistoryTransitionCoordinator<T>;
-  /** Browser history receiving indexed entries and recovery deltas. */
-  history: HistoryTransitionBrowser;
-  /** Last router-owned position accepted by guards and rendering. */
-  acceptedPosition?: number;
-  /** Controller used to cancel a transition superseded by a newer request. */
-  activeTransition?: AbortController;
-  /** Recovery awaiting the browser's matching `popstate` event. */
-  restoration?: HistoryRestoration;
-}
-
-/** Result used to initialize the router and its first coordinator transition. */
-export type PreparedHistoryTransition<T extends HTMLElement> = {
-  /** Mutable runtime passed to the history transition functions. */
-  runtime: HistoryTransitionRuntime<T>;
-  /** Current entry state exposed to the initial navigation callbacks. */
-  applicationState: unknown;
-}
 
 /**
  * Reads router metadata without treating arbitrary application state as an envelope.

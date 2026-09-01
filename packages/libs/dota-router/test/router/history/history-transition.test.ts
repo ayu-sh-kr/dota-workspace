@@ -1,13 +1,16 @@
-import {NavigationResult, RouteMatch} from "@dota/Types";
+import {
+  HistoryTransitionBrowser,
+  HistoryTransitionCoordinator,
+  HistoryTransitionRuntime,
+  NavigationResult,
+  RouteMatch
+} from "@dota/Types";
 import {
   beginHistoryTransition,
   createDotaHistoryState,
   getDotaHistoryEntry,
   handleHistoryPopState,
   HISTORY_REDIRECT_LIMIT,
-  HistoryTransitionBrowser,
-  HistoryTransitionCoordinator,
-  HistoryTransitionRuntime,
   isAcceptedHistoryResult,
   navigateHistory,
   prepareHistoryTransition,
