@@ -205,6 +205,107 @@ export type HistoryTraversalOptions = {
 }
 
 /**
+ * Keeps router recovery metadata beside the application state stored for one browser entry.
+ * The DOM History adapter consumes the position while navigation callbacks receive only
+ * the application-owned state.
+ */
+export type DotaHistoryEntry = {
+  /** Monotonic router position used to recover the last accepted entry. */
+  position: number;
+  /** State exposed to guards, renderers, and lifecycle hooks. */
+  applicationState: unknown;
+}
+
+/** Wraps router-owned metadata written to a browser history entry. */
+export type DotaHistoryState = {
+  /** Namespaced metadata that distinguishes router entries from external entries. */
+  __dotaRouter: DotaHistoryEntry;
+}
+
+/**
+ * Describes a browser recovery waiting for its matching `popstate` event.
+ * It preserves a pending redirect until the last accepted entry has been restored.
+ */
+export type HistoryRestoration = {
+  /** Router-owned position that remains the accepted destination. */
+  targetPosition: number;
+  /** Guard redirect followed after recovery, when the rejected traversal redirected. */
+  redirectTo?: URL;
+  /** Redirect count carried across the recovery event. */
+  redirectCount: number;
+}
+
+/**
+ * Defines the coordinator operations required by browser-history transition policy.
+ * The adapter depends on this smaller boundary instead of a concrete coordinator.
+ * @typeParam T - Route element produced by the coordinator's renderer.
+ */
+export type HistoryTransitionCoordinator<T extends HTMLElement> = {
+  /**
+   * Runs a programmatic transition that may commit a new indexed entry.
+   * @param url - Destination resolved by the history adapter.
+   * @param options - State, commit behavior, and cancellation for the transition.
+   * @returns The outcome used to accept, redirect, or recover browser history.
+   */
+  navigate(url: string | URL, options?: NavigationOptions): Promise<NavigationResult<T>>;
+  /**
+   * Processes an entry selected by the browser before router policy ran.
+   * @param event - Popstate event for the browser-selected entry.
+   * @param options - Callback-visible state and cancellation for the traversal.
+   * @returns The outcome used to accept or recover the selected entry.
+   */
+  handlePopState(event: PopStateEvent, options?: HistoryTraversalOptions): Promise<NavigationResult<T>>;
+}
+
+/** Defines browser-history operations used for entry indexing and traversal recovery. */
+export type HistoryTransitionBrowser = {
+  /** State belonging to the currently selected browser entry. */
+  readonly state: unknown;
+  /**
+   * Replaces the current entry when the router first assigns its position.
+   * @param data - Router envelope stored with the entry.
+   * @param unused - Browser API title argument, retained for platform compatibility.
+   * @param url - Optional URL assigned without creating another history entry.
+   */
+  replaceState(data: unknown, unused: string, url?: string | URL | null): void;
+  /**
+   * Moves by a relative entry delta when a rejected traversal must be restored.
+   * @param delta - Signed offset from the currently selected browser entry.
+   */
+  go(delta?: number): void;
+}
+
+/**
+ * Holds mutable state shared by the DOM History adapter's transition functions.
+ * The contract keeps recovery policy independently testable while the adapter owns
+ * browser event wiring.
+ * @typeParam T - Route element produced during transitions.
+ */
+export type HistoryTransitionRuntime<T extends HTMLElement> = {
+  /** Coordinator that runs guards, rendering, and lifecycle hooks. */
+  coordinator: HistoryTransitionCoordinator<T>;
+  /** Browser history receiving indexed entries and recovery deltas. */
+  history: HistoryTransitionBrowser;
+  /** Last router-owned position accepted by guards and rendering. */
+  acceptedPosition?: number;
+  /** Controller used to cancel a transition superseded by a newer request. */
+  activeTransition?: AbortController;
+  /** Recovery awaiting the browser's matching `popstate` event. */
+  restoration?: HistoryRestoration;
+}
+
+/**
+ * Carries the runtime and callback-visible state needed for initial history navigation.
+ * @typeParam T - Route element produced during transitions.
+ */
+export type PreparedHistoryTransition<T extends HTMLElement> = {
+  /** Mutable runtime passed to the history transition functions. */
+  runtime: HistoryTransitionRuntime<T>;
+  /** Current entry state exposed to the initial navigation callbacks. */
+  applicationState: unknown;
+}
+
+/**
  * Defines the presentation boundary used after a route has passed its guards.
  * Coordinators do not assume how a custom element is mounted, which keeps rendering
  * policy separate from route matching and browser history.
