@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Shared type contracts for composing Dota runtime extensions.",
   "keywords": [
     "dota",
