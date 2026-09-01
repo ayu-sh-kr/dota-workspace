@@ -68,6 +68,8 @@ The return type remains `void`, matching `route(path)`. The History API does not
 
 ## Coordinator processing contract
 
+The two transition modules have deliberately separate responsibilities. [`route-transition.ts`](../../../../../packages/libs/dota-router/src/coordinator/route-transition.ts) is the browser-independent semantic layer: it normalizes URLs, creates `NavigationContext`, orders branch deltas, and converts guard decisions into `NavigationResult`. [`history-transition.ts`](../../../../../packages/libs/dota-router/src/router/history/history-transition.ts) is the History API policy layer: it indexes entries, owns abortable runtime state, delegates to `HistoryCoordinator`, and repairs browser movement that has already occurred. See the [transition-layer comparison](../architecture/transition-layer-comparison.md) and its [flow diagram](../architecture/transition-layer-comparison.svg).
+
 `back()` and `forth()` request browser traversal; they do not call a coordinator directly. The browser-selected destination is only known when the adapter receives `popstate` or `navigate`, so that event remains the authoritative transition input.
 
 Both coordinators already calculate and execute a transition in this order:
