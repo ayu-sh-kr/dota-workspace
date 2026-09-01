@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1320" role="img" aria-labelledby="title desc">
+  <title id="title">Dota Router transition layers</title>
+  <desc id="desc">The coordinator route-transition layer creates navigation context, branch delta, and guard results. The History API history-transition layer indexes entries, delegates to the coordinator, and restores rejected browser traversals.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker>
+    <style><![CDATA[
+      svg { background:#fff; text-rendering:geometricPrecision; }
+      text { font-family:"DM Sans",Poppins,Helvetica,Arial,sans-serif; fill:#1f2937; }
+      .title { font-size:32px; font-weight:700; } .sub { font-size:17px; fill:#64748b; }
+      .lane { fill:#fff; stroke:#e2e8f0; stroke-width:1.5; } .lane-title { font-size:20px; font-weight:700; fill:#334155; }
+      .card { stroke-width:2; rx:10; } .entry { fill:#eef2ff; stroke:#3157c9; } .process { fill:#fff; stroke:#cbd5e1; }
+      .decision { fill:#fffaf0; stroke:#d6a24e; } .effect { fill:#f0fdf4; stroke:#9ac7a3; } .skip { fill:#f8fafc; stroke:#94a3b8; }
+      .label { font-size:16px; font-weight:700; text-anchor:middle; } .note { font-size:14px; fill:#526174; text-anchor:middle; }
+      .branch { font-size:14px; font-weight:700; fill:#334155; } .connector { fill:none; stroke:#64748b; stroke-width:2.5; marker-end:url(#arrow); }
+      .source { font-size:13px; fill:#64748b; }
+    ]]></style>
+  </defs>
+  <rect width="1600" height="1320" fill="#fff"/>
+  <text x="60" y="72" class="title">Two transition layers, one navigation pipeline</text>
+  <text x="60" y="105" class="sub">Route semantics stay coordinator-owned; browser-history movement and repair stay adapter-owned.</text>
+  <rect x="50" y="145" width="700" height="1000" class="lane"/>
+  <rect x="850" y="145" width="700" height="1000" class="lane"/>
+  <text x="85" y="195" class="lane-title">route-transition.ts · coordinator semantics</text>
+  <text x="885" y="195" class="lane-title">history-transition.ts · History API policy</text>
+
+  <rect x="210" y="250" width="380" height="58" class="entry"/><text x="400" y="286" class="label">destination URL + route matches</text>
+  <rect x="210" y="390" width="380" height="58" class="process"/><text x="400" y="426" class="label">toNavigationUrl()</text>
+  <rect x="210" y="530" width="380" height="58" class="process"/><text x="400" y="566" class="label">createNavigationContext()</text>
+  <rect x="210" y="670" width="380" height="58" class="process"/><text x="400" y="706" class="label">getBranchDelta()</text>
+  <rect x="210" y="810" width="380" height="58" class="decision"/><text x="400" y="846" class="label">guard outcome?</text>
+  <rect x="90" y="980" width="260" height="58" class="skip"/><text x="220" y="1016" class="label">cancelled / redirected</text>
+  <rect x="470" y="980" width="260" height="58" class="effect"/><text x="600" y="1016" class="label">NavigationResult</text>
+  <text x="400" y="335" class="note">normalizes relative and absolute destinations</text>
+  <text x="400" y="615" class="note">shared URL, state, params, and abort signal</text>
+  <text x="400" y="755" class="note">deepest-first leave; parent-first enter</text>
+  <path d="M400 308V390M400 448V530M400 588V670M400 728V810M300 868V940H220V980M500 868V940H600V980" class="connector"/>
+  <text x="245" y="920" class="branch">guard stops</text><text x="610" y="920" class="branch">continue/result</text>
+
+  <rect x="1010" y="250" width="380" height="58" class="entry"/><text x="1200" y="286" class="label">navigateHistory(path)</text>
+  <rect x="1010" y="390" width="380" height="58" class="process"/><text x="1200" y="426" class="label">index + begin transition</text>
+  <rect x="1010" y="530" width="380" height="58" class="process"/><text x="1200" y="566" class="label">coordinator.navigate()</text>
+  <rect x="1010" y="670" width="380" height="58" class="decision"/><text x="1200" y="706" class="label">accepted result?</text>
+  <rect x="910" y="840" width="260" height="58" class="effect"/><text x="1040" y="876" class="label">accept position</text>
+  <rect x="1230" y="840" width="260" height="58" class="decision"/><text x="1360" y="876" class="label">restore accepted entry</text>
+  <rect x="1010" y="1010" width="380" height="58" class="entry"/><text x="1200" y="1046" class="label">handleHistoryPopState()</text>
+  <text x="1200" y="335" class="note">assigns router position and commit state</text>
+  <text x="1200" y="615" class="note">guards before commit; render then lifecycle</text>
+  <text x="1200" y="755" class="note">lifecycle failure remains rendered</text>
+  <path d="M1200 308V390M1200 448V530M1200 588V670M1100 728V800H1040V840M1300 728V800H1360V840M1360 898V950H1200V1010" class="connector"/>
+  <text x="1045" y="780" class="branch">yes</text><text x="1368" y="780" class="branch">no / render failure</text>
+  <path d="M1010 1040H800V558H590" class="connector"/>
+  <text x="805" y="575" class="note">popstate supplies selected state; commit disabled</text>
+  <text x="60" y="1210" class="source">Solid arrows: synchronous delegation and state decisions · Sources: route-transition.ts, history-transition.ts, HistoryCoordinator.ts</text>
+</svg>
