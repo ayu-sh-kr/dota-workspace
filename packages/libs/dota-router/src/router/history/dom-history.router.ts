@@ -1,6 +1,7 @@
 import {
   ComponentClass,
   GlobalNavigationHooks,
+  HistoryTransitionRuntime,
   NavigationOption,
   RouteConfig,
   RouteRenderer,
@@ -10,7 +11,6 @@ import {HistoryCoordinator} from "@dota/coordinator/HistoryCoordinator";
 import {createRouteRenderer} from "@dota/coordinator/route-renderer";
 import {
   handleHistoryPopState,
-  HistoryTransitionRuntime,
   navigateHistory,
   prepareHistoryTransition
 } from "@dota/router/history/history-transition";
