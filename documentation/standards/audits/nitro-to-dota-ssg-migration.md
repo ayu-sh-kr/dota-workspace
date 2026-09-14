@@ -52,7 +52,7 @@ before evaluating the hybrid build; it is not caused by Nitro.
 7. Optionally edits the nearest `vercel.json` to add route redirects.
 
 See [`dotaSsg`](../../../packages/libs/dota-ssr/src/vite/index.ts:59) and its
-[options](../../../packages/libs/dota-ssr/src/vite/types.ts:43).
+[options](../../../packages/libs/dota-ssr/src/ssg/types.ts:43).
 
 The important boundary is that this is a build-time Vite runner, not a running
 Nitro HTTP server. It does not call Nitro APIs, and it does not automatically
@@ -237,7 +237,7 @@ the hybrid sequence below.
 
 ### 2. Fix the current SSG realm bug first
 
-Update [`window-globals.ts`](../../../packages/libs/dota-ssr/src/vite/window-globals.ts:27)
+Update [`window-globals.ts`](../../../packages/libs/dota-ssr/src/ssg/window-globals.ts:27)
 to allowlist browser globals or preserve host objects such as `Reflect`,
 `globalThis`, `process`, `Buffer`, and timer/microtask primitives. Add tests that
 `reflect-metadata` remains callable while a `happy-dom` route is installed.
@@ -334,7 +334,7 @@ using a hybrid build as evidence.
 
 - [`@ayu-sh-kr/dota-ssr` README](../../../packages/libs/dota-ssr/README.md)
 - [`dotaSsg` implementation](../../../packages/libs/dota-ssr/src/vite/index.ts)
-- [`dotaSsg` options](../../../packages/libs/dota-ssr/src/vite/types.ts)
-- [`dotaSsg` route resolver](../../../packages/libs/dota-ssr/src/vite/route-output.ts)
+- [`dotaSsg` options](../../../packages/libs/dota-ssr/src/ssg/types.ts)
+- [`dotaSsg` route resolver](../../../packages/libs/dota-ssr/src/ssg/route-output.ts)
 - [`dotaSsg` Vercel integration](../../../packages/libs/dota-ssr/src/vite/vercel-config.ts)
 - [Dota Web Vite configuration](../../../packages/apps/dota-web/vite.config.ts)
