@@ -154,6 +154,7 @@ function installMountStrategy(
  * @param next Renderer used for all non-hydration route transitions.
  * @param root Root component whose id identifies the route outlet host.
  * @param mismatch Policy applied when a captured route host cannot be adopted.
+ * @param handoff Undefined if no initial route handoff is available.
  * @returns Decorated renderer with one initial-load adoption branch.
  */
 function createHydrationRouteRenderer(
@@ -201,6 +202,7 @@ function reportRouteMismatch(handoff: InitialRouteHandoff, mismatch: HydrationMi
  * @param root Root component used to locate the application outlet.
  * @param match Route selected by the coordinator.
  * @param context Initial navigation URL used for the path agreement check.
+ * @param handoff Undefined if no initial route handoff is available.
  * @returns Whether the route renderer should leave the existing page host untouched.
  */
 function rootHasMarkedPage(
