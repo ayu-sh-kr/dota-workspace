@@ -121,6 +121,8 @@ for (const entry of entries) {
       minify: false,
       outDir,
       rolldownOptions: {
+        // SSG worker resolution needs import.meta.url preserved in both ESM and CJS builds.
+        platform: entry.name === 'ssg' || entry.name === 'vite' ? 'node' : undefined,
         // Keep stateful browser runtimes as package references so every subpath
         // resolves one core/event instance. Build-time plugins stay bundled so a
         // packed wrapper contains the exact scanner implementation it was built with.
