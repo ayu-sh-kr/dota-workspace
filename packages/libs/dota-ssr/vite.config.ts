@@ -8,13 +8,15 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(import.meta.dirname, 'src/index.ts'),
-        'vite/index': resolve(import.meta.dirname, 'src/vite/index.ts')
+        'vite/index': resolve(import.meta.dirname, 'src/vite/index.ts'),
+        'ssg/render-worker': resolve(import.meta.dirname, 'src/ssg/render-worker.ts')
       },
       formats: ['cjs', 'es'],
       fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`
     },
     minify: false,
     rolldownOptions: {
+      platform: 'node',
       external: [
         /^node:.*/,
         '@ayu-sh-kr/dota-core',
