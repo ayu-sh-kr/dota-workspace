@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-event-map-generator
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [ebd9613]
+  - @ayu-sh-kr/dota-ast-utils@0.1.0
+
 ## 0.0.5
 
 ### Patch Changes
