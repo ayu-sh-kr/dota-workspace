@@ -1,6 +1,6 @@
-import {readFile} from 'node:fs/promises';
 import {extname, isAbsolute, relative, resolve, sep} from 'node:path';
 import type {Window} from 'happy-dom';
+import {createPrerenderAssetReader, type PrerenderAssetReader} from './asset-reader';
 
 const CONTENT_TYPES: Readonly<Record<string, string>> = {
   '.css': 'text/css; charset=utf-8',
@@ -33,6 +33,8 @@ type PrerenderFetchContext = {
   networkFetch: Window['fetch'];
   /** Requests that must settle before the generated document can be serialized. */
   pendingRequests: Set<ReturnType<Window['fetch']>>;
+  /** Build-owned reader sharing bytes without sharing window-specific responses. */
+  readAsset: PrerenderAssetReader;
 };
 
 /** Input accepted by the active Happy DOM fetch implementation. */
@@ -42,16 +44,20 @@ type PrerenderFetchInit = Parameters<Window['fetch']>[1];
 
 /**
  * Gives Happy DOM browser-style fetch access to Vite's built public files.
- * Same-origin static paths are read from the output directory; missing paths can
- * fall through to an API base URL, while cross-origin URLs keep normal network behavior.
- * Every request is tracked because filesystem reads are invisible to Happy DOM's task queue.
+ * Tracks local reads and network requests so serialization waits for their completion.
  * @param window Route-isolated Happy DOM window whose fetch function is replaced.
  * @param staticRoot Built output directory containing Vite's copied public files.
  * @param fetchBaseUrl Optional API origin used for missing relative paths.
+ * @param readAsset Build-owned asset reader; omission reads uncached local files.
  * @returns A waiter that resolves after all fetch promises started by this adapter settle.
  * @throws When the optional API base URL is not a valid URL.
  */
-export function installPrerenderFetch(window: Window, staticRoot: string, fetchBaseUrl?: string): PrerenderFetchWaiter {
+export function installPrerenderFetch(
+  window: Window,
+  staticRoot: string,
+  fetchBaseUrl?: string,
+  readAsset: PrerenderAssetReader = createPrerenderAssetReader(new Set(), 0)
+): PrerenderFetchWaiter {
   const networkFetch = window.fetch.bind(window);
   const apiBaseUrl = fetchBaseUrl ? new window.URL(fetchBaseUrl) : undefined;
   const context: PrerenderFetchContext = {
@@ -59,6 +65,7 @@ export function installPrerenderFetch(window: Window, staticRoot: string, fetchB
     staticRoot,
     apiBaseUrl,
     networkFetch,
+    readAsset,
     pendingRequests: new Set()
   };
   window.fetch = createPrerenderFetch(context);
@@ -143,12 +150,12 @@ async function performPrerenderFetch(
   }
 
   try {
-    const content = await readFile(file);
+    const {content, size} = await context.readAsset(file, method === 'HEAD');
     const contentType = CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream';
-    return new window.Response(method === 'HEAD' ? null : new Uint8Array(content), {
+    return new window.Response(content === null ? null : new Uint8Array(content), {
       status: 200,
       headers: {
-        'content-length': content.byteLength.toString(),
+        'content-length': size.toString(),
         'content-type': contentType
       }
     });

@@ -990,7 +990,7 @@
           "name": "dota-alert",
           "source": {
             "file": "./src/components/alert/alert.component.ts",
-            "offset": 2503
+            "offset": 2450
           },
           "attributes": [],
           "js": {

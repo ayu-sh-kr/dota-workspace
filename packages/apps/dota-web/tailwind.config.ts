@@ -4,9 +4,10 @@ export default <Partial<Config>>{
   darkMode: "class",
   content: [
     "./src/**/*.{ts,js,html}",
-    "./node_modules/@ayu-sh-kr/dota-ui/**/*.{html,ts}",
+    "./node_modules/@ayu-sh-kr/dota-ui/dist/**/*.{mjs,js}",
+    "../../ui/dota-ui/src/**/*.{html,ts}",
     "./node_modules/@ayu-sh-kr/dota-md/dist/**/*.{mjs,js}",
-    "../../packages/ui/dota-md/src/**/*.ts",
+    "../../ui/dota-md/src/**/*.ts",
   ],
   theme: {
     extend: {

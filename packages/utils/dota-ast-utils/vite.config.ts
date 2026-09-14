@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts'
-import { dependencies } from './package.json' with { type: 'json' };
+import { dependencies } from './package.json';
 
 export default defineConfig({
   oxc: {

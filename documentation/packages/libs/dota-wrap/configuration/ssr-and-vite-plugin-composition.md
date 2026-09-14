@@ -301,7 +301,7 @@ separate from Node/SSG code.
 - [`dota-ssr/package.json`](../../../../../packages/libs/dota-ssr/package.json)
 - [`dota-ssr` hydration implementation](../../../../../packages/libs/dota-ssr/src/index.ts)
 - [`dota-ssr` SSG implementation](../../../../../packages/libs/dota-ssr/src/vite/index.ts)
-- [`dota-ssr` SSG global bridge](../../../../../packages/libs/dota-ssr/src/vite/window-globals.ts)
+- [`dota-ssr` SSG global bridge](../../../../../packages/libs/dota-ssr/src/ssg/window-globals.ts)
 - [`dota-wrap/package.json`](../../../../../packages/libs/dota-wrap/package.json)
 - [`dota-wrap` composition root](../../../../../packages/libs/dota-wrap/src/index.ts)
 - [`dota-wrap` runtime plugin contract](../../../../../packages/libs/dota-wrap/src/runtime-plugin.ts)

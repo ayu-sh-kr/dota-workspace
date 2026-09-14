@@ -3,7 +3,8 @@ import {mkdir, mkdtemp, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {Window} from 'happy-dom';
-import {installPrerenderFetch} from '@dota/vite/prerender-fetch';
+import {installPrerenderFetch} from '@dota/ssg/prerender-fetch';
+import {createPrerenderAssetReader, type PrerenderAssetReader} from '@dota/ssg/asset-reader';
 
 describe('installPrerenderFetch', () => {
   let testRoot: string;
@@ -24,6 +25,68 @@ describe('installPrerenderFetch', () => {
 
   it('rejects an invalid API base URL before installing the adapter', () => {
     expect(() => installPrerenderFetch(window, staticRoot, 'not a URL')).toThrow();
+  });
+
+  it('surfaces asset errors and releases the pending-request barrier', async () => {
+    const error = Object.assign(new Error('denied'), {code: 'EACCES'});
+    const readAsset = vi.fn<PrerenderAssetReader>().mockRejectedValue(error);
+    const waitUntilIdle = installPrerenderFetch(window, staticRoot, undefined, readAsset);
+
+    await expect(window.fetch('/guide.md')).rejects.toBe(error);
+    await expect(waitUntilIdle()).resolves.toBeUndefined();
+    expect(readAsset).toHaveBeenCalledExactlyOnceWith(join(staticRoot, 'guide.md'), false);
+  });
+
+  it.each(['/missing.md', '/'])('returns 404 for HEAD requests to %s', async target => {
+    installPrerenderFetch(window, staticRoot);
+
+    const response = await window.fetch(target, {method: 'HEAD'});
+
+    expect(response.status).toBe(404);
+    await expect(response.text()).resolves.toBe('');
+  });
+
+  it('preserves API fallback for missing HEAD targets', async () => {
+    const networkFetch = vi.fn<Window['fetch']>().mockResolvedValue(new window.Response(null, {status: 204}));
+    window.fetch = networkFetch;
+    installPrerenderFetch(window, staticRoot, 'https://api.example.com');
+
+    const response = await window.fetch('/missing', {method: 'HEAD'});
+
+    expect(response.status).toBe(204);
+    expect(networkFetch).toHaveBeenCalledExactlyOnceWith('https://api.example.com/missing', {method: 'HEAD'});
+  });
+
+  it('serves independent response bodies in separate windows from shared bytes', async () => {
+    await writeFile(join(staticRoot, 'guide.md'), 'shared content');
+    const readAsset = createPrerenderAssetReader(new Set());
+    const secondWindow = new Window({url: 'http://dota.ssg/other'});
+    try {
+      installPrerenderFetch(window, staticRoot, undefined, readAsset);
+      installPrerenderFetch(secondWindow, staticRoot, undefined, readAsset);
+      const first = await window.fetch('/guide.md');
+      await expect(first.text()).resolves.toBe('shared content');
+      const second = await secondWindow.fetch('/guide.md');
+
+      expect(second).not.toBe(first);
+      await expect(second.text()).resolves.toBe('shared content');
+    } finally {
+      await secondWindow.happyDOM.close();
+    }
+  });
+
+  it('returns matching GET and HEAD headers with an empty HEAD body', async () => {
+    await writeFile(join(staticRoot, 'guide.md'), 'héllo');
+    installPrerenderFetch(window, staticRoot);
+
+    const head = await window.fetch('/guide.md', {method: 'HEAD'});
+    const get = await window.fetch('/guide.md');
+
+    expect(head.status).toBe(200);
+    expect(head.headers.get('content-length')).toBe('6');
+    expect([...head.headers]).toEqual([...get.headers]);
+    await expect(head.text()).resolves.toBe('');
+    await expect(get.text()).resolves.toBe('héllo');
   });
 
   it('serves same-origin public files without a web server', async () => {

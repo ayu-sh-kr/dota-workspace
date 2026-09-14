@@ -63,7 +63,7 @@
           "name": "alert-playground",
           "source": {
             "file": "./src/components/blogs/examples/alert-playground.component.ts",
-            "offset": 366
+            "offset": 359
           },
           "attributes": [],
           "js": {
@@ -2583,7 +2583,7 @@
           "name": "dota-alert",
           "source": {
             "file": "../../ui/dota-ui/src/components/alert/alert.component.ts",
-            "offset": 2503
+            "offset": 2450
           },
           "attributes": [],
           "js": {

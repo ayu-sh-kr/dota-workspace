@@ -4,6 +4,11 @@ This document defines the work needed to make Dota static site generation
 faster and more configurable without weakening route isolation or browser
 compatibility.
 
+For build-speed priorities, follow the newer
+[SSG build performance audit](ssg-build-performance-audit.md). It separates
+small changes from isolated parallel rendering; the DOM adapters below remain
+compatibility proposals rather than prerequisites for improving build speed.
+
 The current implementation is correct but intentionally conservative: every
 route is rendered in a fresh DOM realm, and the application is loaded again so
 its custom-element constructors belong to that realm.
@@ -13,8 +18,10 @@ its custom-element constructors belong to that realm.
 `dotaSsg()` is a post-build Vite plugin. It reads the built HTML shell, creates
 a DOM window for each selected route, loads the application through Vite's SSR
 module runner, waits for application readiness, and serializes the settled
-document. The implementation is in
-[`dota-ssr/src/vite/index.ts`](../../../../../packages/libs/dota-ssr/src/vite/index.ts).
+document. The build hook is in
+[`vite/index.ts`](../../../../../packages/libs/dota-ssr/src/vite/index.ts), with generation
+coordinated by [`ssg/generate.ts`](../../../../../packages/libs/dota-ssr/src/ssg/generate.ts)
+and page rendering in [`ssg/prerender-runtime.ts`](../../../../../packages/libs/dota-ssr/src/ssg/prerender-runtime.ts).
 
 The package currently uses `happy-dom` as an optional peer dependency:
 [`dota-ssr/package.json`](../../../../../packages/libs/dota-ssr/package.json)
@@ -158,7 +165,7 @@ the fast Node-based renderer.
 
 ### 7. Design a persistent-realm mode around an application factory
 
-The real performance improvement requires rendering multiple routes in one
+An additional performance opportunity is rendering multiple routes in one
 realm. That cannot be achieved safely by caching the current
 `applicationReady` promise because router state, event services, component
 instances, and DOM state belong to the previous route.

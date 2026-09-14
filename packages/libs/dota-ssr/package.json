@@ -25,6 +25,7 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "exports": {
+    "./worker": "./dist/ssg/render-worker.cjs",
     ".": {
       "types": "./dist/index.d.ts",
       "module": "./dist/index.mjs",

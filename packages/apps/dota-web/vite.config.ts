@@ -39,10 +39,11 @@ export default defineConfig({
         },
       },
       ssg: {
+        concurrency: 3,
         entry: '/src/main.ts',
         autoDetectRoutes: true,
         routes: blogRoutes,
-        vercel: true,
+        deployment: 'vercel',
       },
     }),
   ],

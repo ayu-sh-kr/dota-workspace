@@ -1,5 +1,5 @@
 import {Window} from 'happy-dom';
-import {installWindowGlobals} from '@dota/vite/window-globals';
+import {installWindowGlobals} from '@dota/ssg/window-globals';
 
 describe('installWindowGlobals', () => {
   it('installs the route window browser APIs and restores the original descriptor', () => {

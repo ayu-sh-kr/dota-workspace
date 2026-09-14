@@ -162,5 +162,5 @@
   <rect x="860" y="2820" width="34" height="20" rx="5" class="card effect"/><text x="908" y="2836" class="legend">artifact / browser effect</text>
   <path d="M1230 2830 H1300" class="connector"/><text x="1320" y="2836" class="legend">synchronous flow</text>
   <path d="M1510 2830 H1580" class="connector-async"/><text x="1600" y="2836" class="legend">async wait</text>
-  <text x="100" y="2888" class="source">Source: packages/libs/dota-ssr/src/index.ts · vite/index.ts · vite/route-output.ts · vite/vercel-config.ts · vite/window-globals.ts</text>
+  <text x="100" y="2888" class="source">Source: packages/libs/dota-ssr/src/index.ts · vite/index.ts · ssg/route-output.ts · vite/vercel-config.ts · ssg/window-globals.ts</text>
 </svg>

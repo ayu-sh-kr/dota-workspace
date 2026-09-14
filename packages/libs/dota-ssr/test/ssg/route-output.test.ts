@@ -1,4 +1,4 @@
-import {resolveDecoratedSsgRoutes, resolveSsgRoutes} from '@dota/vite/route-output';
+import {resolveDecoratedSsgRoutes, resolveSsgRoutes} from '@dota/ssg/route-output';
 
 describe('resolveSsgRoutes', () => {
   it('normalizes paths, outputs, and ordering deterministically', () => {
