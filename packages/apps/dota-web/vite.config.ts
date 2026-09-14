@@ -39,6 +39,7 @@ export default defineConfig({
         },
       },
       ssg: {
+        concurrency: 2,
         entry: '/src/main.ts',
         autoDetectRoutes: true,
         routes: blogRoutes,
