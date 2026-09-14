@@ -1,5 +1,11 @@
 # @ayu-sh-kr/dota-md
 
+## 0.0.17
+
+### Patch Changes
+
+- @ayu-sh-kr/dota-web-type-json@0.0.16
+
 ## 0.0.16
 
 ### Patch Changes
