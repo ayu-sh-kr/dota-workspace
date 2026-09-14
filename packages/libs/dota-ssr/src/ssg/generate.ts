@@ -6,14 +6,15 @@ import type {ResolvedConfig} from 'vite';
 import {createPrerenderAssetReader} from './asset-reader';
 import {resolveSsgRoutes} from './route-output';
 import type {DotaSsgOptions, ResolvedDotaSsgRoute} from './types';
-import {updateVercelConfig} from '../vite/vercel-config';
+import {prepareDeployment} from '../vite/deployment';
 import {createPrerenderServer, resolveDecoratedRoutes} from '../vite/prerender-server';
 import {prerenderRoute, type PrerenderTimings} from './prerender-runtime';
 import {renderRoutesInWorkers} from './render-workers';
 
 /**
  * Generates static pages after the client bundle has been written.
- * Coordinates route discovery, isolated rendering, output writes, timing logs, and deployment config.
+ * Prepares deployment files only after successful route writes; empty selections still prepare hosting files.
+ * Coordinates discovery, isolated rendering, timing logs, and server cleanup on success or failure.
  * @param config Resolved Vite build settings supplying the application root, mode, and output directory.
  * @param options Validated plugin options with explicit concurrency and worker timeout values.
  * @throws When discovery, rendering, output writes, or deployment configuration fails.
@@ -27,14 +28,12 @@ export async function generateStaticPages(
   const logger = createConsola({level: LogLevels[logType], formatOptions: {date: true, colors: true}});
   const started = nodePerformance.now();
   const root = options.root ?? config.root;
+  const outputDirectory = resolve(root, config.build.outDir);
   if (!options.autoDetectRoutes && !options.routes?.length) {
-    if (options.vercel) {
-      await updateVercelConfig(root, [], options.vercel === true ? {} : options.vercel);
-    }
+    await prepareDeployment(root, outputDirectory, [], options, config.base);
     logger.info(`[dota-ssr] no routes selected; SSG finished in ${(nodePerformance.now() - started).toFixed(0)}ms`);
     return;
   }
-  const outputDirectory = resolve(root, config.build.outDir);
   const templateFile = resolve(outputDirectory, options.template ?? 'index.html');
   const template = await readFile(templateFile, 'utf8');
   let server = concurrency === 1 || options.autoDetectRoutes ? await createPrerenderServer(
@@ -51,7 +50,14 @@ export async function generateStaticPages(
     const outputs = routes.map(route => resolve(outputDirectory, route.output));
     const directories = new Map<string, Promise<string | undefined>>();
     const routeTimes: {path: string; total: number}[] = [];
-    /** Writes output before reporting render and write durations; worker durations may overlap. */
+    /**
+     * Persists a rendered page before recording timings, so failed writes are not reported as completed routes.
+     * Shares directory creation across concurrent workers; per-route durations can overlap in wall time.
+     * @param route Validated pathname and relative HTML output below the build directory.
+     * @param html Serialized route document ready to publish, including hydration markers.
+     * @param timings Renderer stage durations in milliseconds; disk write time is added here.
+     * @throws If the output directory cannot be created or the rendered document cannot be written.
+     */
     const writeRoute = async (route: ResolvedDotaSsgRoute, html: string, timings: PrerenderTimings): Promise<void> => {
       const writeStarted = nodePerformance.now();
       const outputFile = resolve(outputDirectory, route.output);
@@ -91,9 +97,7 @@ export async function generateStaticPages(
     }
     const renderingMs = nodePerformance.now() - renderingStarted;
     const finishingStarted = nodePerformance.now();
-    if (options.vercel) {
-      await updateVercelConfig(root, routes, options.vercel === true ? {} : options.vercel);
-    }
+    await prepareDeployment(root, outputDirectory, routes, options, config.base);
     await server?.close();
     server = undefined;
     const finishingMs = nodePerformance.now() - finishingStarted;

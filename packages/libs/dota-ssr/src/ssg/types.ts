@@ -35,9 +35,23 @@ export type DotaDecoratedRoute = {
  * It exists separately from SSG options because Vercel discovery is an optional deployment concern.
  */
 export interface DotaSsgVercelOptions {
-  /** Vercel configuration path, relative to the Vite root unless absolute. */
+  /** Existing JSON file, relative to the effective Vite root unless absolute; omission searches ancestors for `vercel.json`. */
   configFile?: string;
 }
+
+/**
+ * Selects the hosting file format prepared after static generation, without deploying the application.
+ * Vercel updates project JSON; Netlify/Cloudflare write `_redirects`; GitHub writes aliases and `.nojekyll`.
+ */
+export type DotaSsgDeploymentTarget = 'vercel' | 'netlify' | 'cloudflare-pages' | 'github-pages';
+
+/**
+ * Object form of `deployment`, allowing Vercel's existing configuration path to be overridden.
+ * Other targets write into Vite's build directory and need only the target discriminator.
+ */
+export type DotaSsgDeploymentOptions =
+  | ({target: 'vercel'} & DotaSsgVercelOptions)
+  | {target: Exclude<DotaSsgDeploymentTarget, 'vercel'>};
 
 /**
  * Configures the build-only Vite plugin that renders Dota routes inside happy-dom.
@@ -69,12 +83,22 @@ export interface DotaSsgOptions {
   template?: string;
   /** Optional application-specific barrier run after happy-dom's pending work has settled. */
   settle?: (window: Window, route: DotaSsgRoute) => void | Promise<void>;
-  /** Enables generated-route redirects in the nearest Vercel configuration. */
+  /**
+   * Prepares one platform's files after rendering, including builds with no selected routes.
+   * Accepts a target name or options object; false disables preparation even when `vercel` is set.
+   * Omission uses the legacy `vercel` option, otherwise no hosting files are changed.
+   */
+  deployment?: DotaSsgDeploymentTarget | DotaSsgDeploymentOptions | false;
+  /**
+   * Backward-compatible Vercel option, used only when `deployment` is omitted.
+   * True discovers the nearest ancestor `vercel.json`; an object overrides its path.
+   * False or omission disables the fallback. Existing Vercel files must already exist.
+   */
   vercel?: boolean | DotaSsgVercelOptions;
 }
 
 /**
- * Safe route-to-file mapping consumed by the prerender coordinator and Vercel integration.
+ * Safe route-to-file mapping consumed by the prerender coordinator and deployment integrations.
  * It is produced only after route normalization validates that the output remains under Vite's build directory.
  */
 export interface ResolvedDotaSsgRoute {

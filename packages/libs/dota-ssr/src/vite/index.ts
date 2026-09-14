@@ -4,6 +4,8 @@ import {generateStaticPages} from '../ssg/generate';
 
 export type {
   DotaSsgOptions,
+  DotaSsgDeploymentTarget,
+  DotaSsgDeploymentOptions,
   DotaDecoratedRoute,
   DotaSsgRoute,
   DotaSsgRouteInput,
@@ -13,13 +15,11 @@ export type {
 export {resolveDecoratedSsgRoutes, resolveSsgRoutes} from '../ssg/route-output';
 
 /**
- * Creates the build-only happy-dom prerender extension for a Dota application.
- * It runs only after Vite produces the client bundle, preserving the normal SPA build
- * unless callers configure it and pass `--ssg` to the build command. Each resolved route
- * receives an isolated window so application globals and component registrations cannot
- * leak between HTML outputs.
- * @param options Route selection, entry, readiness, shell, and optional Vercel configuration.
- * @returns A post-build Vite plugin that writes marked static route documents.
+ * Prerenders isolated route documents and prepares optional hosting files after the client build.
+ * Runs only for builds with `--ssg`; separate windows prevent state leaking between route outputs.
+ * @param options Route selection, entry, readiness, shell, and optional deployment configuration.
+ * @returns A post-build Vite plugin that writes marked route documents and selected deployment files.
+ * @throws For invalid concurrency/timeouts or a settle callback that cannot be transferred to workers.
  */
 export default function dotaSsg(options: DotaSsgOptions): Plugin {
   const concurrency = options.concurrency ?? 1;
@@ -35,14 +35,27 @@ export default function dotaSsg(options: DotaSsgOptions): Plugin {
 
   return {
     name: 'vite-plugin-dota-ssg',
+    /**
+     * Keeps ordinary builds and development sessions on the existing client-rendered path.
+     * @param _config Unresolved Vite settings, not needed for the explicit command-line opt-in.
+     * @param environment Vite command context; only builds with `--ssg` activate this plugin.
+     * @returns Whether Vite should include the SSG plugin in this run.
+     */
     apply(_config, environment) {
       return environment.command === 'build' && process.argv.includes('--ssg');
     },
     enforce: 'post',
+    /**
+     * Captures final paths and build settings for rendering and deployment preparation.
+     * @param resolvedConfig Vite settings after defaults and other plugins have been applied.
+     */
     configResolved(resolvedConfig) {
       config = resolvedConfig;
     },
-    /** Hands the completed client build to static generation. */
+    /**
+     * Generates pages before preparing hosting files so every mapping refers to completed output.
+     * @throws If route rendering or deployment preparation fails; propagates failure to the build.
+     */
     async closeBundle() {
       await generateStaticPages(config, {...options, concurrency, renderTimeout});
     }

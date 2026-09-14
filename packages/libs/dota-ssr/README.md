@@ -143,7 +143,7 @@ dotaSsg({autoDetectRoutes: true, routes: blogRoutes, concurrency: 2});
 
 Each worker keeps its own Vite server and creates a fresh window for every page.
 The next available worker takes the next route; finished output writes can overlap
-other workers' rendering. The coordinator updates Vercel configuration once after
+other workers' rendering. The coordinator prepares deployment files once after
 all pages succeed. Logs show the active worker count. A single page uses the
 sequential path to avoid extra thread startup.
 
@@ -298,12 +298,48 @@ this path: `dotaHydration()` always calls `hydrate()` with its own resolved
 matters for code calling `dota-rendering`'s `hydrate()` directly, outside of this
 plugin.
 
-## Deployment redirects
+## Deployment targets
 
-Set `vercel: true` to add redirects from generated route paths to their static
-documents in the nearest `vercel.json`. Existing Vercel configuration is
-preserved. If discovery cannot find the intended file, use
-`vercel: {configFile: '../vercel.json'}`.
+Select a hosting platform through the plugin's optional `deployment` setting:
+
+```ts
+dotaSsg({
+  autoDetectRoutes: true,
+  deployment: 'netlify'
+})
+```
+
+| Value | Deployment files |
+| --- | --- |
+| `'vercel'` | Updates redirects in the nearest ancestor `vercel.json`, preserving unrelated settings and redirects. The file must already exist. |
+| `'netlify'` | Writes route rewrites into a managed block in the build output's `_redirects`. |
+| `'cloudflare-pages'` | Writes the same static rewrite format to the build output's `_redirects` for Cloudflare Pages. |
+| `'github-pages'` | Writes `.nojekyll`; copies custom HTML outputs to route-shaped directory indexes because GitHub Pages does not support rewrite rules. |
+
+Use `deployment: {target: 'vercel', configFile: '../vercel.json'}` to select an
+explicit Vercel file, relative to the Vite root. Other targets also accept the
+object form, such as `deployment: {target: 'netlify'}`.
+
+Existing `vercel: true`, `vercel: false`, and `vercel: {configFile: '...'}` options
+remain supported with their previous behavior. An explicit `deployment` takes
+precedence, including `deployment: false` to disable all deployment output. When
+both options are omitted, no deployment files are changed.
+
+Netlify and Cloudflare Pages preserve existing rules outside the `# BEGIN dota-ssg`
+and `# END dota-ssg` block. Generated rules precede those rules so a catch-all SPA
+fallback does not hide prerendered routes. Repeated builds replace the managed
+block, removing stale generated routes. Keep authored rules in `public/_redirects`
+so Vite copies them into each clean build. Generated URLs include Vite's `base`
+pathname. These integrations target static hosting, not Netlify Functions or
+Cloudflare Pages Functions.
+
+For GitHub project sites, set Vite's `base` to the repository path (for example,
+`'/my-repo/'`) and publish the build output directory. Route aliases retain the
+rendered HTML and require assets to use that configured base. A conflicting
+existing alias file fails the build instead of being overwritten; use a clean
+build when changing custom outputs. GitHub Pages does not gain server redirects
+or a SPA fallback from this option. Publishing and CI workflow configuration
+remain separate from generating these deployment files.
 
 ## Public API
 

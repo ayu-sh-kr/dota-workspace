@@ -142,6 +142,20 @@ describe('dotaSsg build output', () => {
     expect(readFile).not.toHaveBeenCalledWith(join(root, 'dist/index.html'), 'utf8');
   });
 
+  it('prepares the configured platform after rendering', async () => {
+    await build({routes: ['/guide'], deployment: 'netlify'});
+
+    expect(await readFile(join(root, 'dist/_redirects'), 'utf8')).toContain('/guide /guide/index.html 200');
+    expect(await readFile(join(root, 'dist/guide/index.html'), 'utf8')).toContain('path="/guide"');
+  });
+
+  it('prepares GitHub Pages even when no routes are selected', async () => {
+    await build({deployment: 'github-pages'});
+
+    expect(await readFile(join(root, 'dist/.nojekyll'), 'utf8')).toBe('');
+    expect(createServer).not.toHaveBeenCalled();
+  });
+
   it('still discovers routes when the explicit list is empty', async () => {
     server.ssrLoadModule.mockResolvedValueOnce({routeMetadata: [{path: '/discovered', ssr: true}]});
 
