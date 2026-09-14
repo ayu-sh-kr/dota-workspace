@@ -103,5 +103,5 @@
   <rect x="360" y="2280" width="34" height="20" rx="5" class="card"/><text x="408" y="2296" class="legend">processing</text>
   <rect x="570" y="2280" width="34" height="20" rx="5" class="card decision"/><text x="618" y="2296" class="legend">guard</text>
   <rect x="740" y="2280" width="34" height="20" rx="5" class="card effect"/><text x="788" y="2296" class="legend">resolved output</text>
-  <text x="1110" y="2296" class="source">Source: packages/libs/dota-ssr/src/vite/route-output.ts</text>
+  <text x="1110" y="2296" class="source">Source: packages/libs/dota-ssr/src/ssg/route-output.ts</text>
 </svg>
