@@ -2,7 +2,7 @@
 import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
-import {resolveSsgRoutes} from '@dota/vite/route-output';
+import {resolveSsgRoutes} from '@dota/ssg/route-output';
 import {createVercelRedirects, updateVercelConfig} from '@dota/vite/vercel-config';
 
 describe('createVercelRedirects', () => {
