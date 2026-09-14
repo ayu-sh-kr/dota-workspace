@@ -81,5 +81,5 @@
   <rect x="390" y="1910" width="34" height="20" rx="5" class="card"/><text x="438" y="1926" class="legend">process</text>
   <rect x="590" y="1910" width="34" height="20" rx="5" class="card decision"/><text x="638" y="1926" class="legend">guard</text>
   <rect x="770" y="1910" width="34" height="20" rx="5" class="card effect"/><text x="818" y="1926" class="legend">global state effect</text>
-  <text x="1130" y="1926" class="source">Source: packages/libs/dota-ssr/src/vite/window-globals.ts</text>
+  <text x="1130" y="1926" class="source">Source: packages/libs/dota-ssr/src/ssg/window-globals.ts</text>
 </svg>
