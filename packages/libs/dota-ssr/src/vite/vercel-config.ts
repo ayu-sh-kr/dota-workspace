@@ -1,6 +1,6 @@
 import {readFile, writeFile} from 'node:fs/promises';
 import {dirname, isAbsolute, resolve} from 'node:path';
-import type {DotaSsgVercelOptions, ResolvedDotaSsgRoute} from './types';
+import type {DotaSsgVercelOptions, ResolvedDotaSsgRoute} from '../ssg/types';
 
 /** Generated canonical redirect appended for one non-root SSG route. */
 type VercelRedirect = {
