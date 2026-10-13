@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Workflow"
+  short_description: "Branch, commit, and pull request conventions"
+  default_prompt: "Use $git-workflow to branch, commit, push, or open a pull request in this workspace, following root AGENTS.md."
