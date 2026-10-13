@@ -1,6 +1,6 @@
 import {performance as nodePerformance} from 'node:perf_hooks';
 import {Window} from 'happy-dom';
-import type {ViteDevServer} from 'vite';
+import {createServerModuleRunner, isRunnableDevEnvironment, type ViteDevServer} from 'vite';
 import {VIRTUAL_SSG_ENTRY} from '../vite/prerender-server';
 import {installPrerenderFetch} from './prerender-fetch';
 import {installWindowGlobals} from './window-globals';
@@ -63,6 +63,7 @@ export async function prerenderRoute(
   options: DotaSsgOptions,
   readAsset: PrerenderAssetReader
 ): Promise<PrerenderResult> {
+  const runner = resolveSsrRunner(server);
   const started = nodePerformance.now();
   const timings: PrerenderTimings = {setup: 0, load: 0, ready: 0, settle: 0, serialize: 0, cleanup: 0, total: 0};
   const window = createPrerenderWindow(route.path);
@@ -70,13 +71,14 @@ export async function prerenderRoute(
   const restoreGlobals = installWindowGlobals(window);
   window.document.write(template);
   window.document.close();
-  server.moduleGraph.invalidateAll();
+  // Re-evaluate modules against this route's window, but keep Vite's transform cache across routes.
+  runner.clearCache();
   let disableHydrationEmit: (() => void) | undefined;
   let phaseStarted = nodePerformance.now();
   timings.setup = phaseStarted - started;
 
   try {
-    const loaded = await server.ssrLoadModule(VIRTUAL_SSG_ENTRY, {fixStacktrace: true}) as SsgEntryModule;
+    const loaded = await runner.import(VIRTUAL_SSG_ENTRY) as SsgEntryModule;
     timings.load = nodePerformance.now() - phaseStarted;
     phaseStarted = nodePerformance.now();
     disableHydrationEmit = loaded.disableHydrationEmit;
@@ -111,6 +113,34 @@ export async function prerenderRoute(
       timings.total = nodePerformance.now() - started;
     }
   }
+}
+
+/** Module runner shared by every route rendered with one prerender server. */
+type SsrRunner = ReturnType<typeof createServerModuleRunner>;
+
+/** Runners keyed by SSR environment, so each prerender server keeps one runner for all its routes. */
+const SSR_RUNNERS = new WeakMap<object, SsrRunner>();
+
+/**
+ * Returns one module runner per prerender server, created on first use.
+ * Clearing its cache drops evaluated modules only; unlike `moduleGraph.invalidateAll()`, it keeps
+ * transformed code, so each route pays for module evaluation instead of a full re-transform.
+ * Source-map interception stays off, as in Vite's `ssrLoadModule` runner: the default enables
+ * Node source maps, which parses every module's inline map again on each route.
+ * @param server Prerender server whose SSR environment executes the application entry.
+ * @returns Runner used to evaluate the virtual SSG entry for one route window.
+ * @throws Error when the SSR environment cannot execute modules in this process.
+ */
+function resolveSsrRunner(server: ViteDevServer): SsrRunner {
+  const environment = server.environments.ssr;
+  const existing = SSR_RUNNERS.get(environment);
+  if (existing) return existing;
+  if (!isRunnableDevEnvironment(environment)) {
+    throw new Error('SSG requires a runnable Vite SSR environment');
+  }
+  const runner = createServerModuleRunner(environment, {hmr: false, sourcemapInterceptor: false});
+  SSR_RUNNERS.set(environment, runner);
+  return runner;
 }
 
 /**
