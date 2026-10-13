@@ -5,13 +5,13 @@ import {
   DecoratorView,
   ObjectExpressionView,
   PropertyView,
+  SourceFileIndex,
 } from "@ayu-sh-kr/dota-ast-utils";
 import type {Plugin} from "vite";
 import {ComponentScanPath} from "@dota/Constants.ts";
 import fg from "fast-glob";
 import {readFile, writeFile} from "node:fs/promises";
 import {resolve} from "node:path";
-import {parse} from "@swc/core";
 import type {ClassDeclaration} from "@swc/core";
 import {createConsola, LogLevels} from "consola";
 import type {ConsolaInstance} from "consola";
@@ -55,8 +55,9 @@ export function resetWebTypeJsonState(): void {
 
 /**
  * Scans configured roots once for Dota components and public properties.
- * Each file is read and parsed once even when scan roots overlap, and the result
- * retains both HTML attribute and JavaScript field identities for all serializers.
+ * Each file is read and parsed once even when scan roots overlap, and parses are shared with
+ * the other Dota plugins through the source index. The result retains both HTML attribute
+ * and JavaScript field identities for all serializers.
  * @param root Package root used for Web Types source paths and CEM ownership.
  * @param scanRoots Roots to search; defaults to the package root.
  * @returns Deterministically sorted component metadata shared by every output format.
@@ -75,9 +76,8 @@ export async function scanWebComponents(
   log.debug("Scanned files: ", files.length);
 
   const scannedInfos: WebComponentInfo[] = [];
-  for (const file of files) {
-    const code = await readFile(file, "utf-8");
-    const ast = await parse(code, {syntax: "typescript", decorators: true});
+  const modules = await SourceFileIndex.shared().loadAll(files);
+  for (const {sourceFile: file, sourceText: code, ast} of modules) {
     const hasComponentDecorator = (classDeclaration: ClassDeclaration) =>
       DecoratorUtils.extractDecorators(classDeclaration)
         .some(decorator => DecoratorUtils.decoratorName(decorator) === "Component");
