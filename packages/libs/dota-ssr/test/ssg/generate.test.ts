@@ -274,6 +274,40 @@ describe('dotaSsg build output', () => {
     expect(await readFile(join(root, 'dist/index.html'), 'utf8')).toContain('<title>Settled title</title>');
   });
 
+  it('writes a still-loading page with a warning once settleTimeout passes', async () => {
+    await writeFile(join(root, 'dist/poll.txt'), 'poll');
+    const logger = {info: vi.fn(), debug: vi.fn(), start: vi.fn(), success: vi.fn(), warn: vi.fn()};
+    vi.mocked(createConsola).mockReturnValueOnce(logger as unknown as ReturnType<typeof createConsola>);
+    let polls = 0;
+    server.ssrLoadModule.mockImplementationOnce(async () => {
+      const routeWindow = globalThis.window as unknown as Window;
+      const poll = (): void => {
+        polls += 1;
+        document.querySelector('app-root')!.textContent = `polls ${polls}`;
+        void routeWindow.fetch('/poll.txt').then(response => response.text()).then(poll);
+      };
+      poll();
+      return {default: {applicationReady: Promise.resolve()}, disableHydrationEmit};
+    });
+
+    await build({routes: ['/polling'], settleTimeout: 200});
+    const pollsAtWrite = polls;
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    expect(await readFile(join(root, 'dist/polling/index.html'), 'utf8')).toContain('polls ');
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('/polling: still loading after 200ms'));
+    expect(polls).toBe(pollsAtWrite);
+  });
+
+  it('does not warn when a page settles before settleTimeout', async () => {
+    const logger = {info: vi.fn(), debug: vi.fn(), start: vi.fn(), success: vi.fn(), warn: vi.fn()};
+    vi.mocked(createConsola).mockReturnValueOnce(logger as unknown as ReturnType<typeof createConsola>);
+
+    await build({routes: ['/quiet'], settleTimeout: 200});
+
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
   it('logs route timings, stage details, and a summary after server shutdown', async () => {
     const logger = {info: vi.fn(), debug: vi.fn(), start: vi.fn(), success: vi.fn()};
     vi.mocked(createConsola).mockReturnValueOnce(logger as unknown as ReturnType<typeof createConsola>);
