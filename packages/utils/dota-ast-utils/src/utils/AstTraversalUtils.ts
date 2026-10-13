@@ -34,4 +34,30 @@ export class AstTraversalUtils {
     visit(root);
     return nodes;
   }
+
+  /**
+   * Collects nodes of several SWC discriminants in one traversal.
+   * Use it instead of repeated `findNodes` calls over the same tree; each list keeps source order.
+   * @param root - Module or nested AST node from which discovery begins.
+   * @param types - SWC node discriminants to collect.
+   * @returns Matching nodes per requested discriminant, with an empty list for absent types.
+   */
+  static findNodesByType<T extends AstNode>(root: unknown, types: readonly T['type'][]): Map<T['type'], T[]> {
+    const nodesByType = new Map<T['type'], T[]>(types.map(type => [type, []]));
+
+    const visit = (node: unknown): void => {
+      if (node == null || typeof node !== 'object') return;
+      if (Array.isArray(node)) {
+        node.forEach(visit);
+        return;
+      }
+
+      const typedNode = node as Record<string, unknown>;
+      nodesByType.get(typedNode.type as T['type'])?.push(typedNode as T);
+      Object.values(typedNode).forEach(visit);
+    };
+
+    visit(root);
+    return nodesByType;
+  }
 }
