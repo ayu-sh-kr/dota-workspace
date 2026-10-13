@@ -245,6 +245,25 @@ describe('dotaSsg build output', () => {
     expect(await readFile(join(root, 'dist/index.html'), 'utf8')).toContain('first second');
   });
 
+  it('captures content from fetches chained beyond two settle passes', async () => {
+    for (const step of ['one', 'two', 'three']) await writeFile(join(root, `dist/${step}.txt`), step);
+    server.ssrLoadModule.mockImplementationOnce(async () => {
+      const routeWindow = globalThis.window as unknown as Window;
+      const readStep = (step: string) => routeWindow.fetch(`/${step}.txt`).then(response => response.text());
+      routeWindow.setTimeout(async () => {
+        const steps = [await readStep('one'), await readStep('two'), await readStep('three')];
+        routeWindow.setTimeout(() => {
+          document.querySelector('app-root')!.textContent = steps.join(' ');
+        });
+      });
+      return {default: {applicationReady: Promise.resolve()}, disableHydrationEmit};
+    });
+
+    await build({routes: ['/']});
+
+    expect(await readFile(join(root, 'dist/index.html'), 'utf8')).toContain('one two three');
+  });
+
   it('settles work scheduled by a custom callback before serialization', async () => {
     await build({routes: ['/'], settle: window => {
       window.setTimeout(() => {
