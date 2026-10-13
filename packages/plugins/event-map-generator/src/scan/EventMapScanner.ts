@@ -1,7 +1,6 @@
 import fg from 'fast-glob';
-import { readFile } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
-import { parse, type CallExpression, type ClassDeclaration, type ClassMethod, type Expression, type Module } from '@swc/core';
+import { type CallExpression, type ClassDeclaration, type ClassMethod, type Expression, type Module } from '@swc/core';
 import {
   AstTraversalUtils,
   CallExpressionView,
@@ -13,6 +12,7 @@ import {
   ObjectExpressionView,
   TypeAnnotationUtils,
   findModuleSourceOffset,
+  SourceFileIndex,
   utf8ByteOffsetToSourceOffset,
   AstModuleResolver,
   type AstModuleIndex,
@@ -710,12 +710,8 @@ export async function scanEventMapSources(
     },
   )));
   const files = [...new Set(discoveredFiles.flat())].sort((left, right) => left.localeCompare(right));
-  const modules: ParsedAstModule[] = [];
-  for (const file of files) {
-    const sourceText = await readFile(file, 'utf8');
-    const ast = await parse(sourceText, parseOptions);
-    modules.push({sourceFile: file, sourceText, ast});
-  }
+  const sourceIndex = options.sourceIndex ?? SourceFileIndex.shared();
+  const modules: ParsedAstModule[] = await sourceIndex.loadAll(files, parseOptions);
 
   const index = AstModuleResolver.createIndex(modules, {isDeclarationNameEligible: EventNamePolicy.isEventConstantName});
   const candidates = modules.flatMap(module => collectCandidatesFromModule(
