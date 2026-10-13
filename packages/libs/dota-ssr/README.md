@@ -118,7 +118,9 @@ After Vite writes the client bundle, the plugin:
 7. Serializes the complete document to the route's safe output file.
 
 Each route gets a fresh window and the generated output stays below Vite's
-output directory. Duplicate paths, query/hash routes, dynamic autodetected
+output directory. The application's modules run again for every route, but Vite
+transforms them only once per server: the first route pays the transform cost and
+later routes reuse the transformed code. Duplicate paths, query/hash routes, dynamic autodetected
 routes, and output paths that escape the build directory are rejected.
 
 Routes render sequentially by default, or in isolated threads when `concurrency`
@@ -142,6 +144,8 @@ dotaSsg({autoDetectRoutes: true, routes: blogRoutes, concurrency: 2});
 ```
 
 Each worker keeps its own Vite server and creates a fresh window for every page.
+Because each worker's server transforms the application again, parallel rendering
+pays off only when per-route work outweighs that startup; measure before raising it.
 The next available worker takes the next route; finished output writes can overlap
 other workers' rendering. The coordinator prepares deployment files once after
 all pages succeed. Logs show the active worker count. A single page uses the
@@ -156,7 +160,8 @@ entry's `applicationReady` promise if needed.
 `renderTimeout` defaults to 120000 milliseconds in parallel mode and bounds worker
 startup, each route including its output write, and shutdown. Errors report the
 affected route when known and terminate the pool. More workers use more memory;
-each cache retains at most 32 MiB. Dota Web enables two workers.
+each cache retains at most 32 MiB. Dota Web renders sequentially, which is fastest
+for its 19 routes.
 
 Prerender servers omit the Dota event-map and Web Types generators because the
 client build already writes those artifacts. Application transforms and the route

@@ -4,7 +4,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import type {Window} from 'happy-dom';
 import {createConsola} from 'consola';
-import {createServer, type ResolvedConfig, type ViteDevServer} from 'vite';
+import {createServer, createServerModuleRunner, type ResolvedConfig, type ViteDevServer} from 'vite';
 import type {DotaSsgOptions} from '@dota/ssg/types';
 import {generateStaticPages} from '@dota/ssg/generate';
 
@@ -12,7 +12,9 @@ vi.mock('node:fs/promises', {spy: true});
 vi.mock('consola', {spy: true});
 vi.mock('vite', async importOriginal => ({
   ...await importOriginal<typeof import('vite')>(),
-  createServer: vi.fn()
+  createServer: vi.fn(),
+  createServerModuleRunner: vi.fn((environment: {runner: unknown}) => environment.runner),
+  isRunnableDevEnvironment: vi.fn((environment: object | undefined) => environment != null && 'runner' in environment)
 }));
 
 describe('dotaSsg build output', () => {
@@ -20,10 +22,21 @@ describe('dotaSsg build output', () => {
   const disableHydrationEmit = vi.fn();
   const server = {
     pluginContainer: {resolveId: vi.fn()},
-    moduleGraph: {invalidateAll: vi.fn()},
     ssrLoadModule: vi.fn<ViteDevServer['ssrLoadModule']>(),
+    environments: {ssr: createSsrEnvironment()},
     close: vi.fn<() => Promise<void>>()
   };
+
+  /**
+   * Creates a fresh SSR environment, so each test gets its own cached module runner.
+   * Route renders share the ssrLoadModule mock so tests can count every module load in one place.
+   */
+  function createSsrEnvironment() {
+    return {runner: {
+      import: vi.fn((id: string) => server.ssrLoadModule(id, {fixStacktrace: true})),
+      clearCache: vi.fn()
+    }};
+  }
 
   /** Generates pages in an isolated output directory with the plugin's defaults. */
   async function build(options: DotaSsgOptions): Promise<void> {
@@ -37,6 +50,7 @@ describe('dotaSsg build output', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    server.environments.ssr = createSsrEnvironment();
     root = await mkdtemp(join(tmpdir(), 'dota-ssg-build-'));
     await mkdir(join(root, 'dist'));
     await writeFile(join(root, 'dist/index.html'), '<html><head></head><body><app-root></app-root></body></html>');
@@ -187,6 +201,26 @@ describe('dotaSsg build output', () => {
     expect(await readFile(join(root, 'dist/pages/b.html'), 'utf8')).toContain('path="/b" data-dh-route="true"');
     expect(windows[0]).not.toBe(windows[1]);
     expect(mkdir).toHaveBeenCalledExactlyOnceWith(join(root, 'dist/pages'), {recursive: true});
+    expect(server.close).toHaveBeenCalledOnce();
+  });
+
+  it('re-evaluates the entry for every route through the SSR runner', async () => {
+    const {runner} = server.environments.ssr;
+    await build({routes: ['/a', '/b']});
+
+    expect(runner.clearCache).toHaveBeenCalledTimes(2);
+    expect(runner.import).toHaveBeenNthCalledWith(1, 'virtual:dota-ssg-entry');
+    expect(runner.import).toHaveBeenNthCalledWith(2, 'virtual:dota-ssg-entry');
+    expect(runner.clearCache.mock.invocationCallOrder[1]).toBeLessThan(runner.import.mock.invocationCallOrder[1]);
+    expect(createServerModuleRunner).toHaveBeenCalledExactlyOnceWith(server.environments.ssr, {hmr: false, sourcemapInterceptor: false});
+  });
+
+  it('rejects an SSR environment that cannot run modules before installing globals', async () => {
+    const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
+    server.environments.ssr = {} as ReturnType<typeof createSsrEnvironment>;
+
+    await expect(build({routes: ['/']})).rejects.toThrow('runnable Vite SSR environment');
+    expect(Object.getOwnPropertyDescriptor(globalThis, 'document')).toEqual(originalDocument);
     expect(server.close).toHaveBeenCalledOnce();
   });
 
