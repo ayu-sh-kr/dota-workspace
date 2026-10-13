@@ -112,7 +112,8 @@ After Vite writes the client bundle, the plugin:
 2. Creates an isolated Happy DOM window for each resolved route.
 3. Loads the configured application entry through Vite's module graph.
 4. Awaits `applicationReady` (or the export named by `readyExport`).
-5. Waits for pending DOM work and tracked `fetch()` calls.
+5. Waits for pending DOM work and tracked `fetch()` calls, repeating until no
+   request is pending, so loaders that chain requests are captured.
 6. Runs `settle()` when application-specific data readiness needs another
    barrier.
 7. Serializes the complete document to the route's safe output file.
@@ -134,6 +135,12 @@ other than generated route HTML are expected to stay unchanged during a build.
 The renderer skips startup when the explicit route list is empty and autodetection
 is off. After the normal content readiness barrier, an extra settling pass runs
 only when a custom `settle()` callback has run.
+
+Settling for one route stops after `settleTimeout` milliseconds (default 30000)
+or 25 passes, whichever comes first. The page is then written as rendered so far
+and the build logs a warning naming the route, so a page that keeps polling cannot
+stall the build. Requests the page makes after it is written, and responses still
+in flight, never reach it.
 
 ### Parallel rendering
 
