@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [9d7813a]
+  - @ayu-sh-kr/dota-ssr@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-ssr
 
+## 0.1.1
+
+### Patch Changes
+
+- 9d7813a: Speed up static generation by reusing Vite's transformed modules across routes. Each route still
+  runs the application in a fresh window, but no longer re-transforms every module first. On Dota Web,
+  sequential prerendering of 19 routes dropped from about 41s to 8s.
+
 ## 0.1.0
 
 ### Minor Changes
