@@ -88,7 +88,8 @@ describe('renderRoutesInWorkers', () => {
     expect(write).toHaveBeenCalledExactlyOnceWith(
       {path: '/a', output: 'a/index.html'},
       expect.stringContaining('<app-root>'),
-      expect.objectContaining({total: expect.any(Number)})
+      expect.objectContaining({total: expect.any(Number)}),
+      true
     );
   });
 
