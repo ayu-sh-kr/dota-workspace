@@ -24,6 +24,7 @@ export default defineConfig({
         "url",
         "fast-glob",
         "@swc/core",
+        "@ayu-sh-kr/dota-ast-utils",
         "vite",
       ],
     }
