@@ -17,9 +17,10 @@ const CONTENT_TYPES: Readonly<Record<string, string>> = {
 /**
  * Waits until all requests started by a prerender window have settled.
  * The SSG coordinator uses this barrier after DOM settling so async content loaders
- * cannot be omitted from the serialized document.
+ * cannot be omitted from the serialized document. Resolves `true` when it waited for at
+ * least one request, so the coordinator knows response handlers may have queued more work.
  */
-export type PrerenderFetchWaiter = () => Promise<void>;
+export type PrerenderFetchWaiter = () => Promise<boolean>;
 
 /** Carries the route-specific dependencies shared by the fetch adapter and its waiter. */
 type PrerenderFetchContext = {
@@ -49,7 +50,8 @@ type PrerenderFetchInit = Parameters<Window['fetch']>[1];
  * @param staticRoot Built output directory containing Vite's copied public files.
  * @param fetchBaseUrl Optional API origin used for missing relative paths.
  * @param readAsset Build-owned asset reader; omission reads uncached local files.
- * @returns A waiter that resolves after all fetch promises started by this adapter settle.
+ * @returns A waiter that resolves after all fetch promises started by this adapter settle,
+ *   with `true` when any request was still pending.
  * @throws When the optional API base URL is not a valid URL.
  */
 export function installPrerenderFetch(
@@ -71,10 +73,13 @@ export function installPrerenderFetch(
   window.fetch = createPrerenderFetch(context);
 
   return async () => {
+    let waited = false;
     while (context.pendingRequests.size > 0) {
+      waited = true;
       await Promise.allSettled([...context.pendingRequests]);
       await Promise.resolve();
     }
+    return waited;
   };
 }
 
