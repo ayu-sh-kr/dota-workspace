@@ -5,3 +5,4 @@ export * from './ExpressionTypeUtils';
 export * from './TypeAnnotationUtils';
 export * from './AstModuleResolver';
 export * from './AstModulePathResolver';
+export * from './SourceFileIndex';
