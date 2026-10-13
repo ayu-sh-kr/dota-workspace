@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { parseSync, type Module } from '@swc/core';
+import { SourceFileIndex } from '@ayu-sh-kr/dota-ast-utils';
 import { EventMapScanPath } from '@dota/Constants.ts';
 
 const { fgMock, readFileMock, parseMock } = vi.hoisted(() => ({
@@ -34,6 +35,12 @@ beforeEach(() => {
   readFileMock.mockReset();
   parseMock.mockReset();
   sourceByFile.clear();
+  // A fresh index per test, reading through the mocks, stands in for the plugins' shared index.
+  vi.spyOn(SourceFileIndex, 'shared').mockReturnValue(new SourceFileIndex({
+    stamp: async () => '',
+    read: file => readFileMock(file, 'utf8'),
+    parse: (sourceText, options) => parseMock(sourceText, options),
+  }));
 });
 
 describe('scanEventMapSources', () => {
@@ -56,22 +63,26 @@ describe('scanEventMapSources', () => {
     expect(parseMock).not.toHaveBeenCalled();
   });
 
-  it('propagates file-read failures without attempting a parse', async () => {
+  it('propagates file-read failures without parsing the unreadable file', async () => {
     const root = '/workspace';
     const sourceFile = resolve(root, './src/a.ts');
     const laterSourceFile = resolve(root, './src/b.ts');
+    const laterSource = 'export const later = 1;';
     const readError = new Error('read failed');
 
     fgMock.mockResolvedValueOnce([sourceFile, laterSourceFile]);
-    readFileMock.mockRejectedValueOnce(readError);
+    readFileMock.mockImplementation(async (file: string) => {
+      if (file === sourceFile) throw readError;
+      return laterSource;
+    });
+    parseMock.mockImplementation(async (source: string) => parseSource(source));
 
     await expect(scanEventMapSources(root)).rejects.toBe(readError);
 
     expect(fgMock).toHaveBeenCalledOnce();
-    expect(readFileMock).toHaveBeenCalledOnce();
     expect(readFileMock).toHaveBeenCalledWith(sourceFile, 'utf8');
-    expect(readFileMock).not.toHaveBeenCalledWith(laterSourceFile, 'utf8');
-    expect(parseMock).not.toHaveBeenCalled();
+    expect(parseMock).not.toHaveBeenCalledWith(undefined, expect.anything());
+    expect(parseMock.mock.calls.every(([source]) => source === laterSource)).toBe(true);
   });
 
   it('propagates parse failures after successfully discovering and reading the file', async () => {
@@ -79,18 +90,20 @@ describe('scanEventMapSources', () => {
     const sourceFile = resolve(root, './src/a.ts');
     const laterSourceFile = resolve(root, './src/b.ts');
     const source = "publisher.publish({ name: 'sample:event' });";
+    const laterSource = 'export const later = 1;';
     const parseError = new Error('parse failed');
 
     fgMock.mockResolvedValueOnce([sourceFile, laterSourceFile]);
-    readFileMock.mockResolvedValueOnce(source);
-    parseMock.mockRejectedValueOnce(parseError);
+    readFileMock.mockImplementation(async (file: string) => file === sourceFile ? source : laterSource);
+    parseMock.mockImplementation(async (text: string) => {
+      if (text === source) throw parseError;
+      return parseSource(text);
+    });
 
     await expect(scanEventMapSources(root)).rejects.toBe(parseError);
 
     expect(fgMock).toHaveBeenCalledOnce();
     expect(readFileMock).toHaveBeenCalledWith(sourceFile, 'utf8');
-    expect(readFileMock).not.toHaveBeenCalledWith(laterSourceFile, 'utf8');
-    expect(parseMock).toHaveBeenCalledOnce();
     expect(parseMock).toHaveBeenCalledWith(source, { syntax: 'typescript', decorators: true });
   });
 
