@@ -1,5 +1,5 @@
 import type { LogType } from 'consola';
-import type { AstModuleResolutionOptions, AstResolutionReason, AstResolutionTraceStep } from '@ayu-sh-kr/dota-ast-utils';
+import type { AstModuleResolutionOptions, AstResolutionReason, AstResolutionTraceStep, SourceFileIndex } from '@ayu-sh-kr/dota-ast-utils';
 
 /** Resolver settings exposed by the event generator while remaining Vite-independent. */
 export type EventMapResolverOptions = AstModuleResolutionOptions;
@@ -150,4 +150,6 @@ export type EventMapScanOptions = {
   resolver?: EventMapResolverOptions;
   /** Receives unresolved event expressions without changing the scanner's safe skip behavior. */
   onResolutionFailure?: (diagnostic: EventMapResolutionDiagnostic) => void;
+  /** Parsed-source cache to read from; defaults to the index shared by the Dota plugins. */
+  sourceIndex?: SourceFileIndex;
 };
