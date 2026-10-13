@@ -96,7 +96,9 @@ None of these are caused by the PR; each reproduces with `master` or the publish
 3. Prerendering fetches icons from `api.iconify.design`. Without network access, as in this benchmark,
    the portfolio logs 477 and Webingo 2 failed icon fetches; output depends on that service at build time.
 4. The `dota-ssr` test "captures chained asynchronous content without a custom settle callback" fails
-   intermittently (2 of 4 runs) on `master`.
+   intermittently (2 of 4 runs) on `master`. Settling ran a fixed two passes, so DOM work scheduled
+   after a chained fetch could be missed. Fixed later in this PR: settling repeats until a pass waits
+   for no request.
 
 ## Reproduce
 
