@@ -1,5 +1,5 @@
 // @vitest-environment node
-import {mkdir, mkdtemp, rm, writeFile} from 'node:fs/promises';
+import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join, resolve} from 'node:path';
 import {build} from 'vite';
@@ -160,7 +160,9 @@ describe('renderRoutesInWorkers', () => {
 
   it('retains app transforms while omitting duplicate metadata writers', async () => {
     const configFile = join(root, 'vite.config.mjs');
+    const transformLog = join(root, 'transforms.txt');
     await writeFile(configFile, `
+      import {appendFileSync} from 'node:fs';
       export default {
         plugins: [
           Promise.resolve([
@@ -168,24 +170,29 @@ describe('renderRoutesInWorkers', () => {
             {name: 'vite-plugin-dota-web-type-json', buildStart() { throw new Error('duplicate web types'); }}
           ]),
           {name: 'app-transform', transform(code, id) {
-            if (id.endsWith('/main.ts')) return code.replace('ORIGINAL', 'TRANSFORMED');
+            if (id.endsWith('/main.ts')) {
+              appendFileSync(${JSON.stringify(transformLog)}, 'main\\n');
+              return code.replace('ORIGINAL', 'TRANSFORMED');
+            }
           }}
         ]
       };
     `);
     data.config = {...data.config, configFile};
     await writeFile(join(root, 'src/main.ts'), `
-      document.title = 'ORIGINAL';
+      document.title = 'ORIGINAL ' + location.pathname;
       export const applicationReady = Promise.resolve();
     `);
     const pages: string[] = [];
 
-    await renderRoutesInWorkers(resolveSsgRoutes(['/a', '/b']), data, 2, 10_000, async (_, html) => {
+    await renderRoutesInWorkers(resolveSsgRoutes(['/a', '/b']), data, 1, 10_000, async (_, html) => {
       pages.push(html);
     }, workerFile);
 
     expect(pages).toHaveLength(2);
-    expect(pages.every(html => html.includes('<title>TRANSFORMED</title>'))).toBe(true);
+    expect(pages[0]).toContain('<title>TRANSFORMED /a</title>');
+    expect(pages[1]).toContain('<title>TRANSFORMED /b</title>');
+    expect(await readFile(transformLog, 'utf8')).toBe('main\n');
   });
 
   it('produces the same marked documents with one or two workers', async () => {
