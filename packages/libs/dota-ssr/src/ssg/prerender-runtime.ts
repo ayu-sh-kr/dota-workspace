@@ -2,7 +2,7 @@ import {performance as nodePerformance} from 'node:perf_hooks';
 import {Window} from 'happy-dom';
 import {createServerModuleRunner, isRunnableDevEnvironment, type ViteDevServer} from 'vite';
 import {VIRTUAL_SSG_ENTRY} from '../vite/prerender-server';
-import {installPrerenderFetch} from './prerender-fetch';
+import {installPrerenderFetch, type PrerenderFetchWaiter} from './prerender-fetch';
 import {installWindowGlobals} from './window-globals';
 import type {PrerenderAssetReader} from './asset-reader';
 import type {DotaSsgOptions, ResolvedDotaSsgRoute} from './types';
@@ -158,21 +158,25 @@ function markPrerenderedRoute(window: Window, pathname: string): void {
   }
 }
 
+/** Upper bound on settle passes for pages whose timers keep starting new requests. */
+const MAX_SETTLE_PASSES = 25;
+
 /**
- * Re-checks both Happy DOM tasks and tracked fetches before serialization.
- * Fetches can enqueue DOM work after the first task barrier, so each pass waits
- * for both queues twice to include content rendered by asynchronous loaders.
+ * Re-checks both Happy DOM tasks and tracked fetches until a pass finds no fetch to wait for.
+ * A completed fetch can start another fetch or schedule DOM work, so a fixed number of passes
+ * misses content from loaders that chain requests. A pass in which no request was pending ends
+ * the loop, because its task barrier already drained any work queued by earlier responses.
+ * After `MAX_SETTLE_PASSES` passes, the page is serialized with whatever has rendered by then.
  * @param window Route-isolated Happy DOM window whose task queue is settling.
  * @param waitForFetches Barrier returned by the route fetch adapter.
  */
-async function settlePrerenderWindow(window: Window, waitForFetches: () => Promise<void>): Promise<void> {
-  await Promise.resolve();
-  await Promise.resolve();
-  await window.happyDOM.waitUntilComplete();
-  await waitForFetches();
-  await Promise.resolve();
-  await window.happyDOM.waitUntilComplete();
-  await waitForFetches();
+async function settlePrerenderWindow(window: Window, waitForFetches: PrerenderFetchWaiter): Promise<void> {
+  for (let pass = 0; pass < MAX_SETTLE_PASSES; pass += 1) {
+    await Promise.resolve();
+    await Promise.resolve();
+    await window.happyDOM.waitUntilComplete();
+    if (!await waitForFetches()) return;
+  }
 }
 
 /**
