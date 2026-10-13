@@ -30,4 +30,25 @@ describe('AstTraversalUtils', () => {
     expect(AstTraversalUtils.findNodes(null, 'Marker')).toEqual([]);
     expect(AstTraversalUtils.findNodes(['text', 0, false], 'Marker')).toEqual([]);
   });
+
+  it('groups several node types in one traversal, matching per-type discovery', () => {
+    const ast = parseSync(`
+      const first = (value: string) => publisher.publish({ name: value });
+      class Holder { field = 1; method(input: number) { return emit(input); } }
+    `, { syntax: 'typescript' }) as Module;
+    const types = ['CallExpression', 'Parameter', 'ClassProperty', 'VariableDeclarator'] as const;
+
+    const grouped = AstTraversalUtils.findNodesByType(ast, types);
+
+    for (const type of types) {
+      expect(grouped.get(type)).toEqual(AstTraversalUtils.findNodes(ast, type));
+    }
+  });
+
+  it('returns an empty list for every requested type that is absent', () => {
+    const grouped = AstTraversalUtils.findNodesByType({ type: 'Marker' }, ['Marker', 'Missing']);
+
+    expect(grouped.get('Marker')).toEqual([{ type: 'Marker' }]);
+    expect(grouped.get('Missing')).toEqual([]);
+  });
 });
