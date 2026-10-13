@@ -1,9 +1,8 @@
 import {ASTFilterConstants} from "@dota/Constants.ts";
-import {readFile} from "node:fs/promises";
-import {join} from "node:path";
-import {type ClassDeclaration, type Expression, type ExpressionStatement, type Module, type Script, type Span, parse, printSync} from "@swc/core";
+import {resolve} from "node:path";
+import {type ClassDeclaration, type Expression, type ExpressionStatement, type Module, type Script, type Span, printSync} from "@swc/core";
 import {ASTHelperUtils} from "@dota/ASTHelperUtils.ts";
-import {DeclarationUtils, DecoratorView, ExportDeclarationQueryImpl, KeyValuePropertyView, ObjectExpressionView} from "@ayu-sh-kr/dota-ast-utils";
+import {DeclarationUtils, DecoratorView, ExportDeclarationQueryImpl, KeyValuePropertyView, ObjectExpressionView, SourceFileIndex} from "@ayu-sh-kr/dota-ast-utils";
 import {DotaComponentCandidate} from "./component-candidate.domain.ts";
 
 /**
@@ -133,7 +132,8 @@ export function extractRouteCandidatesFromAst(ast: Module, code: string): DotaRo
 /**
  * Resolves page files from component scan results and extracts routes from each one.
  * Only files ending in `.page.ts` are considered for route discovery.
- * Read and parse failures are logged and skipped so a single bad file does not stop the scan.
+ * Pages are parsed through the shared source index, so files the component scan already
+ * parsed are not parsed again. Read and parse failures are logged and skipped.
  * The returned candidates are tagged with their original relative file path.
  * This is the file-system entry point used by the preloader to build route metadata.
  * Debug logging records every discovered route for traceability during scanning.
@@ -144,34 +144,27 @@ export async function extractRouteCandidatesFromComponents(
   logger: RouteScanLogger = console
 ): Promise<DotaRouteCandidate[]> {
   const pageCandidates = components.filter(candidate => candidate.filePath.endsWith(".page.ts"));
+  const sourceIndex = SourceFileIndex.shared();
+  const modules = await Promise.all(pageCandidates.map(candidate => {
+    const file = resolve(root, candidate.filePath);
+    return sourceIndex.load(file).catch((e: unknown) => {
+      logger.error?.(`Failed to read or parse ${file}: ${e}`);
+      return null;
+    });
+  }));
   const routeCandidates: DotaRouteCandidate[] = [];
 
-  for (const candidate of pageCandidates) {
-    const file = join(root, candidate.filePath);
-    let code: string;
-    try {
-      code = await readFile(file, "utf-8");
-    } catch (e) {
-      logger.error?.(`Failed to read ${file}: ${e}`);
-      continue;
-    }
-
-    let ast: Module;
-    try {
-      ast = await parse(code, {syntax: "typescript", decorators: true});
-    } catch (e) {
-      logger.error?.(`Failed to parse ${file}: ${e}`);
-      continue;
-    }
-
-    const fileRoutes = extractRouteCandidatesFromAst(ast, code).map(routeCandidate => {
+  pageCandidates.forEach((candidate, index) => {
+    const module = modules[index];
+    if (!module) return;
+    const fileRoutes = extractRouteCandidatesFromAst(module.ast, module.sourceText).map(routeCandidate => {
       routeCandidate.filePath = candidate.filePath;
       logger.debug?.(`Found route candidate ${routeCandidate.name} in file ${candidate.filePath} with path ${routeCandidate.path}`);
       return routeCandidate;
     });
 
     routeCandidates.push(...fileRoutes);
-  }
+  });
 
   return routeCandidates;
 }
