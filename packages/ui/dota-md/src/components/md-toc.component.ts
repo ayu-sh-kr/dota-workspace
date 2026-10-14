@@ -17,7 +17,7 @@ import {
 } from '@ayu-sh-kr/dota-rendering';
 import { type TocEntry } from '@dota/services/md.service.ts';
 import { type ThemeName } from '@dota/themes.ts';
-import { type ColorName } from '@dota/Types.ts';
+import { type ColorKey } from '@dota/Types.ts';
 import { type TocClasses, TocUtils } from '@dota/toc-utils.ts';
 
 /**
@@ -37,7 +37,7 @@ import { type TocClasses, TocUtils } from '@dota/toc-utils.ts';
  * | Attribute      | Default    | Description                                     |
  * |----------------|------------|-------------------------------------------------|
  * | `theme`        | `'flat'`   | Theme name — must be a key of `THEMES`.         |
- * | `color`        | `'indigo'` | Accent colour — a `ColorName` key.              |
+ * | `color`        | `'indigo'` | Accent colour — a theme color key.                |
  * | `header-height`| `64`       | Sticky header height in px for scroll offsets.  |
  * | `label`        | `'On this page'` | Text shown above the TOC list.          |
  *
@@ -67,7 +67,7 @@ export class MdTocComponent extends BaseElement {
   theme: ThemeName = 'flat';
 
   @Property({ name: 'color', type: String })
-  color: ColorName = 'indigo';
+  color: ColorKey = 'indigo';
 
   /**
    * Sticky header height in pixels.  Must match your layout's header height, so
@@ -125,7 +125,7 @@ export class MdTocComponent extends BaseElement {
   onColorChange(event: ApplicationEvent<'md:color-change'>) {
     const c = event?.data?.color;
     if (c) {
-      this.color = c as ColorName;
+      this.color = c as ColorKey;
       this.updateHTML();
     }
   }
