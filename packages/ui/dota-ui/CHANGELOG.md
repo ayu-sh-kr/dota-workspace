@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [44079e2]
+  - @ayu-sh-kr/dota-web-type-json@0.0.17
+
 ## 0.1.0
 
 ### Minor Changes

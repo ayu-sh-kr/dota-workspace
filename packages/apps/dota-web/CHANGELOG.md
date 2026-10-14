@@ -1,5 +1,16 @@
 # doto-web
 
+## 0.0.46
+
+### Patch Changes
+
+- Updated dependencies [44079e2]
+- Updated dependencies [44079e2]
+- Updated dependencies [44079e2]
+  - @ayu-sh-kr/dota-wrap@0.2.0
+  - @ayu-sh-kr/dota-md@0.0.18
+  - @ayu-sh-kr/dota-ui@0.1.1
+
 ## 0.0.45
 
 ### Patch Changes
