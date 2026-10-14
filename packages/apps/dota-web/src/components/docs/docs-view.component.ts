@@ -162,8 +162,8 @@ export class DocsViewComponent extends BaseElement {
   }
 
   /**
-   * `<md-view>` and `<md-toc>` stay in the top-level template so hydration adopts their
-   * prerendered content; conditional sub-templates are recreated on hydration.
+   * Renders the same template on the server and on the client's first render (no loading
+   * state), so hydration adopts `<md-view>` and `<md-toc>` with their prerendered content.
    */
   render(): TemplateResult {
     const doc = this.doc;
