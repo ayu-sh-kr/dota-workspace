@@ -67,31 +67,24 @@ export class CodeSnippetComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-        <div class="rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur-2xl
-                    shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_28px_90px_-54px_rgba(15,23,42,0.95)]
-                    dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_28px_90px_-52px_rgba(0,0,0,0.96)]
-                    w-full min-w-0" style="overflow:hidden">
+        <div class="code-panel w-full min-w-0">
 
             <!-- Title bar -->
-            <div class="flex items-center justify-between px-4 py-3 bg-white/[0.045] border-b border-white/10">
+            <div class="code-toolbar flex items-center justify-between px-4 py-3">
 
                 <div class="flex items-center gap-2" aria-hidden="true">
-                    <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/70"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
-                    <span class="ml-2 text-xs text-gray-500 font-mono">${this.filename}</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-code-danger"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-code-warning"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-code-success"></span>
+                    <span class="ml-2 text-xs text-code-muted font-mono">${this.filename}</span>
                 </div>
 
                 <button id="copy-btn"
-                        class="flex items-center gap-1 text-xs text-gray-500
-                               hover:text-purple-400 transition-colors duration-200
-                               cursor-pointer active:scale-95
-                               focus-visible:outline-none focus-visible:ring-2
-                               focus-visible:ring-purple-500 rounded"
+                        class="button-link button-compact button-code"
                         aria-label="Copy code to clipboard"
                         title="Copy to clipboard">
                     <dota-icon name="material-symbols:content-copy-rounded"
-                               color="purple" variant="ghost" size="sm">
+                               classname="text-code-accent" variant="ghost" size="sm">
                     </dota-icon>
                     <span>Copy</span>
                 </button>
@@ -99,7 +92,7 @@ export class CodeSnippetComponent extends BaseElement {
 
             <!-- Code body: populated by MDService in afterViewInit -->
             <div id="snippet-body"
-                 class="overflow-x-auto custom-scrollbar text-[13px] leading-7 select-text"
+                 class="overflow-x-auto custom-scrollbar type-code select-text"
                  aria-label="Code snippet: ${this.filename}">
             </div>
 
