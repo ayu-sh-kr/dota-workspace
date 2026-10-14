@@ -40,6 +40,7 @@ import { type TocClasses, TocUtils } from '@dota/toc-utils.ts';
  * | `color`        | `'indigo'` | Accent colour — a theme color key.                |
  * | `header-height`| `64`       | Sticky header height in px for scroll offsets.  |
  * | `label`        | `'On this page'` | Text shown above the TOC list.          |
+ * | `container-class` | default column | Classes replacing the outer `<aside>` layout. |
  *
  * ### Events consumed
  * | Event              | Payload                  |
@@ -83,6 +84,13 @@ export class MdTocComponent extends BaseElement {
    */
   @Property({ name: 'label', type: String })
   label: string = 'On this page';
+
+  /**
+   * Classes for the outer `<aside>`; replaces the default sticky right-hand column
+   * so the host layout can place the TOC. Attribute: `container-class`.
+   */
+  @Property({ name: 'container-class', type: String })
+  containerClass: string = '';
 
   private _toc: TocEntry[] = [];
   private _activeId: string = '';
@@ -252,7 +260,7 @@ export class MdTocComponent extends BaseElement {
     `;
 
     return html`
-      <aside class="${containerClass}" aria-hidden="${hasItems ? 'false' : 'true'}">
+      <aside class="${this.containerClass || containerClass}" aria-hidden="${hasItems ? 'false' : 'true'}">
         ${when(hasItems, contents)}
       </aside>
     `;
