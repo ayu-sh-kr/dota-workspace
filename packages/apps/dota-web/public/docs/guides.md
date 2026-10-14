@@ -1,3 +1,5 @@
+# Guides
+
 `Dota Core` provides various functionalities to assist developers in multiple aspect of
 web development. This document serves as a guide to help you understand how to use these functionalities effectively.
 
@@ -74,8 +76,8 @@ To enable decorators, you need to update your `tsconfig.json` file to include th
 
 
 Read more about `Dota Core` and how to use it in your project in the following sections.
-- [Components Definition](Component-Definition.md)
-- [Component Registration](Component-Registration.md)
+- [Components Definition](/docs/component-definition)
+- [Component Registration](/docs/component-registration)
 
 
 
