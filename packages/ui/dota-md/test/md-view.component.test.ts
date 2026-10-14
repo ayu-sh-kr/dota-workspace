@@ -112,3 +112,18 @@ describe('MdViewComponent subclasses', () => {
     expect(view.querySelector('.legacy p')?.textContent).toBe('Published');
   });
 });
+
+describe('MdViewComponent prerendered content', () => {
+  it('replaces the serialized theme classes when another color is applied', async () => {
+    const indigo = flatMarkdownTheme.color.indigo!.p!.text!;
+    const view = connect(`<md-view theme="flat" color="indigo"><div data-md-content><p class="${indigo}">Text</p><code class="hljs">x</code></div></md-view>`);
+
+    view.onColorChange({name: 'md:color-change', data: {color: 'rose'}});
+    await initialized();
+
+    const paragraph = view.querySelector('p')!;
+    expect(paragraph.className).toContain(flatMarkdownTheme.color.rose!.p!.text!);
+    expect(paragraph.className).not.toContain(indigo);
+    expect(view.querySelector('code')!.className).toBe('hljs');
+  });
+});
