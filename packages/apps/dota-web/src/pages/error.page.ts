@@ -62,7 +62,7 @@ export class ErrorPage extends DotaPageElement {
                     Go Home
                 </a>
 
-                <a href="/docs?content=Getting-Started.md"
+                <a href="/docs/Getting-Started"
                    class="bg-gray-200 dark:bg-slate-800 dark:text-white px-5 py-3 rounded-lg flex items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor"
