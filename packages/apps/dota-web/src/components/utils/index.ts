@@ -5,8 +5,6 @@ export {GithubButtonComponent} from "@dota/components/utils/buttons/github-butto
 export {DarkModeButtonComponent} from "@dota/components/utils/buttons/dark-mode-button.component.ts";
 export {FooterComponent} from "@dota/components/utils/footer.component.ts";
 export {AiButtonComponent} from "@dota/components/utils/buttons/ai-button.component.ts";
-export {LoaderComponent} from "@dota/components/utils/section/loader.component.ts";
-export {LoaderSectionComponent} from "@dota/components/utils/section/loader-section.component.ts";
 export {ScrollBottomButtonComponent} from "@dota/components/utils/buttons/scroll-bottom-button.component.ts";
 export {HamBurgerButtonComponent} from "@dota/components/utils/buttons/ham-burger-button.component.ts";
 export {SelfEndComponent} from "@dota/components/utils/self-end.component.ts";
