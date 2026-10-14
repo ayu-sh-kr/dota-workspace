@@ -2185,10 +2185,21 @@
           }
         },
         {
+          "name": "doc-article-page",
+          "source": {
+            "file": "./src/pages/doc-article.page.ts",
+            "offset": 717
+          },
+          "attributes": [],
+          "js": {
+            "properties": []
+          }
+        },
+        {
           "name": "doc-content",
           "source": {
             "file": "./src/components/docs/doc-content.component.ts",
-            "offset": 440
+            "offset": 496
           },
           "attributes": [
             {
@@ -2200,7 +2211,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-content.component.ts",
-                "offset": 596
+                "offset": 588
               }
             }
           ],
@@ -2212,7 +2223,7 @@
                 "default": "max-w-4xl",
                 "source": {
                   "file": "./src/components/docs/doc-content.component.ts",
-                  "offset": 596
+                  "offset": 588
                 }
               }
             ]
@@ -2298,7 +2309,7 @@
           "name": "doc-page",
           "source": {
             "file": "./src/pages/doc.page.ts",
-            "offset": 788
+            "offset": 799
           },
           "attributes": [],
           "js": {
@@ -2309,7 +2320,7 @@
           "name": "doc-path",
           "source": {
             "file": "./src/components/docs/doc-path.component.ts",
-            "offset": 691
+            "offset": 719
           },
           "attributes": [
             {
@@ -2320,7 +2331,7 @@
               },
               "source": {
                 "file": "./src/components/docs/doc-path.component.ts",
-                "offset": 792
+                "offset": 820
               }
             }
           ],
@@ -2331,7 +2342,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/docs/doc-path.component.ts",
-                  "offset": 792
+                  "offset": 820
                 }
               }
             ]
@@ -2341,7 +2352,7 @@
           "name": "doc-section",
           "source": {
             "file": "./src/components/docs/doc-section.component.ts",
-            "offset": 909
+            "offset": 972
           },
           "attributes": [],
           "js": {
@@ -4517,7 +4528,7 @@
               },
               "source": {
                 "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-                "offset": 704
+                "offset": 693
               }
             }
           ],
@@ -4529,7 +4540,7 @@
                 "default": "false",
                 "source": {
                   "file": "./src/components/sidebar/navigation-sidebar.component.ts",
-                  "offset": 704
+                  "offset": 693
                 }
               }
             ]
