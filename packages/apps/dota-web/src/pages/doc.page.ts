@@ -16,7 +16,7 @@ import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
  * <app-header> and <app-footer> are intentionally omitted here so the doc
  * layout can use the full viewport height without a floating nav bar on top.
  */
-@Route({path: '/docs'})
+@Route({path: '/docs', ssr: true})
 @Component({
   selector: 'doc-page',
   shadow: false
