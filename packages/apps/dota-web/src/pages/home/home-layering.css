@@ -11,5 +11,5 @@ app-notification,
 notification-holder {
     display: block;
     position: relative;
-    z-index: 1;
+    z-index: var(--layout-z-content);
 }
