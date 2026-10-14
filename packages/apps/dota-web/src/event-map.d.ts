@@ -19,7 +19,6 @@ declare module "@ayu-sh-kr/dota-wrap/event" {
     "disconnected": any;
     "docs:color-change": { color: ColorName };
     "docs:theme-change": { theme: ThemeName };
-    "docs:toc-update": any;
     "dom-updated": any;
     "md:color-change": { color: ColorName };
     "md:render": MarkdownResult;
