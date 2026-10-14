@@ -14,15 +14,15 @@ const NAV_SECTIONS = [...new Set(DOCS.map(doc => doc.section))]
   .map(section => ({section, docs: DOCS.filter(doc => doc.section === section)}));
 
 /**
- * Documentation reader: top bar, section navigation, the Markdown article, its table of
- * contents, and previous/next links, all for the page named by `slug`.
+ * Renders one documentation page, including its header, navigation, Markdown article,
+ * table of contents, appearance controls, and previous/next links.
  *
- * SSG first: during prerender the Markdown is fetched and rendered into `<md-view>`, so a
- * prerendered page arrives complete and is never fetched again. The article skeleton is
- * hidden by CSS whenever `<md-view>` holds content, so it only shows while client navigation
- * loads a page; the template never changes, which keeps hydration and `<md-view>` stable.
- * Appearance (theme and accent) is stored per browser and applied through the
- * `md:theme-change` / `md:color-change` events that `<md-view>` and `<md-toc>` follow.
+ * `slug` selects the page from `DOCS`. On connection, the component restores the reader's
+ * saved theme and accent, then loads Markdown only when the page was not already prerendered
+ * into `<md-view>`. Keeping `<md-view>` and `<md-toc>` in the unconditional template lets
+ * hydration reuse those elements; the skeleton is shown only until the article has content.
+ * Appearance changes are saved per browser and published as `md:theme-change` or
+ * `md:color-change`, which the Markdown view and table of contents consume.
  *
  * Selector: `docs-view`.
  */
@@ -32,7 +32,11 @@ const NAV_SECTIONS = [...new Set(DOCS.map(doc => doc.section))]
 })
 export class DocsViewComponent extends BaseElement {
 
-  /** Slug of the page to show; an unknown slug renders a not-found message. Attribute `slug`. */
+  /**
+   * URL slug of the documentation page to display. The value is matched against `DOCS`;
+   * an empty or unknown slug leaves the article area in its not-found state.
+   * This is the `slug` HTML attribute and is supplied by the docs route.
+   */
   @Property({name: 'slug', type: String})
   slug: string = '';
 
@@ -42,7 +46,12 @@ export class DocsViewComponent extends BaseElement {
     super();
   }
 
-  /** Applies the saved appearance, then loads the Markdown unless the page was prerendered. */
+  /**
+   * Restores appearance before the first render can be used, then fills the Markdown view.
+   * A prerendered article is detected by its existing content and is deliberately not fetched
+   * again, avoiding duplicate work during hydration. Client-side navigation has no content,
+   * so it loads the selected document and asks `MDService` to render it into `<md-view>`.
+   */
   @OnEvent('connected', true)
   async loadDoc(): Promise<void> {
     this.restoreAppearance();
@@ -51,7 +60,12 @@ export class DocsViewComponent extends BaseElement {
     MDService.render(await this.loader.loadDoc(doc.slug), {publish: true});
   }
 
-  /** Stores and broadcasts a theme or accent picked in the appearance menu. */
+  /**
+   * Persists and broadcasts a selection made in either appearance dropdown.
+   * The select's `name` distinguishes the theme from the accent; the value is stored under
+   * that setting's docs-specific key, then published so both child views update themselves.
+   * @param event Change event whose target is one of the appearance selects.
+   */
   @BindEvent({event: 'change', id: '[data-appearance]'})
   changeAppearance(event: Event): void {
     const {name, value} = event.target as HTMLSelectElement;
@@ -63,7 +77,11 @@ export class DocsViewComponent extends BaseElement {
     return DOCS.find(doc => doc.slug === this.slug);
   }
 
-  /** Reapplies the stored theme and accent; the prerendered page uses the defaults. */
+  /**
+   * Applies valid saved appearance values to the two controls and republishes them.
+   * Invalid or missing storage is ignored, leaving the template defaults in place; this
+   * protects the reader from old, manually edited, or unsupported local-storage values.
+   */
   private restoreAppearance(): void {
     this.querySelectorAll<HTMLSelectElement>('[data-appearance]').forEach(select => {
       const saved = LocalStorageService.get(`docs-${select.name}`);
@@ -73,12 +91,18 @@ export class DocsViewComponent extends BaseElement {
     });
   }
 
+  /**
+   * Converts a control name into the application event understood by Markdown children.
+   * Publishing through the shared event channel keeps `<md-view>` and `<md-toc>` synchronized
+   * without coupling this page shell to either component's implementation.
+   */
   private publishAppearance(name: string, value: string): void {
     const publisher = ApplicationEventService.getInstance().getPublisher();
     if (name === 'theme') void publisher.publishAsync({name: 'md:theme-change', data: {theme: value}});
     else void publisher.publishAsync({name: 'md:color-change', data: {color: value}});
   }
 
+  /** Builds the grouped sidebar links and marks the current slug as the active page. */
   private renderNav(): TemplateResult {
     return html`
       <nav aria-label="Documentation" class="space-y-6 text-sm">
@@ -103,6 +127,7 @@ export class DocsViewComponent extends BaseElement {
     `;
   }
 
+  /** Builds the theme and accent selects from the supported appearance values. */
   private renderAppearance(): TemplateResult {
     const select = 'h-8 rounded-md border border-gray-200 bg-white px-2 text-xs capitalize text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200';
     return html`
@@ -118,8 +143,9 @@ export class DocsViewComponent extends BaseElement {
   }
 
   /**
-   * Placeholder for the article, hidden (`group-has-…:hidden`) as soon as `<md-view>`
-   * holds content: always for prerendered pages, after loading for client navigation.
+   * Builds the loading placeholder for client-side document loads.
+   * CSS hides it as soon as `<md-view>` contains an article, so the same template works for
+   * prerendered pages (hidden immediately) and client navigation (visible while loading).
    */
   private renderSkeleton(): TemplateResult {
     return html`
@@ -136,6 +162,7 @@ export class DocsViewComponent extends BaseElement {
     `;
   }
 
+  /** Renders the fallback shown when `slug` does not identify an entry in `DOCS`. */
   private renderNotFound(): TemplateResult {
     return html`
       <h1 class="text-3xl font-bold">Page not found</h1>
@@ -144,6 +171,12 @@ export class DocsViewComponent extends BaseElement {
     `;
   }
 
+  /**
+   * Builds links to the adjacent entries in `DOCS`'s reading order.
+   * Missing neighbors become empty grid cells so the first and last pages keep the same
+   * two-column layout without exposing a link to a nonexistent document.
+   * @param doc The currently selected documentation entry.
+   */
   private renderPager(doc: DocEntry): TemplateResult {
     const index = DOCS.indexOf(doc);
     const card = 'flex flex-col gap-1 rounded-xl border border-gray-200 p-4 transition-colors hover:border-indigo-400 dark:border-gray-800 dark:hover:border-indigo-500';
@@ -162,8 +195,10 @@ export class DocsViewComponent extends BaseElement {
   }
 
   /**
-   * Renders the same template on the server and on the client's first render (no loading
-   * state), so hydration adopts `<md-view>` and `<md-toc>` with their prerendered content.
+   * Composes the stable page shell and selects the article or not-found state.
+   * The server and the client's first render produce the same template (no loading state),
+   * so hydration adopts `<md-view>` and `<md-toc>` with their prerendered content. Both stay
+   * in the top-level template; only surrounding navigation and fallback fragments vary.
    */
   render(): TemplateResult {
     const doc = this.doc;
