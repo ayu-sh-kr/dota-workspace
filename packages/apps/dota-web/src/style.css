@@ -1,32 +1,36 @@
 @import "@ayu-sh-kr/dota-ui/dota-ui.css";
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=Fira+Code:wght@300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Satisfy&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import "../public/assets/css/font.css";
+@import "../public/assets/css/theme.css";
+@import "../public/assets/css/color.css";
+@import "../public/assets/css/typography.css";
+@import "../public/assets/css/layout.css";
+@import "../public/assets/css/action.css";
 
 @import "./components/community/community-card.css";
 @import "./components/home/blob-separator.css";
-@import "./components/home/blob-wrapper.css";
-@import "./components/home/home-layering.css";
-@import "./components/home/home-motion.css";
-@import "./components/home/our-tools.css";
-@import "./components/home/utils/code-snippet.css";
-@import "./components/home/utils/device-preview.css";
-@import "./components/home/utils/get-started-button.css";
-@import "./components/home/utils/tab-holder.css";
+@import "./components/home/blob-wrapper/blob-wrapper.component.css";
+@import "./pages/home/home-layering.css";
+@import "./pages/home/home-motion.css";
+@import "./pages/home/home.page.css";
+@import "./components/home/hero-section/hero-section.component.css";
+@import "./components/home/feature/feature.component.css";
+@import "./components/home/client-section/client-section.component.css";
+@import "./components/home/faq-section/faq-section.component.css";
+@import "./components/utils/header/header.component.css";
+@import "./components/utils/footer/footer.component.css";
+@import "./components/home/our-tools/our-tools.component.css";
+@import "./components/home/utils/code-snippet/code-snippet.component.css";
+@import "./components/home/utils/device-preview/device-preview.component.css";
+@import "./components/home/utils/tab-holder/tab-holder.component.css";
 @import "./components/utils/notification/notification.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-    ::selection,
-    ::-moz-selection {
-        @apply bg-purple-500 text-white dark:bg-purple-600;
-    }
-}
-
 @layer utilities {
     .font-adaptive {
-        @apply text-gray-900 dark:text-gray-50;
+        color: var(--foreground-color);
     }
 
     .custom-scrollbar::-webkit-scrollbar {
@@ -36,11 +40,11 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #dadada;
+        background: var(--border-color);
         border-radius: 50px;
     }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #b1b1b1; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--muted-color); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
 
     .no-scrollbar {
@@ -49,9 +53,4 @@
     }
 
     code { @apply custom-scrollbar; }
-}
-
-body {
-    overflow-x: hidden;
-    font-family: "DM Sans", sans-serif;
 }
