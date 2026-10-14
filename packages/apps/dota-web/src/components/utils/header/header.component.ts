@@ -8,7 +8,7 @@ export class HeaderComponent extends BaseElement {
   items: Link[] = [
     {
       name: "Documents",
-      url: "/docs/Getting-Started",
+      url: "/docs/getting-started",
     },
 
     {
