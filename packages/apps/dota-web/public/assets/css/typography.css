@@ -1,0 +1,72 @@
+/* Typography roles encode size, weight, leading, and tracking as one decision. */
+:root {
+  --type-display-size: clamp(2.75rem, 1.8rem + 4.2vw, 5rem);
+  --type-display-weight: 700;
+  --type-display-leading: 1.05;
+  --type-display-tracking: -0.045em;
+  --type-title-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  --type-section-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
+  --type-heading-weight: 600;
+  --type-heading-leading: 1.15;
+  --type-heading-tracking: -0.03em;
+  --type-lede-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --type-body-size: 1rem;
+  --type-body-leading: 1.65;
+  --type-reading-size: 1.0625rem;
+  --type-reading-leading: 1.75;
+  --type-compact-size: 0.875rem;
+  --type-label-size: 0.75rem;
+  --type-label-tracking: 0.12em;
+  --type-control-size: 0.9375rem;
+  --type-control-weight: 600;
+  --type-control-leading: 1.25;
+  --type-code-size: 0.875rem;
+  --type-code-leading: 1.65;
+}
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  font-family: var(--font-body);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-leading);
+  -webkit-font-smoothing: antialiased;
+}
+:where(button, input, textarea, select) { font: inherit; }
+:where(code, pre, kbd, samp) { font-family: var(--font-code); }
+
+@layer components {
+  .type-display {
+    font-family: var(--font-display);
+    font-size: var(--type-display-size);
+    font-weight: var(--type-display-weight);
+    line-height: var(--type-display-leading);
+    letter-spacing: var(--type-display-tracking);
+    text-wrap: balance;
+  }
+
+  .type-title, .type-section {
+    font-family: var(--font-display);
+    font-weight: var(--type-heading-weight);
+    line-height: var(--type-heading-leading);
+    letter-spacing: var(--type-heading-tracking);
+    text-wrap: balance;
+  }
+  .type-title { font-size: var(--type-title-size); }
+  .type-section { font-size: var(--type-section-size); }
+  .type-lede { font-size: var(--type-lede-size); line-height: var(--type-body-leading); }
+  .type-body { font-size: var(--type-body-size); line-height: var(--type-body-leading); }
+  .type-reading { font-size: var(--type-reading-size); line-height: var(--type-reading-leading); }
+  .type-compact { font-size: var(--type-compact-size); line-height: var(--type-body-leading); }
+  .type-eyebrow {
+    color: var(--primary-color);
+    font-size: var(--type-label-size);
+    font-weight: 600;
+    letter-spacing: var(--type-label-tracking);
+    text-transform: uppercase;
+  }
+  .type-code { font-family: var(--font-code); font-size: var(--type-code-size); line-height: var(--type-code-leading); }
+}
+
+@media (pointer: coarse) {
+  :where(input, textarea, select) { font-size: 1rem; }
+}
