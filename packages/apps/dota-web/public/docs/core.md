@@ -1,3 +1,5 @@
+# Core Concepts
+
 In this section we will be exploring the core concept behind the `web-components` and working
 of the `Dota-Core` library.
 
@@ -87,7 +89,7 @@ export class MyElement extends BaseElement {
 ```
 
 Above code creates a new class `MyElement` that extends `BaseElement`.
--  For more read [Component Definition](Component-Definition.md) section.
+-  For more read [Component Definition](/docs/component-definition) section.
 
 
 ## Adding Attributes
@@ -191,14 +193,14 @@ export class MyElement extends BaseElement {
 ```
 
 - The above code defines the `myAttribute` property in the `MyElement` class using the `@Property` decorator.
-- For more read [Property Binding](Property-Binding.md) section.
+- For more read [Property Binding](/docs/property-binding) section.
 
 
 >As you can see, with each new functionality we bring to you using `Dota-Core`, the code becomes
  more readable and maintainable, also headache of maintaining repetitive action like attribute binding
  is taken care of by the library itself.
 > 
-> Similar thing is done for the `events` and `emitters` as well. Read [Event Binding](Event-Binding.md) section and [Event Emitter](Event-Emitter.md) section for more information.
+> Similar thing is done for the `events` and `emitters` as well. Read [Event Binding](/docs/event-binding) section and [Event Emitter](/docs/event-emitter) section for more information.
 
 
 ## Shadow DOM
