@@ -1,6 +1,6 @@
 import {AfterInit, BaseElement, Component, Property, String, Watcher} from "@ayu-sh-kr/dota-wrap/core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
-import {MarkdownService} from "@dota/service/markdown.service.ts";
+import {MDService} from "@ayu-sh-kr/dota-md";
 
 @Component({
   selector: "resource-content",
@@ -30,7 +30,7 @@ export class ResourceContentComponent extends BaseElement {
   @Watcher('resourcePath')
   async updateContent() {
     const content = await this.docService.loadResource(this.resourcePath);
-    this.content = MarkdownService.renderMarkdown(content);
+    this.content = MDService.renderHtml(content);
     this.updateHTML();
   }
 
