@@ -63,7 +63,7 @@
           "name": "alert-playground",
           "source": {
             "file": "./src/components/blogs/examples/alert-playground.component.ts",
-            "offset": 359
+            "offset": 366
           },
           "attributes": [],
           "js": {
@@ -2165,7 +2165,7 @@
           "name": "docs-view",
           "source": {
             "file": "./src/components/docs/docs-view.component.ts",
-            "offset": 1770
+            "offset": 1760
           },
           "attributes": [
             {
@@ -2177,7 +2177,7 @@
               },
               "source": {
                 "file": "./src/components/docs/docs-view.component.ts",
-                "offset": 1953
+                "offset": 2098
               }
             }
           ],
@@ -2189,7 +2189,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/docs/docs-view.component.ts",
-                  "offset": 1953
+                  "offset": 2098
                 }
               }
             ]
@@ -2364,7 +2364,7 @@
           "name": "dota-alert",
           "source": {
             "file": "../../ui/dota-ui/src/components/alert/alert.component.ts",
-            "offset": 2450
+            "offset": 2503
           },
           "attributes": [],
           "js": {
