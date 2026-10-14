@@ -1,6 +1,6 @@
 ---
 name: dota-web-components
-description: Use when creating, modifying, or reviewing app-owned components and pages in packages/apps/dota-web. Covers Dota Wrap/Dota Core custom-element conventions, routing, lifecycle hooks, properties, events, rendering, Tailwind styling, and Markdown views.
+description: Use when creating, modifying, or reviewing app-owned components and pages in packages/apps/dota-web. Covers custom-element conventions, routing, lifecycle, rendering, shared CSS grammar, colocated component styles, and Markdown views.
 ---
 
 # Dota Web Components
@@ -236,11 +236,73 @@ render(): string {
 
 Styling conventions:
 
-- Use Tailwind classes inline.
-- Include `dark:` variants when the component has colors, borders, or backgrounds.
+- Use semantic Tailwind utilities and shared type/layout classes inline; see the CSS grammar below.
+- Let semantic tokens resolve light/dark colors. Use `dark:` only for a component-specific structural or visual effect that cannot be expressed by the shared roles.
 - Use responsive prefixes such as `sm:`, `md:`, `lg:`, and `xl:` for layout changes.
 - Prefer composition with existing custom elements such as `app-header`, `app-footer`, `md-view`, `md-toc`, `dota-icon`, and section components.
 - For lists, map data to strings and `join("")` or `join(" ")`.
+
+### Shared CSS grammar and ownership
+
+The application-wide foundation lives under `packages/apps/dota-web/public/assets/css/`
+and is imported by `src/style.css`, before page and component styles:
+
+| File | Owns |
+| --- | --- |
+| `font.css` | Font loading and body, display, and code font stacks |
+| `theme.css` | Literal color collection and palette ramps; no component selectors |
+| `color.css` | Semantic colors, mode mappings, status roles, surfaces, actions, and shared treatments |
+| `typography.css` | Named type roles, including size, weight, leading, and tracking |
+| `layout.css` | Spacing scale, containers, section rhythm, shared grids, radii, and stacking |
+| `action.css` | Primary, secondary, text, icon, and compact action grammar and interaction states |
+
+Consume roles such as `--foreground-color`, `--primary-color`, `--type-section-size`, and
+`--layout-gutter`. Prefer `text-muted`, `bg-surface`, `border-default`, `type-section`,
+`surface-card`, `layout-page`, and `layout-split` over repeated palette utilities or
+independent heading/container scales. `tailwind.config.ts` maps semantic utilities to
+these properties. This application uses Tailwind 3: declare tokens with `:root` and
+`html.dark`, not Tailwind 4 `@theme`/`@source` directives copied from other projects.
+
+Actions consume `button-primary`, `button-secondary`, `button-link`, or `button-icon`.
+Use `button-compact` for dense toolbars and `button-code` for controls on fixed code
+surfaces. The action grammar owns geometry, type, hierarchy, hover, focus, disabled,
+and reduced-motion states. Primary actions use neutral contrast; accents identify links
+and focus. Action shapes follow the navigation/tab pill family, while panels use the
+card radius. Do not invent a component-specific CTA silhouette or color treatment;
+change the shared grammar when the requested change should apply to an action role.
+
+Keep the reusable palette collection in `theme.css`; changing the active application
+palette belongs in `color.css`. Components consume semantic roles rather than literal
+colors or numbered palette steps. Keep link, filled-action, on-action, and code-surface
+roles distinct so each can maintain readable contrast in both modes. Component library
+color attributes remain library contracts; app-specific appearance should use the
+library's supported class/config hooks rather than change its public presets.
+
+When a component needs additional values or overrides, give it a directory containing
+both its implementation and stylesheet:
+
+```text
+src/components/home/hero-section/
+  hero-section.component.ts
+  hero-section.component.css
+```
+
+Import that stylesheet centrally in `src/style.css`. Scope selectors and local custom
+properties to the owning component or a distinctive class. Derive local values from
+the shared grammar; do not add component-specific `:root` tokens. Promote a role to the
+foundation only when it has an application-wide meaning or real reuse. A component
+that needs only shared classes does not require an empty stylesheet or new directory.
+
+Page-only composition and coordinated effects belong beside the page, for example
+`src/pages/home/home.page.ts` and `home.page.css`. Update imports/barrels when moving
+components; preserve selectors and runtime behavior. Do not move library styles into
+the app foundation or impose the app's palette on published library defaults.
+
+Validation should include the app build and relevant tests, confirmation that CSS
+imports are bundled without unresolved paths or `@apply`, and visual checks of light,
+dark, mobile, and reduced-motion states when a browser is available. Files in `public`
+are copied as static assets too; the app must consume the processed `style.css` entry,
+not link raw component stylesheets containing Tailwind directives.
 - Keep markup readable with multiline templates.
 
 ## Data Loading and Markdown
@@ -312,6 +374,7 @@ Before finishing a Dota web component:
 - Route/query values use `@Param`.
 - DOM events use `@BindEvent`, `@HostListener`, `@WindowListener`, or `@DocumentListener`.
 - App events use `ApplicationEventService` and `@OnEvent`.
-- Markup uses Tailwind classes with dark-mode variants where needed.
+- Markup consumes shared semantic color, typography, and layout roles.
+- Shared foundation CSS is in `public/assets/css`; component overrides are colocated and imported by `src/style.css`.
 - Internal state changes that affect markup call `this.updateHTML()`.
 - Data loading happens after connect/init, not in `render()` or the constructor.
