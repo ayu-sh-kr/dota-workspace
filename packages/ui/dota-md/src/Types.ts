@@ -69,7 +69,13 @@ export type ColorEntry = TypographColorToken & {
   selection?: string;
 }
 
-export type Color = Record<ColorName, ColorEntry>
+/**
+ * Key of a theme's color map: a built-in Tailwind color name or an app-defined key such
+ * as `'primary'` that a custom theme provides.
+ */
+export type ColorKey = ColorName | (string & {});
+
+export type Color = Record<ColorKey, ColorEntry>
 
 export type Theme = {
   name: string;
