@@ -1,7 +1,7 @@
 import { BaseElement, Component, HostListener, Property, String } from "@ayu-sh-kr/dota-wrap/core";
-import { RouterUtils } from "@ayu-sh-kr/dota-wrap/router";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import { routerService } from "@dota/main.ts";
+import { docPath, resolveDocFile } from "@dota/utils/doc-route.utils.ts";
 
 /**
  * DocPathComponent — a single navigation item in the doc sidebar.
@@ -10,7 +10,7 @@ import { routerService } from "@dota/main.ts";
  * Highlights when the current URL contains the file path.
  *
  * On click:
- *   1. Routes to /docs?content=<file>
+ *   1. Routes to the prerendered /docs/<name> path
  *   2. Dispatches 'doc:nav' so the mobile sidebar drawer closes itself.
  */
 @Component({
@@ -31,13 +31,12 @@ export class DocPathComponent extends BaseElement {
   @HostListener({ event: "click" })
   onClick() {
     if (!this.filePath) return;
-    routerService.route(`/docs?content=${this.filePath}`);
+    routerService.route(docPath(this.filePath));
     window.dispatchEvent(new CustomEvent("doc:nav"));
   }
 
   private get isActive(): boolean {
-    const path = this.filePath ?? '';
-    return path.length > 0 && RouterUtils.getCurrentPath().includes(path);
+    return !!this.filePath && resolveDocFile(window.location.pathname, window.location.search) === this.filePath;
   }
 
   private get label(): string {
