@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-preloader-plugin
 
+## 0.0.18
+
+### Patch Changes
+
+- d5cfc3e: A `.page.ts` file that declares several routed pages is scanned once, so its routes are no longer emitted twice. Duplicate entries made SSG fail with `Duplicate SSG route`.
+  - @ayu-sh-kr/dota-core@1.9.13
+  - @ayu-sh-kr/dota-router@0.1.1
+
 ## 0.0.17
 
 ### Patch Changes

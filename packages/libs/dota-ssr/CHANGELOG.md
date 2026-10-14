@@ -1,5 +1,16 @@
 # @ayu-sh-kr/dota-ssr
 
+## 0.2.1
+
+### Patch Changes
+
+- d5cfc3e: Static generation no longer fails on pages whose components remove other nodes when they disconnect, such as `dota-popover` removing its panel from `<body>`. The rendered tree is now detached before the route window closes, which avoids a happy-dom teardown error that aborted the whole build.
+- Updated dependencies [d5cfc3e]
+  - @ayu-sh-kr/dota-rendering@0.1.6
+  - @ayu-sh-kr/dota-core@1.9.13
+  - @ayu-sh-kr/dota-router@0.1.1
+  - @ayu-sh-kr/dota-runtime@0.0.6
+
 ## 0.2.0
 
 ### Minor Changes
