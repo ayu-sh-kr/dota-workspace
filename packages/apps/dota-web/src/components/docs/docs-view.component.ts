@@ -1,13 +1,9 @@
-import {ApplicationEventService, BaseElement, BindEvent, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
-import {MDService, THEMES} from "@ayu-sh-kr/dota-md";
+import {MDService} from "@ayu-sh-kr/dota-md";
 import {DOCS, docUrl, type DocEntry} from "@dota/configs/docs.config.ts";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
-import {LocalStorageService} from "@dota/service/local-storage.service.ts";
-
-/** Accent colors offered by the appearance menu; each is a color key of every built-in theme. */
-const ACCENTS = ['indigo', 'violet', 'purple', 'blue', 'sky', 'teal', 'emerald', 'lime', 'amber', 'orange', 'rose', 'slate'];
 
 /** Sidebar navigation grouped by section, in reading order. */
 const NAV_SECTIONS = [...new Set(DOCS.map(doc => doc.section))]
@@ -17,12 +13,11 @@ const NAV_SECTIONS = [...new Set(DOCS.map(doc => doc.section))]
  * Renders one documentation page, including its header, navigation, Markdown article,
  * table of contents, appearance controls, and previous/next links.
  *
- * `slug` selects the page from `DOCS`. On connection, the component restores the reader's
- * saved theme and accent, then loads Markdown only when the page was not already prerendered
- * into `<md-view>`. Keeping `<md-view>` and `<md-toc>` in the unconditional template lets
- * hydration reuse those elements; the skeleton is shown only until the article has content.
- * Appearance changes are saved per browser and published as `md:theme-change` or
- * `md:color-change`, which the Markdown view and table of contents consume.
+ * `slug` selects the page from `DOCS`. On connection, the component loads Markdown only when the
+ * page was not already prerendered into `<md-view>`. Keeping `<md-view>` and `<md-toc>` in the
+ * unconditional template lets hydration reuse those elements; the skeleton is shown only until
+ * the article has content. Theme and accent are owned by `<docs-theme-picker>` and
+ * `<docs-accent-picker>`, which drive both views through `md:theme-change` and `md:color-change`.
  *
  * Selector: `docs-view`.
  */
@@ -47,59 +42,20 @@ export class DocsViewComponent extends BaseElement {
   }
 
   /**
-   * Restores appearance before the first render can be used, then fills the Markdown view.
+   * Fills the Markdown view.
    * A prerendered article is detected by its existing content and is deliberately not fetched
    * again, avoiding duplicate work during hydration. Client-side navigation has no content,
    * so it loads the selected document and asks `MDService` to render it into `<md-view>`.
    */
   @OnEvent('connected', true)
   async loadDoc(): Promise<void> {
-    this.restoreAppearance();
     const doc = this.doc;
     if (!doc || this.querySelector('[data-md-content] > *')) return;
     MDService.render(await this.loader.loadDoc(doc.slug), {publish: true});
   }
 
-  /**
-   * Persists and broadcasts a selection made in either appearance dropdown.
-   * The select's `name` distinguishes the theme from the accent; the value is stored under
-   * that setting's docs-specific key, then published so both child views update themselves.
-   * @param event Change event whose target is one of the appearance selects.
-   */
-  @BindEvent({event: 'change', id: '[data-appearance]'})
-  changeAppearance(event: Event): void {
-    const {name, value} = event.target as HTMLSelectElement;
-    LocalStorageService.add(`docs-${name}`, value);
-    this.publishAppearance(name, value);
-  }
-
   private get doc(): DocEntry | undefined {
     return DOCS.find(doc => doc.slug === this.slug);
-  }
-
-  /**
-   * Applies valid saved appearance values to the two controls and republishes them.
-   * Invalid or missing storage is ignored, leaving the template defaults in place; this
-   * protects the reader from old, manually edited, or unsupported local-storage values.
-   */
-  private restoreAppearance(): void {
-    this.querySelectorAll<HTMLSelectElement>('[data-appearance]').forEach(select => {
-      const saved = LocalStorageService.get(`docs-${select.name}`);
-      if (!saved || ![...select.options].some(option => option.value === saved)) return;
-      select.value = saved;
-      this.publishAppearance(select.name, saved);
-    });
-  }
-
-  /**
-   * Converts a control name into the application event understood by Markdown children.
-   * Publishing through the shared event channel keeps `<md-view>` and `<md-toc>` synchronized
-   * without coupling this page shell to either component's implementation.
-   */
-  private publishAppearance(name: string, value: string): void {
-    const publisher = ApplicationEventService.getInstance().getPublisher();
-    if (name === 'theme') void publisher.publishAsync({name: 'md:theme-change', data: {theme: value}});
-    else void publisher.publishAsync({name: 'md:color-change', data: {color: value}});
   }
 
   /** Builds the grouped sidebar links and marks the current slug as the active page. */
@@ -124,21 +80,6 @@ export class DocsViewComponent extends BaseElement {
           </div>
         `)}
       </nav>
-    `;
-  }
-
-  /** Builds the theme and accent selects from the supported appearance values. */
-  private renderAppearance(): TemplateResult {
-    const select = 'h-8 rounded-md border border-gray-200 bg-white px-2 text-xs capitalize text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200';
-    return html`
-      <label class="sr-only" for="docs-theme">Theme</label>
-      <select id="docs-theme" name="theme" data-appearance class="${select}">
-        ${Object.keys(THEMES).map(theme => html`<option value="${theme}">${theme}</option>`)}
-      </select>
-      <label class="sr-only" for="docs-color">Accent</label>
-      <select id="docs-color" name="color" data-appearance class="${select}">
-        ${ACCENTS.map(color => html`<option value="${color}">${color}</option>`)}
-      </select>
     `;
   }
 
@@ -212,7 +153,8 @@ export class DocsViewComponent extends BaseElement {
               <a href="${docUrl(DOCS[0].slug)}" class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">Docs</a>
             </div>
             <div class="flex shrink-0 items-center gap-1.5">
-              ${this.renderAppearance()}
+              <docs-theme-picker></docs-theme-picker>
+              <docs-accent-picker></docs-accent-picker>
               <dark-mode-button color="indigo"></dark-mode-button>
               <github-button></github-button>
             </div>
