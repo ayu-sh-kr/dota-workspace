@@ -2,7 +2,7 @@ import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
 import {html, type TemplateResult, trustedHTML, type TrustedHtmlValue} from "@ayu-sh-kr/dota-rendering";
 import {resolveTheme, type ThemeName} from "@dota/themes.ts";
-import {type ColorKey} from "@dota/Types.ts";
+import {type ColorKey, type Theme} from "@dota/Types.ts";
 import {applyMarkdownThemeToElement, getSelectionClass} from "@dota/renderer.ts";
 import {type MarkdownResult, MDService} from "@dota/services/md.service.ts";
 
@@ -65,6 +65,8 @@ export class MdViewComponent extends BaseElement {
   private result?: MarkdownResult;
   /** True while initialized and connected; content received earlier is flushed on init. */
   private ready = false;
+  /** Theme and color stamped on adopted prerendered content, replaced on the first theming. */
+  private prior?: {theme: Theme; color: ColorKey};
 
   /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
@@ -79,8 +81,11 @@ export class MdViewComponent extends BaseElement {
   connectedCallback(): void {
     if (!this.content) {
       // Prerendered views already contain the wrapper; adopt its children rather than nesting it.
-      this.content = this.querySelector('[data-md-content]')?.innerHTML ?? this.innerHTML;
+      const prerendered = this.querySelector('[data-md-content]');
+      this.content = prerendered?.innerHTML ?? this.innerHTML;
       this.contentMarkup = trustedHTML(this.content);
+      // Its classes come from the serialized theme, which a saved preference may replace.
+      if (prerendered) this.prior = {theme: resolveTheme(this.getAttribute('theme') ?? undefined), color: this.getAttribute('color') ?? 'neutral'};
     }
     super.connectedCallback();
   }
@@ -154,6 +159,7 @@ export class MdViewComponent extends BaseElement {
   private setContent(result: MarkdownResult): void {
     if (result === this.result) return;
     this.result = result;
+    this.prior = undefined;
     this.content = result.html;
     this.contentMarkup = trustedHTML(result.html);
     if (!this.ready) return;
@@ -178,7 +184,7 @@ export class MdViewComponent extends BaseElement {
   /** Updates renderer-owned classes on mounted content without replacing its nodes. */
   private applyThemeToContent(): HTMLElement | null {
     const container = this.querySelector<HTMLElement>('[data-md-content]');
-    if (container) applyMarkdownThemeToElement(container, resolveTheme(this.theme), this.color ?? 'neutral');
+    if (container) applyMarkdownThemeToElement(container, resolveTheme(this.theme), this.color ?? 'neutral', this.prior);
     return container;
   }
 }
