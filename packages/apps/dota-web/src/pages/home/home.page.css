@@ -1,0 +1,10 @@
+home-page main {
+  min-block-size: 100svh;
+  overflow-x: clip;
+  background: var(--background-color);
+  color: var(--foreground-color);
+}
+
+/* Repeated homepage section chrome; geometry and color come from the grammar. */
+.home-section-divider { border-top: 1px solid var(--border-color); }
+.home-section-copy { display: flex; flex-direction: column; gap: var(--layout-space-5); }
