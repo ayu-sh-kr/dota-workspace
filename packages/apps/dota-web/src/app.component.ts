@@ -1,4 +1,4 @@
-import '@dota/pages/home.page.ts'
+import '@dota/pages/home/home.page.ts'
 import '@dota/pages/docs.page.ts'
 import '@dota/pages/error.page.ts'
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";

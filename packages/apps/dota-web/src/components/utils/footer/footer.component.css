@@ -1,0 +1,7 @@
+.app-footer {
+  position: relative;
+  margin-block-start: var(--layout-section-compact);
+  padding-block: var(--layout-section-compact);
+  border-top: 1px solid var(--border-color);
+  background: var(--surface-color);
+}

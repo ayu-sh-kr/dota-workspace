@@ -1,0 +1,2 @@
+.feature-card { padding: var(--layout-pad-card); }
+.feature-card:hover { border-color: var(--primary-color-border); }

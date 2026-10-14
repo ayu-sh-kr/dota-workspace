@@ -1,0 +1,12 @@
+@layer utilities {
+    .framework-logo {
+        @apply size-24 transform transition-all duration-300 ease-out hover:-translate-y-1.5 hover:scale-105 lg:size-36;
+        filter: drop-shadow(0 1rem 2rem var(--shadow-color));
+    }
+}
+
+.framework-logo:hover { filter: drop-shadow(0 1rem 2rem var(--framework-glow, var(--primary-color-ring))); }
+.framework-react { --framework-glow: var(--ecosystem-rest-color); }
+.framework-angular { --framework-glow: var(--danger-color); }
+.framework-vue { --framework-glow: var(--success-color); }
+.framework-solid { --framework-glow: var(--primary-color); }

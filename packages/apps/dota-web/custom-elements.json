@@ -1116,6 +1116,72 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/docs/docs-accent-picker.component.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "DocsAccentPickerComponent",
+          "customElement": true,
+          "tagName": "docs-accent-picker",
+          "superclass": {
+            "name": "BaseElement"
+          },
+          "members": [],
+          "attributes": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DocsAccentPickerComponent",
+          "declaration": {
+            "name": "DocsAccentPickerComponent"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "docs-accent-picker",
+          "declaration": {
+            "name": "DocsAccentPickerComponent"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/docs/docs-theme-picker.component.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "DocsThemePickerComponent",
+          "customElement": true,
+          "tagName": "docs-theme-picker",
+          "superclass": {
+            "name": "BaseElement"
+          },
+          "members": [],
+          "attributes": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DocsThemePickerComponent",
+          "declaration": {
+            "name": "DocsThemePickerComponent"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "docs-theme-picker",
+          "declaration": {
+            "name": "DocsThemePickerComponent"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/docs/docs-view.component.js",
       "declarations": [
         {
@@ -1220,7 +1286,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/blob-wrapper.component.js",
+      "path": "src/components/home/blob-wrapper/blob-wrapper.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1322,7 +1388,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/client-section.component.js",
+      "path": "src/components/home/client-section/client-section.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1454,7 +1520,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/faq-section.component.js",
+      "path": "src/components/home/faq-section/faq-section.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1487,7 +1553,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/feature.component.js",
+      "path": "src/components/home/feature/feature.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1520,7 +1586,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/hero-section.component.js",
+      "path": "src/components/home/hero-section/hero-section.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1605,7 +1671,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/our-tools.component.js",
+      "path": "src/components/home/our-tools/our-tools.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1671,7 +1737,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/utils/code-snippet.component.js",
+      "path": "src/components/home/utils/code-snippet/code-snippet.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1740,7 +1806,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/utils/device-preview.component.js",
+      "path": "src/components/home/utils/device-preview/device-preview.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1835,7 +1901,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/utils/get-started-button.component.js",
+      "path": "src/components/home/utils/get-started-button/get-started-button.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -1868,7 +1934,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/utils/tab-holder.component.js",
+      "path": "src/components/home/utils/tab-holder/tab-holder.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -2389,7 +2455,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/utils/footer.component.js",
+      "path": "src/components/utils/footer/footer.component.js",
       "declarations": [
         {
           "kind": "class",
@@ -3147,7 +3213,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/pages/home.page.js",
+      "path": "src/pages/home/home.page.js",
       "declarations": [
         {
           "kind": "class",

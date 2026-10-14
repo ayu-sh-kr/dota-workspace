@@ -84,27 +84,22 @@ export class CapabilitySectionComponent extends BaseElement {
 
     return html`
         <section role="region" aria-labelledby="capability-heading"
-                 class="hero-fade-up relative isolate font-dm w-full
-                        before:absolute before:inset-x-8 before:top-0 before:h-px before:bg-gradient-to-r
-                        before:from-transparent before:via-slate-200/70 before:to-transparent
-                        dark:before:via-white/10 before:-z-10">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-16 lg:pt-10 lg:pb-20">
+                 class="hero-fade-up relative isolate font-sans w-full home-section-divider">
+            <div class="layout-page layout-section">
 
                     <!-- Two-column grid: left = header + tabs + description, right = code -->
-                    <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                    <div class="layout-split">
 
                         <!-- Left: section header + tab bar + description -->
-                        <div class="flex flex-col gap-5 lg:max-w-lg">
+                        <div class="home-section-copy">
 
                             <!-- Section header -->
                             <div>
-                                <span class="text-xs font-semibold tracking-[0.18em] uppercase
-                                             text-purple-400 dark:text-purple-300">
+                                <span class="type-eyebrow">
                                     Custom Decorators
                                 </span>
                                 <h2 id="capability-heading"
-                                    class="mt-2 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight
-                                           text-gray-800 dark:text-gray-100/90 leading-tight">
+                                    class="mt-2 type-section text-foreground">
                                     Event Listeners.</h2>
                             </div>
 
@@ -113,41 +108,32 @@ export class CapabilitySectionComponent extends BaseElement {
 
                             <!-- Active tab description -->
                             <p id="cap-tab-desc"
-                               class="text-base text-gray-400 dark:text-gray-500 leading-relaxed">
+                               class="type-body text-muted">
                                 ${first.description}
                             </p>
                         </div>
 
                         <!-- Right: code card -->
                         <div id="cap-code-card"
-                             class="w-full min-w-0 rounded-2xl border border-white/10
-                                    bg-slate-950/95 backdrop-blur-2xl
-                                    shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_28px_90px_-54px_rgba(15,23,42,0.95)]
-                                    dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_28px_90px_-52px_rgba(0,0,0,0.96)]
-                                    overflow-hidden">
+                             class="code-panel w-full min-w-0">
 
                             <!-- Title bar -->
-                            <div class="flex items-center justify-between px-4 py-3
-                                        bg-white/[0.045] border-b border-white/10">
+                            <div class="code-toolbar flex items-center justify-between px-4 py-3">
                                 <div class="flex items-center gap-2" aria-hidden="true">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
-                                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-400/70"></span>
-                                    <span class="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-code-danger"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-code-warning"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-code-success"></span>
                                     <span id="cap-tab-filename"
-                                          class="ml-2 text-xs text-gray-500 font-mono">
+                                          class="ml-2 text-xs text-code-muted font-mono">
                                         ${first.filename}
                                     </span>
                                 </div>
                                 <button id="cap-copy-btn"
-                                        class="flex items-center gap-1 text-xs text-gray-500
-                                               hover:text-purple-400 transition-colors duration-200
-                                               cursor-pointer active:scale-95
-                                               focus-visible:outline-none focus-visible:ring-2
-                                               focus-visible:ring-purple-500 rounded"
+                                        class="button-link button-compact button-code"
                                         aria-label="Copy code to clipboard"
                                         title="Copy to clipboard">
                                     <dota-icon name="material-symbols:content-copy-rounded"
-                                               color="purple" variant="ghost" size="sm">
+                                               classname="text-code-accent" variant="ghost" size="sm">
                                     </dota-icon>
                                     <span>Copy</span>
                                 </button>
@@ -155,8 +141,7 @@ export class CapabilitySectionComponent extends BaseElement {
 
                             <!-- Code body: populated by MDService in afterViewInit -->
                             <div id="cap-tab-code-body"
-                                 class="tab-code-body overflow-x-auto custom-scrollbar
-                                        text-[13px] leading-7 select-text">
+                                 class="tab-code-body overflow-x-auto custom-scrollbar type-code select-text">
                             </div>
 
                         </div>

@@ -10,7 +10,6 @@ export type PlatformToken = {
 
 export function toggleDark() {
   const value = document.documentElement.classList.toggle("dark");
-  document.documentElement.classList.toggle("bg-slate-950");
   return value;
 }
 
@@ -18,7 +17,6 @@ export class GeneralUtils {
 
   static toggleDarkMode() {
     const isDarkMode = document.documentElement.classList.toggle('dark');
-    document.documentElement.classList.toggle('bg-slate-950', isDarkMode);
     LocalStorageService.add('theme', isDarkMode ? 'dark' : 'light');
     window.dispatchEvent(new CustomEvent('themeChange', {
       detail: { isDarkMode: GeneralUtils.isDarkMode() }
@@ -47,10 +45,8 @@ export class GeneralUtils {
   static setBrowserTheme(theme: string) {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
-      document.documentElement.classList.add('bg-slate-950');
     } else {
       document.documentElement.classList.remove('dark');
-      document.documentElement.classList.remove('bg-slate-950');
     }
   }
 

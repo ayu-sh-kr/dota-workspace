@@ -1,0 +1,67 @@
+/* Shared geometry. Component-specific composition belongs beside its component. */
+:root {
+  --layout-page-max: 80rem;
+  --layout-content-max: 60rem;
+  --layout-reading-max: 70ch;
+  --layout-form-max: 38rem;
+  --layout-docs-nav: 15.5rem;
+  --layout-docs-toc: 13rem;
+  --layout-gutter: clamp(1.25rem, 4vw, 3rem);
+  --layout-section-space: clamp(4rem, 7vw, 6rem);
+  --layout-section-compact: clamp(2rem, 4vw, 3rem);
+  --layout-hero-space: clamp(7rem, 15vh, 10rem);
+  --layout-space-1: 0.25rem;
+  --layout-space-2: 0.5rem;
+  --layout-space-3: 0.75rem;
+  --layout-space-4: 1rem;
+  --layout-space-5: 1.5rem;
+  --layout-space-6: 2rem;
+  --layout-space-7: 3rem;
+  --layout-space-8: 4rem;
+  --layout-space-9: 6rem;
+  --layout-pad-card: clamp(1.25rem, 2vw, 2rem);
+  --layout-radius-control: 0.5rem;
+  --layout-radius-code: 0.75rem;
+  --layout-radius-card: 1rem;
+  --layout-radius-pill: 9999px;
+  --layout-radius-action: var(--layout-radius-pill);
+  --layout-control-height: 2.75rem;
+  --layout-control-compact-height: 2.25rem;
+  --layout-header-height: 3.5rem;
+  --layout-sticky-top: 6rem;
+  --layout-z-content: 1;
+  --layout-z-sticky: 30;
+  --layout-z-nav: 50;
+  --layout-z-overlay: 60;
+  --layout-z-notification: 80;
+  --motion-fast: 150ms;
+  --motion-normal: 250ms;
+}
+
+html { scroll-padding-top: var(--layout-sticky-top); }
+body { margin: 0; min-inline-size: 20rem; overflow-x: clip; }
+app-root, home-page { display: block; }
+
+@layer components {
+  .layout-page, .layout-content, .layout-reading, .layout-form {
+    inline-size: 100%;
+    margin-inline: auto;
+    padding-inline: var(--layout-gutter);
+  }
+  .layout-page { max-inline-size: var(--layout-page-max); }
+  .layout-content { max-inline-size: var(--layout-content-max); }
+  .layout-reading { max-inline-size: var(--layout-reading-max); }
+  .layout-form { max-inline-size: var(--layout-form-max); }
+  .layout-section { padding-block: var(--layout-section-space); }
+  .layout-section-compact { padding-block: var(--layout-section-compact); }
+  .layout-split { display: grid; align-items: center; gap: var(--layout-space-7); }
+  .layout-card-grid { display: grid; gap: var(--layout-space-5); }
+
+  @media (min-width: 640px) {
+    .layout-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .layout-split { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--layout-space-8); }
+    .layout-card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+}

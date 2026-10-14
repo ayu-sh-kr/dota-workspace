@@ -8,13 +8,13 @@ interface FaqItem {
 }
 
 const FAQ_ACCORDION_CONFIG = {
-  container: "overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 transition-colors hover:border-purple-200 dark:border-white/10 dark:bg-slate-950/40 dark:hover:border-purple-400/30",
+  container: "overflow-hidden rounded-card border border-default bg-surface transition-colors hover:border-primary-border",
   button: {
-    base: "flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-semibold text-slate-800 transition-colors hover:bg-purple-50/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-purple-500 dark:text-slate-100 dark:hover:bg-purple-400/10",
+    base: "flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-semibold text-foreground transition-colors hover:bg-primary-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-focus",
     size: {lg: ""},
     color: {purple: {ghost: ""}},
   },
-  paragraph: "px-5 pb-5 text-sm leading-6 text-slate-600 dark:text-slate-400",
+  paragraph: "px-5 pb-5 text-sm leading-6 text-muted",
 } satisfies AccordionStyleConfig;
 
 /**
@@ -67,29 +67,30 @@ export class FaqSectionComponent extends BaseElement {
   render(): TemplateResult {
     return html`
       <section aria-labelledby="faq-heading"
-               class="relative isolate overflow-hidden font-dm px-6 py-20 sm:py-28">
+               class="relative isolate overflow-hidden layout-section">
         <div aria-hidden="true"
-             class="absolute inset-x-0 top-1/2 -z-10 h-72 -translate-y-1/2 bg-gradient-to-r from-transparent via-purple-200/40 to-transparent blur-3xl dark:via-purple-500/10"></div>
+             class="absolute inset-x-0 top-1/2 -z-10 h-72 -translate-y-1/2 bg-gradient-to-r from-transparent
+                     via-primary-subtle to-transparent blur-3xl"></div>
 
-        <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
+        <div class="layout-page faq-grid">
           <div class="lg:pt-5">
-            <span class="inline-flex items-center rounded-full border border-purple-200/80 bg-purple-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-purple-600 dark:border-purple-400/20 dark:bg-purple-400/10 dark:text-purple-300">
+            <span class="type-eyebrow">
               FAQ
             </span>
-            <h2 id="faq-heading" class="mt-5 max-w-lg text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+            <h2 id="faq-heading" class="mt-5 max-w-lg type-section text-foreground">
               Clear answers for building with Dota.
             </h2>
-            <p class="mt-4 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-400">
+            <p class="mt-4 max-w-xl type-body text-muted">
               A quick guide to the maintained libraries, the problems they solve, and where they fit in your next application.
             </p>
             <a href="/docs/getting-started"
-               class="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-purple-600 transition-colors hover:text-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-500 dark:text-purple-300 dark:hover:text-purple-200">
+               class="button-link mt-7">
               Read the getting-started guide
               <span aria-hidden="true">→</span>
             </a>
           </div>
 
-          <div class="rounded-3xl border border-white/70 bg-white/70 p-3 shadow-[0_24px_80px_-44px_rgba(76,29,149,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-[0_24px_80px_-44px_rgba(0,0,0,0.9)] sm:p-4">
+          <div class="rounded-card border border-default bg-surface p-3 shadow-lift backdrop-blur-xl sm:p-4">
             <div class="space-y-2" role="list">
               ${this.faqs.map((faq) => html`
                 <div role="listitem">

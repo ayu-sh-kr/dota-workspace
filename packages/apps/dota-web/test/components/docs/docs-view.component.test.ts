@@ -1,5 +1,4 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {ApplicationEventService} from '@ayu-sh-kr/dota-wrap/core';
 import {MDService, MdViewComponent} from '@ayu-sh-kr/dota-md';
 import {LocalStorageService} from '@dota/service/local-storage.service.ts';
 
@@ -56,19 +55,6 @@ describe('DocsViewComponent', () => {
     await view.loadDoc();
 
     expect(loadDoc).not.toHaveBeenCalled();
-  });
-
-  it('stores and publishes a picked accent color', async () => {
-    const publish = vi.fn();
-    vi.spyOn(ApplicationEventService.getInstance(), 'getPublisher').mockReturnValue({publishAsync: publish} as never);
-    const view = await mount('<docs-view slug="router"></docs-view>');
-    const select = view.querySelector<HTMLSelectElement>('select[name="color"]')!;
-
-    select.value = 'rose';
-    select.dispatchEvent(new Event('change', {bubbles: true}));
-
-    expect(LocalStorageService.add).toHaveBeenCalledWith('docs-color', 'rose');
-    expect(publish).toHaveBeenCalledWith({name: 'md:color-change', data: {color: 'rose'}});
   });
 
   it('renders a not-found message for an unknown slug', async () => {

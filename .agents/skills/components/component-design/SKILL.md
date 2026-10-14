@@ -25,3 +25,4 @@ More than one child skill can apply. For example, a reusable `dota-ui` carousel 
 - Treat library components as public APIs; preserve behavior and accessibility while allowing deliberate visual configuration.
 - Treat registration as integration work, not a styling diagnosis.
 - Keep component-specific rules out of this router. Add a child skill only when a concern has a distinct trigger and repeatable guidance.
+- For Dota Web theme tokens, typography, layout grammar, or component stylesheet placement, read `app/dota-web-components/SKILL.md`; it owns the `public/assets/css` foundation and colocated component CSS convention.

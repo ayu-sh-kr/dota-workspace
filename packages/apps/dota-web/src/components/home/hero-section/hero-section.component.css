@@ -1,0 +1,37 @@
+app-hero { display: block; }
+.home-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-block-size: 100svh;
+  align-items: center;
+  overflow: hidden;
+}
+.home-hero-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: var(--layout-hero-space) var(--layout-section-space);
+  text-align: center;
+}
+.home-hero-title { max-inline-size: 18ch; }
+.home-hero-description { max-inline-size: 48ch; }
+.home-hero-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--layout-space-2) var(--layout-space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--layout-radius-control);
+  background: var(--surface-color);
+  font-size: var(--type-label-size);
+  font-weight: 500;
+}
+.home-install {
+  display: flex;
+  inline-size: min(100%, 26rem);
+  align-items: center;
+  gap: var(--layout-space-2);
+  margin-block-start: var(--layout-space-6);
+  padding: var(--layout-space-3) var(--layout-space-4);
+}

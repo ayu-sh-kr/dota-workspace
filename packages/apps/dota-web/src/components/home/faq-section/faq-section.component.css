@@ -1,0 +1,5 @@
+.faq-grid { display: grid; gap: var(--layout-space-7); }
+
+@media (min-width: 1024px) {
+  .faq-grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+}

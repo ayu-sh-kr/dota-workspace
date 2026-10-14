@@ -3,7 +3,7 @@ export {NotificationComponent} from "@dota/components/utils/notification/notific
 export {NotificationHolderComponent} from "@dota/components/utils/notification/notification-holder.component.ts";
 export {GithubButtonComponent} from "@dota/components/utils/buttons/github-button.component.ts";
 export {DarkModeButtonComponent} from "@dota/components/utils/buttons/dark-mode-button.component.ts";
-export {FooterComponent} from "@dota/components/utils/footer.component.ts";
+export {FooterComponent} from "@dota/components/utils/footer/footer.component.ts";
 export {AiButtonComponent} from "@dota/components/utils/buttons/ai-button.component.ts";
 export {ScrollBottomButtonComponent} from "@dota/components/utils/buttons/scroll-bottom-button.component.ts";
 export {HamBurgerButtonComponent} from "@dota/components/utils/buttons/ham-burger-button.component.ts";

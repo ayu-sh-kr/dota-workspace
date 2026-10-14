@@ -1,6 +1,6 @@
 import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
-import {TAB_REGISTRY} from "./capability.config.ts";
+import {TAB_REGISTRY} from "../capability.config.ts";
 
 /**
  * Generic tab bar component.

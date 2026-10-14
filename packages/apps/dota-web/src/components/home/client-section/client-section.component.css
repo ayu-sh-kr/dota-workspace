@@ -1,0 +1,6 @@
+.client-grid { display: grid; gap: var(--layout-space-5); }
+.client-card { padding: var(--layout-pad-card); }
+
+@media (min-width: 768px) {
+  .client-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
