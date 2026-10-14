@@ -92,6 +92,18 @@ export class MdTocComponent extends BaseElement {
   }
 
   /**
+   * Adopts entries from prerendered markup before the first mount, so a hydrated TOC
+   * keeps highlighting headings even though no `md:render` event follows.
+   */
+  connectedCallback(): void {
+    if (!this._toc.length) {
+      this._toc = TocUtils.readEntries(this.querySelector('nav > ul'));
+      this._activeId = TocUtils.flatIds(this._toc)[0] ?? '';
+    }
+    super.connectedCallback();
+  }
+
+  /**
    * Receives new TOC entries whenever `MDService.render({ publish: true })`
    * fires an ` md:render` event.  Resets the active heading to the first entry
    * and re-renders the list.
