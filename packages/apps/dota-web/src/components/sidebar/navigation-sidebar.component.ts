@@ -19,7 +19,7 @@ export class NavigationSidebarComponent extends BaseElement {
   items: Link[] = [
     {
       name: "Documents",
-      url: "/docs?content=Getting-Started.md",
+      url: "/docs/Getting-Started",
     },
 
     {
