@@ -1,122 +1,184 @@
-import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
-import {type ThemeName, THEMES} from "@dota/themes.ts";
-import {type ColorName, type Theme} from "@dota/Types.ts";
-import {materialMarkdownTheme} from "@dota/md-themes";
-import {applyMarkdownThemeToElement} from "@dota/renderer.ts";
-import { OnEvent } from "@ayu-sh-kr/dota-event";
-import { type ApplicationEvent } from "@ayu-sh-kr/dota-event";
+import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
 import {html, type TemplateResult, trustedHTML, type TrustedHtmlValue} from "@ayu-sh-kr/dota-rendering";
+import {resolveTheme, type ThemeName} from "@dota/themes.ts";
+import {type ColorKey} from "@dota/Types.ts";
+import {applyMarkdownThemeToElement, getSelectionClass} from "@dota/renderer.ts";
+import {type MarkdownResult, MDService} from "@dota/services/md.service.ts";
 
+/** Wrapper layout used when no `content-class` is set. */
+const DEFAULT_CONTENT_CLASS = 'w-full px-3 sm:px-5 lg:px-8 py-4 sm:py-6 lg:py-8 antialiased text-sm sm:text-base leading-6 sm:leading-7';
+
+/** Name of the DOM event `<md-view>` dispatches after new Markdown is mounted and themed. */
+export const MD_RENDERED_EVENT = 'md-rendered';
+
+/** Detail of the {@link MD_RENDERED_EVENT} DOM event. */
+export interface MdRenderedDetail {
+  /** The `[data-md-content]` element holding the rendered Markdown, ready for post-processing. */
+  container: HTMLElement;
+  /** The render result that produced the content, including its TOC. */
+  result: MarkdownResult;
+}
+
+/**
+ * `<md-view>` — renders themed Markdown HTML.
+ *
+ * Content arrives through the shared `md:render` event (`MDService.render(raw, { publish: true })`)
+ * or through {@link MdViewComponent.renderMarkdown}, which updates only this view. Customise it by
+ * composition: `content-class` styles the wrapper, and the bubbling {@link MD_RENDERED_EVENT}
+ * (`md-rendered`) hands the mounted content to the host for post-processing.
+ *
+ * @example
+ * ```html
+ * <md-view theme="flat" color="indigo" content-class="article-body"></md-view>
+ * ```
+ * ```ts
+ * @BindEvent({event: 'md-rendered', id: 'md-view'})
+ * decorate(event: CustomEvent<MdRenderedDetail>) {
+ *   event.detail.container.querySelector('h1')?.remove();
+ * }
+ * ```
+ */
 @Component({
   selector: "md-view",
   shadow: false
 })
 export class MdViewComponent extends BaseElement {
 
+  /** Registered theme name (`flat`, `material`, `apple`, `github`, or one added with `registerTheme`). */
   @Property({name: 'theme', type: String})
   theme: ThemeName = 'flat';
 
+  /** Key of the theme's color map: a Tailwind color name or a custom key the theme defines. */
   @Property({name: 'color', type: String})
-  color: ColorName = 'neutral'
+  color: ColorKey = 'neutral';
 
-  /** Latest parser-produced markup, retained independently from visual theme state. */
+  /** Classes for the content wrapper; replaces the default padding and text sizing when set. */
+  @Property({name: 'content-class', type: String})
+  contentClass: string = DEFAULT_CONTENT_CLASS;
+
+  /** Latest Markdown HTML, retained independently from the visual theme. */
   content: string = '';
-  /** Stable directive identity prevents theme updates from scheduling content replacement. */
+  /** Stable directive identity so theme updates never replace content nodes. */
   private contentMarkup: TrustedHtmlValue = trustedHTML('');
+  /** Render result behind the current content; absent for authored or prerendered content. */
+  private result?: MarkdownResult;
+  /** True while initialized and connected; content received earlier is flushed on init. */
+  private ready = false;
 
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
-    this.contentMarkup = trustedHTML(this.content);
   }
 
-  /** Applies the initial visual theme after the trusted content range has mounted. */
-  @AfterInit()
-  afterViewInit(): void {
+  /**
+   * Adopts authored or prerendered light DOM as the initial content before the first mount.
+   * Capturing here rather than in the constructor also works where children are not yet
+   * visible during element upgrade (as in happy-dom prerendering).
+   */
+  connectedCallback(): void {
+    if (!this.content) {
+      // Prerendered views already contain the wrapper; adopt its children rather than nesting it.
+      this.content = this.querySelector('[data-md-content]')?.innerHTML ?? this.innerHTML;
+      this.contentMarkup = trustedHTML(this.content);
+    }
+    super.connectedCallback();
+  }
+
+  /**
+   * Themes the mounted content and flushes Markdown that arrived before initialization.
+   * Overrides the lifecycle hook rather than using `@AfterInit`, whose metadata subclasses
+   * do not inherit, so subclasses keep this behavior and their own `@AfterInit` handlers.
+   */
+  handleAfterInit(): void {
+    this.ready = true;
+    if (this.result) this.updateHTML();
+    this.decorateContent();
+    super.handleAfterInit();
+  }
+
+  /** Defers content updates while detached; the next initialization flushes them. */
+  disconnectedCallback(): void {
+    this.ready = false;
+    super.disconnectedCallback();
+  }
+
+  /**
+   * Renders Markdown into this view only, without broadcasting `md:render` to other views.
+   * Safe to call before the view has initialized; the content mounts once it is ready.
+   * @param markdown Raw Markdown source.
+   * @returns The rendered HTML and TOC, e.g. for a page-specific table of contents.
+   */
+  renderMarkdown(markdown: string): MarkdownResult {
+    const result = MDService.render(markdown);
+    this.setContent(result);
+    return result;
+  }
+
+  /** Switches theme in place on `md:theme-change`. */
+  @OnEvent('md:theme-change')
+  onThemeChange(event: ApplicationEvent<'md:theme-change'>) {
+    if (!event.data?.theme) return;
+    this.theme = event.data.theme as ThemeName;
+    this.updateHTML();
     this.applyThemeToContent();
   }
 
-  /**
-   * Patches wrapper styling and updates descendant classes without replacing content nodes.
-   * @param event Theme selection published by the Markdown application channel.
-   */
-  @OnEvent('md:theme-change')
-  onThemeChange(event: ApplicationEvent<'md:theme-change'>) {
-    const data = event.data;
-    if (data.theme) {
-      this.theme = data.theme as ThemeName;
-      this.updateHTML();
-      this.applyThemeToContent();
-      return;
-    }
-    console.warn('[MdViewComponent] Received md:theme-change event without theme data.');
-  }
-
-  /**
-   * Applies a new accent color to existing Markdown elements in place.
-   * @param event Color selection published by the Markdown application channel.
-   */
+  /** Switches accent color in place on `md:color-change`. */
   @OnEvent('md:color-change')
   onColorChange(event: ApplicationEvent<'md:color-change'>) {
-    const data = event.data;
-    if (data.color) {
-      this.color = data.color as ColorName;
-      this.updateHTML();
-      this.applyThemeToContent();
-      return;
-    }
-    console.warn('[MdViewComponent] Received md:color-change event without color data.');
+    if (!event.data?.color) return;
+    this.color = event.data.color as ColorKey;
+    this.updateHTML();
+    this.applyThemeToContent();
   }
 
-  /**
-   * Replaces only the trusted Markdown range when the document output changes.
-   * Theme application runs afterward against the newly parsed element instances.
-   * @param event Parser result containing the next approved HTML document fragment.
-   */
+  /** Replaces the content with a published render result. */
   @OnEvent('md:render')
   onContentChange(event: ApplicationEvent<'md:render'>) {
-    const data = event.data;
-    if (typeof data?.html === 'string') {
-      this.content = data.html;
-      this.contentMarkup = trustedHTML(data.html);
-      this.updateHTML();
-      this.applyThemeToContent();
-      return;
-    }
-    console.warn('[MdViewComponent] Received md:render event without html data.');
+    if (typeof event.data?.html === 'string') this.setContent(event.data);
   }
 
-  /** Resolves the active theme with the library default as a defensive fallback. */
-  private get activeTheme(): Theme {
-    return THEMES[this.theme ?? 'flat'] ?? materialMarkdownTheme;
-  }
-
-  /**
-   * Updates only renderer-owned classes on the mounted Markdown descendants.
-   * Content nodes retain identity across theme and color changes so embedded
-   * custom elements, selection, and browser-managed state are not reset.
-   */
-  private applyThemeToContent(): void {
-    const container = this.querySelector('[data-md-content]');
-    if (!container) return;
-    applyMarkdownThemeToElement(container, this.activeTheme, this.color ?? 'indigo');
-  }
-
-  /** Produces a stable component shell whose content and visual parts patch independently. */
   render(): TemplateResult {
-    const theme = this.activeTheme;
-    const colorEntry = theme.color[this.color ?? 'indigo'];
-    const selection  = colorEntry?.selection ?? '';
-
+    const theme = resolveTheme(this.theme);
     return html`
-            <div data-md-content class="w-full
-                         px-3 sm:px-5 lg:px-8
-                         py-4 sm:py-6 lg:py-8
-                         antialiased text-sm sm:text-base leading-6 sm:leading-7
-                         ${selection}"
-                 style="${`font-family: ${theme.fontFamily}`}">
-                ${this.contentMarkup}
-            </div>
-        `;
+      <div data-md-content
+           class="${`${this.contentClass ?? DEFAULT_CONTENT_CLASS} ${getSelectionClass(theme, this.color)}`}"
+           style="${`font-family: ${theme.fontFamily}`}">
+        ${this.contentMarkup}
+      </div>
+    `;
+  }
+
+  /** Stores a render result and mounts it once the view is ready; repeated results are ignored. */
+  private setContent(result: MarkdownResult): void {
+    if (result === this.result) return;
+    this.result = result;
+    this.content = result.html;
+    this.contentMarkup = trustedHTML(result.html);
+    if (!this.ready) return;
+    this.updateHTML();
+    this.decorateContent();
+  }
+
+  /** Themes mounted content; rendered Markdown also gets lazy images and an `md-rendered` event. */
+  private decorateContent(): void {
+    const container = this.applyThemeToContent();
+    if (!container || !this.result) return;
+    container.querySelectorAll<HTMLImageElement>('img:not([loading])').forEach((image) => {
+      image.loading = 'lazy';
+      image.decoding = 'async';
+    });
+    this.dispatchEvent(new CustomEvent<MdRenderedDetail>(MD_RENDERED_EVENT, {
+      bubbles: true,
+      detail: {container, result: this.result},
+    }));
+  }
+
+  /** Updates renderer-owned classes on mounted content without replacing its nodes. */
+  private applyThemeToContent(): HTMLElement | null {
+    const container = this.querySelector<HTMLElement>('[data-md-content]');
+    if (container) applyMarkdownThemeToElement(container, resolveTheme(this.theme), this.color ?? 'neutral');
+    return container;
   }
 }
