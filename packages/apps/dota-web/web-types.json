@@ -2360,61 +2360,6 @@
           }
         },
         {
-          "name": "doc-toc",
-          "source": {
-            "file": "./src/components/docs/doc-toc.component.ts",
-            "offset": 1927
-          },
-          "attributes": [
-            {
-              "name": "color",
-              "default": "indigo",
-              "required": false,
-              "value": {
-                "type": "string"
-              },
-              "source": {
-                "file": "./src/components/docs/doc-toc.component.ts",
-                "offset": 2084
-              }
-            },
-            {
-              "name": "theme",
-              "default": "flat",
-              "required": false,
-              "value": {
-                "type": "string"
-              },
-              "source": {
-                "file": "./src/components/docs/doc-toc.component.ts",
-                "offset": 2011
-              }
-            }
-          ],
-          "js": {
-            "properties": [
-              {
-                "name": "color",
-                "type": "string",
-                "default": "indigo",
-                "source": {
-                  "file": "./src/components/docs/doc-toc.component.ts",
-                  "offset": 2084
-                }
-              },
-              {
-                "name": "theme",
-                "type": "string",
-                "default": "flat",
-                "source": {
-                  "file": "./src/components/docs/doc-toc.component.ts",
-                  "offset": 2011
-                }
-              }
-            ]
-          }
-        },
-        {
           "name": "dota-accordion",
           "source": {
             "file": "../../ui/dota-ui/src/components/accordian/accordion.component.ts",
@@ -4303,86 +4248,10 @@
           }
         },
         {
-          "name": "markdown-view",
-          "source": {
-            "file": "./src/components/utils/markdown-view.component.ts",
-            "offset": 595
-          },
-          "attributes": [
-            {
-              "name": "color",
-              "default": "indigo",
-              "required": false,
-              "value": {
-                "type": "string"
-              },
-              "source": {
-                "file": "./src/components/utils/markdown-view.component.ts",
-                "offset": 859
-              }
-            },
-            {
-              "name": "max-width",
-              "default": "max-w-full",
-              "required": false,
-              "value": {
-                "type": "string"
-              },
-              "source": {
-                "file": "./src/components/utils/markdown-view.component.ts",
-                "offset": 1051
-              }
-            },
-            {
-              "name": "theme",
-              "default": "flat",
-              "required": false,
-              "value": {
-                "type": "string"
-              },
-              "source": {
-                "file": "./src/components/utils/markdown-view.component.ts",
-                "offset": 730
-              }
-            }
-          ],
-          "js": {
-            "properties": [
-              {
-                "name": "color",
-                "type": "string",
-                "default": "indigo",
-                "source": {
-                  "file": "./src/components/utils/markdown-view.component.ts",
-                  "offset": 859
-                }
-              },
-              {
-                "name": "maxWidth",
-                "type": "string",
-                "default": "max-w-full",
-                "source": {
-                  "file": "./src/components/utils/markdown-view.component.ts",
-                  "offset": 1051
-                }
-              },
-              {
-                "name": "theme",
-                "type": "string",
-                "default": "flat",
-                "source": {
-                  "file": "./src/components/utils/markdown-view.component.ts",
-                  "offset": 730
-                }
-              }
-            ]
-          }
-        },
-        {
           "name": "md-toc",
           "source": {
             "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-            "offset": 2174
+            "offset": 2175
           },
           "attributes": [
             {
@@ -4394,7 +4263,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                "offset": 2416
+                "offset": 2417
               }
             },
             {
@@ -4430,7 +4299,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                "offset": 2341
+                "offset": 2342
               }
             }
           ],
@@ -4442,7 +4311,7 @@
                 "default": "indigo",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                  "offset": 2416
+                  "offset": 2417
                 }
               },
               {
@@ -4469,7 +4338,7 @@
                 "default": "flat",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-toc.component.ts",
-                  "offset": 2341
+                  "offset": 2342
                 }
               }
             ]
@@ -4479,7 +4348,7 @@
           "name": "md-view",
           "source": {
             "file": "../../ui/dota-md/src/components/md-view.component.ts",
-            "offset": 609
+            "offset": 1993
           },
           "attributes": [
             {
@@ -4491,7 +4360,19 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                "offset": 766
+                "offset": 2353
+              }
+            },
+            {
+              "name": "content-class",
+              "default": "DEFAULT_CONTENT_CLASS",
+              "required": false,
+              "value": {
+                "type": "string"
+              },
+              "source": {
+                "file": "../../ui/dota-md/src/components/md-view.component.ts",
+                "offset": 2533
               }
             },
             {
@@ -4503,7 +4384,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                "offset": 693
+                "offset": 2184
               }
             }
           ],
@@ -4515,7 +4396,16 @@
                 "default": "neutral",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                  "offset": 766
+                  "offset": 2353
+                }
+              },
+              {
+                "name": "contentClass",
+                "type": "string",
+                "default": "DEFAULT_CONTENT_CLASS",
+                "source": {
+                  "file": "../../ui/dota-md/src/components/md-view.component.ts",
+                  "offset": 2533
                 }
               },
               {
@@ -4524,7 +4414,7 @@
                 "default": "flat",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                  "offset": 693
+                  "offset": 2184
                 }
               }
             ]
@@ -4545,7 +4435,7 @@
           "name": "message-card",
           "source": {
             "file": "./src/components/chat/message-card.component.ts",
-            "offset": 295
+            "offset": 274
           },
           "attributes": [
             {
@@ -4556,7 +4446,7 @@
               },
               "source": {
                 "file": "./src/components/chat/message-card.component.ts",
-                "offset": 395
+                "offset": 374
               }
             },
             {
@@ -4567,7 +4457,7 @@
               },
               "source": {
                 "file": "./src/components/chat/message-card.component.ts",
-                "offset": 553
+                "offset": 532
               }
             },
             {
@@ -4578,7 +4468,7 @@
               },
               "source": {
                 "file": "./src/components/chat/message-card.component.ts",
-                "offset": 474
+                "offset": 453
               }
             }
           ],
@@ -4589,7 +4479,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/chat/message-card.component.ts",
-                  "offset": 395
+                  "offset": 374
                 }
               },
               {
@@ -4597,7 +4487,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/chat/message-card.component.ts",
-                  "offset": 553
+                  "offset": 532
                 }
               },
               {
@@ -4605,7 +4495,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/chat/message-card.component.ts",
-                  "offset": 474
+                  "offset": 453
                 }
               }
             ]
@@ -5001,7 +4891,7 @@
           "name": "resource-content",
           "source": {
             "file": "./src/components/resource/resource-content.component.ts",
-            "offset": 319
+            "offset": 298
           },
           "attributes": [
             {
@@ -5012,7 +4902,7 @@
               },
               "source": {
                 "file": "./src/components/resource/resource-content.component.ts",
-                "offset": 433
+                "offset": 412
               }
             }
           ],
@@ -5023,7 +4913,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/resource/resource-content.component.ts",
-                  "offset": 433
+                  "offset": 412
                 }
               }
             ]
