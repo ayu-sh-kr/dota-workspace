@@ -33,35 +33,23 @@ export class HeaderComponent extends BaseElement {
 
   render(): string {
     return HTML`
-           <header class="z-50 px-3 font-dm fixed top-4 left-0 w-full">
-                <nav class="relative isolate flex min-h-14 items-center justify-between overflow-hidden
-                            max-w-5xl rounded-full mx-auto px-3 sm:px-4
-                            border border-white/70 bg-white/[0.58] backdrop-blur-2xl
-                            shadow-[inset_0_1px_0_rgba(255,255,255,0.76),0_18px_58px_-44px_rgba(15,23,42,0.88)]
-                            dark:border-white/10 dark:bg-white/[0.055]
-                            dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_58px_-44px_rgba(0,0,0,0.92)]
-                            before:absolute before:inset-0 before:-z-10 before:opacity-[0.22]
-                            before:bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.14)_1px,transparent_0)]
-                            before:bg-[length:18px_18px] dark:before:opacity-[0.12]">
+           <header class="app-header">
+                <nav class="app-header-nav">
                      <div class="flex min-w-0 items-center px-2 sm:px-3">
                         <a href="/"
                            class="inline-flex items-center rounded-full px-2 text-xl sm:text-2xl font-extrabold tracking-tight
-                                  text-gray-950 transition-colors duration-200 hover:text-purple-500
-                                  dark:text-gray-50 dark:hover:text-purple-300">
+                                   text-foreground transition-colors duration-200 hover:text-primary">
                             Dota
                         </a>
                      </div>
                     <div class="md:flex justify-center items-center hidden flex-1">
-                        <ul class="flex items-center gap-x-1 rounded-full border border-white/60 bg-white/[0.36] p-1
-                                   backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035]">
+                        <ul class="flex items-center gap-x-1 rounded-full bg-surface p-1 backdrop-blur-xl">
                                 ${this.items.map((item) => {
                                   return `
                                      <li>
                                         <a href="${item.url}"
-                                           class="block rounded-full px-3 py-1.5 text-sm font-semibold
-                                                  text-gray-600 transition-all duration-200
-                                                  hover:bg-white/70 hover:text-gray-950
-                                                  dark:text-gray-300 dark:hover:bg-white/[0.07] dark:hover:text-gray-50">
+                                           class="block rounded-full px-3 py-1.5 text-sm font-semibold text-muted transition-all duration-200
+                                                   hover:bg-surface hover:text-foreground">
                                             ${item.name}
                                         </a>
                                      </li>
@@ -69,8 +57,8 @@ export class HeaderComponent extends BaseElement {
                                 }).join("")}
                          </ul>
                       </div>
-                      <div class="flex items-center gap-x-1 justify-end rounded-full border border-white/60 bg-white/[0.34] p-1
-                                  backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035]">
+                      <div class="flex items-center gap-x-1 justify-end rounded-full bg-surface p-1
+                              backdrop-blur-xl">
                         <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <github-button></github-button>
                         </span>
