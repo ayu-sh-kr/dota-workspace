@@ -1,6 +1,5 @@
 export {HomePage} from "@dota/pages/home.page.ts";
-export {DocPage} from "@dota/pages/doc.page.ts";
-export {DocArticlePage} from "@dota/pages/doc-article.page.ts";
+export {DocsPage, DocsIndexPage} from "@dota/pages/docs.page.ts";
 export {ResourcePage} from "@dota/pages/resource.page.ts";
 export {CommunityPage} from "@dota/pages/community.page.ts";
 export {BlogPage} from "@dota/pages/blog.page.ts";
