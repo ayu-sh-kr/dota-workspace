@@ -2,7 +2,7 @@ import {performance as nodePerformance} from 'node:perf_hooks';
 import {Window} from 'happy-dom';
 import {createServerModuleRunner, isRunnableDevEnvironment, type ViteDevServer} from 'vite';
 import {VIRTUAL_SSG_ENTRY} from '../vite/prerender-server';
-import {installPrerenderFetch} from './prerender-fetch';
+import {installPrerenderFetch, settlesBefore, type PrerenderFetchWaiter} from './prerender-fetch';
 import {installWindowGlobals} from './window-globals';
 import type {PrerenderAssetReader} from './asset-reader';
 import type {DotaSsgOptions, ResolvedDotaSsgRoute} from './types';
@@ -41,7 +41,12 @@ export interface PrerenderTimings {
 export interface PrerenderResult {
   html: string;
   timings: PrerenderTimings;
+  /** False when settling hit its time or pass limit, so late content may be missing. */
+  settled: boolean;
 }
+
+/** Default `settleTimeout`: how long one route may wait for pending tasks and requests. */
+export const DEFAULT_SETTLE_TIMEOUT = 30_000;
 
 /**
  * Executes one route in a fresh browser realm and serializes its settled document.
@@ -52,7 +57,7 @@ export interface PrerenderResult {
  * @param outputDirectory Built client directory used to resolve same-origin fetch requests.
  * @param options Plugin options containing readiness and optional settle policy.
  * @param readAsset Build-local asset cache excluding every generated route destination.
- * @returns Complete HTML and elapsed stage timings, including cleanup.
+ * @returns Complete HTML, elapsed stage timings including cleanup, and whether settling finished.
  * @throws Error when the configured application readiness export is not a promise.
  */
 export async function prerenderRoute(
@@ -91,19 +96,21 @@ export async function prerenderRoute(
     await ready;
     timings.ready = nodePerformance.now() - phaseStarted;
     phaseStarted = nodePerformance.now();
-    await settlePrerenderWindow(window, waitForFetches);
+    const settleTimeout = options.settleTimeout ?? DEFAULT_SETTLE_TIMEOUT;
+    let settled = await settlePrerenderWindow(window, waitForFetches, settleTimeout);
     if (options.settle) {
       await options.settle(window, route);
-      await settlePrerenderWindow(window, waitForFetches);
+      settled = await settlePrerenderWindow(window, waitForFetches, settleTimeout) && settled;
     }
     timings.settle = nodePerformance.now() - phaseStarted;
     phaseStarted = nodePerformance.now();
     markPrerenderedRoute(window, route.path);
     const html = `<!doctype html>\n${window.document.documentElement.outerHTML}\n`;
     timings.serialize = nodePerformance.now() - phaseStarted;
-    return {html, timings};
+    return {html, timings, settled};
   } finally {
     const cleanupStarted = nodePerformance.now();
+    waitForFetches.close();
     try {
       disableHydrationEmit?.();
       await window.happyDOM.close();
@@ -158,21 +165,32 @@ function markPrerenderedRoute(window: Window, pathname: string): void {
   }
 }
 
+/** Upper bound on settle passes for pages whose timers keep starting new requests. */
+export const MAX_SETTLE_PASSES = 25;
+
 /**
- * Re-checks both Happy DOM tasks and tracked fetches before serialization.
- * Fetches can enqueue DOM work after the first task barrier, so each pass waits
- * for both queues twice to include content rendered by asynchronous loaders.
+ * Re-checks both Happy DOM tasks and tracked fetches until a pass finds no fetch to wait for.
+ * A completed fetch can start another fetch or schedule DOM work, so a fixed number of passes
+ * misses content from loaders that chain requests. A pass in which no request was pending ends
+ * the loop, because its task barrier already drained any work queued by earlier responses.
+ * Waiting stops after `MAX_SETTLE_PASSES` passes or `timeout` milliseconds, whichever comes
+ * first; the page is then serialized with whatever has rendered.
  * @param window Route-isolated Happy DOM window whose task queue is settling.
  * @param waitForFetches Barrier returned by the route fetch adapter.
+ * @param timeout Milliseconds this settle may take before the page is serialized as it is.
+ * @returns Whether the page went quiet before either limit.
  */
-async function settlePrerenderWindow(window: Window, waitForFetches: () => Promise<void>): Promise<void> {
-  await Promise.resolve();
-  await Promise.resolve();
-  await window.happyDOM.waitUntilComplete();
-  await waitForFetches();
-  await Promise.resolve();
-  await window.happyDOM.waitUntilComplete();
-  await waitForFetches();
+async function settlePrerenderWindow(window: Window, waitForFetches: PrerenderFetchWaiter, timeout: number): Promise<boolean> {
+  const deadline = nodePerformance.now() + timeout;
+  for (let pass = 0; pass < MAX_SETTLE_PASSES; pass += 1) {
+    await Promise.resolve();
+    await Promise.resolve();
+    if (!await settlesBefore(window.happyDOM.waitUntilComplete(), deadline)) return false;
+    const waited = await waitForFetches(deadline);
+    if (nodePerformance.now() >= deadline) return false;
+    if (!waited) return true;
+  }
+  return false;
 }
 
 /**

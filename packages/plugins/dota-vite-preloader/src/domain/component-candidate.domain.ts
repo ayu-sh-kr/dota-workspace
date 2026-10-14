@@ -1,14 +1,15 @@
 import {ASTFilterConstants, ComponentScanPath} from "@dota/Constants.ts";
 import fg from "fast-glob";
-import {readFile} from "node:fs/promises";
-import {ClassDeclaration, type Module, parse} from "@swc/core";
+import {resolve} from "node:path";
+import {ClassDeclaration, type Module} from "@swc/core";
 import {ASTHelperUtils} from "@dota/ASTHelperUtils.ts";
 import {
   DeclarationUtils,
   DecoratorView,
   ExportDeclarationQueryImpl,
   KeyValuePropertyView,
-  ObjectExpressionView
+  ObjectExpressionView,
+  SourceFileIndex
 } from "@ayu-sh-kr/dota-ast-utils";
 
 /**
@@ -94,6 +95,9 @@ export function extractComponentCandidatesFromAst(ast: Module): DotaComponentCan
 
 /**
  * Scans the project directory for Dota component files and extracts component metadata.
+ * Files are read relative to `root`, not the process directory, and parsed through the
+ * source index shared with the other Dota plugins. Unreadable or unparsable files are
+ * logged and skipped. Candidate paths stay relative to `root` for generated imports.
  */
 export async function scanDotaComponents(root: string, logger: ComponentScanLogger = console): Promise<DotaComponentCandidate[]> {
   const files = await fg([
@@ -102,28 +106,21 @@ export async function scanDotaComponents(root: string, logger: ComponentScanLogg
     ComponentScanPath.SOURCE_PAGE_DIRECTORY_SCAN_PATH
   ], {cwd: root, absolute: false});
 
-  const candidates: DotaComponentCandidate[] = [];
+  const sourceIndex = SourceFileIndex.shared();
+  const modules = await Promise.all(files.map(file => sourceIndex.load(resolve(root, file)).catch((e: unknown) => {
+    logger.error?.(`Failed to read or parse ${file}: ${e}`);
+    return null;
+  })));
 
-  for (const file of files) {
-    const code = await readFile(file, "utf-8");
-    let ast: Module;
-    try {
-      ast = await parse(code, {syntax: "typescript", decorators: true});
-    } catch (e) {
-      logger.error?.(`Failed to parse ${file}: ${e}`);
-      continue;
-    }
-
-    const fileCandidates = extractComponentCandidatesFromAst(ast).map(candidate => {
+  return files.flatMap((file, index) => {
+    const module = modules[index];
+    if (!module) return [];
+    return extractComponentCandidatesFromAst(module.ast).map(candidate => {
       candidate.filePath = file;
       logger.debug?.(`Found component candidate ${candidate.name} in file ${file} with tag ${candidate.tagName}`);
       return candidate;
     });
-
-    candidates.push(...fileCandidates);
-  }
-
-  return candidates;
+  });
 }
 
 /**

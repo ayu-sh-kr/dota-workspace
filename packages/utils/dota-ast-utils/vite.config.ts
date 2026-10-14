@@ -18,7 +18,7 @@ export default defineConfig({
     },
     minify: false,
     rolldownOptions: {
-      external: ['node:path', ...(dependencies ? Object.keys(dependencies) : [])]
+      external: ['node:path', 'node:fs/promises', ...(dependencies ? Object.keys(dependencies) : [])]
     }
   },
 

@@ -8,7 +8,7 @@ import {resolveSsgRoutes} from './route-output';
 import type {DotaSsgOptions, ResolvedDotaSsgRoute} from './types';
 import {prepareDeployment} from '../vite/deployment';
 import {createPrerenderServer, resolveDecoratedRoutes} from '../vite/prerender-server';
-import {prerenderRoute, type PrerenderTimings} from './prerender-runtime';
+import {DEFAULT_SETTLE_TIMEOUT, MAX_SETTLE_PASSES, prerenderRoute, type PrerenderTimings} from './prerender-runtime';
 import {renderRoutesInWorkers} from './render-workers';
 
 /**
@@ -56,9 +56,10 @@ export async function generateStaticPages(
      * @param route Validated pathname and relative HTML output below the build directory.
      * @param html Serialized route document ready to publish, including hydration markers.
      * @param timings Renderer stage durations in milliseconds; disk write time is added here.
+     * @param settled False when settling hit its limit, which is reported as a warning.
      * @throws If the output directory cannot be created or the rendered document cannot be written.
      */
-    const writeRoute = async (route: ResolvedDotaSsgRoute, html: string, timings: PrerenderTimings): Promise<void> => {
+    const writeRoute = async (route: ResolvedDotaSsgRoute, html: string, timings: PrerenderTimings, settled: boolean): Promise<void> => {
       const writeStarted = nodePerformance.now();
       const outputFile = resolve(outputDirectory, route.output);
       const directory = dirname(outputFile);
@@ -69,6 +70,9 @@ export async function generateStaticPages(
       const total = timings.total + writeMs;
       routeTimes.push({path: route.path, total});
       logger.info(`[dota-ssr] ${route.path}: ${total.toFixed(0)}ms (render ${timings.total.toFixed(0)}ms, write ${writeMs.toFixed(0)}ms)`);
+      if (!settled) {
+        logger.warn(`[dota-ssr] ${route.path}: still loading after ${options.settleTimeout ?? DEFAULT_SETTLE_TIMEOUT}ms or ${MAX_SETTLE_PASSES} settle passes; wrote the page as rendered so far`);
+      }
       logger.debug(`[dota-ssr] ${route.path} stages: setup ${timings.setup.toFixed(0)}ms, load ${timings.load.toFixed(0)}ms, ready ${timings.ready.toFixed(0)}ms, settle ${timings.settle.toFixed(0)}ms, serialize ${timings.serialize.toFixed(0)}ms, cleanup ${timings.cleanup.toFixed(0)}ms`);
     };
     const renderingStarted = nodePerformance.now();
@@ -83,7 +87,8 @@ export async function generateStaticPages(
         root, template, outputDirectory, outputs,
         options: {
           entry: options.entry, renderingModule: options.renderingModule,
-          readyExport: options.readyExport, fetchBaseUrl: options.fetchBaseUrl, logType
+          readyExport: options.readyExport, fetchBaseUrl: options.fetchBaseUrl,
+          settleTimeout: options.settleTimeout, logType
         }
       }, workerCount, renderTimeout, writeRoute);
     } else if (routes.length) {
@@ -92,7 +97,7 @@ export async function generateStaticPages(
       const readAsset = createPrerenderAssetReader(new Set(outputs));
       for (const route of routes) {
         const result = await prerenderRoute(server, template, route, outputDirectory, options, readAsset);
-        await writeRoute(route, result.html, result.timings);
+        await writeRoute(route, result.html, result.timings, result.settled);
       }
     }
     const renderingMs = nodePerformance.now() - renderingStarted;

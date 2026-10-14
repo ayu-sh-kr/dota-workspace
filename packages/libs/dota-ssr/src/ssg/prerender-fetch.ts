@@ -1,4 +1,5 @@
 import {extname, isAbsolute, relative, resolve, sep} from 'node:path';
+import {performance as nodePerformance} from 'node:perf_hooks';
 import type {Window} from 'happy-dom';
 import {createPrerenderAssetReader, type PrerenderAssetReader} from './asset-reader';
 
@@ -17,9 +18,19 @@ const CONTENT_TYPES: Readonly<Record<string, string>> = {
 /**
  * Waits until all requests started by a prerender window have settled.
  * The SSG coordinator uses this barrier after DOM settling so async content loaders
- * cannot be omitted from the serialized document.
+ * cannot be omitted from the serialized document. Resolves `true` when it waited for at
+ * least one request, so the coordinator knows response handlers may have queued more work.
+ * An optional deadline, in `performance.now()` milliseconds, stops waiting for requests
+ * that are still pending at that time.
  */
-export type PrerenderFetchWaiter = () => Promise<void>;
+export type PrerenderFetchWaiter = {
+  (deadline?: number): Promise<boolean>;
+  /**
+   * Stops the adapter after the route is serialized. Later requests never settle, so a
+   * page that keeps fetching cannot run on after its window closes.
+   */
+  close(): void;
+};
 
 /** Carries the route-specific dependencies shared by the fetch adapter and its waiter. */
 type PrerenderFetchContext = {
@@ -31,10 +42,12 @@ type PrerenderFetchContext = {
   apiBaseUrl?: URL;
   /** Original Happy DOM fetch used for cross-origin and API-forwarded requests. */
   networkFetch: Window['fetch'];
-  /** Requests that must settle before the generated document can be serialized. */
-  pendingRequests: Set<ReturnType<Window['fetch']>>;
+  /** Deliveries of requests that must reach the page before the document can be serialized. */
+  pendingRequests: Set<Promise<void>>;
   /** Build-owned reader sharing bytes without sharing window-specific responses. */
   readAsset: PrerenderAssetReader;
+  /** Set once the route is serialized; later requests are left pending. */
+  closed: boolean;
 };
 
 /** Input accepted by the active Happy DOM fetch implementation. */
@@ -49,7 +62,9 @@ type PrerenderFetchInit = Parameters<Window['fetch']>[1];
  * @param staticRoot Built output directory containing Vite's copied public files.
  * @param fetchBaseUrl Optional API origin used for missing relative paths.
  * @param readAsset Build-owned asset reader; omission reads uncached local files.
- * @returns A waiter that resolves after all fetch promises started by this adapter settle.
+ * @returns A waiter that resolves after all fetch promises started by this adapter settle,
+ *   or at its optional deadline, with `true` when any request was still pending; its
+ *   `close()` stops the adapter once the route is serialized.
  * @throws When the optional API base URL is not a valid URL.
  */
 export function installPrerenderFetch(
@@ -66,34 +81,89 @@ export function installPrerenderFetch(
     apiBaseUrl,
     networkFetch,
     readAsset,
-    pendingRequests: new Set()
+    pendingRequests: new Set(),
+    closed: false
   };
   window.fetch = createPrerenderFetch(context);
 
-  return async () => {
+  const waitForFetches = async (deadline = Number.POSITIVE_INFINITY): Promise<boolean> => {
+    let waited = false;
     while (context.pendingRequests.size > 0) {
-      await Promise.allSettled([...context.pendingRequests]);
+      waited = true;
+      // Checked on every round: requests answered from cached assets can chain through microtasks
+      // alone, which keeps the event loop from ever running the deadline timer.
+      if (nodePerformance.now() >= deadline) return waited;
+      if (!await settlesBefore(Promise.allSettled([...context.pendingRequests]), deadline)) return waited;
       await Promise.resolve();
     }
+    return waited;
   };
+  return Object.assign(waitForFetches, {
+    close: () => {
+      context.closed = true;
+    }
+  });
+}
+
+/**
+ * Waits for a promise, giving up at a deadline measured on the Node performance clock.
+ * Uses Node's timer rather than the route window's, which may be paused or replaced.
+ * @param promise Work to wait for; its result is ignored.
+ * @param deadline `performance.now()` value after which waiting stops.
+ * @returns Whether the promise settled before the deadline.
+ */
+export async function settlesBefore(promise: Promise<unknown>, deadline: number): Promise<boolean> {
+  if (deadline === Number.POSITIVE_INFINITY) {
+    await promise;
+    return true;
+  }
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const expired = new Promise<false>(resolve => {
+    timer = setTimeout(() => resolve(false), Math.max(0, deadline - nodePerformance.now()));
+  });
+  try {
+    return await Promise.race([promise.then(() => true), expired]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**
  * Creates the fetch function installed on one route-isolated window.
  * The returned function tracks both fulfilled and rejected requests so the waiter
  * cannot retain a settled request or hide the request's original rejection.
+ * Responses reach the page in a later event-loop task, as network responses do, so a page
+ * that fetches in a loop cannot starve the timers that bound settling.
+ * Once the adapter is closed, new and in-flight requests never settle: the page's handlers
+ * would otherwise run after its window closed, against the next route's globals, and a
+ * rejection might go unhandled.
  * @param context Route-specific static root, network delegate, and pending-request set.
  * @returns A Happy DOM-compatible fetch function for the route.
  */
 function createPrerenderFetch(context: PrerenderFetchContext): Window['fetch'] {
   return (input, init) => {
-    const request = performPrerenderFetch(context, input, init);
-    context.pendingRequests.add(request);
-    void request.then(
-      () => context.pendingRequests.delete(request),
-      () => context.pendingRequests.delete(request)
-    );
-    return request;
+    if (context.closed) return new Promise(() => undefined);
+    let markDelivered!: () => void;
+    const delivery = new Promise<void>(resolve => {
+      markDelivered = resolve;
+    });
+    context.pendingRequests.add(delivery);
+    return new Promise((resolve, reject) => {
+      /**
+       * Hands the outcome to the page in a later task, then releases the waiter after the page's
+       * handlers are queued, so any request they start is pending when the waiter looks again.
+       * @param settle Resolves or rejects the page's promise unless the adapter has closed.
+       */
+      const deliver = (settle: () => void) => setImmediate(() => {
+        context.pendingRequests.delete(delivery);
+        if (!context.closed) settle();
+        markDelivered();
+      });
+      performPrerenderFetch(context, input, init).then(
+        response => deliver(() => resolve(response)),
+        (error: unknown) => deliver(() => reject(error))
+      );
+    });
   };
 }
 

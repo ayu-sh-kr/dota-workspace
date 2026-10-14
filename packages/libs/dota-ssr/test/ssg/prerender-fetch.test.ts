@@ -33,7 +33,7 @@ describe('installPrerenderFetch', () => {
     const waitUntilIdle = installPrerenderFetch(window, staticRoot, undefined, readAsset);
 
     await expect(window.fetch('/guide.md')).rejects.toBe(error);
-    await expect(waitUntilIdle()).resolves.toBeUndefined();
+    await expect(waitUntilIdle()).resolves.toBe(false);
     expect(readAsset).toHaveBeenCalledExactlyOnceWith(join(staticRoot, 'guide.md'), false);
   });
 
@@ -134,7 +134,7 @@ describe('installPrerenderFetch', () => {
     const waitUntilIdle = installPrerenderFetch(window, staticRoot, 'https://api.example.com');
 
     await expect(window.fetch('/api/posts')).rejects.toThrow('API unavailable');
-    await expect(waitUntilIdle()).resolves.toBeUndefined();
+    await expect(waitUntilIdle()).resolves.toBe(false);
     expect(networkFetch).toHaveBeenCalledWith('https://api.example.com/api/posts', undefined);
   });
 
@@ -179,5 +179,39 @@ describe('installPrerenderFetch', () => {
 
     expect(networkFetch).toHaveBeenCalledOnce();
     await expect(request.then(response => response.text())).resolves.toBe('# Remote');
+  });
+
+  it('stops waiting at the deadline and keeps every request from the page after close', async () => {
+    let resolveRequest!: (response: Response) => void;
+    window.fetch = vi.fn(() => new Promise(resolve => {
+      resolveRequest = resolve as (response: Response) => void;
+    })) as unknown as Window['fetch'];
+    const waitUntilIdle = installPrerenderFetch(window, staticRoot);
+    const settledRequests: string[] = [];
+    const track = (name: string, request: Promise<unknown>) => void request.then(
+      () => settledRequests.push(name),
+      () => settledRequests.push(name)
+    );
+    track('in-flight', window.fetch('https://content.example/slow.md'));
+
+    await expect(waitUntilIdle(performance.now() + 20)).resolves.toBe(true);
+    waitUntilIdle.close();
+    track('late', window.fetch('/late.md'));
+    resolveRequest(new window.Response('# Slow') as unknown as Response);
+    await new Promise(resolve => setTimeout(resolve, 20));
+
+    expect(settledRequests).toEqual([]);
+    await expect(waitUntilIdle()).resolves.toBe(false);
+  });
+
+  it('reports whether it waited for a pending request', async () => {
+    await writeFile(join(staticRoot, 'pending.md'), '# Pending');
+    const waitUntilIdle = installPrerenderFetch(window, staticRoot);
+
+    await expect(waitUntilIdle()).resolves.toBe(false);
+    const request = window.fetch('/pending.md');
+    await expect(waitUntilIdle()).resolves.toBe(true);
+    await expect(waitUntilIdle()).resolves.toBe(false);
+    await request;
   });
 });

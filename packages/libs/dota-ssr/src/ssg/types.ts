@@ -63,6 +63,11 @@ export interface DotaSsgOptions {
   concurrency?: number;
   /** Worker startup, route/write, and shutdown timeout in milliseconds; defaults to 120000 in parallel mode. */
   renderTimeout?: number;
+  /**
+   * Milliseconds one route may wait for pending DOM tasks and requests before it is serialized as it
+   * is, with a warning; defaults to 30000. Bounds pages that keep polling in sequential and parallel mode.
+   */
+  settleTimeout?: number;
   /** Minimum verbosity for SSG and renderer diagnostics; defaults to `info`. */
   logType?: LogType;
   /** Explicit routes to prerender; they override matching decorated route outputs. */

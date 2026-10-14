@@ -17,13 +17,13 @@ export interface RenderWorkerData {
   /** Generated destinations excluded from each worker's immutable asset cache. */
   outputs: string[];
   /** Only cloneable renderer settings; function callbacks cannot cross threads. */
-  options: Pick<DotaSsgOptions, 'entry' | 'renderingModule' | 'readyExport' | 'fetchBaseUrl' | 'logType'>;
+  options: Pick<DotaSsgOptions, 'entry' | 'renderingModule' | 'readyExport' | 'fetchBaseUrl' | 'settleTimeout' | 'logType'>;
 }
 
 /** One response per worker request, or a startup/shutdown notification. */
 export type RenderWorkerResponse =
   | {type: 'ready' | 'closed'}
-  | {type: 'rendered'; html: string; timings: PrerenderTimings}
+  | {type: 'rendered'; html: string; timings: PrerenderTimings; settled: boolean}
   | {type: 'error'; message: string};
 
 /**
@@ -41,7 +41,7 @@ export async function renderRoutesInWorkers(
   data: RenderWorkerData,
   concurrency: number,
   timeout: number,
-  write: (route: ResolvedDotaSsgRoute, html: string, timings: PrerenderTimings) => Promise<void>,
+  write: (route: ResolvedDotaSsgRoute, html: string, timings: PrerenderTimings, settled: boolean) => Promise<void>,
   workerFile = createRequire(import.meta.url).resolve('@ayu-sh-kr/dota-ssr/worker')
 ): Promise<void> {
   const workers: Worker[] = [];
@@ -81,7 +81,7 @@ export async function renderRoutesInWorkers(
             resolve();
             return;
           }
-          if (message.type === 'rendered' && route) await write(route, message.html, message.timings);
+          if (message.type === 'rendered' && route) await write(route, message.html, message.timings, message.settled);
           if (failed) return;
           route = routes[nextRoute++];
           armTimeout();

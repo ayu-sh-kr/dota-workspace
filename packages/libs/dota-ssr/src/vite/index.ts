@@ -28,6 +28,10 @@ export default function dotaSsg(options: DotaSsgOptions): Plugin {
   if (!Number.isInteger(renderTimeout) || renderTimeout < 1 || renderTimeout > 2_147_483_647) {
     throw new Error('SSG renderTimeout must be an integer between 1 and 2147483647 milliseconds');
   }
+  if (options.settleTimeout !== undefined
+    && (!Number.isInteger(options.settleTimeout) || options.settleTimeout < 1 || options.settleTimeout > 2_147_483_647)) {
+    throw new Error('SSG settleTimeout must be an integer between 1 and 2147483647 milliseconds');
+  }
   if (concurrency > 1 && options.settle) {
     throw new Error('Parallel SSG cannot transfer a settle callback to workers; use concurrency: 1 or await the work in applicationReady');
   }

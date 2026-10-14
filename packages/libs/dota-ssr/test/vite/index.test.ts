@@ -31,6 +31,10 @@ describe('dotaSsg', () => {
     expect(() => dotaSsg({renderTimeout})).toThrow('SSG renderTimeout');
   });
 
+  it.each([0, -1, 1.5, Infinity, 2_147_483_648])('rejects invalid settle timeout %s', settleTimeout => {
+    expect(() => dotaSsg({settleTimeout})).toThrow('SSG settleTimeout');
+  });
+
   it('rejects parallel callbacks instead of silently dropping their readiness work', () => {
     expect(() => dotaSsg({concurrency: 2, settle: () => {}})).toThrow('cannot transfer a settle callback');
   });

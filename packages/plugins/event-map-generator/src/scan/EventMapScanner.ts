@@ -1,7 +1,6 @@
 import fg from 'fast-glob';
-import { readFile } from 'node:fs/promises';
 import { basename, resolve } from 'node:path';
-import { parse, type CallExpression, type ClassDeclaration, type ClassMethod, type Expression, type Module } from '@swc/core';
+import { type CallExpression, type ClassDeclaration, type ClassMethod, type Expression, type Module } from '@swc/core';
 import {
   AstTraversalUtils,
   CallExpressionView,
@@ -13,6 +12,7 @@ import {
   ObjectExpressionView,
   TypeAnnotationUtils,
   findModuleSourceOffset,
+  SourceFileIndex,
   utf8ByteOffsetToSourceOffset,
   AstModuleResolver,
   type AstModuleIndex,
@@ -152,6 +152,9 @@ type SourceNode = {
   span?: SourceSpan;
 };
 
+/** Declaration nodes whose annotations can type a published payload, in binding lookup order. */
+const TYPE_BINDING_NODE_TYPES = ['VariableDeclarator', 'Parameter', 'ClassProperty', 'PrivateProperty'] as const;
+
 /**
  * Builds the same-file type context used for identifier payloads and imports.
  * Annotation-only lookup intentionally avoids a TypeScript program while still
@@ -167,12 +170,9 @@ function createModuleTypeContext(ast: Module, sourceText: string, sourceFile: st
     ...collectTypeImports(ast, sourceFile),
     ...collectExportedTypeImports(ast, sourceFile),
   ]);
-  const typeBindings = AstTraversalUtils.findNodes<AstRecord>(ast, 'VariableDeclarator')
-    .concat(
-      AstTraversalUtils.findNodes<AstRecord>(ast, 'Parameter'),
-      AstTraversalUtils.findNodes<AstRecord>(ast, 'ClassProperty'),
-      AstTraversalUtils.findNodes<AstRecord>(ast, 'PrivateProperty'),
-    )
+  const bindingNodes = AstTraversalUtils.findNodesByType<AstRecord>(ast, TYPE_BINDING_NODE_TYPES);
+  const typeBindings = TYPE_BINDING_NODE_TYPES
+    .flatMap(type => bindingNodes.get(type) ?? [])
     .flatMap(node => createTypeBinding(node, sourceText, moduleStart));
   const callableReturnTypes = collectCallableReturnTypes(ast, sourceText, moduleStart);
 
@@ -572,7 +572,9 @@ function collectCandidatesFromModule(
   module: ParsedAstModule,
   index: AstModuleIndex,
 ): EventMapScanCandidate[] {
-  const context = createModuleTypeContext(ast, sourceText, sourceFile);
+  // Only publication calls need payload types, so most modules never build this context.
+  let context: ModuleTypeContext | undefined;
+  const getContext = (): ModuleTypeContext => context ??= createModuleTypeContext(ast, sourceText, sourceFile);
   const candidates: EventMapScanCandidate[] = [];
   const candidatesByKey = new Map<string, EventMapScanCandidate>();
   const moduleSourceOffset = options.includeLocations === true ? findModuleSourceOffset(sourceText) : 0;
@@ -615,7 +617,8 @@ function collectCandidatesFromModule(
     return result.value;
   };
 
-  const classDeclarations = AstTraversalUtils.findNodes<ClassDeclaration>(ast, 'ClassDeclaration');
+  const eventNodes = AstTraversalUtils.findNodesByType<ClassDeclaration | CallExpression>(ast, ['ClassDeclaration', 'CallExpression']);
+  const classDeclarations = (eventNodes.get('ClassDeclaration') ?? []) as ClassDeclaration[];
   classDeclarations.forEach(classDeclaration => {
     classDeclaration.body
       .filter((member): member is ClassMethod => member.type === 'ClassMethod')
@@ -647,7 +650,7 @@ function collectCandidatesFromModule(
       });
   });
 
-  AstTraversalUtils.findNodes<CallExpression>(ast, 'CallExpression').forEach(callExpression => {
+  ((eventNodes.get('CallExpression') ?? []) as CallExpression[]).forEach(callExpression => {
     const call = CallExpressionView.from(callExpression);
     const methodName = call.getCalleeName();
     if (![ASTFilterConstants.PUBLISH_METHOD_NAME, ASTFilterConstants.PUBLISH_ASYNC_METHOD_NAME, ASTFilterConstants.EMIT_METHOD_NAME].includes(methodName ?? '')) {
@@ -663,7 +666,7 @@ function collectCandidatesFromModule(
       addCandidate(
         eventName,
         'publish',
-        resolvePayloadType(call, context),
+        resolvePayloadType(call, getContext()),
         options.includeLocations === true
           ? createSourceLocation(
             (eventExpression as SourceNode).span,
@@ -707,12 +710,8 @@ export async function scanEventMapSources(
     },
   )));
   const files = [...new Set(discoveredFiles.flat())].sort((left, right) => left.localeCompare(right));
-  const modules: ParsedAstModule[] = [];
-  for (const file of files) {
-    const sourceText = await readFile(file, 'utf8');
-    const ast = await parse(sourceText, parseOptions);
-    modules.push({sourceFile: file, sourceText, ast});
-  }
+  const sourceIndex = options.sourceIndex ?? SourceFileIndex.shared();
+  const modules: ParsedAstModule[] = await sourceIndex.loadAll(files, parseOptions);
 
   const index = AstModuleResolver.createIndex(modules, {isDeclarationNameEligible: EventNamePolicy.isEventConstantName});
   const candidates = modules.flatMap(module => collectCandidatesFromModule(

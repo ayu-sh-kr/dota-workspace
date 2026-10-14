@@ -2,9 +2,8 @@ import {Plugin, ViteDevServer} from "vite";
 import {ComponentUtils} from "@dota/ComponentUtils.ts";
 import {consola, createConsola, LogLevels, LogType} from 'consola';
 import {VirtualImportID} from "@dota/Constants.ts";
-import {readFile} from "node:fs/promises";
 import {relative} from "node:path";
-import {type Module, parse} from "@swc/core";
+import {SourceFileIndex} from "@ayu-sh-kr/dota-ast-utils";
 import {
   DotaComponentCandidate,
   extractComponentCandidatesFromAst,
@@ -144,24 +143,16 @@ export default function dotaVitePreloader({root = process.cwd(), logType = 'info
         const prevCandidates = cachedCandidates?.filter(c => c.filePath === relPath) ?? [];
         const prevRouteCandidates = cachedRouteCandidates?.filter(c => c.filePath === relPath) ?? [];
 
-        let code: string;
+        let module;
         try {
-          code = await readFile(file, 'utf-8');
+          module = await SourceFileIndex.shared().load(file);
         } catch {
-          reloadVirtualModule(file, 'changed (read error)');
+          reloadVirtualModule(file, 'changed (read or parse error)');
           return;
         }
 
-        let ast: Module;
-        try {
-          ast = await parse(code, {syntax: 'typescript', decorators: true});
-        } catch {
-          reloadVirtualModule(file, 'changed (parse error)');
-          return;
-        }
-
-        const nextCandidates = extractComponentCandidatesFromAst(ast);
-        const nextRouteCandidates = extractRouteCandidatesFromAst(ast, code);
+        const nextCandidates = extractComponentCandidatesFromAst(module.ast);
+        const nextRouteCandidates = extractRouteCandidatesFromAst(module.ast, module.sourceText);
         const metadataChanged =
           isComponentMetadataChanged(prevCandidates, nextCandidates) ||
           isRouteMetadataChanged(prevRouteCandidates, nextRouteCandidates);
