@@ -89,6 +89,8 @@ Sticky Table of Contents sidebar. Highlights the active heading on scroll, smoot
 
 TOC entries are populated automatically when `MDService.render({ publish: true })` fires. No additional wiring needed.
 
+A prerendered `<md-toc>` adopts its entries on hydration, so active-heading tracking works without a new `md:render` event.
+
 ---
 
 ## MDService
