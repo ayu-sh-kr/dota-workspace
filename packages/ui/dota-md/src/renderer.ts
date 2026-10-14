@@ -76,17 +76,18 @@ export function applyMarkdownTheme(html: string, theme: Theme, color: ColorKey):
  * @param color Key of the theme's color map
  */
 export function applyMarkdownThemeToElement(root: ParentNode, theme: Theme, color: ColorKey): void {
-  root.querySelectorAll(THEMED_TAGS.join(',')).forEach((element) => {
-    const tag = element.localName as ThemedTag;
-    const previous = APPLIED_THEME_CLASSES.get(element);
-    if (previous?.length) element.classList.remove(...previous);
-    const next = isHighlightedCode(tag, element.className)
-      ? []
-      : resolveClasses(theme, color, tag).split(/\s+/).filter(Boolean);
-    // Guarded so unthemed tags do not gain an empty `class` attribute.
-    if (next.length) element.classList.add(...next);
-    APPLIED_THEME_CLASSES.set(element, next);
-  });
+  for (const tag of THEMED_TAGS) {
+    // Resolved once per tag and shared by every element of that tag.
+    const classes = resolveClasses(theme, color, tag).split(/\s+/).filter(Boolean);
+    root.querySelectorAll(tag).forEach((element) => {
+      const previous = APPLIED_THEME_CLASSES.get(element);
+      if (previous?.length) element.classList.remove(...previous);
+      const next = isHighlightedCode(tag, element.className) ? [] : classes;
+      // Guarded so unthemed tags do not gain an empty `class` attribute.
+      if (next.length) element.classList.add(...next);
+      APPLIED_THEME_CLASSES.set(element, next);
+    });
+  }
 }
 
 /** Returns the color entry's `selection:*` classes, meant for the content wrapper. */
