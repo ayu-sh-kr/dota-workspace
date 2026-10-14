@@ -4348,7 +4348,7 @@
           "name": "md-view",
           "source": {
             "file": "../../ui/dota-md/src/components/md-view.component.ts",
-            "offset": 1993
+            "offset": 1982
           },
           "attributes": [
             {
@@ -4360,7 +4360,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                "offset": 2353
+                "offset": 2342
               }
             },
             {
@@ -4372,7 +4372,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                "offset": 2533
+                "offset": 2522
               }
             },
             {
@@ -4384,7 +4384,7 @@
               },
               "source": {
                 "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                "offset": 2184
+                "offset": 2173
               }
             }
           ],
@@ -4396,7 +4396,7 @@
                 "default": "neutral",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                  "offset": 2353
+                  "offset": 2342
                 }
               },
               {
@@ -4405,7 +4405,7 @@
                 "default": "DEFAULT_CONTENT_CLASS",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                  "offset": 2533
+                  "offset": 2522
                 }
               },
               {
@@ -4414,7 +4414,7 @@
                 "default": "flat",
                 "source": {
                   "file": "../../ui/dota-md/src/components/md-view.component.ts",
-                  "offset": 2184
+                  "offset": 2173
                 }
               }
             ]
