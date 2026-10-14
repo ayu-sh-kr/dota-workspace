@@ -143,10 +143,11 @@ export async function extractRouteCandidatesFromComponents(
   root: string,
   logger: RouteScanLogger = console
 ): Promise<DotaRouteCandidate[]> {
-  const pageCandidates = components.filter(candidate => candidate.filePath.endsWith(".page.ts"));
+  // A page file declaring several components is listed once per component; scan it once.
+  const pageFiles = [...new Set(components.map(candidate => candidate.filePath).filter(path => path.endsWith(".page.ts")))];
   const sourceIndex = SourceFileIndex.shared();
-  const modules = await Promise.all(pageCandidates.map(candidate => {
-    const file = resolve(root, candidate.filePath);
+  const modules = await Promise.all(pageFiles.map(filePath => {
+    const file = resolve(root, filePath);
     return sourceIndex.load(file).catch((e: unknown) => {
       logger.error?.(`Failed to read or parse ${file}: ${e}`);
       return null;
@@ -154,12 +155,12 @@ export async function extractRouteCandidatesFromComponents(
   }));
   const routeCandidates: DotaRouteCandidate[] = [];
 
-  pageCandidates.forEach((candidate, index) => {
+  pageFiles.forEach((filePath, index) => {
     const module = modules[index];
     if (!module) return;
     const fileRoutes = extractRouteCandidatesFromAst(module.ast, module.sourceText).map(routeCandidate => {
-      routeCandidate.filePath = candidate.filePath;
-      logger.debug?.(`Found route candidate ${routeCandidate.name} in file ${candidate.filePath} with path ${routeCandidate.path}`);
+      routeCandidate.filePath = filePath;
+      logger.debug?.(`Found route candidate ${routeCandidate.name} in file ${filePath} with path ${routeCandidate.path}`);
       return routeCandidate;
     });
 
