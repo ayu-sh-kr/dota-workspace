@@ -47,6 +47,17 @@ describe("route-candidate.domain", () => {
     });
   });
 
+  it("scans a page file once when it declares several components", async () => {
+    const componentCandidates: DotaComponentCandidate[] = [
+      {name: "HomePage", filePath: "test/fixtures/route.page.ts", tagName: "home-page"},
+      {name: "DocsPage", filePath: "test/fixtures/route.page.ts", tagName: "docs-page"}
+    ];
+
+    const candidates = await extractRouteCandidatesFromComponents(componentCandidates, process.cwd());
+
+    expect(candidates.map(candidate => candidate.path)).toEqual(["/", "/docs"]);
+  });
+
   it("extracts annotation data from the route decorator fixture", () => {
     const {ast, source} = loadRouteFixture();
     const candidates = extractRouteCandidatesFromAst(ast, source);
