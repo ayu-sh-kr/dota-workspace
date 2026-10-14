@@ -3,8 +3,6 @@ import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {DOTA_TOOLS, type DotaTool} from "@dota/components/home/utils/tools.config.ts";
 
 type PackagePresentation = {
-  tint: string;
-  tintEnd: string;
   x: number;
   y: number;
   mobileX: number;
@@ -23,14 +21,14 @@ const PACKAGE_ORDER = [
 ] as const;
 
 const PRESENTATION: Record<string, PackagePresentation> = {
-  "dota-core": {tint: "#8b7cf6", tintEnd: "#6d5ce0", x: 50, y: 48, mobileX: 50, mobileY: 48},
-  "dota-ui": {tint: "#e05e9b", tintEnd: "#c04382", x: 76, y: 25, mobileX: 78, mobileY: 24},
-  "dota-router": {tint: "#f2a65e", tintEnd: "#d67f3f", x: 80, y: 56, mobileX: 78, mobileY: 52},
-  "dota-rest": {tint: "#5ea8f2", tintEnd: "#3f7fd6", x: 24, y: 24, mobileX: 22, mobileY: 24},
-  "dota-event": {tint: "#5ed6c8", tintEnd: "#3fb0a4", x: 20, y: 57, mobileX: 22, mobileY: 53},
-  "dota-wrap": {tint: "#b18cf2", tintEnd: "#8f66d9", x: 65, y: 79, mobileX: 70, mobileY: 79},
-  "dota-md": {tint: "#9aa7b8", tintEnd: "#6f7d92", x: 36, y: 80, mobileX: 30, mobileY: 79},
-  "dota-vite-preloader": {tint: "#f2d05e", tintEnd: "#d6ad3f", x: 88, y: 82, mobileX: 83, mobileY: 94},
+  "dota-core": {x: 50, y: 48, mobileX: 50, mobileY: 48},
+  "dota-ui": {x: 76, y: 25, mobileX: 78, mobileY: 24},
+  "dota-router": {x: 80, y: 56, mobileX: 78, mobileY: 52},
+  "dota-rest": {x: 24, y: 24, mobileX: 22, mobileY: 24},
+  "dota-event": {x: 20, y: 57, mobileX: 22, mobileY: 53},
+  "dota-wrap": {x: 65, y: 79, mobileX: 70, mobileY: 79},
+  "dota-md": {x: 36, y: 80, mobileX: 30, mobileY: 79},
+  "dota-vite-preloader": {x: 88, y: 82, mobileX: 50, mobileY: 94},
 };
 
 const CONSTELLATION_EDGES: ReadonlyArray<readonly [string, string]> = [
@@ -67,25 +65,23 @@ export class OurToolsComponent extends BaseElement {
   }
 
   private chapter(tool: DotaTool, index: number): TemplateResult {
-    const presentation = PRESENTATION[tool.id];
     const facts = tool.tags.slice(0, 3);
 
     return html`
       <section class="dota-package-chapter" data-chapter data-index="${index}"
-               style="--tint:${presentation.tint};--tint-end:${presentation.tintEnd}"
+               data-package="${tool.id}"
                aria-labelledby="dota-package-${index}">
         <div class="dota-package-pin">
-          <div class="dota-package-glow dota-reveal-segment" aria-hidden="true"></div>
-          <article class="dota-package-card">
+          <article class="dota-package-card surface-card">
             <div class="dota-package-tilt">
               <div class="dota-package-glyph dota-reveal-segment" aria-hidden="true">
-                <dota-icon name="${tool.icon}" classname="text-white" size="xl"></dota-icon>
+                <dota-icon name="${tool.icon}" classname="text-primary" size="xl"></dota-icon>
               </div>
-              <p class="dota-package-eyebrow dota-reveal-segment">${tool.role}</p>
-              <h3 id="dota-package-${index}" class="dota-package-name dota-reveal-segment">
+              <p class="dota-package-eyebrow dota-reveal-segment type-eyebrow">${tool.role}</p>
+              <h3 id="dota-package-${index}" class="dota-package-name dota-reveal-segment type-section">
                 <span>dota-</span>${this.packageName(tool)}
               </h3>
-              <p class="dota-package-description dota-reveal-segment">${tool.description}</p>
+              <p class="dota-package-description dota-reveal-segment type-body">${tool.description}</p>
               <ul class="dota-package-spec" role="list" aria-label="${tool.name} highlights">
                 ${facts.map((fact, factIndex) => html`<li class="dota-reveal-segment" style="--fact-index:${factIndex}">${fact}</li>`)}
               </ul>
@@ -111,9 +107,9 @@ export class OurToolsComponent extends BaseElement {
   private constellationNode(tool: DotaTool, index: number): TemplateResult {
     const point = PRESENTATION[tool.id];
     return html`
-      <div class="dota-constellation-node" data-constellation-node style="--node-delay:${(index * .035).toFixed(3)};--node-x:${point.x}%;--node-y:${point.y}%;--mobile-x:${point.mobileX}%;--mobile-y:${point.mobileY}%;--tint:${point.tint};--tint-end:${point.tintEnd}">
+      <div class="dota-constellation-node" data-constellation-node data-package="${tool.id}" style="--node-delay:${(index * .035).toFixed(3)};--node-x:${point.x}%;--node-y:${point.y}%;--mobile-x:${point.mobileX}%;--mobile-y:${point.mobileY}%">
         <span class="dota-constellation-glyph" aria-hidden="true">
-          <dota-icon name="${tool.icon}" classname="text-white" size="md"></dota-icon>
+          <dota-icon name="${tool.icon}" classname="text-primary" size="md"></dota-icon>
         </span>
         <span class="dota-constellation-label">${tool.name}</span>
       </div>
@@ -126,8 +122,8 @@ export class OurToolsComponent extends BaseElement {
       <section class="dota-constellation-finale" data-finale aria-labelledby="dota-constellation-title">
         <div class="dota-constellation-pin">
           <div class="dota-constellation-copy">
-            <p>One native system</p>
-            <h3 id="dota-constellation-title">Every piece, in orbit.</h3>
+            <p class="type-eyebrow">One native system</p>
+            <h3 id="dota-constellation-title" class="type-section">Every piece, in orbit.</h3>
           </div>
           <figure class="dota-constellation-map" aria-describedby="dota-constellation-description">
             <figcaption id="dota-constellation-description" class="sr-only">
@@ -153,7 +149,7 @@ export class OurToolsComponent extends BaseElement {
         ${this.orderedTools.map((tool, index) => html`
           <button type="button" data-rail-index="${index}" aria-label="Jump to ${tool.name}"
                   aria-current="${index === this.activeChapter ? "step" : "false"}"
-                  style="--dot:${PRESENTATION[tool.id].tint}">
+                  data-package="${tool.id}">
             <span></span>
           </button>
         `)}
@@ -257,8 +253,6 @@ export class OurToolsComponent extends BaseElement {
     const y = (event.clientY - rect.top) / rect.height - .5;
     tilt.style.setProperty("--tilt-x", `${(-y * 6).toFixed(2)}deg`);
     tilt.style.setProperty("--tilt-y", `${(x * 8).toFixed(2)}deg`);
-    tilt.style.setProperty("--mx", `${((x + .5) * 100).toFixed(1)}%`);
-    tilt.style.setProperty("--my", `${((y + .5) * 100).toFixed(1)}%`);
   }
 
   @HostListener({event: "pointerout"})
@@ -268,17 +262,15 @@ export class OurToolsComponent extends BaseElement {
     const tilt = card.querySelector<HTMLElement>(".dota-package-tilt");
     tilt?.style.removeProperty("--tilt-x");
     tilt?.style.removeProperty("--tilt-y");
-    tilt?.style.removeProperty("--mx");
-    tilt?.style.removeProperty("--my");
   }
 
   render(): TemplateResult {
     const tools = this.orderedTools;
     return html`
-      <section class="dota-ecosystem-reveal font-dm" aria-labelledby="dota-ecosystem-title">
+      <section class="dota-ecosystem-reveal font-sans" aria-labelledby="dota-ecosystem-title">
         <header class="dota-ecosystem-intro">
-          <p>Ecosystem / 08 native packages</p>
-          <h2 id="dota-ecosystem-title">Meet the pieces.<br><span>Then watch them connect.</span></h2>
+          <p class="type-eyebrow">Ecosystem / 08 native packages</p>
+          <h2 id="dota-ecosystem-title" class="type-section">Meet the pieces.<br><span>Then watch them connect.</span></h2>
           <div class="dota-ecosystem-scroll-cue" aria-hidden="true"><i></i><span>Scroll to explore</span></div>
         </header>
         ${this.progressRail()}
