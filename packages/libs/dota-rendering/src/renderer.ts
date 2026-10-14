@@ -30,6 +30,8 @@ const COMPONENT_START_MARKER = '<!--dota-component-start-->';
 const COMPONENT_END_MARKER = '<!--dota-component-end-->';
 const COMPONENT_ATTRIBUTE = 'data-dota-component';
 const NODE_INDEX_ATTRIBUTE = 'data-dota-index';
+/** `Node.DOCUMENT_FRAGMENT_NODE`, without relying on a global `Node` in non-browser runtimes. */
+const DOCUMENT_FRAGMENT_NODE = 11;
 const DYNAMIC_ATTRIBUTE = 'data-dota-dynamic';
 /** Supplies a unique parser-token namespace to every mounted template strategy. */
 let templateMarkerId = 0;
@@ -619,7 +621,9 @@ class TemplateStrategy implements RenderStrategy {
     }
     const nextValue = part.templateValue.replace(this.markerPattern, (_, markerIndex: string) =>
       valueText(values[Number(markerIndex)]));
-    if (!part.element.isConnected) {
+    // Elements still in the fragment being mounted are current; only an element detached
+    // from a live tree is re-resolved, otherwise a stale node sharing the locator would win.
+    if (!part.element.isConnected && part.element.getRootNode().nodeType !== DOCUMENT_FRAGMENT_NODE) {
       part.element = this.root.findDynamicElement(part.locator) ?? part.element;
     }
     part.element.setAttribute(part.name, nextValue);
