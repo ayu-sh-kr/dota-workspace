@@ -70,6 +70,27 @@ export class TocUtils {
   }
 
   /**
+   * Rebuild TOC entries from an already rendered TOC list, such as prerendered `<md-toc>`
+   * markup, so a hydrated TOC keeps tracking headings without a new `md:render` event.
+   * Levels are derived from list nesting.
+   *
+   * @param list  The rendered `<ul>` whose `li > a[data-toc-id]` items hold the entries.
+   * @param level Heading level assigned to this list's items.
+   */
+  static readEntries(list: Element | null, level = 1): TocEntry[] {
+    return [...(list?.children ?? [])].flatMap((item) => {
+      const link = item.querySelector<HTMLElement>(':scope > a[data-toc-id]');
+      if (!link?.dataset.tocId) return [];
+      return [{
+        level,
+        id: link.dataset.tocId,
+        text: link.textContent?.trim() ?? '',
+        children: TocUtils.readEntries(item.querySelector(':scope > ul'), level + 1),
+      }];
+    });
+  }
+
+  /**
    * Recursively build the inner HTML string for a TOC `<ul>` list.
    *
    * @param entries    The TOC entries to render.
