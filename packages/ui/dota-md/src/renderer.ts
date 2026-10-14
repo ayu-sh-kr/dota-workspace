@@ -71,16 +71,19 @@ export function applyMarkdownTheme(html: string, theme: Theme, color: ColorKey):
  * Classes this function added previously are removed first, so switching theme or
  * color never accumulates stale classes, while parser classes such as highlight tokens remain.
  *
- * @param root  Container whose descendants receive the theme
- * @param theme Theme supplying typography and color tokens
- * @param color Key of the theme's color map
+ * @param root     Container whose descendants receive the theme
+ * @param theme    Theme supplying typography and color tokens
+ * @param color    Key of the theme's color map
+ * @param prior    Theme and color already stamped on content this function has not themed
+ *                 yet, such as prerendered markup; their classes are replaced too.
  */
-export function applyMarkdownThemeToElement(root: ParentNode, theme: Theme, color: ColorKey): void {
+export function applyMarkdownThemeToElement(root: ParentNode, theme: Theme, color: ColorKey, prior?: {theme: Theme; color: ColorKey}): void {
   for (const tag of THEMED_TAGS) {
     // Resolved once per tag and shared by every element of that tag.
     const classes = resolveClasses(theme, color, tag).split(/\s+/).filter(Boolean);
+    const priorClasses = prior ? resolveClasses(prior.theme, prior.color, tag).split(/\s+/).filter(Boolean) : [];
     root.querySelectorAll(tag).forEach((element) => {
-      const previous = APPLIED_THEME_CLASSES.get(element);
+      const previous = APPLIED_THEME_CLASSES.get(element) ?? priorClasses;
       if (previous?.length) element.classList.remove(...previous);
       const next = isHighlightedCode(tag, element.className) ? [] : classes;
       // Guarded so unthemed tags do not gain an empty `class` attribute.
