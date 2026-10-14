@@ -3398,6 +3398,39 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/pages/doc-article.page.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "DocArticlePage",
+          "customElement": true,
+          "tagName": "doc-article-page",
+          "superclass": {
+            "name": "DotaPageElement"
+          },
+          "members": [],
+          "attributes": []
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "DocArticlePage",
+          "declaration": {
+            "name": "DocArticlePage"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "doc-article-page",
+          "declaration": {
+            "name": "DocArticlePage"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/pages/doc.page.js",
       "declarations": [
         {
