@@ -9,7 +9,7 @@
           "name": "md-toc",
           "source": {
             "file": "./src/components/md-toc.component.ts",
-            "offset": 2175
+            "offset": 2265
           },
           "attributes": [
             {
@@ -21,7 +21,19 @@
               },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2417
+                "offset": 2507
+              }
+            },
+            {
+              "name": "container-class",
+              "default": "",
+              "required": false,
+              "value": {
+                "type": "string"
+              },
+              "source": {
+                "file": "./src/components/md-toc.component.ts",
+                "offset": 3261
               }
             },
             {
@@ -33,7 +45,7 @@
               },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2747
+                "offset": 2837
               }
             },
             {
@@ -45,7 +57,7 @@
               },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2912
+                "offset": 3002
               }
             },
             {
@@ -57,7 +69,7 @@
               },
               "source": {
                 "file": "./src/components/md-toc.component.ts",
-                "offset": 2342
+                "offset": 2432
               }
             }
           ],
@@ -69,7 +81,16 @@
                 "default": "indigo",
                 "source": {
                   "file": "./src/components/md-toc.component.ts",
-                  "offset": 2417
+                  "offset": 2507
+                }
+              },
+              {
+                "name": "containerClass",
+                "type": "string",
+                "default": "",
+                "source": {
+                  "file": "./src/components/md-toc.component.ts",
+                  "offset": 3261
                 }
               },
               {
@@ -78,7 +99,7 @@
                 "default": "64",
                 "source": {
                   "file": "./src/components/md-toc.component.ts",
-                  "offset": 2747
+                  "offset": 2837
                 }
               },
               {
@@ -87,7 +108,7 @@
                 "default": "On this page",
                 "source": {
                   "file": "./src/components/md-toc.component.ts",
-                  "offset": 2912
+                  "offset": 3002
                 }
               },
               {
@@ -96,7 +117,7 @@
                 "default": "flat",
                 "source": {
                   "file": "./src/components/md-toc.component.ts",
-                  "offset": 2342
+                  "offset": 2432
                 }
               }
             ]
@@ -106,7 +127,7 @@
           "name": "md-view",
           "source": {
             "file": "./src/components/md-view.component.ts",
-            "offset": 1982
+            "offset": 1994
           },
           "attributes": [
             {
@@ -118,7 +139,7 @@
               },
               "source": {
                 "file": "./src/components/md-view.component.ts",
-                "offset": 2342
+                "offset": 2354
               }
             },
             {
@@ -130,7 +151,7 @@
               },
               "source": {
                 "file": "./src/components/md-view.component.ts",
-                "offset": 2522
+                "offset": 2534
               }
             },
             {
@@ -142,7 +163,7 @@
               },
               "source": {
                 "file": "./src/components/md-view.component.ts",
-                "offset": 2173
+                "offset": 2185
               }
             }
           ],
@@ -154,7 +175,7 @@
                 "default": "neutral",
                 "source": {
                   "file": "./src/components/md-view.component.ts",
-                  "offset": 2342
+                  "offset": 2354
                 }
               },
               {
@@ -163,7 +184,7 @@
                 "default": "DEFAULT_CONTENT_CLASS",
                 "source": {
                   "file": "./src/components/md-view.component.ts",
-                  "offset": 2522
+                  "offset": 2534
                 }
               },
               {
@@ -172,7 +193,7 @@
                 "default": "flat",
                 "source": {
                   "file": "./src/components/md-view.component.ts",
-                  "offset": 2173
+                  "offset": 2185
                 }
               }
             ]
