@@ -21,14 +21,15 @@ import '@ayu-sh-kr/dota-md/dota-md.css';
 
 ### `<md-view>`
 
-Renders themed markdown HTML. Reacts to events on the shared event bus — no wiring required when used alongside `MDService.render({ publish: true })`.
+Renders themed markdown HTML. It updates from the shared `md:render` event (`MDService.render(raw, { publish: true })`) or from `renderMarkdown()`, which renders into that one view only.
 
 **Attributes**
 
-| Attribute | Default   | Description                                          |
-|-----------|-----------|------------------------------------------------------|
-| `theme`   | `flat`    | Theme name (`flat`, `material`, `apple`, `github`).  |
-| `color`   | `neutral` | Accent colour — any Tailwind color name.             |
+| Attribute       | Default         | Description                                                            |
+|-----------------|-----------------|------------------------------------------------------------------------|
+| `theme`         | `flat`          | Theme name: a built-in theme or one added with `registerTheme`.        |
+| `color`         | `neutral`       | Key of the theme's color map: a Tailwind color or a custom key.        |
+| `content-class` | padded wrapper  | Classes for the `[data-md-content]` wrapper; replaces the default layout. |
 
 **Usage**
 
@@ -43,6 +44,27 @@ const raw = `# Hello\nSome **markdown** content.`;
 MDService.render(raw, { publish: true });
 // md-view receives the md:render event and updates automatically
 ```
+
+**Customising a view**
+
+Compose `<md-view>` rather than subclassing it. Render into one view with `renderMarkdown()`, and post-process its content from the bubbling `md-rendered` DOM event, whose detail holds the mounted `container` and the render `result`. Images receive `loading="lazy"` automatically.
+
+```ts
+import { BindEvent } from '@ayu-sh-kr/dota-core';
+import { MD_RENDERED_EVENT, type MdRenderedDetail, type MdViewComponent } from '@ayu-sh-kr/dota-md';
+
+// In the host component that renders <md-view content-class="article-body">
+showArticle(markdown: string) {
+  this.querySelector<MdViewComponent>('md-view')!.renderMarkdown(markdown);
+}
+
+@BindEvent({ event: MD_RENDERED_EVENT, id: 'md-view' })
+decorate(event: CustomEvent<MdRenderedDetail>) {
+  event.detail.container.querySelector('h1')?.remove();
+}
+```
+
+`renderMarkdown()` may be called before the view has initialised; the content mounts once it is ready. Prerendered `<md-view>` markup is adopted as initial content instead of being nested.
 
 ---
 
@@ -110,14 +132,22 @@ MDService.clearCacheFor(content);   // clear one entry
 MDService.setCacheLimit(100);       // adjust max entries (default 50)
 ```
 
-### Custom markdown-it instance
+### Parser, highlighter, and plugins
+
+`MDService.configure()` rebuilds the shared markdown-it instance and clears the cache. Defaults: raw HTML, linkify, typographer, heading anchors, and highlight.js.
 
 ```ts
-import markdownit from 'markdown-it';
+import footnote from 'markdown-it-footnote';
+import container from 'markdown-it-container';
 
-MDService.setMd(markdownit().use(myPlugin));
-// Clears the cache automatically
+MDService.configure({
+  options: { breaks: true },                       // markdown-it options
+  highlight: (code, lang) => myHighlighter(code, lang), // or `false` to disable highlighting
+  plugins: [footnote, [container, 'tip']],          // plugin or [plugin, ...params]
+});
 ```
+
+`createMarkdown(setup)` returns the same configured instance for use outside the service. `MDService.setMd(instance)` accepts any markdown-it instance; the TOC is read from heading `id` attributes, so add `markdown-it-anchor` (as `createMarkdown` does) to keep TOC links working. TOC ids always match the rendered heading ids.
 
 ---
 
@@ -146,11 +176,32 @@ Built-in themes available via the `theme` attribute:
 
 More themes will be added in future releases.
 
+### Custom themes
+
+Register a theme to use it by name in `<md-view>`, `<md-toc>`, and `md:theme-change`. `extendTheme` derives one from a base theme, overriding only the tags and color tokens you pass; color keys may be app-specific names such as `primary`.
+
+```ts
+import { extendTheme, flatMarkdownTheme, registerTheme } from '@ayu-sh-kr/dota-md';
+
+registerTheme(extendTheme(flatMarkdownTheme, {
+  name: 'brand',
+  fontFamily: 'var(--brand-font)',
+  typography: { pre: 'brand-code-block' },
+  color: { primary: { a: { text: 'text-[var(--brand)]' } } },
+}));
+```
+
+```html
+<md-view theme="brand" color="primary"></md-view>
+```
+
+`applyMarkdownTheme(html, theme, color)` applies a theme to an HTML string where no DOM exists yet.
+
 ---
 
 ## Colors
 
-Any Tailwind color name is accepted on the `color` attribute:
+Built-in themes accept any Tailwind color name on the `color` attribute:
 
 `slate` · `gray` · `zinc` · `neutral` · `stone` · `red` · `orange` · `amber` · `yellow` · `lime` · `green` · `emerald` · `teal` · `cyan` · `sky` · `blue` · `indigo` · `violet` · `purple` · `fuchsia` · `pink` · `rose`
 
