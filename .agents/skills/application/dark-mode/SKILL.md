@@ -1,6 +1,6 @@
 ---
 name: dark-mode
-description: Use when implementing, modifying, or reviewing dark mode in a Dota Wrap/Dota Web project. Covers the local convention for toggling Tailwind class-based dark mode with GeneralUtils, LocalStorageService, AppComponent startup initialization, dark-mode-button, themeChange window events, and dark: Tailwind styling.
+description: Use when implementing, modifying, or reviewing dark mode in a Dota Wrap/Dota Web project. Covers class-based mode selection, semantic CSS tokens, GeneralUtils, persisted preferences, startup initialization, and themeChange window events.
 ---
 
 # Skill: Implementing Dark Mode with dota-core
@@ -58,7 +58,6 @@ export class GeneralUtils {
   // Toggle between dark and light, persist, and broadcast
   static toggleDarkMode() {
     const isDarkMode = document.documentElement.classList.toggle('dark');
-    document.documentElement.classList.toggle('bg-slate-950', isDarkMode);
     LocalStorageService.add('theme', isDarkMode ? 'dark' : 'light');
     window.dispatchEvent(new CustomEvent('themeChange', {
       detail: { isDarkMode: GeneralUtils.isDarkMode() }
@@ -80,16 +79,16 @@ export class GeneralUtils {
   // Apply a resolved theme string to the DOM
   static setBrowserTheme(theme: string) {
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark', 'bg-slate-950');
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark', 'bg-slate-950');
+      document.documentElement.classList.remove('dark');
     }
   }
 }
 ```
 
 **Key points:**
-- `'dark'` and `'bg-slate-950'` are always toggled together.
+- Toggle only the `dark` class. `public/assets/css/color.css` owns document backgrounds through semantic tokens; do not add a palette utility such as `bg-slate-950` to `<html>`.
 - `'theme'` is the localStorage key.
 - `toggleDarkMode` fires a native `CustomEvent('themeChange')` on `window` so any component can re-render reactively without subscribing to `ApplicationEventService`.
 
@@ -195,9 +194,11 @@ export class DarkModeButtonComponent extends BaseElement {
       : 'material-symbols:sunny-rounded';
 
     return `
-      <span id="dark-button" class="active:scale-95 cursor-pointer">
+      <button id="dark-button" type="button"
+              class="inline-flex size-9 items-center justify-center rounded-full text-primary hover:bg-raised active:scale-95 cursor-pointer"
+              aria-label="Switch to ${isDarkTheme ? 'light' : 'dark'} mode">
         <dota-icon name="${icon}" color="${this.color}" variant="ghost" size="md"></dota-icon>
-      </span>
+      </button>
     `;
   }
 }
@@ -242,7 +243,7 @@ Because components don't share state directly, the `themeChange` window event is
 ```text
 User clicks dark-mode-button
   -> GeneralUtils.toggleDarkMode()
-    -> toggles .dark / .bg-slate-950 on <html>
+    -> toggles .dark on <html>; semantic CSS tokens resolve the mode
     -> writes to localStorage('theme')
     -> window.dispatchEvent(new CustomEvent('themeChange', { detail: { isDarkMode } }))
       -> any component with @WindowListener({ event: 'themeChange' }) calls this.updateHTML()
@@ -261,15 +262,18 @@ onThemeChange() {
 
 ## 7. Tailwind Dark Variant
 
-Components use the `dark:` prefix for dark-mode styles:
+App components consume semantic classes mapped to CSS properties in `tailwind.config.ts`:
 
 ```html
-<div class="bg-white text-gray-900 dark:bg-slate-950 dark:text-gray-100">
+<div class="bg-surface text-foreground">
   ...
 </div>
 ```
 
-Because `shadow: false` is used throughout (no Shadow DOM), the `dark` class on `<html>` cascades into all components without any extra configuration.
+`public/assets/css/color.css` defines the light roles on `:root` and overrides them on
+`html.dark`. Because app components use light DOM (`shadow: false`), they inherit these
+properties without extra configuration. Keep component-specific effects beside their
+component and use `dark:` only when the semantic roles cannot express the effect.
 
 ---
 
@@ -281,4 +285,5 @@ Because `shadow: false` is used throughout (no Shadow DOM), the `dark` class on 
 - [ ] Root component (`AppComponent`) applies theme via `@AfterInit()` on startup
 - [ ] Toggle button dispatches `themeChange` via `window.dispatchEvent`
 - [ ] Any component that must re-render on theme change uses `@WindowListener({ event: 'themeChange' })`
+- [ ] App backgrounds and colors consume semantic tokens from `public/assets/css/color.css`
 - [ ] All dota-wrap decorators imported from `@ayu-sh-kr/dota-wrap/core`
