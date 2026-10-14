@@ -1,8 +1,3 @@
-import {DocPage} from "@dota/pages";
-import {RouteConfig} from "@ayu-sh-kr/dota-wrap/router";
-import {BaseElement} from "@ayu-sh-kr/dota-wrap/core";
-
-
 export interface DocConfig {
   category: string;
   paths: string[];
@@ -36,54 +31,5 @@ export const docConfigs: DocConfig[] = [
   }
 ]
 
-export const docRoutes: RouteConfig<BaseElement>[]  = [
-  {
-    path: '/Getting-Started.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Guides.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Component-Definition.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Component-Registration.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Property-Binding.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Event-Binding.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Event-Emitter.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Core.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Reactivity.md',
-    component: DocPage,
-  },
-
-  {
-    path: '/Decorators.md',
-    component: DocPage,
-  },
-]
+/** Every docs Markdown file in sidebar order, used for navigation and SSG routes. */
+export const docFiles: string[] = docConfigs.flatMap(config => config.paths);
