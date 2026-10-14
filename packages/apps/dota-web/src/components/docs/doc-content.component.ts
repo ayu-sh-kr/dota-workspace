@@ -1,17 +1,15 @@
-import {AfterInit, BaseElement, Component, Param, Property, String, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, Component, Property, String, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {WithLoading} from "@dota/utils/DecoratorUtils.ts";
 import {MDService} from "@ayu-sh-kr/dota-md";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
+import {resolveDocFile} from "@dota/utils/doc-route.utils.ts";
 
 @Component({
   selector: 'doc-content',
   shadow: false
 })
 export class DocContentComponent extends BaseElement {
-
-  @Param('content')
-  filePath: string = 'Getting-Started.md';
 
   @Property({name: 'max-width', type: String})
   maxWidth: string = 'max-w-4xl';
@@ -57,17 +55,22 @@ export class DocContentComponent extends BaseElement {
 
   /**
    * Load the Markdown file, render via MDService, and publish as md:render.
-   * <md-view> listens to md:render / md:theme-change / md:color-change directly
-   * and manages its own content and styling — doc-content never needs to track
-   * or forward theme/color.
+   * <md-view> and <md-toc> listen to md:render / md:theme-change / md:color-change
+   * directly — doc-content never tracks or forwards theme/color. A prerendered
+   * page already holds the rendered document, which <md-view> and <md-toc> adopt,
+   * so it is not fetched again.
    */
   @AfterInit()
-  @WithLoading()
   async afterViewInit() {
-    const path = (this.filePath ?? 'Getting-Started.md').replace('/', '');
-    const raw  = await this.docLoaderService.loadDoc(path);
-    MDService.render(raw, { publish: true });
+    if (!this.querySelector('[data-md-content]')?.textContent?.trim()) await this.loadDoc();
     this.scrollToAnchor();
+  }
+
+  /** Fetches the active document and publishes its render result. */
+  @WithLoading()
+  private async loadDoc() {
+    const raw = await this.docLoaderService.loadDoc(resolveDocFile(window.location.pathname, window.location.search));
+    MDService.render(raw, { publish: true });
   }
 
   render(): TemplateResult {
