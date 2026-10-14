@@ -89,6 +89,76 @@
       "source": "/community",
       "destination": "/community/",
       "permanent": true
+    },
+    {
+      "source": "/docs",
+      "destination": "/docs/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Component-Definition",
+      "destination": "/docs/Component-Definition/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Component-Registration",
+      "destination": "/docs/Component-Registration/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Core",
+      "destination": "/docs/Core/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Decorators",
+      "destination": "/docs/Decorators/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Event-Binding",
+      "destination": "/docs/Event-Binding/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Event-Emitter",
+      "destination": "/docs/Event-Emitter/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Getting-Started",
+      "destination": "/docs/Getting-Started/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Guides",
+      "destination": "/docs/Guides/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Life-Cycle",
+      "destination": "/docs/Life-Cycle/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Property-Binding",
+      "destination": "/docs/Property-Binding/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Reactivity",
+      "destination": "/docs/Reactivity/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Rest-Client",
+      "destination": "/docs/Rest-Client/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/Router",
+      "destination": "/docs/Router/",
+      "permanent": true
     }
   ],
   "rewrites": [
