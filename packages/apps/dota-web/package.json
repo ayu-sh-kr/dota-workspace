@@ -15,7 +15,6 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "catalog:",
-    "@types/markdown-it": "catalog:",
     "@types/node": "catalog:",
     "autoprefixer": "catalog:",
     "jiti": "catalog:",
@@ -30,10 +29,6 @@
     "@ayu-sh-kr/dota-md": "workspace:*",
     "@floating-ui/dom": "catalog:",
     "highlight.js": "catalog:",
-    "markdown-it": "catalog:",
-    "markdown-it-anchor": "catalog:",
-    "markdown-it-highlightjs": "catalog:",
-    "markdown-it-toc-done-right": "catalog:",
     "reflect-metadata": "catalog:"
   },
   "web-types": "./web-types.json",
