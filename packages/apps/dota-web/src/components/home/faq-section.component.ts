@@ -82,7 +82,7 @@ export class FaqSectionComponent extends BaseElement {
             <p class="mt-4 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-400">
               A quick guide to the maintained libraries, the problems they solve, and where they fit in your next application.
             </p>
-            <a href="/docs/Getting-Started"
+            <a href="/docs/getting-started"
                class="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-purple-600 transition-colors hover:text-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-500 dark:text-purple-300 dark:hover:text-purple-200">
               Read the getting-started guide
               <span aria-hidden="true">→</span>
