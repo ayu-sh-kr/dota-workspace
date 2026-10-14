@@ -4,7 +4,7 @@ In the world of web development, design systems provide a structured approach to
 
 ## Integration with Dota
 
-As shown in the [Tailwind Setup section](/docs/Guides.md) of our guides, Dota components work well with modern CSS frameworks. The `DocLoaderService` and the `dota-md` `MDService` used in our `ResourceContentComponent` ensure that your design system styling is properly applied to dynamically loaded content.
+As shown in the [Tailwind Setup section](/docs/Guides) of our guides, Dota components work well with modern CSS frameworks. The `DocLoaderService` and the `dota-md` `MDService` used in our `ResourceContentComponent` ensure that your design system styling is properly applied to dynamically loaded content.
 
 ## Benefits
 
@@ -15,4 +15,4 @@ As shown in the [Tailwind Setup section](/docs/Guides.md) of our guides, Dota co
 
 ## Getting Started
 
-To use a design system with your Dota web components, follow the installation instructions for your chosen system and refer to our [Guides](/docs/Guides.md) for configuration details.
+To use a design system with your Dota web components, follow the installation instructions for your chosen system and refer to our [Guides](/docs/Guides) for configuration details.
