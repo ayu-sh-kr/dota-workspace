@@ -1,0 +1,63 @@
+/* Action grammar: one geometry and type scale, with hierarchy expressed by treatment.
+ * Primary: neutral contrast fill. Secondary: outlined surface. Link: accent text.
+ * Actions share the pill geometry used by navigation and tabs; panels stay rounded.
+ */
+@layer components {
+  .button-primary, .button-secondary, .button-link, .button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--layout-space-2);
+    min-block-size: var(--layout-control-height);
+    padding: var(--layout-space-2) var(--layout-space-5);
+    border: 1px solid transparent;
+    border-radius: var(--layout-radius-action);
+    font-family: var(--font-body);
+    font-size: var(--type-control-size);
+    font-weight: var(--type-control-weight);
+    line-height: var(--type-control-leading);
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
+  }
+
+  .button-primary {
+    background: var(--action-primary-background);
+    color: var(--action-primary-foreground);
+  }
+  .button-primary:hover { background: var(--action-primary-hover); }
+
+  .button-secondary {
+    border-color: var(--border-color);
+    background: var(--surface-color);
+    color: var(--foreground-color);
+  }
+  .button-secondary:hover { border-color: var(--border-strong-color); background: var(--surface-raised-color); }
+
+  .button-link, .button-icon { background: transparent; color: var(--primary-color); }
+  .button-link { padding-inline: 0; }
+  .button-link:hover { color: var(--primary-color-hover); text-decoration: underline; text-underline-offset: 0.25em; }
+  .button-icon { inline-size: var(--layout-control-height); padding: var(--layout-space-2); }
+  .button-icon:hover { background: var(--surface-raised-color); }
+
+  .button-compact {
+    min-block-size: var(--layout-control-compact-height);
+    padding: var(--layout-space-1) var(--layout-space-2);
+    font-size: var(--type-compact-size);
+  }
+  .button-code { color: var(--code-muted-color); }
+  .button-code:hover { color: var(--code-accent-color); }
+
+  :is(.button-primary, .button-secondary, .button-link, .button-icon):disabled {
+    background: var(--disabled-background-color);
+    color: var(--disabled-color);
+    border-color: var(--border-color);
+    cursor: not-allowed;
+    text-decoration: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button-primary, .button-secondary, .button-link, .button-icon { transition: none; }
+}
