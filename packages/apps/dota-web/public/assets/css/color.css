@@ -1,0 +1,143 @@
+/* Semantic color grammar. Components consume roles, never palette steps.
+ * The existing html.dark toggle owns the mode; code examples keep a dark canvas.
+ */
+:root {
+  color-scheme: light;
+  --background-color: var(--color-dota-canvas-light);
+  --foreground-color: var(--color-dota-ink);
+  --contrast-background-color: var(--foreground-color);
+  --contrast-foreground-color: var(--background-color);
+  --action-primary-background: var(--contrast-background-color);
+  --action-primary-foreground: var(--contrast-foreground-color);
+  --action-primary-hover: var(--code-background-color);
+  --muted-color: var(--color-dota-muted-light);
+  --surface-color: var(--color-pure-black-50);
+  --surface-raised-color: var(--color-dota-raised-light);
+  --border-color: var(--color-dota-border-light);
+  --border-strong-color: var(--color-inkstone-400);
+  --primary-color: var(--color-dota-violet-700);
+  --primary-color-hover: var(--color-dota-violet-800);
+  --primary-color-subtle: var(--color-dota-violet-50);
+  --primary-color-border: var(--color-dota-violet-300);
+  --primary-color-fill: var(--color-dota-violet-700);
+  --primary-color-fill-hover: var(--color-dota-violet-800);
+  --primary-color-on: var(--color-pure-black-50);
+  --focus-color: var(--primary-color);
+  --disabled-color: var(--muted-color);
+  --disabled-background-color: var(--surface-raised-color);
+  --success-color: var(--color-status-success-light);
+  --warning-color: var(--color-status-warning-light);
+  --danger-color: var(--color-status-danger-light);
+  --code-background-color: var(--color-midnight-black-950);
+  --code-foreground-color: var(--color-paper-50);
+  --code-muted-color: var(--color-inkstone-300);
+  --code-border-color: var(--color-slate-black-800);
+  --code-toolbar-color: var(--color-slate-black-950);
+  --code-accent-color: var(--color-dota-violet-300);
+  --code-success-color: var(--color-status-success-dark);
+  --code-warning-color: var(--color-status-warning-dark);
+  --code-danger-color: var(--color-status-danger-dark);
+  --ecosystem-core-color: var(--color-dota-violet-600);
+  --ecosystem-core-end: var(--color-dota-violet-800);
+  --ecosystem-ui-color: var(--color-google-berry-500);
+  --ecosystem-ui-end: var(--color-google-berry-700);
+  --ecosystem-router-color: var(--color-persimmon-400);
+  --ecosystem-router-end: var(--color-persimmon-700);
+  --ecosystem-rest-color: var(--color-google-blue-premium-400);
+  --ecosystem-rest-end: var(--color-google-blue-premium-700);
+  --ecosystem-event-color: var(--color-mature-webingo-teal-400);
+  --ecosystem-event-end: var(--color-mature-webingo-teal-700);
+  --ecosystem-wrap-color: var(--color-wisteria-bloom-400);
+  --ecosystem-wrap-end: var(--color-wisteria-bloom-700);
+  --ecosystem-md-color: var(--color-mountain-mist-400);
+  --ecosystem-md-end: var(--color-mountain-mist-700);
+  --ecosystem-plugin-color: var(--color-honeycomb-400);
+  --ecosystem-plugin-end: var(--color-honeycomb-700);
+  --highlight-color: var(--color-dota-highlight);
+  --shadow-color: var(--color-dota-shadow-light);
+  --shadow-lift: 0 12px 32px -16px var(--shadow-color);
+  --shadow-pop: 0 24px 64px -24px var(--shadow-color);
+  --scrim-color: var(--color-dota-scrim);
+  --glass-color: var(--surface-color);
+  --primary-color-wash: var(--primary-color-subtle);
+  --primary-color-ring: var(--primary-color-border);
+}
+
+html.dark {
+  color-scheme: dark;
+  --background-color: var(--color-dota-canvas-dark);
+  --foreground-color: var(--color-dota-paper);
+  --action-primary-hover: var(--color-pure-black-50);
+  --muted-color: var(--color-dota-muted-dark);
+  --surface-color: var(--color-dota-surface-dark);
+  --surface-raised-color: var(--color-dota-raised-dark);
+  --border-color: var(--color-dota-border-dark);
+  --border-strong-color: var(--color-inkstone-500);
+  --primary-color: var(--color-dota-violet-300);
+  --primary-color-hover: var(--color-dota-violet-400);
+  --primary-color-subtle: var(--color-dota-violet-950);
+  --primary-color-border: var(--color-dota-violet-600);
+  --primary-color-fill: var(--color-dota-violet-600);
+  --primary-color-fill-hover: var(--color-dota-violet-700);
+  --success-color: var(--color-status-success-dark);
+  --warning-color: var(--color-status-warning-dark);
+  --danger-color: var(--color-status-danger-dark);
+  --shadow-color: var(--color-dota-shadow-dark);
+}
+
+/* Override the UI package's body background in both modes. */
+html, html body, html.dark body {
+  background-color: var(--background-color);
+  color: var(--foreground-color);
+}
+
+@supports (color: color-mix(in srgb, black, white)) {
+  :root {
+    --glass-color: color-mix(in srgb, var(--surface-color) 88%, transparent);
+    --primary-color-wash: color-mix(in srgb, var(--primary-color) 10%, transparent);
+    --primary-color-ring: color-mix(in srgb, var(--primary-color) 24%, transparent);
+  }
+}
+
+::selection {
+  background: var(--primary-color-fill);
+  color: var(--primary-color-on);
+}
+
+::placeholder { color: var(--muted-color); opacity: 1; }
+
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 3px;
+}
+
+:where(button, input, textarea, select):disabled {
+  color: var(--disabled-color);
+  background: var(--disabled-background-color);
+  cursor: not-allowed;
+}
+
+@layer components {
+  .surface-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--layout-radius-card);
+    background: var(--surface-color);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .code-panel {
+    overflow: hidden;
+    border: 1px solid var(--code-border-color);
+    border-radius: var(--layout-radius-code);
+    background: var(--code-background-color);
+    color: var(--code-foreground-color);
+    box-shadow: var(--shadow-pop);
+  }
+
+  .code-toolbar {
+    background: var(--code-toolbar-color);
+    border-bottom: 1px solid var(--code-border-color);
+    color: var(--code-muted-color);
+  }
+
+}
