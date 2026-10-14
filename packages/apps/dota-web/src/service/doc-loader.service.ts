@@ -18,9 +18,10 @@ export class DocLoaderService {
       .build();
   }
 
-  async loadDoc(path: string): Promise<string> {
+  /** Loads the Markdown for a documentation page from `public/docs/<slug>.md`. */
+  async loadDoc(slug: string): Promise<string> {
     const response = await this.restClient.get()
-      .uri(`/documents/${path}`)
+      .uri(`/docs/${slug}.md`)
       .retrieve()
       .toResponse();
 
