@@ -33,9 +33,9 @@ export class OfferComponent extends BaseElement {
   render(): TemplateResult {
     return html`
         <div 
-            class="${this.isVisible ? '' : 'hidden'} relative font-dm flex items-center justify-center w-full bg-gradient-to-r from-purple-600 via-black to-purple-600 py-4"
+            class="${this.isVisible ? '' : 'hidden'} relative font-sans flex items-center justify-center w-full bg-gradient-to-r from-primary-subtle via-default to-primary-subtle py-4"
         >
-            <div class="text-lg text-white gap-x-4 hover:text-opacity-90 cursor-pointer flex">Write <span class="text-purple-600"> Reusable </span> HTML</div>
+            <div class="text-lg text-foreground gap-x-4 hover:text-opacity-90 cursor-pointer flex">Write <span class="text-primary"> Reusable </span> HTML</div>
             <span id="close" class="absolute right-10 focus:scale-95 cursor-pointer">
                     <dota-icon name="ic:twotone-close" color="gray" variant="soft" size="md"></dota-icon>
             </span>
