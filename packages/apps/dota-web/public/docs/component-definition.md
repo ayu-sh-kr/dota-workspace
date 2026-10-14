@@ -1,5 +1,5 @@
 # The `@Component` Decorator
-As discussed on the [Getting-Started](Getting-Started.md) the `@Component` decorator is used for storing metadata
+As discussed on the [Getting-Started](/docs/getting-started) the `@Component` decorator is used for storing metadata
 related to the definition of the component itself. Using the `reflect-metada` library, `dota-core` stores
 information such as html selector of the component, whether component will be rendered in shadow dom or normal
 dom. Apart from this it stores a reference to the component itself for initialization purpose

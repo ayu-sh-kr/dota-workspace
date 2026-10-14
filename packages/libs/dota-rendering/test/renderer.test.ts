@@ -3,6 +3,7 @@ import {
   deferRender,
   getDotaRenderingLogger,
   html,
+  nothing,
   patch,
   render,
   update
@@ -187,5 +188,24 @@ describe('renderer public API', () => {
 
     expect(() => instance.dispose()).not.toThrow();
     expect(root.innerHTML).toBe(committedMarkup);
+  });
+});
+
+describe('re-mounting a changed template', () => {
+  it('binds attributes to the new nodes, not to stale nodes sharing a locator', () => {
+    const view = (loading: boolean) => html`
+      <main>
+        ${loading ? html`<div class="skeleton"><div></div></div>` : nothing}
+        <ul>${['x', 'y'].map((item) => html`<li><a href="${`/${item}`}">${item}</a></li>`)}</ul>
+      </main>`;
+    const root = document.createElement('div');
+    document.body.append(root);
+
+    const instance = render(root, view(true));
+    update(instance, view(false));
+
+    expect(root.querySelector('.skeleton')).toBeNull();
+    expect([...root.querySelectorAll('a')].map((link) => link.getAttribute('href'))).toEqual(['/x', '/y']);
+    root.remove();
   });
 });

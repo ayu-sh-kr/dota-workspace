@@ -17,7 +17,7 @@ import {
 } from '@ayu-sh-kr/dota-rendering';
 import { type TocEntry } from '@dota/services/md.service.ts';
 import { type ThemeName } from '@dota/themes.ts';
-import { type ColorName } from '@dota/Types.ts';
+import { type ColorKey } from '@dota/Types.ts';
 import { type TocClasses, TocUtils } from '@dota/toc-utils.ts';
 
 /**
@@ -37,9 +37,10 @@ import { type TocClasses, TocUtils } from '@dota/toc-utils.ts';
  * | Attribute      | Default    | Description                                     |
  * |----------------|------------|-------------------------------------------------|
  * | `theme`        | `'flat'`   | Theme name — must be a key of `THEMES`.         |
- * | `color`        | `'indigo'` | Accent colour — a `ColorName` key.              |
+ * | `color`        | `'indigo'` | Accent colour — a theme color key.                |
  * | `header-height`| `64`       | Sticky header height in px for scroll offsets.  |
  * | `label`        | `'On this page'` | Text shown above the TOC list.          |
+ * | `container-class` | default column | Classes replacing the outer `<aside>` layout. |
  *
  * ### Events consumed
  * | Event              | Payload                  |
@@ -67,7 +68,7 @@ export class MdTocComponent extends BaseElement {
   theme: ThemeName = 'flat';
 
   @Property({ name: 'color', type: String })
-  color: ColorName = 'indigo';
+  color: ColorKey = 'indigo';
 
   /**
    * Sticky header height in pixels.  Must match your layout's header height, so
@@ -84,11 +85,30 @@ export class MdTocComponent extends BaseElement {
   @Property({ name: 'label', type: String })
   label: string = 'On this page';
 
+  /**
+   * Classes for the outer `<aside>`; replaces the default sticky right-hand column
+   * so the host layout can place the TOC. Attribute: `container-class`.
+   */
+  @Property({ name: 'container-class', type: String })
+  containerClass: string = '';
+
   private _toc: TocEntry[] = [];
   private _activeId: string = '';
 
   constructor() {
     super();
+  }
+
+  /**
+   * Adopts entries from prerendered markup before the first mount, so a hydrated TOC
+   * keeps highlighting headings even though no `md:render` event follows.
+   */
+  connectedCallback(): void {
+    if (!this._toc.length) {
+      this._toc = TocUtils.readEntries(this.querySelector('nav > ul'));
+      this._activeId = TocUtils.flatIds(this._toc)[0] ?? '';
+    }
+    super.connectedCallback();
   }
 
   /**
@@ -125,7 +145,7 @@ export class MdTocComponent extends BaseElement {
   onColorChange(event: ApplicationEvent<'md:color-change'>) {
     const c = event?.data?.color;
     if (c) {
-      this.color = c as ColorName;
+      this.color = c as ColorKey;
       this.updateHTML();
     }
   }
@@ -240,7 +260,7 @@ export class MdTocComponent extends BaseElement {
     `;
 
     return html`
-      <aside class="${containerClass}" aria-hidden="${hasItems ? 'false' : 'true'}">
+      <aside class="${this.containerClass || containerClass}" aria-hidden="${hasItems ? 'false' : 'true'}">
         ${when(hasItems, contents)}
       </aside>
     `;

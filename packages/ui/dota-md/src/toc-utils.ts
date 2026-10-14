@@ -1,6 +1,6 @@
 import type { TocEntry } from '@dota/services/md.service.ts';
 import type { ThemeName } from '@dota/themes.ts';
-import type { ColorName } from '@dota/Types.ts';
+import type { ColorKey } from '@dota/Types.ts';
 import { THEMES } from '@dota/themes.ts';
 
 // ─── TocClasses ───────────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ export interface TocClasses {
  * and any consuming application that wants to build its own TOC UI.
  *
  * ### Responsibilities
- * - Resolve Tailwind classes for links / active-bar from a `Theme` + `ColorName`.
+ * - Resolve Tailwind classes for links / active-bar from a `Theme` + color key.
  * - Flatten a nested `TocEntry[]` tree into an ordered list of heading IDs.
  * - Build the inner HTML string for a TOC list (recursive, theme-aware).
  * - Smooth-scroll a heading element into view below a sticky header.
@@ -41,7 +41,7 @@ export class TocUtils {
    *
    * Falls back to indigo tokens when the theme / color entry is absent.
    */
-  static resolveClasses(theme: ThemeName, color: ColorName): TocClasses {
+  static resolveClasses(theme: ThemeName, color: ColorKey): TocClasses {
     const entry   = THEMES[theme]?.color?.[color];
     const aToken  = entry?.a;
     const active  = aToken?.text  ?? 'text-indigo-600 dark:text-indigo-400';
@@ -67,6 +67,27 @@ export class TocUtils {
       ids.push(...TocUtils.flatIds(e.children));
     }
     return ids;
+  }
+
+  /**
+   * Rebuild TOC entries from an already rendered TOC list, such as prerendered `<md-toc>`
+   * markup, so a hydrated TOC keeps tracking headings without a new `md:render` event.
+   * Levels are derived from list nesting.
+   *
+   * @param list  The rendered `<ul>` whose `li > a[data-toc-id]` items hold the entries.
+   * @param level Heading level assigned to this list's items.
+   */
+  static readEntries(list: Element | null, level = 1): TocEntry[] {
+    return [...(list?.children ?? [])].flatMap((item) => {
+      const link = item.querySelector<HTMLElement>(':scope > a[data-toc-id]');
+      if (!link?.dataset.tocId) return [];
+      return [{
+        level,
+        id: link.dataset.tocId,
+        text: link.textContent?.trim() ?? '',
+        children: TocUtils.readEntries(item.querySelector(':scope > ul'), level + 1),
+      }];
+    });
   }
 
   /**

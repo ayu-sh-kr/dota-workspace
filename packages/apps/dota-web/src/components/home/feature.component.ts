@@ -88,7 +88,7 @@ export class FeatureComponent extends BaseElement {
 
             <!-- CTA -->
             <div class="hero-fade-up hero-delay-2 flex justify-center mt-10">
-                <a href="/docs?content=Getting-Started.md"
+                <a href="/docs/getting-started"
                    class="hero-cta-secondary text-sm font-medium text-gray-400 dark:text-gray-500
                           hover:text-purple-400 dark:hover:text-purple-400
                           transition-colors duration-200 flex items-center gap-1.5"

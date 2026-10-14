@@ -1,6 +1,6 @@
 import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {type MessageType} from "@dota/pages/chat.page.ts";
-import {MarkdownService} from "@dota/service/markdown.service.ts";
+import {MDService} from "@ayu-sh-kr/dota-md";
 
 @Component({
   selector: "message-card",
@@ -39,7 +39,7 @@ export class MessageCardComponent extends BaseElement {
 
   escapeHtml(html: string): string {
     if(!html) return "";
-    return MarkdownService.renderMarkdown(html);
+    return MDService.renderHtml(html);
   }
 
   render() {
