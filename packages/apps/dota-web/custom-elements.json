@@ -1116,35 +1116,35 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/docs/color-picker.component.js",
+      "path": "src/components/docs/docs-view.component.js",
       "declarations": [
         {
           "kind": "class",
-          "name": "ColorPickerComponent",
+          "name": "DocsViewComponent",
           "customElement": true,
-          "tagName": "color-picker",
+          "tagName": "docs-view",
           "superclass": {
             "name": "BaseElement"
           },
           "members": [
             {
               "kind": "field",
-              "name": "currentColor",
-              "attribute": "current-color",
+              "name": "slug",
+              "attribute": "slug",
               "type": {
                 "text": "string"
               },
-              "default": "indigo"
+              "default": ""
             }
           ],
           "attributes": [
             {
-              "name": "current-color",
-              "fieldName": "currentColor",
+              "name": "slug",
+              "fieldName": "slug",
               "type": {
                 "text": "string"
               },
-              "default": "indigo"
+              "default": ""
             }
           ]
         }
@@ -1152,322 +1152,16 @@
       "exports": [
         {
           "kind": "js",
-          "name": "ColorPickerComponent",
+          "name": "DocsViewComponent",
           "declaration": {
-            "name": "ColorPickerComponent"
+            "name": "DocsViewComponent"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "color-picker",
+          "name": "docs-view",
           "declaration": {
-            "name": "ColorPickerComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/docs/doc-content.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "DocContentComponent",
-          "customElement": true,
-          "tagName": "doc-content",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [
-            {
-              "kind": "field",
-              "name": "maxWidth",
-              "attribute": "max-width",
-              "type": {
-                "text": "string"
-              },
-              "default": "max-w-4xl"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "max-width",
-              "fieldName": "maxWidth",
-              "type": {
-                "text": "string"
-              },
-              "default": "max-w-4xl"
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "DocContentComponent",
-          "declaration": {
-            "name": "DocContentComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "doc-content",
-          "declaration": {
-            "name": "DocContentComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/docs/doc-header.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "DocHeaderComponent",
-          "customElement": true,
-          "tagName": "doc-header",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [
-            {
-              "kind": "field",
-              "name": "activeFile",
-              "attribute": "active-file",
-              "type": {
-                "text": "string"
-              },
-              "default": "Getting-Started.md"
-            },
-            {
-              "kind": "field",
-              "name": "color",
-              "attribute": "color",
-              "type": {
-                "text": "string"
-              },
-              "default": "indigo"
-            },
-            {
-              "kind": "field",
-              "name": "theme",
-              "attribute": "theme",
-              "type": {
-                "text": "string"
-              },
-              "default": "flat"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "active-file",
-              "fieldName": "activeFile",
-              "type": {
-                "text": "string"
-              },
-              "default": "Getting-Started.md"
-            },
-            {
-              "name": "color",
-              "fieldName": "color",
-              "type": {
-                "text": "string"
-              },
-              "default": "indigo"
-            },
-            {
-              "name": "theme",
-              "fieldName": "theme",
-              "type": {
-                "text": "string"
-              },
-              "default": "flat"
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "DocHeaderComponent",
-          "declaration": {
-            "name": "DocHeaderComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "doc-header",
-          "declaration": {
-            "name": "DocHeaderComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/docs/doc-path.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "DocPathComponent",
-          "customElement": true,
-          "tagName": "doc-path",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [
-            {
-              "kind": "field",
-              "name": "filePath",
-              "attribute": "file-path",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "file-path",
-              "fieldName": "filePath",
-              "type": {
-                "text": "string"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "DocPathComponent",
-          "declaration": {
-            "name": "DocPathComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "doc-path",
-          "declaration": {
-            "name": "DocPathComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/docs/doc-section.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "DocSectionComponent",
-          "customElement": true,
-          "tagName": "doc-section",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [],
-          "attributes": []
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "DocSectionComponent",
-          "declaration": {
-            "name": "DocSectionComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "doc-section",
-          "declaration": {
-            "name": "DocSectionComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/docs/doc-sidebar.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "DocSidebarComponent",
-          "customElement": true,
-          "tagName": "doc-sidebar",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [],
-          "attributes": []
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "DocSidebarComponent",
-          "declaration": {
-            "name": "DocSidebarComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "doc-sidebar",
-          "declaration": {
-            "name": "DocSidebarComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/docs/theme-picker.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "ThemePickerComponent",
-          "customElement": true,
-          "tagName": "theme-picker",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [
-            {
-              "kind": "field",
-              "name": "currentTheme",
-              "attribute": "current-theme",
-              "type": {
-                "text": "string"
-              },
-              "default": "flat"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "current-theme",
-              "fieldName": "currentTheme",
-              "type": {
-                "text": "string"
-              },
-              "default": "flat"
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "ThemePickerComponent",
-          "declaration": {
-            "name": "ThemePickerComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "theme-picker",
-          "declaration": {
-            "name": "ThemePickerComponent"
+            "name": "DocsViewComponent"
           }
         }
       ]
@@ -3049,91 +2743,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/utils/section/loader-section.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "LoaderSectionComponent",
-          "customElement": true,
-          "tagName": "loader-section",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [
-            {
-              "kind": "field",
-              "name": "isLoading",
-              "attribute": "is-loader",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "is-loader",
-              "fieldName": "isLoading",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "LoaderSectionComponent",
-          "declaration": {
-            "name": "LoaderSectionComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "loader-section",
-          "declaration": {
-            "name": "LoaderSectionComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/utils/section/loader.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "LoaderComponent",
-          "customElement": true,
-          "tagName": "app-loader",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [],
-          "attributes": []
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "LoaderComponent",
-          "declaration": {
-            "name": "LoaderComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "app-loader",
-          "declaration": {
-            "name": "LoaderComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/utils/section/no-content.component.js",
       "declarations": [
         {
@@ -3398,15 +3007,26 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/pages/doc-article.page.js",
+      "path": "src/pages/docs.page.js",
       "declarations": [
         {
           "kind": "class",
-          "name": "DocArticlePage",
+          "name": "DocsIndexPage",
           "customElement": true,
-          "tagName": "doc-article-page",
+          "tagName": "docs-index-page",
           "superclass": {
-            "name": "DotaPageElement"
+            "name": "DocsRoutePage"
+          },
+          "members": [],
+          "attributes": []
+        },
+        {
+          "kind": "class",
+          "name": "DocsPage",
+          "customElement": true,
+          "tagName": "docs-page",
+          "superclass": {
+            "name": "DocsRoutePage"
           },
           "members": [],
           "attributes": []
@@ -3415,49 +3035,30 @@
       "exports": [
         {
           "kind": "js",
-          "name": "DocArticlePage",
+          "name": "DocsIndexPage",
           "declaration": {
-            "name": "DocArticlePage"
+            "name": "DocsIndexPage"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "doc-article-page",
+          "name": "docs-index-page",
           "declaration": {
-            "name": "DocArticlePage"
+            "name": "DocsIndexPage"
           }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/pages/doc.page.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "DocPage",
-          "customElement": true,
-          "tagName": "doc-page",
-          "superclass": {
-            "name": "DotaPageElement"
-          },
-          "members": [],
-          "attributes": []
-        }
-      ],
-      "exports": [
+        },
         {
           "kind": "js",
-          "name": "DocPage",
+          "name": "DocsPage",
           "declaration": {
-            "name": "DocPage"
+            "name": "DocsPage"
           }
         },
         {
           "kind": "custom-element-definition",
-          "name": "doc-page",
+          "name": "docs-page",
           "declaration": {
-            "name": "DocPage"
+            "name": "DocsPage"
           }
         }
       ]
