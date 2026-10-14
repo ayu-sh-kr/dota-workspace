@@ -1,4 +1,5 @@
 import './style.css'
+import 'highlight.js/styles/github-dark.css'
 
 import {AppComponent} from "@dota/app.component.ts";
 import {ErrorPage, HomePage} from "@dota/pages";

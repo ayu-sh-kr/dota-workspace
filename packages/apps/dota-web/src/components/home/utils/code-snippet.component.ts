@@ -22,7 +22,7 @@ export class CodeSnippetComponent extends BaseElement {
 
   constructor() {
     super();
-    // Read code from text content, same pattern as MarkdownViewComponent,
+    // Read code from text content,
     // then dedent so template indentation doesn't appear in the rendered output.
     this.rawCode = CodeSnippetComponent.dedent(this.textContent ?? '');
   }

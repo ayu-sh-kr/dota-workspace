@@ -113,13 +113,26 @@ export async function prerenderRoute(
     waitForFetches.close();
     try {
       disableHydrationEmit?.();
-      await window.happyDOM.close();
+      await closePrerenderWindow(window);
     } finally {
       restoreGlobals();
       timings.cleanup = nodePerformance.now() - cleanupStarted;
       timings.total = nodePerformance.now() - started;
     }
   }
+}
+
+/**
+ * Detaches the rendered tree, then closes the route window.
+ * Disconnect callbacks may remove other nodes, such as a popover panel portalled to
+ * `<body>`. happy-dom's window teardown walks child lists with a cached length and
+ * fails when they shrink, so body children are removed one at a time first.
+ * @param window Route window whose page has already been serialized.
+ */
+export async function closePrerenderWindow(window: Window): Promise<void> {
+  const body = window.document.body;
+  while (body?.lastChild) body.removeChild(body.lastChild);
+  await window.happyDOM.close();
 }
 
 /** Module runner shared by every route rendered with one prerender server. */

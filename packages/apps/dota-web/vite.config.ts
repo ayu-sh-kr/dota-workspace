@@ -3,11 +3,13 @@ import {resolve} from "node:path";
 import {fileURLToPath} from "node:url";
 import {dotaVitePlugins} from "@ayu-sh-kr/dota-wrap/vite";
 import {blogPosts} from "./src/configs/blogs.config.ts";
+import {DOCS, docUrl} from "./src/configs/docs.config.ts";
 
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 const blogRoutes = blogPosts.map(post =>
   `/blogs/content/${encodeURIComponent(post.category)}/${encodeURIComponent(post.path)}`
 );
+const docRoutes = DOCS.map(doc => docUrl(doc.slug));
 
 export default defineConfig({
   oxc: {
@@ -42,7 +44,7 @@ export default defineConfig({
         concurrency: 1,
         entry: '/src/main.ts',
         autoDetectRoutes: true,
-        routes: blogRoutes,
+        routes: [...blogRoutes, ...docRoutes],
         deployment: 'vercel',
       },
     }),

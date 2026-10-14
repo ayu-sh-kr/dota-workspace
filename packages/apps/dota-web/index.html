@@ -5,13 +5,21 @@
     <link rel="icon" type="jpg" href="/images/logo.png"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Dota Web</title>
+    <style>html.dark { background-color: #020617; color-scheme: dark; }</style>
+    <script>
+        // Apply the saved theme before first paint; mirrors GeneralUtils.getBrowserTheme().
+        (function () {
+            var theme = localStorage.getItem('theme');
+            var dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+            if (dark) document.documentElement.classList.add('dark', 'bg-slate-950');
+        })();
+    </script>
 </head>
 <body>
 <div id="app">
     <app-root id="app-root"></app-root>
     <notification-holder id="dota-notification" position="bottom-right"></notification-holder>
     <dota-alert></dota-alert>
-    <loader-section></loader-section>
 </div>
 <script type="module" src="/src/main.ts"></script>
 </body>

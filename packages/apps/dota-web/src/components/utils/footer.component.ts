@@ -33,11 +33,11 @@ export class FooterComponent extends BaseElement {
               <h3 class="font-semibold text-gray-900 dark:text-white">Overview</h3>
               <ul class="mt-2 space-y-2 dark:text-white">
                 <li><a href="#" class="text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-300 transition-colors">Introduction</a></li>
-                <li><a href="/docs?content=Getting-Started.md" class="text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-300 transition-colors">Getting
+                <li><a href="/docs/getting-started" class="text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-300 transition-colors">Getting
                   Started</a></li>
-                <li><a href="/docs?content=Component-Registration.md" class="text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-300 transition-colors">Component
+                <li><a href="/docs/component-registration" class="text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-300 transition-colors">Component
                   API</a></li>
-                <li><a href="/docs?content=Guides.md" class="text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-300 transition-colors">Guides</a></li>
+                <li><a href="/docs/guides" class="text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-300 transition-colors">Guides</a></li>
                 <li><a href="#" class="text-gray-600 dark:text-gray-300 hover:text-purple-500 dark:hover:text-purple-300 transition-colors">FAQ</a></li>
               </ul>
             </div>

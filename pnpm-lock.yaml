@@ -72,9 +72,6 @@ catalogs:
     markdown-it-highlightjs:
       specifier: 4.3.0
       version: 4.3.0
-    markdown-it-toc-done-right:
-      specifier: 4.2.0
-      version: 4.2.0
     postcss:
       specifier: 8.5.10
       version: 8.5.10
@@ -171,9 +168,6 @@ importers:
       markdown-it-highlightjs:
         specifier: 'catalog:'
         version: 4.3.0
-      markdown-it-toc-done-right:
-        specifier: 'catalog:'
-        version: 4.2.0
       postcss:
         specifier: 'catalog:'
         version: 8.5.10
@@ -213,18 +207,6 @@ importers:
       highlight.js:
         specifier: 'catalog:'
         version: 11.11.1
-      markdown-it:
-        specifier: 'catalog:'
-        version: 14.3.0
-      markdown-it-anchor:
-        specifier: 'catalog:'
-        version: 9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.3.0)
-      markdown-it-highlightjs:
-        specifier: 'catalog:'
-        version: 4.3.0
-      markdown-it-toc-done-right:
-        specifier: 'catalog:'
-        version: 4.2.0
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -232,9 +214,6 @@ importers:
       '@tailwindcss/typography':
         specifier: 'catalog:'
         version: 0.5.19(tailwindcss@3.4.19)
-      '@types/markdown-it':
-        specifier: 'catalog:'
-        version: 14.1.2
       '@types/node':
         specifier: 'catalog:'
         version: 24.9.0
@@ -692,9 +671,6 @@ importers:
       markdown-it-highlightjs:
         specifier: 'catalog:'
         version: 4.3.0
-      markdown-it-toc-done-right:
-        specifier: 'catalog:'
-        version: 4.2.0
     devDependencies:
       '@ayu-sh-kr/dota-event-map-generator':
         specifier: workspace:*
@@ -2258,9 +2234,6 @@ packages:
 
   markdown-it-highlightjs@4.3.0:
     resolution: {integrity: sha512-dTEXpTV2J9WJiO8TA/FJ4DxidrYtTNcfBAdl+CLjQ3UFWj8s4dJyCPTcvoXNLmN5U5ZTCGu7TSkSvBvi4fUqkQ==}
-
-  markdown-it-toc-done-right@4.2.0:
-    resolution: {integrity: sha512-UB/IbzjWazwTlNAX0pvWNlJS8NKsOQ4syrXZQ/C72j+jirrsjVRT627lCaylrKJFBQWfRsPmIVQie8x38DEhAQ==}
 
   markdown-it@14.3.0:
     resolution: {integrity: sha512-RCEsPjR+sr0x+AuYp601tKTkgFG4YEPLCzHST3cQ/fhlJkqAkz1L2/Qbp1j9qw5SBwQHFBoW8+hoN5xssOF0Tw==}
@@ -4291,8 +4264,6 @@ snapshots:
   markdown-it-highlightjs@4.3.0:
     dependencies:
       highlight.js: 11.11.1
-
-  markdown-it-toc-done-right@4.2.0: {}
 
   markdown-it@14.3.0:
     dependencies:

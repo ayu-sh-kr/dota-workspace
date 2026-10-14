@@ -38,6 +38,9 @@
     "dev": "vite",
     "lint": "tsc",
     "build": "tsc && vite build",
+    "test": "tsc --noEmit && vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "build-pack": "pnpm build && pnpm pack",
     "preview": "vite preview",
     "release": "pnpm run build && changeset publish"
@@ -61,8 +64,7 @@
     "@ayu-sh-kr/dota-web-type-json": "workspace:*",
     "markdown-it": "catalog:",
     "markdown-it-anchor": "catalog:",
-    "markdown-it-highlightjs": "catalog:",
-    "markdown-it-toc-done-right": "catalog:"
+    "markdown-it-highlightjs": "catalog:"
   },
   "web-types": "./web-types.json"
 }
