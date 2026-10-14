@@ -1,3 +1,5 @@
+# Decorators
+
 `Dota-Core` relys on decorators to provide meta-data to the components. Decorators are a special kind of declaration that can be attached to a class or a method. They are used to modify the behavior of the class or method. 
 Decorators are a stage 2 proposal for JavaScript and are available in TypeScript.
 
