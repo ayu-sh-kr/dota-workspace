@@ -96,68 +96,68 @@
       "permanent": true
     },
     {
-      "source": "/docs/Component-Definition",
-      "destination": "/docs/Component-Definition/",
+      "source": "/docs/component-definition",
+      "destination": "/docs/component-definition/",
       "permanent": true
     },
     {
-      "source": "/docs/Component-Registration",
-      "destination": "/docs/Component-Registration/",
+      "source": "/docs/component-registration",
+      "destination": "/docs/component-registration/",
       "permanent": true
     },
     {
-      "source": "/docs/Core",
-      "destination": "/docs/Core/",
+      "source": "/docs/core",
+      "destination": "/docs/core/",
       "permanent": true
     },
     {
-      "source": "/docs/Decorators",
-      "destination": "/docs/Decorators/",
+      "source": "/docs/decorators",
+      "destination": "/docs/decorators/",
       "permanent": true
     },
     {
-      "source": "/docs/Event-Binding",
-      "destination": "/docs/Event-Binding/",
+      "source": "/docs/event-binding",
+      "destination": "/docs/event-binding/",
       "permanent": true
     },
     {
-      "source": "/docs/Event-Emitter",
-      "destination": "/docs/Event-Emitter/",
+      "source": "/docs/event-emitter",
+      "destination": "/docs/event-emitter/",
       "permanent": true
     },
     {
-      "source": "/docs/Getting-Started",
-      "destination": "/docs/Getting-Started/",
+      "source": "/docs/getting-started",
+      "destination": "/docs/getting-started/",
       "permanent": true
     },
     {
-      "source": "/docs/Guides",
-      "destination": "/docs/Guides/",
+      "source": "/docs/guides",
+      "destination": "/docs/guides/",
       "permanent": true
     },
     {
-      "source": "/docs/Life-Cycle",
-      "destination": "/docs/Life-Cycle/",
+      "source": "/docs/life-cycle",
+      "destination": "/docs/life-cycle/",
       "permanent": true
     },
     {
-      "source": "/docs/Property-Binding",
-      "destination": "/docs/Property-Binding/",
+      "source": "/docs/property-binding",
+      "destination": "/docs/property-binding/",
       "permanent": true
     },
     {
-      "source": "/docs/Reactivity",
-      "destination": "/docs/Reactivity/",
+      "source": "/docs/reactivity",
+      "destination": "/docs/reactivity/",
       "permanent": true
     },
     {
-      "source": "/docs/Rest-Client",
-      "destination": "/docs/Rest-Client/",
+      "source": "/docs/rest-client",
+      "destination": "/docs/rest-client/",
       "permanent": true
     },
     {
-      "source": "/docs/Router",
-      "destination": "/docs/Router/",
+      "source": "/docs/router",
+      "destination": "/docs/router/",
       "permanent": true
     }
   ],
