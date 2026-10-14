@@ -146,21 +146,29 @@ associate each comment with the correct `@Property` node.
 isLoading = false;
 ```
 
-## Document members selectively
+## Explain methods for maintainers
 
 For individual class members and module-level support functions, follow the `$code-documentation` skill. Read its
 `SKILL.md` before writing member TSDoc and use its concise purpose, rationale,
-parameter, return-value, and failure-mode standard. Add member comments only for
-non-trivial public APIs, lifecycle handlers, event handlers whose policy is not
-clear from their name, and helpers with a maintenance hazard. For animation
-components, this includes helpers that normalize inputs, resolve palettes or
-styles, manage canvas/frame loops, attach global listeners, or return cleanup
-functions. Do not duplicate the class contract on every decorated field or
-method, and do not comment simple fields, constructors, or obvious render methods.
+parameter, return-value, and failure-mode standard. Explain behavior in plain language
+to a developer who has not just read the code: say what the method is for, what observable
+work it performs, what important ordering or guard it preserves, and what happens when
+input is missing or unsupported. Explain relationships such as “restore state, then
+publish it” or “skip the fetch when prerendered”; do not merely translate each statement.
+
+Document every non-trivial lifecycle hook, event handler, state/selection helper, render
+helper, and private method whose policy could be accidentally changed. A method comment
+should normally be 2–5 focused sentences (5–9 lines), with `@param`, `@returns`, or
+`@throws` when useful. One-line comments are acceptable only for truly obvious accessors
+or pure template fragments. For hydration-sensitive components, explicitly document which
+DOM nodes must stay stable, how prerendered content is detected, and why a loading or
+fallback branch is selected.
 
 ## Final review
 
 Confirm that the class TSDoc matches the current decorators and template, every
 public input and meaningful state transition is covered, incoming and outgoing
 events state their source and effect, framework behavior is distinguished from
-component-specific behavior, and member comments follow `$code-documentation`.
+component-specific behavior, and every non-trivial method can be understood without
+reading its implementation line by line. Check that comments explain why guards,
+ordering, persistence, fallback, hydration, or child-element stability matter.
