@@ -80,6 +80,7 @@ Sticky Table of Contents sidebar. Highlights the active heading on scroll, smoot
 | `color`         | `indigo`       | Accent colour.                                           |
 | `header-height` | `64`           | Sticky header height in px, used for scroll offset.      |
 | `label`         | `On this page` | Text displayed above the TOC list.                       |
+| `container-class` | sticky column | Classes replacing the outer `<aside>` layout.          |
 
 **Usage**
 
