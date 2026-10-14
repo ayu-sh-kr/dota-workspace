@@ -42,11 +42,9 @@ export class DevicePreviewComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-      <div class="flex flex-col justify-center items-center gap-y-4 rounded-3xl border border-white/70
-                  bg-white/[0.45] px-5 py-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_18px_58px_-48px_rgba(15,23,42,0.9)]
-                  backdrop-blur-2xl dark:border-white/10 dark:bg-white/[0.04]
-                  dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_18px_58px_-48px_rgba(0,0,0,0.92)]">
-        <img src="${this.image}" alt="dota-react" class="${this.shadowColor}"/>
+      <div class="flex flex-col justify-center items-center gap-y-4 rounded-card border border-default bg-surface
+              px-5 py-6 shadow-lift backdrop-blur-2xl">
+        <img src="${this.image}" alt="${this.label}" class="${this.shadowColor}"/>
         <dota-button label="${this.label}" color="${this.color}" variant="soft" round="md"></dota-button>
       </div>
     `
@@ -54,8 +52,8 @@ export class DevicePreviewComponent extends BaseElement {
 }
 
 export const FrameworkStyleConfig = {
-  react: "framework-logo saturate-90 opacity-90 hover:drop-shadow-[0px_18px_28px_rgba(34,211,238,0.22)]",
-  angular: "framework-logo saturate-90 opacity-90 hover:drop-shadow-[0px_18px_28px_rgba(220,38,38,0.20)]",
-  vue: "framework-logo saturate-90 opacity-90 hover:drop-shadow-[0px_18px_28px_rgba(22,163,74,0.20)]",
-  solid: "framework-logo saturate-90 opacity-90 hover:drop-shadow-[0px_18px_28px_rgba(147,51,234,0.22)]",
+  react: "framework-logo framework-react",
+  angular: "framework-logo framework-angular",
+  vue: "framework-logo framework-vue",
+  solid: "framework-logo framework-solid",
 }
