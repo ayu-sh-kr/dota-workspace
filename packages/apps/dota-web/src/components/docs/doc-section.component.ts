@@ -2,6 +2,7 @@ import {ApplicationEventService, BaseElement, Component} from "@ayu-sh-kr/dota-w
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
+import {resolveDocFile} from "@dota/utils/doc-route.utils.ts";
 
 /**
  * DocSectionComponent
@@ -54,10 +55,9 @@ export class DocSectionComponent extends BaseElement {
     }
   }
 
-  /** Active file name derived from the ?content= query param. */
+  /** Active file name derived from the docs path or the legacy ?content= query. */
   private get activeFile(): string {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('content') ?? 'Getting-Started.md';
+    return resolveDocFile(window.location.pathname, window.location.search);
   }
 
   render(): TemplateResult {
