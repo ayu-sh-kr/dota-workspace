@@ -59,37 +59,27 @@ export class ToolListItemComponent extends BaseElement {
     if (!tool) return html`<div class="h-[60px]"></div>`;
 
     return html`
-        <button class="group flex w-full items-center gap-2 sm:gap-3 rounded-2xl px-4 py-4 text-left
-                       cursor-pointer transition-all duration-300 backdrop-blur-2xl
-                       border border-white/70 dark:border-white/10
-                       bg-white/[0.52] dark:bg-white/[0.04]
-                       shadow-[inset_0_1px_0_rgba(255,255,255,0.68),0_14px_48px_-42px_rgba(15,23,42,0.86)]
-                       dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_14px_48px_-42px_rgba(0,0,0,0.9)]
-                       hover:-translate-y-0.5 hover:border-purple-300/30
-                       data-[active]:border-purple-300/35 data-[active]:bg-white/[0.68]
-                       dark:data-[active]:bg-white/[0.06]">
-            <div class="flex-shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-lg
-                        bg-white/55 dark:bg-white/[0.055] border border-purple-300/25 dark:border-purple-300/15
-                        flex items-center justify-center
-                        transition-colors duration-200
-                        group-data-[active]:bg-purple-500/[0.12]">
+        <button class="group flex w-full items-center gap-2 sm:gap-3 rounded-card px-4 py-4 text-left cursor-pointer
+                transition-all duration-300 backdrop-blur-2xl border border-default bg-surface shadow-lift
+                hover:-translate-y-0.5 hover:border-primary-border data-[active]:border-primary-border
+                data-[active]:bg-surface">
+            <div class="flex-shrink-0 w-7 h-7 sm:w-9 sm:h-9 rounded-control bg-surface border border-primary-border
+                    flex items-center justify-center transition-colors duration-200
+                    group-data-[active]:bg-primary-subtle">
                 <dota-icon name="${tool.icon}" color="purple" size="sm" variant="ghost"></dota-icon>
             </div>
             <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold font-mono truncate transition-colors duration-200
-                          text-gray-700 dark:text-gray-300
-                          group-data-[active]:text-gray-900 dark:group-data-[active]:text-gray-100">
+                <p class="text-sm font-semibold font-mono truncate transition-colors duration-200 text-foreground
+                        group-data-[active]:text-foreground">
                     ${tool.name}
                 </p>
-                <p class="text-xs truncate mt-0.5 transition-colors duration-200
-                          text-gray-400 dark:text-gray-500
-                          group-data-[active]:text-gray-500 dark:group-data-[active]:text-gray-400">
+                <p class="text-xs truncate mt-0.5 transition-colors duration-200 text-muted group-data-[active]:text-muted">
                     ${tool.tagline}
                 </p>
             </div>
             <dota-icon name="material-symbols:chevron-right-rounded" color="purple" size="sm"
-                       class="opacity-0 group-hover:opacity-60 group-data-[active]:opacity-100
-                              transition-opacity duration-200"></dota-icon>
+                       class="opacity-0 group-hover:opacity-60 group-data-[active]:opacity-100 transition-opacity
+                               duration-200"></dota-icon>
         </button>
     `;
   }
