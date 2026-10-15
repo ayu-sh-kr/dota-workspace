@@ -1,6 +1,7 @@
 import {Sanitizer} from "@dota/core";
 import type {BaseElement, PropertyDetails, PropertyType} from "@dota/core";
-import {CoreMetadata, Metadata, type MetadataRecord} from "@dota/core/metadata";
+import {Metadata, type MetadataRecord} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
 
 /** Carries the quietly resolved property value and whether markup supplied it. */
 type InitialPropertyValue = {
