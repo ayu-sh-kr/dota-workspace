@@ -105,8 +105,11 @@ so every decorator is metadata-only. For a TC39 migration, only the decorator si
 - `HelperUtils.getComponentMetadata(ctor, 'Component')` stays public. dota-router and dota-ssr
   call it, and dota-ssr tests define `Component` with `Reflect`. It reads the layer first, then
   falls back to `reflect-metadata`.
-- `HelperUtils.fetchOrCreate` and `readMetadata` become deprecated wrappers over
-  `reflect-metadata` for third-party code. dota-core no longer uses them.
+- `HelperUtils.fetchOrCreate` is deprecated but compatible. For the appenders the decorators
+  used (`Property`, `State`, `Bind`, `Host`, `Window`, `Document`, `Output`, `Param`, `Element`,
+  `Exposed`, `Before`, `After`, `Watcher:<name>`), it returns a live `Map` view of the layer in
+  the old entry shapes, so existing readers and writers keep working. Other appenders keep the
+  `reflect-metadata` storage. dota-core itself no longer calls it.
 - `reflect-metadata` stays a dependency, because `emitDecoratorMetadata` output and dota-event
   need `Reflect.metadata`.
 
