@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { BaseElement, Component, Property, State, Watcher } from '@dota/core';
-import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
 import { Number, String } from '@dota/core';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
