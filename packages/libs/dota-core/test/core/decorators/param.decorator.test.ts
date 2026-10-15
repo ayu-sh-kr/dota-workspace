@@ -1,11 +1,12 @@
 import 'reflect-metadata';
-import { BaseElement, Component, HelperUtils } from '@dota/core';
+import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import { BaseElement, Component } from '@dota/core';
 import { Param } from '@dota/core/decorators/param.decorator.ts';
 import { ParameterConfig } from '@dota/core/types';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
-function getParamMetadata(target: any): Map<string, ParameterConfig> {
-  return HelperUtils.fetchOrCreate<ParameterConfig>(target, 'Param');
+function getParamMetadata(target: any): ReadonlyMap<string, ParameterConfig> {
+  return Metadata.for(target).own(CoreMetadata.params);
 }
 
 let urlSearchParamsSpy: {mockRestore: () => void} | undefined;
