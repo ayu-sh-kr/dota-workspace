@@ -1,4 +1,4 @@
-import {HelperUtils} from "@dota/core";
+import {CoreMetadata, Metadata} from "@dota/core/metadata";
 
 /**
  * A method decorator that registers a method to be called before the initialization of a custom element.
@@ -24,9 +24,8 @@ import {HelperUtils} from "@dota/core";
 function BeforeInitDecorator(): MethodDecorator {
   return function (target: any, propertyKey: string | any, descriptor: PropertyDescriptor) {
 
-    let data = HelperUtils.fetchOrCreate<Function>(target, 'Before');
-
-    data.set(propertyKey.toString(), descriptor.value);
+    const name = propertyKey.toString();
+    Metadata.for(target).add(CoreMetadata.beforeInit, name, {name, method: descriptor.value});
 
     return descriptor;
   }
