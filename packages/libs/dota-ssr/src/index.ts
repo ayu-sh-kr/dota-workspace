@@ -1,4 +1,4 @@
-import {HelperUtils, type ComponentConfig} from '@ayu-sh-kr/dota-core';
+import {CoreMetadata, Metadata} from '@ayu-sh-kr/dota-core';
 import {
   HYDRATION_COMPONENT_ATTRIBUTE,
   HYDRATION_SCOPE_ATTRIBUTE,
@@ -212,8 +212,8 @@ function rootHasMarkedPage(
   handoff?: InitialRouteHandoff
 ): boolean {
   if (match.route.render) return false;
-  const rootConfig = HelperUtils.getComponentMetadata(root, 'Component') as ComponentConfig | undefined;
-  const pageConfig = HelperUtils.getComponentMetadata(match.route.component, 'Component') as ComponentConfig | undefined;
+  const rootConfig = Metadata.for(root).own(CoreMetadata.component);
+  const pageConfig = Metadata.for(match.route.component).own(CoreMetadata.component);
   if (!rootConfig?.selector || !pageConfig?.selector) return false;
 
   const rootElement = handoff?.root ?? document.getElementById(rootConfig.selector);
@@ -237,7 +237,7 @@ function rootHasMarkedPage(
  * @returns A startup handoff when the current document contains an eligible route host.
  */
 function captureInitialRoute(root: ComponentClass): InitialRouteHandoff | undefined {
-  const rootConfig = HelperUtils.getComponentMetadata(root, 'Component') as ComponentConfig | undefined;
+  const rootConfig = Metadata.for(root).own(CoreMetadata.component);
   if (!rootConfig?.selector) return undefined;
 
   const rootElement = document.getElementById(rootConfig.selector) ?? document.querySelector(rootConfig.selector);
