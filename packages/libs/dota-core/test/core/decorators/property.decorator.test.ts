@@ -1,11 +1,12 @@
 import 'reflect-metadata';
-import { BaseElement, Component, Property, HelperUtils } from '@dota/core';
+import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import { BaseElement, Component, Property } from '@dota/core';
 import { Number, String, Boolean } from '@dota/core';
 import { PropertyDetails } from '@dota/core/types';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
-function getPropertyMetadata(target: any): Map<string, PropertyDetails> {
-  return HelperUtils.fetchOrCreate<PropertyDetails>(target, 'Property');
+function getPropertyMetadata(target: any): ReadonlyMap<string, PropertyDetails> {
+  return Metadata.for(target).own(CoreMetadata.properties);
 }
 
 describe('@Property decorator – metadata registration', () => {
@@ -71,12 +72,31 @@ describe('@Property decorator – metadata registration', () => {
   });
 
   it('adds the attribute name to observedAttributes on the constructor', () => {
-    class Host {
+    class Host extends BaseElement {
       @Property({ name: 'count', type: Number })
       count!: number;
+
+      render() { return ``; }
     }
 
-    expect((Host as any).observedAttributes).toContain('count');
+    expect((Host as any).observedAttributes).toEqual(['count']);
+  });
+
+  it('inherits parent attributes without adding the child\'s to the parent', () => {
+    class Parent extends BaseElement {
+      @Property({ name: 'base', type: String })
+      base!: string;
+
+      render() { return ``; }
+    }
+
+    class Child extends Parent {
+      @Property({ name: 'extra', type: Number })
+      extra!: number;
+    }
+
+    expect((Child as any).observedAttributes).toEqual(['base', 'extra']);
+    expect((Parent as any).observedAttributes).toEqual(['base']);
   });
 
   it('does not share metadata between two sibling classes', () => {
