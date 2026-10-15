@@ -26,9 +26,12 @@ import components from "virtual:dota-components";
 import {ApplicationEventService} from "@ayu-sh-kr/dota-wrap/core";
 import {NotificationService} from "@dota/components/utils/notification/notification.service.ts";
 import {DefaultApplicationEventListenerRegistry} from "@ayu-sh-kr/dota-wrap/event";
-import {MdTocComponent, MdViewComponent} from "@ayu-sh-kr/dota-md";
+import {MDService, MdTocComponent, MdViewComponent} from "@ayu-sh-kr/dota-md";
 import {routeConfig} from "virtual:dota-routes";
 import {dotaHydration} from "@ayu-sh-kr/dota-wrap/ssr";
+import {markdownSetup} from "@dota/configs/markdown.config.ts";
+
+MDService.configure(markdownSetup);
 
 const applicationEventService = ApplicationEventService.getInstance();
 const applicationEventPublisher = applicationEventService.getPublisher();

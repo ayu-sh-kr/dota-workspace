@@ -1,7 +1,6 @@
 import markdownit, { type Options as MarkdownItOptions, type PluginSimple, type PluginWithParams } from 'markdown-it';
 import type MarkdownIt from 'markdown-it';
 import type Token from 'markdown-it/lib/token.mjs';
-import highlightjs from 'markdown-it-highlightjs';
 import anchor from 'markdown-it-anchor';
 import { ApplicationEventService } from '@ayu-sh-kr/dota-core';
 
@@ -30,7 +29,8 @@ export interface MarkdownResult {
 }
 
 /**
- * Replaces the default highlight.js integration.
+ * Highlights fenced code. `dota-md` ships no highlighter, so applications choose the library
+ * and the languages they bundle.
  * Receives the fenced block's source and language and returns highlighted HTML, or an
  * empty string to let markdown-it escape the code itself.
  */
@@ -40,7 +40,11 @@ export type MarkdownHighlighter = (code: string, language: string) => string;
 export interface MarkdownSetup {
   /** markdown-it options merged over the defaults (`html`, `linkify`, `typographer`). */
   options?: MarkdownItOptions;
-  /** Custom highlighter, or `false` to render fenced code without highlighting. Defaults to highlight.js. */
+  /**
+   * Highlighter for fenced code. Omitted or `false` renders escaped code without highlighting.
+   * A plugin that sets markdown-it's highlighter, such as `markdown-it-highlightjs`, also works
+   * through {@link MarkdownSetup.plugins}.
+   */
   highlight?: MarkdownHighlighter | false;
   /** Extra plugins applied after the built-in ones, e.g. `[footnote, [container, 'tip']]`. */
   plugins?: Array<PluginSimple | [plugin: PluginWithParams, ...params: any[]]>;
@@ -56,8 +60,8 @@ export interface MarkdownRenderOptions {
 
 /**
  * Builds a markdown-it instance with the `dota-md` defaults: raw HTML, linkify, typographer,
- * heading anchors, and highlight.js. Pass a {@link MarkdownSetup} to swap the highlighter,
- * change parser options, or add plugins.
+ * and heading anchors. Fenced code is escaped but not highlighted; pass a {@link MarkdownSetup}
+ * to add a highlighter, change parser options, or add plugins.
  *
  * @example
  * ```ts
@@ -71,8 +75,7 @@ export function createMarkdown(setup: MarkdownSetup = {}): MarkdownIt {
   const { options, highlight, plugins = [] } = setup;
   const md = markdownit({ html: true, linkify: true, typographer: true, breaks: false, ...options });
 
-  if (typeof highlight === 'function') md.set({ highlight });
-  else if (highlight !== false) md.use(highlightjs, { auto: true, code: true });
+  if (highlight) md.set({ highlight });
 
   md.use(anchor);
   for (const plugin of plugins) {
@@ -121,7 +124,7 @@ function extractToc(tokens: Token[]): TocEntry[] {
  * ```ts
  * const { html, toc } = MDService.render(rawMd);
  * MDService.render(rawMd, { publish: true });
- * MDService.configure({ highlight: false });
+ * MDService.configure({ highlight: (code, lang) => myHighlighter(code, lang) });
  * ```
  */
 export class MDService {
@@ -133,16 +136,26 @@ export class MDService {
   private static _cacheLimit = 50;
 
   /**
-   * Replaces the markdown-it instance and clears the cache.
-   * Any instance works; headings receive TOC ids when it uses `markdown-it-anchor`
-   * (as {@link createMarkdown} does) or another plugin that sets heading `id` attributes.
+   * Swaps the shared parser for an instance the application built itself.
+   * Every later render uses it, and cached results are cleared so no page keeps HTML
+   * produced by the previous parser.
+   * Headings receive TOC ids only when the instance uses `markdown-it-anchor` (as
+   * {@link createMarkdown} does) or another plugin that sets heading `id` attributes.
+   * @param md Fully configured markdown-it instance to render with from now on.
    */
   static setMd(md: MarkdownIt): void {
     MDService._md = md;
     MDService._cache.clear();
   }
 
-  /** Rebuilds the shared instance from a {@link MarkdownSetup}; shorthand for `setMd(createMarkdown(setup))`. */
+  /**
+   * Applies the application's Markdown setup, such as its syntax highlighter, parser options,
+   * or extra plugins, to every later render.
+   * Call it once at startup, before the first render: content rendered earlier stays in its
+   * old form, and prerendered and client-rendered pages only match when both use the same setup.
+   * Equivalent to `setMd(createMarkdown(setup))`, so the cache is cleared as well.
+   * @param setup Highlighter, parser options, and plugins; omitted fields keep the `dota-md` defaults.
+   */
   static configure(setup: MarkdownSetup): void {
     MDService.setMd(createMarkdown(setup));
   }

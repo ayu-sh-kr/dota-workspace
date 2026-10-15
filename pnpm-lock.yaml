@@ -207,6 +207,9 @@ importers:
       highlight.js:
         specifier: 'catalog:'
         version: 11.11.1
+      markdown-it-highlightjs:
+        specifier: 'catalog:'
+        version: 4.3.0
       reflect-metadata:
         specifier: 'catalog:'
         version: 0.2.2
@@ -668,9 +671,6 @@ importers:
       markdown-it-anchor:
         specifier: 'catalog:'
         version: 9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.3.0)
-      markdown-it-highlightjs:
-        specifier: 'catalog:'
-        version: 4.3.0
     devDependencies:
       '@ayu-sh-kr/dota-event-map-generator':
         specifier: workspace:*
