@@ -88,7 +88,7 @@ export class PropertyUtils {
    * @returns Changed public property name, or undefined when no semantic value changed.
    */
   static bindAttribute(element: BaseElement, name: string, value: string): string | undefined {
-    const property = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property').get(name);
+    const property = HelperUtils.readMetadata<PropertyDetails>(element, 'Property').get(name);
     if (!property) return;
 
     const nextValue = Sanitizer.sanitize(value, property.type);
@@ -112,7 +112,7 @@ export class PropertyUtils {
    * @param element Component about to perform its initial mount or hydration attempt.
    */
   static seedInitialValues(element: BaseElement): void {
-    const properties = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property');
+    const properties = HelperUtils.readMetadata<PropertyDetails>(element, 'Property');
     properties.forEach((meta) => {
       const resolved = this.resolveInitialValue(element, meta).value;
       if (resolved === undefined || this.isEquivalentValue(element[meta.prototype], resolved, meta.type)) return;
@@ -176,7 +176,7 @@ export class PropertyUtils {
    * ```
    */
   static bindReactive(element: any) {
-    const data = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property');
+    const data = HelperUtils.readMetadata<PropertyDetails>(element, 'Property');
 
     data.forEach((meta: PropertyDetails) => {
       const publicKey = meta.prototype; // the actual property name, e.g. "duration"
@@ -271,7 +271,7 @@ export class PropertyUtils {
   }
 
   static bindWatchers(element: BaseElement, prototype: string) {
-    const watchers = HelperUtils.fetchOrCreate<WatcherOptionMeta>(element, `Watcher:${prototype}`);
+    const watchers = HelperUtils.readMetadata<WatcherOptionMeta>(element, `Watcher:${prototype}`);
     if (watchers && watchers.size > 0) {
       watchers.forEach((item: WatcherOptionMeta) => {
         if (element[item.name] && typeof element[item.name] === 'function') {
@@ -299,7 +299,7 @@ export class PropertyUtils {
    * element.reactive // false
    */
   static unbindReactive(element: any) {
-    let data = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property');
+    let data = HelperUtils.readMetadata<PropertyDetails>(element, 'Property');
 
     data.forEach((value: PropertyDetails) => {
       const propertyKey = `_${value.prototype}`;
