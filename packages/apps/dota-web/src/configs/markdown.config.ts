@@ -1,4 +1,4 @@
-import {MDService} from "@ayu-sh-kr/dota-md";
+import type {MarkdownSetup} from "@ayu-sh-kr/dota-md";
 import hljs from "highlight.js/lib/core";
 import bash from "highlight.js/lib/languages/bash";
 import css from "highlight.js/lib/languages/css";
@@ -19,12 +19,14 @@ import highlightjs from "markdown-it-highlightjs/core";
  */
 const LANGUAGES = {bash, css, javascript, json, kotlin, lua, plaintext, python, shell, typescript, xml};
 
+Object.entries(LANGUAGES).forEach(([name, language]) => hljs.registerLanguage(name, language));
+
 /**
- * Installs the site's highlight.js setup on the shared Markdown service.
- * Only the registered grammars are bundled, and unlabeled fences are auto-detected among them.
- * Call it before the application renders so prerendered and hydrated pages highlight alike.
+ * The site's Markdown setup, passed to `MDService.configure` before the application starts.
+ * Highlights fenced code with the trimmed highlight.js above, so only the registered grammars
+ * are bundled; unlabeled fences are auto-detected among them, and code gets the `hljs` class
+ * that the highlight.js theme styles.
  */
-export function configureMarkdown(): void {
-  Object.entries(LANGUAGES).forEach(([name, language]) => hljs.registerLanguage(name, language));
-  MDService.configure({plugins: [[highlightjs, {hljs, auto: true, code: true}]]});
-}
+export const markdownSetup: MarkdownSetup = {
+  plugins: [[highlightjs, {hljs, auto: true, code: true}]],
+};
