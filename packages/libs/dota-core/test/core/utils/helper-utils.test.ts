@@ -321,3 +321,28 @@ describe('HelperUtils.toDotaElementConstructor', () => {
   });
 });
 
+
+describe('HelperUtils.readMetadata', () => {
+
+  it('returns the class metadata registered by decorators', () => {
+    class Reader {}
+    HelperUtils.fetchOrCreate<string>(Reader.prototype, 'Bind').set('key', 'value');
+
+    expect(HelperUtils.readMetadata<string>(new Reader(), 'Bind').get('key')).toBe('value');
+  });
+
+  it('returns the same map for every instance of a class', () => {
+    class Shared {}
+    HelperUtils.fetchOrCreate(Shared.prototype, 'Bind');
+
+    expect(HelperUtils.readMetadata(new Shared(), 'Bind')).toBe(HelperUtils.readMetadata(new Shared(), 'Bind'));
+  });
+
+  it('returns an empty map without defining metadata on the instance', () => {
+    class Missing {}
+    const target = new Missing();
+
+    expect(HelperUtils.readMetadata(target, 'Absent').size).toBe(0);
+    expect(Reflect.hasMetadata('Missing:Absent', target)).toBe(false);
+  });
+});
