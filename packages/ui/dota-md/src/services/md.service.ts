@@ -136,16 +136,26 @@ export class MDService {
   private static _cacheLimit = 50;
 
   /**
-   * Replaces the markdown-it instance and clears the cache.
-   * Any instance works; headings receive TOC ids when it uses `markdown-it-anchor`
-   * (as {@link createMarkdown} does) or another plugin that sets heading `id` attributes.
+   * Swaps the shared parser for an instance the application built itself.
+   * Every later render uses it, and cached results are cleared so no page keeps HTML
+   * produced by the previous parser.
+   * Headings receive TOC ids only when the instance uses `markdown-it-anchor` (as
+   * {@link createMarkdown} does) or another plugin that sets heading `id` attributes.
+   * @param md Fully configured markdown-it instance to render with from now on.
    */
   static setMd(md: MarkdownIt): void {
     MDService._md = md;
     MDService._cache.clear();
   }
 
-  /** Rebuilds the shared instance from a {@link MarkdownSetup}; shorthand for `setMd(createMarkdown(setup))`. */
+  /**
+   * Applies the application's Markdown setup, such as its syntax highlighter, parser options,
+   * or extra plugins, to every later render.
+   * Call it once at startup, before the first render: content rendered earlier stays in its
+   * old form, and prerendered and client-rendered pages only match when both use the same setup.
+   * Equivalent to `setMd(createMarkdown(setup))`, so the cache is cleared as well.
+   * @param setup Highlighter, parser options, and plugins; omitted fields keep the `dota-md` defaults.
+   */
   static configure(setup: MarkdownSetup): void {
     MDService.setMd(createMarkdown(setup));
   }
