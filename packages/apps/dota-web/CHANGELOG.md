@@ -1,5 +1,11 @@
 # doto-web
 
+## 0.0.50
+
+### Patch Changes
+
+- @ayu-sh-kr/dota-wrap@0.2.3
+
 ## 0.0.49
 
 ### Patch Changes
