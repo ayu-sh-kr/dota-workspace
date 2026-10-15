@@ -1,5 +1,5 @@
 import {
-  BindConfig, ElementConfigInternal, EventDetails,
+  BindConfig, ElementConfigInternal, EventDetails, EventType,
   EventOptionMeta,
   MethodDetails, ParameterConfig,
   StateConfig
@@ -24,6 +24,7 @@ import {
   type RenderOutput
 } from "@ayu-sh-kr/dota-rendering";
 import {resolveMountStrategy} from "@dota/core/elements/render-strategy.ts";
+import {CoreMetadata, Metadata, type MetadataRecord} from "@dota/core/metadata";
 
 
 /**
@@ -39,6 +40,24 @@ type PendingAttributeChange = {
   newValue: string;
 };
 
+
+/**
+ * Settled promise whose reactions run as microtasks. V8 schedules these internally, which is
+ * cheaper per call than the `queueMicrotask` binding on lifecycle paths run for every element.
+ */
+const settled = Promise.resolve();
+
+/**
+ * Runs `task` after `ticks` microtasks, reporting a thrown error instead of rejecting.
+ * Connection and disconnection events keep the second-microtask timing that their former
+ * `Promise.all` chains had, so code awaiting a single microtask observes the same order.
+ * @param ticks Number of microtask turns to wait; 1 or 2.
+ * @param task Work deferred until the current synchronous lifecycle step completes.
+ */
+function afterMicrotask(ticks: 1 | 2, task: () => void): void {
+  const run = ticks === 1 ? task : () => { settled.then(task).catch((reason) => console.error(reason)); };
+  settled.then(run).catch((reason) => console.error(reason));
+}
 
 export abstract class BaseElement extends HTMLElement {
   [key: string]: any
@@ -56,9 +75,20 @@ export abstract class BaseElement extends HTMLElement {
   private __eventManagerService: EventManagerService<BaseElement>;
   private __applicationEventService = ApplicationEventService.getInstance();
   private __delegatedBindListeners = new Map<string, EventListener>();
+  private __eventListenerHandlers = new Map<string, EventListener>();
+  /** This class's metadata record, resolved once so lifecycle reads skip owner lookup. */
+  private readonly __metadata: MetadataRecord = Metadata.for(this);
   private __classApplicationEventManager!: ClassApplicationEventBindManager
   protected __eventChannel!: EventChannel
   private __classScopedApplicationEventManager!: ClassApplicationEventBindManager
+
+  /**
+   * Attributes the browser reports to {@link attributeChangedCallback}: every `@Property`
+   * attribute of this class and its ancestors. Read by `customElements.define`.
+   */
+  static get observedAttributes(): string[] {
+    return [...Metadata.for(this).get(CoreMetadata.properties).keys()];
+  }
 
   protected constructor() {
     super();
@@ -86,42 +116,40 @@ export abstract class BaseElement extends HTMLElement {
     this.handleBeforeInit();
     PropertyUtils.seedInitialValues(this);
 
-    // Needs html to be rendered before binding methods and events,
-    // so we defer those tasks to the next microtask.
-    this.bindHTML();
+    try {
+      // Bindings need the rendered tree, so the render runs first.
+      this.bindHTML();
+      this.bindProperties();
+      this.bindParameters();
+      this.bindState();
+      this.bindElements();
+      this.exposeMethods();
+      this.bindMethods();
+      this.bindEmitter();
+      this.bindHostEvents();
+      this.bindWindowEvents();
+      this.bindDocumentEvents();
+      this.bindEventListeners();
+      this.__classApplicationEventManager.bind();
+      this.__classScopedApplicationEventManager.bind();
+    } catch (reason) {
+      console.error(reason);
+      return;
+    }
 
-    // Defer non-critical tasks to the next microtask to avoid blocking the main thread.
-    const bindProperties = this.bindProperties();
-    const bindParameters = this.bindParameters();
-    const bindState = this.bindState(this);
-    const bindElements = this.bindElements();
-    const exposedMethods = this.exposeMethods();
-    const bindMethods = this.bindMethods();
-    const bindEmitter = this.bindEmitter();
-    const bindHostEvents = this.bindHostEvents();
-    const bindWindowEvents = this.bindWindowEvents();
-    const bindDocumentEvents = this.bindDocumentEvents();
-    this.__classApplicationEventManager.bind();
-    this.__classScopedApplicationEventManager.bind();
-
-    Promise.all([
-      exposedMethods, bindMethods, bindEmitter, bindHostEvents,
-      bindWindowEvents, bindDocumentEvents, bindProperties, bindParameters,
-      bindState, bindElements
-    ])
-      .then(() => {
-        this.__initialized = true;
-        if (this.__wasHydrated) {
-          this.__eventChannel.emit({
-            name: LifecycleEventConstants.HYDRATED
-          });
-        }
+    afterMicrotask(2, () => {
+      if (!this.isConnected) return;
+      this.__initialized = true;
+      if (this.__wasHydrated) {
         this.__eventChannel.emit({
-          name: LifecycleEventConstants.CONNECTED
-        })
-        this.handleAfterInit();
+          name: LifecycleEventConstants.HYDRATED
+        });
+      }
+      this.__eventChannel.emit({
+        name: LifecycleEventConstants.CONNECTED
       })
-      .catch((reason) => console.error(reason));
+      this.handleAfterInit();
+    });
   }
 
   disconnectedCallback() {
@@ -130,24 +158,25 @@ export abstract class BaseElement extends HTMLElement {
     this.__wasHydrated = false;
     this.__pendingAttributeChanges.length = 0;
 
-    const unbindMethods = this.unbindMethods();
-    const unbindHostEvents = this.unbindHostEvents();
-    const unbindWindowEvents = this.unbindWindowEvents();
-    const documentEvents = this.unbindDocumentEvents();
-    const unbindProperties = this.unbindProperties();
-    this.__classApplicationEventManager.unbind();
-    this.__classScopedApplicationEventManager.unbind();
+    try {
+      this.unbindMethods();
+      this.unbindHostEvents();
+      this.unbindWindowEvents();
+      this.unbindDocumentEvents();
+      this.unbindEventListeners();
+      this.unbindProperties();
+      this.__classApplicationEventManager.unbind();
+      this.__classScopedApplicationEventManager.unbind();
+    } catch (reason) {
+      console.error(reason);
+      return;
+    }
 
-    Promise.all([
-      unbindMethods, unbindHostEvents, unbindWindowEvents,
-      documentEvents, unbindProperties
-    ])
-      .then(() => {
-        this.__eventChannel.emit({
-          name: LifecycleEventConstants.DISCONNECTED
-        })
+    afterMicrotask(2, () => {
+      this.__eventChannel.emit({
+        name: LifecycleEventConstants.DISCONNECTED
       })
-      .catch((reason) => console.error(reason));
+    });
   }
 
   abstract render(): RenderOutput;
@@ -173,7 +202,7 @@ export abstract class BaseElement extends HTMLElement {
     } else {
       this.__renderInstance = mountRender(root, output);
     }
-    const bindElements = this.bindElements();
+    this.bindElements();
 
     attributeChanges.forEach(({name, oldValue, newValue}) => {
       this.__eventChannel.emit({
@@ -182,13 +211,11 @@ export abstract class BaseElement extends HTMLElement {
       });
     });
 
-    bindElements
-      .then(() => {
-        this.__eventChannel.emit({
-          name: LifecycleEventConstants.DOM_UPDATED
-        })
+    afterMicrotask(1, () => {
+      this.__eventChannel.emit({
+        name: LifecycleEventConstants.DOM_UPDATED
       })
-      .catch((reason) => console.error(reason));
+    });
   }
 
   /**
@@ -200,7 +227,7 @@ export abstract class BaseElement extends HTMLElement {
     if (!this.__initialized || this.__updateScheduled) return;
 
     this.__updateScheduled = true;
-    queueMicrotask(() => {
+    afterMicrotask(1, () => {
       if (!this.__updateScheduled) return;
       this.updateHTML();
     });
@@ -255,12 +282,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method handleBeforeInit
    */
   handleBeforeInit() {
-    const data = HelperUtils.readMetadata<Function>(this, 'Before')
-    const fun = data.get('beforeViewInit')
-
-    if (fun) {
-      fun.apply(this);
-    }
+    this.runHooks(CoreMetadata.beforeInit);
   }
 
   /**
@@ -274,12 +296,19 @@ export abstract class BaseElement extends HTMLElement {
    * @method handleAfterInit
    */
   handleAfterInit() {
-    const data = HelperUtils.readMetadata<Function>(this, 'After');
-    const fun = data.get('afterViewInit')
+    this.runHooks(CoreMetadata.afterInit);
+  }
 
-    if (fun) {
-      fun.apply(this);
-    }
+  /**
+   * Calls every registered hook in declaration order, base class first, through the instance
+   * so a subclass override of a hook method runs.
+   * @param key Hook registry to run.
+   */
+  private runHooks(key: typeof CoreMetadata.beforeInit): void {
+    this.__metadata.get(key).forEach(({name}) => {
+      const hook = this[name];
+      if (typeof hook === 'function') hook.call(this);
+    });
   }
 
   /**
@@ -340,7 +369,7 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method bindProperties
    */
-  private async bindProperties() {
+  private bindProperties() {
     PropertyUtils.bindReactive(this)
   }
 
@@ -354,7 +383,7 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method unbindProperties
    */
-  private async unbindProperties() {
+  private unbindProperties() {
     PropertyUtils.unbindReactive(this)
   }
 
@@ -368,9 +397,8 @@ export abstract class BaseElement extends HTMLElement {
    * - DOM replacement
    * - slot/shadow boundaries (for composed events like click)
    */
-  private async bindMethods() {
-    const data = HelperUtils.readMetadata<BindConfig>(this, 'Bind');
-    if (!data) return;
+  private bindMethods() {
+    const data = this.__metadata.get(CoreMetadata.bindings);
 
     // Bind on a stable root
     const root: HTMLElement | ShadowRoot = this.isShadow ? this.shadowRoot : this;
@@ -391,15 +419,16 @@ export abstract class BaseElement extends HTMLElement {
               : [e.target]
           ) as Array<EventTarget | null>;
 
+          // Only nodes inside this component (and its host) may match; ancestors may not.
           for (const node of path) {
-            if (!(node instanceof Element)) continue;
-            if (node.matches(config.id)) {
+            if (node instanceof Element && node.matches(config.id)) {
               const fn = this[methodName];
               if (typeof fn === 'function') {
                 fn.call(this, e);
               }
               break;
             }
+            if (node === root || node === this) break;
           }
         };
 
@@ -414,9 +443,8 @@ export abstract class BaseElement extends HTMLElement {
    *
    * Updated to unbind delegated listeners correctly.
    */
-  private async unbindMethods() {
-    const data = HelperUtils.readMetadata<BindConfig>(this, 'Bind');
-    if (!data) return;
+  private unbindMethods() {
+    const data = this.__metadata.get(CoreMetadata.bindings);
 
     const root: HTMLElement | ShadowRoot = this.isShadow ? this.shadowRoot : this;
 
@@ -443,8 +471,8 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method exposeMethods
    */
-  private async exposeMethods() {
-    let data = HelperUtils.readMetadata<MethodDetails>(this, 'Exposed')
+  private exposeMethods() {
+    let data = this.__metadata.get(CoreMetadata.exposed)
 
     if (data) {
       data.forEach((value, key) => {
@@ -467,10 +495,9 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method bindEmitter
    */
-  private async bindEmitter() {
-    let data = HelperUtils.readMetadata<EventDetails>(this, 'Output')
+  private bindEmitter() {
+    let data = this.__metadata.get(CoreMetadata.emitters)
 
-    if (!data) return;
 
     data.forEach((value: EventDetails, key: string) => {
       this[key] = new EventEmitter(value.eventName)
@@ -502,10 +529,9 @@ export abstract class BaseElement extends HTMLElement {
    * myComponent.bindHostEvents();
    * // The click event on the host element will now trigger the handleClick method
    */
-  private async bindHostEvents() {
-    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Host');
+  private bindHostEvents() {
+    const data = this.__metadata.get(CoreMetadata.hostListeners);
 
-    if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
       const element = this.isShadow ? this.shadowRoot : this;
@@ -524,10 +550,9 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method unbindHostEvents
    */
-  private async unbindHostEvents() {
-    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Host');
+  private unbindHostEvents() {
+    const data = this.__metadata.get(CoreMetadata.hostListeners);
 
-    if (!data) return;
 
     data.forEach((option: EventOptionMeta) => {
       const element = this.isShadow ? this.shadowRoot : this;
@@ -563,10 +588,9 @@ export abstract class BaseElement extends HTMLElement {
    * myComponent.bindWindowEvents();
    * // The resize event on the window will now trigger the handleResize method
    */
-  private async bindWindowEvents() {
-    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Window');
+  private bindWindowEvents() {
+    const data = this.__metadata.get(CoreMetadata.windowListeners);
 
-    if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
       this.__eventManagerService.bindEvent(window, value, 'Window');
@@ -582,9 +606,8 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method unbindWindowEvents
    */
-  private async unbindWindowEvents() {
-    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Window');
-    if (!data) return;
+  private unbindWindowEvents() {
+    const data = this.__metadata.get(CoreMetadata.windowListeners);
 
     data.forEach((value: EventOptionMeta) => {
       this.__eventManagerService.unbindEvent(window, value, 'Window');
@@ -603,10 +626,9 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method bindDocumentEvents
    */
-  private async bindDocumentEvents() {
-    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Document');
+  private bindDocumentEvents() {
+    const data = this.__metadata.get(CoreMetadata.documentListeners);
 
-    if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
       this.__eventManagerService.bindEvent(document, value, 'Document');
@@ -622,16 +644,42 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method unbindDocumentEvents
    */
-  private async unbindDocumentEvents() {
-    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Document');
+  private unbindDocumentEvents() {
+    const data = this.__metadata.get(CoreMetadata.documentListeners);
 
-    if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
       this.__eventManagerService.unbindEvent(document, value, 'Document');
     });
   }
 
+
+  /**
+   * Adds `@EventListener` handlers to the window or the host. Each handler is created once per
+   * connection and kept so disconnect removes the exact function that was added.
+   */
+  private bindEventListeners() {
+    this.__metadata.get(CoreMetadata.eventListeners).forEach((meta, method) => {
+      if (this.__eventListenerHandlers.has(method)) return;
+
+      const handler: EventListener = (event: Event) => this[meta.method]?.call(this, event);
+      const target: EventTarget = meta.type === EventType.WINDOW ? window : this;
+      target.addEventListener(meta.name, handler, meta.options);
+      this.__eventListenerHandlers.set(method, handler);
+    });
+  }
+
+  /** Removes the handlers added by {@link bindEventListeners}. */
+  private unbindEventListeners() {
+    this.__metadata.get(CoreMetadata.eventListeners).forEach((meta, method) => {
+      const handler = this.__eventListenerHandlers.get(method);
+      if (!handler) return;
+
+      const target: EventTarget = meta.type === EventType.WINDOW ? window : this;
+      target.removeEventListener(meta.name, handler, meta.options);
+      this.__eventListenerHandlers.delete(method);
+    });
+  }
 
   /**
    * Binds URL parameters to the component's properties based on metadata.
@@ -643,8 +691,8 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method bindParameters
    */
-  private async bindParameters() {
-    const data = HelperUtils.readMetadata<ParameterConfig>(this, 'Param');
+  private bindParameters() {
+    const data = this.__metadata.get(CoreMetadata.params);
     if (data.size > 0) {
       const params = new URLSearchParams(window.location.search);
       data.forEach((value: ParameterConfig, key: string) => {
@@ -663,10 +711,9 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method bindState
    */
-  private async bindState(element: BaseElement) {
-    let data = HelperUtils.readMetadata<StateConfig>(element, 'State');
-
-    data.forEach((value: StateConfig) => {
+  private bindState() {
+    const element = this;
+    this.__metadata.get(CoreMetadata.states).forEach((value: StateConfig) => {
       const propertyKey = `_${value.prototype}`
 
       Object.defineProperty(element, value.prototype, {
@@ -698,9 +745,8 @@ export abstract class BaseElement extends HTMLElement {
    *
    * @method bindElements
    */
-  private async bindElements() {
-    const data = HelperUtils.readMetadata<ElementConfigInternal>(this, 'Element');
-    if (!data) return;
+  private bindElements() {
+    const data = this.__metadata.get(CoreMetadata.elements);
 
     data.forEach((value) => {
       let selector = '';
