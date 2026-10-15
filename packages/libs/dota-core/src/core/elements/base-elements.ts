@@ -1,5 +1,5 @@
 import {
-  BindConfig, ElementConfigInternal, EventDetails, EventType,
+  BindConfig, ElementConfigInternal, EventDetails,
   EventOptionMeta,
   MethodDetails, ParameterConfig,
   StateConfig
@@ -24,7 +24,14 @@ import {
   type RenderOutput
 } from "@ayu-sh-kr/dota-rendering";
 import {resolveMountStrategy} from "@dota/core/elements/render-strategy.ts";
-import {CoreMetadata, Metadata, type MetadataRecord} from "@dota/core/metadata";
+import {
+  afterMicrotask,
+  bindEventListeners,
+  runLifecycleHooks,
+  unbindEventListeners
+} from "@dota/core/elements/component-lifecycle.ts";
+import {Metadata, type MetadataRecord} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
 
 
 /**
@@ -40,24 +47,6 @@ type PendingAttributeChange = {
   newValue: string;
 };
 
-
-/**
- * Settled promise whose reactions run as microtasks. V8 schedules these internally, which is
- * cheaper per call than the `queueMicrotask` binding on lifecycle paths run for every element.
- */
-const settled = Promise.resolve();
-
-/**
- * Runs `task` after `ticks` microtasks, reporting a thrown error instead of rejecting.
- * Connection and disconnection events keep the second-microtask timing that their former
- * `Promise.all` chains had, so code awaiting a single microtask observes the same order.
- * @param ticks Number of microtask turns to wait; 1 or 2.
- * @param task Work deferred until the current synchronous lifecycle step completes.
- */
-function afterMicrotask(ticks: 1 | 2, task: () => void): void {
-  const run = ticks === 1 ? task : () => { settled.then(task).catch((reason) => console.error(reason)); };
-  settled.then(run).catch((reason) => console.error(reason));
-}
 
 export abstract class BaseElement extends HTMLElement {
   [key: string]: any
@@ -129,7 +118,7 @@ export abstract class BaseElement extends HTMLElement {
       this.bindHostEvents();
       this.bindWindowEvents();
       this.bindDocumentEvents();
-      this.bindEventListeners();
+      bindEventListeners(this, this.__metadata, this.__eventListenerHandlers);
       this.__classApplicationEventManager.bind();
       this.__classScopedApplicationEventManager.bind();
     } catch (reason) {
@@ -163,7 +152,7 @@ export abstract class BaseElement extends HTMLElement {
       this.unbindHostEvents();
       this.unbindWindowEvents();
       this.unbindDocumentEvents();
-      this.unbindEventListeners();
+      unbindEventListeners(this, this.__metadata, this.__eventListenerHandlers);
       this.unbindProperties();
       this.__classApplicationEventManager.unbind();
       this.__classScopedApplicationEventManager.unbind();
@@ -282,7 +271,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method handleBeforeInit
    */
   handleBeforeInit() {
-    this.runHooks(CoreMetadata.beforeInit);
+    runLifecycleHooks(this, this.__metadata, CoreMetadata.beforeInit);
   }
 
   /**
@@ -296,19 +285,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method handleAfterInit
    */
   handleAfterInit() {
-    this.runHooks(CoreMetadata.afterInit);
-  }
-
-  /**
-   * Calls every registered hook in declaration order, base class first, through the instance
-   * so a subclass override of a hook method runs.
-   * @param key Hook registry to run.
-   */
-  private runHooks(key: typeof CoreMetadata.beforeInit): void {
-    this.__metadata.get(key).forEach(({name}) => {
-      const hook = this[name];
-      if (typeof hook === 'function') hook.call(this);
-    });
+    runLifecycleHooks(this, this.__metadata, CoreMetadata.afterInit);
   }
 
   /**
@@ -653,33 +630,6 @@ export abstract class BaseElement extends HTMLElement {
     });
   }
 
-
-  /**
-   * Adds `@EventListener` handlers to the window or the host. Each handler is created once per
-   * connection and kept so disconnect removes the exact function that was added.
-   */
-  private bindEventListeners() {
-    this.__metadata.get(CoreMetadata.eventListeners).forEach((meta, method) => {
-      if (this.__eventListenerHandlers.has(method)) return;
-
-      const handler: EventListener = (event: Event) => this[meta.method]?.call(this, event);
-      const target: EventTarget = meta.type === EventType.WINDOW ? window : this;
-      target.addEventListener(meta.name, handler, meta.options);
-      this.__eventListenerHandlers.set(method, handler);
-    });
-  }
-
-  /** Removes the handlers added by {@link bindEventListeners}. */
-  private unbindEventListeners() {
-    this.__metadata.get(CoreMetadata.eventListeners).forEach((meta, method) => {
-      const handler = this.__eventListenerHandlers.get(method);
-      if (!handler) return;
-
-      const target: EventTarget = meta.type === EventType.WINDOW ? window : this;
-      target.removeEventListener(meta.name, handler, meta.options);
-      this.__eventListenerHandlers.delete(method);
-    });
-  }
 
   /**
    * Binds URL parameters to the component's properties based on metadata.
