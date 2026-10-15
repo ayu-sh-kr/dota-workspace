@@ -1,7 +1,8 @@
 import 'reflect-metadata';
 import { BaseElement, BeforeInit, Component, HelperUtils, Property, String, Watcher } from '@dota/core';
 import { BindConfig, DotaElementConstructor, PropertyDetails, StateConfig, WatcherOptionMeta } from '@dota/core/types';
-import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
 import { defineAndCreate } from '../../Utils.ts';
 
 describe('HelperUtils.fetchOrCreate', () => {
