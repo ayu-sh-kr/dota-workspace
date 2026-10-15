@@ -25,7 +25,8 @@ export default defineConfig({
         '@ayu-sh-kr/dota-runtime',
         'consola',
         'happy-dom',
-        'vite'
+        'vite',
+        'vite/module-runner'
       ],
       output: {
         exports: 'named'
