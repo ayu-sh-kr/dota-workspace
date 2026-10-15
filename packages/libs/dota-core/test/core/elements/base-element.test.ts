@@ -823,6 +823,60 @@ describe('BaseElement – disconnectedCallback', () => {
     el.click();
     expect(spy).toHaveBeenCalledTimes(1);
   });
+
+  it('keeps the rendered subtree when moved without a state change', async () => {
+    @Component({ selector: 'disconnected-move-keeps-dom', shadow: false })
+    class TestComponent extends BaseElement {
+      constructor() {
+        super();
+      }
+
+      render() { return `<input value="x">`; }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    const input = el.querySelector('input')!;
+    input.value = 'typed';
+
+    el.remove();
+    await microtask();
+    document.body.appendChild(el);
+    await microtask();
+
+    expect(el.querySelector('input')).toBe(input);
+    expect(input.value).toBe('typed');
+    el.remove();
+  });
+
+  it('renders state changed while detached when reconnected', async () => {
+    @Component({ selector: 'disconnected-move-renders-state', shadow: false })
+    class TestComponent extends BaseElement {
+      @State()
+      label = 'first';
+
+      constructor() {
+        super();
+      }
+
+      render() { return `<span>${this.label}</span>`; }
+    }
+
+    const { el } = defineAndCreate(TestComponent);
+    document.body.appendChild(el);
+    await microtask();
+
+    el.remove();
+    await microtask();
+    el.label = 'second';
+    document.body.appendChild(el);
+    await microtask();
+
+    expect(el.querySelector('span')!.textContent).toBe('second');
+    el.remove();
+  });
 });
 
 // ─── Lifecycle events via EventChannel ───────────────────────────────────────
