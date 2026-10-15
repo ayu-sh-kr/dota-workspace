@@ -1,7 +1,8 @@
 import 'reflect-metadata';
 import { BaseElement, Component, HelperUtils } from '@dota/core';
 import { ComponentConfig } from '@dota/core/types';
-import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
 function getComponentConfig(ctor: any): ComponentConfig {
