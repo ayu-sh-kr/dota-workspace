@@ -1,4 +1,5 @@
-import {EventOptions, HelperUtils, EventOptionMeta} from "@dota/core";
+import {CoreMetadata, Metadata} from "@dota/core/metadata";
+import {EventOptions, EventOptionMeta} from "@dota/core";
 
 
 /**
@@ -24,8 +25,7 @@ import {EventOptions, HelperUtils, EventOptionMeta} from "@dota/core";
  */
 function WindowListenerDecorator(config: EventOptions): MethodDecorator {
     return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
-        const data = HelperUtils.fetchOrCreate<EventOptionMeta>(target, "Window")
-        data.set(propertyKey.toString(), {
+        Metadata.for(target).add(CoreMetadata.windowListeners, propertyKey.toString(), {
             name: propertyKey.toString(),
             method: descriptor.value,
             event: config.event
