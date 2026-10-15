@@ -29,6 +29,7 @@
     "@ayu-sh-kr/dota-md": "workspace:*",
     "@floating-ui/dom": "catalog:",
     "highlight.js": "catalog:",
+    "markdown-it-highlightjs": "catalog:",
     "reflect-metadata": "catalog:"
   },
   "web-types": "./web-types.json",
