@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
 import { BaseElement, Component } from '@dota/core';
 import { Element } from '@dota/core/decorators/element.decorator.ts';
 import { ElementConfigInternal } from '@dota/core/types';
