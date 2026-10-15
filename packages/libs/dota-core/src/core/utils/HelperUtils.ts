@@ -2,6 +2,7 @@ import "reflect-metadata";
 import {DotaElementConstructor, PropertyDetails, WatcherOptionMeta} from "@dota/core/types";
 import {BaseElement} from "@dota/core";
 import {CoreMetadata, Metadata} from "@dota/core/metadata";
+import {legacyMetadataView} from "@dota/core/utils/legacy-metadata.ts";
 
 
 export class HelperUtils {
@@ -17,21 +18,25 @@ export class HelperUtils {
    * @param {any} target - The target object to fetch or create metadata for.
    * @param {string} appender - The appender string used to construct the metadata key.
    * @returns {Map<string, T>} - The metadata Map associated with the target and appender.
-   * @deprecated dota-core decorators no longer store metadata here. Use `Metadata.for(target)`
-   * with a key from `MetadataKey`, which supports inheritance and cached reads.
+   * The appenders dota-core decorators used (`Property`, `Bind`, `Before`, `Watcher:<name>`, …)
+   * return a live view of the metadata layer, so reads include inherited metadata and writes
+   * reach the owning class. Other appenders keep the original `reflect-metadata` storage.
+   * @deprecated Use `Metadata.for(target)` with a `CoreMetadata` or `MetadataKey` key.
    */
   static fetchOrCreate<T>(target: any, appender: string): Map<string, T> {
     const key = `${target.constructor.name}:${appender}`
 
-    let data: Map<string, T>;
-    if (!Reflect.hasMetadata(key, target)) {
-      data = new Map<string, T>();
-      Reflect.defineMetadata(key, data, target);
+    // Appenders that dota-core decorators used to write now live in the metadata layer.
+    const view = legacyMetadataView<T>(target, appender);
+    if (view) {
+      if (!Reflect.hasMetadata(key, target)) Reflect.defineMetadata(key, view, target);
+      return view;
     }
 
-    data = Reflect.getMetadata(key, target);
-
-    return data;
+    if (!Reflect.hasMetadata(key, target)) {
+      Reflect.defineMetadata(key, new Map<string, T>(), target);
+    }
+    return Reflect.getMetadata(key, target);
   }
 
   /**
