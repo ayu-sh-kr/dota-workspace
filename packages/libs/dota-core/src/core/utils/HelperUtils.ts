@@ -1,8 +1,9 @@
 import "reflect-metadata";
 import {DotaElementConstructor, PropertyDetails, WatcherOptionMeta} from "@dota/core/types";
 import {BaseElement} from "@dota/core";
-import {CoreMetadata, Metadata} from "@dota/core/metadata";
-import {legacyMetadataView} from "@dota/core/utils/legacy-metadata.ts";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
+import {LegacyMetadataAdapters} from "@dota/core/utils/legacy-metadata.ts";
 
 
 export class HelperUtils {
@@ -27,7 +28,7 @@ export class HelperUtils {
     const key = `${target.constructor.name}:${appender}`
 
     // Appenders that dota-core decorators used to write now live in the metadata layer.
-    const view = legacyMetadataView<T>(target, appender);
+    const view = LegacyMetadataAdapters.view<T>(target, appender);
     if (view) {
       if (!Reflect.hasMetadata(key, target)) Reflect.defineMetadata(key, view, target);
       return view;
