@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
 import { BaseElement, Component, Property } from '@dota/core';
 import { Number, String, Boolean } from '@dota/core';
 import { PropertyDetails } from '@dota/core/types';
