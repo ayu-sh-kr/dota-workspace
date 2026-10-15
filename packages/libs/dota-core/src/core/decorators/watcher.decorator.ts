@@ -1,4 +1,4 @@
-import {HelperUtils, WatcherOptionMeta} from "@dota/core";
+import {CoreMetadata, Metadata} from "@dota/core/metadata";
 import {GeneralUtils} from "@dota/core/utils/GeneralUtils.ts";
 
 /**
@@ -29,21 +29,19 @@ import {GeneralUtils} from "@dota/core/utils/GeneralUtils.ts";
  * }
  */
 function WatcherDecorator(value: string | string[]): MethodDecorator {
-    return function (target, propertyKey, descriptor: PropertyDescriptor) {
-        if(value) {
-            const properties = GeneralUtils.convertToArray(value);
-            properties.forEach(property => {
-                const data = HelperUtils.fetchOrCreate<WatcherOptionMeta>(target, `Watcher:${property}`);
-                data.set(propertyKey.toString(), {
-                    name: propertyKey.toString(),
-                    method: descriptor.value,
-                    value: property
-                });
-            })
-        }
+  return function (target, propertyKey, descriptor: PropertyDescriptor) {
+    if (!value) return descriptor;
 
-        return descriptor;
-    }
+    const name = propertyKey.toString();
+    const properties = GeneralUtils.convertToArray(value);
+    Metadata.for(target).update(CoreMetadata.watchers, name, (current) => ({
+      name,
+      method: descriptor.value,
+      value: [...new Set([...(current?.value ?? []), ...properties])]
+    }));
+
+    return descriptor;
+  }
 }
 
 export {WatcherDecorator as Watcher}
