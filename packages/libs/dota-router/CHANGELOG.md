@@ -1,5 +1,21 @@
 # @ayu-sh-kr/dota-router
 
+## 0.2.0
+
+### Minor Changes
+
+- f0663f6: `@Route` configuration is now stored in dota-core's metadata layer under the exported `RouterMetadata.route` key, instead of `reflect-metadata`.
+
+  - Read a page's route with `Metadata.for(Page).own(RouterMetadata.route)`. Code that read `Reflect.getOwnMetadata('Route', Page)` must switch to this.
+  - A subclass of a routed page is still not a route itself. `RouterUtils.prepareConfig` reads only each class's own route.
+  - Route rendering reads `@Component` configuration through the metadata layer.
+
+### Patch Changes
+
+- Updated dependencies [f0663f6]
+- Updated dependencies [f0663f6]
+  - @ayu-sh-kr/dota-core@1.10.0
+
 ## 0.1.1
 
 ### Patch Changes
