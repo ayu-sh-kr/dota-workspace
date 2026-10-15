@@ -129,8 +129,6 @@ export abstract class BaseElement extends HTMLElement {
     this.__updateScheduled = false;
     this.__wasHydrated = false;
     this.__pendingAttributeChanges.length = 0;
-    this.__renderInstance?.dispose();
-    this.__renderInstance = undefined;
 
     const unbindMethods = this.unbindMethods();
     const unbindHostEvents = this.unbindHostEvents();
@@ -257,7 +255,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method handleBeforeInit
    */
   handleBeforeInit() {
-    let data: Map<string, Function> = HelperUtils.fetchOrCreate<Function>(this, 'Before')
+    const data = HelperUtils.readMetadata<Function>(this, 'Before')
     const fun = data.get('beforeViewInit')
 
     if (fun) {
@@ -276,7 +274,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method handleAfterInit
    */
   handleAfterInit() {
-    const data: Map<string, Function> = HelperUtils.fetchOrCreate<Function>(this, 'After');
+    const data = HelperUtils.readMetadata<Function>(this, 'After');
     const fun = data.get('afterViewInit')
 
     if (fun) {
@@ -303,6 +301,15 @@ export abstract class BaseElement extends HTMLElement {
     }
 
     const root: Element | ShadowRoot = this.isShadow ? this.resolveRenderRoot() : this;
+
+    // A moved element keeps its rendered tree, so reconnecting diffs against it instead of
+    // rebuilding the subtree and discarding descendant DOM state.
+    if (this.__renderInstance) {
+      updateRender(this.__renderInstance, this.render());
+      this.__wasHydrated = false;
+      return;
+    }
+
     const mountResult: MountResult = resolveMountStrategy()(this, root, this.render());
     this.__renderInstance = mountResult;
     this.__wasHydrated = mountResult.hydrated === true;
@@ -362,7 +369,7 @@ export abstract class BaseElement extends HTMLElement {
    * - slot/shadow boundaries (for composed events like click)
    */
   private async bindMethods() {
-    const data = HelperUtils.fetchOrCreate<BindConfig>(this, 'Bind');
+    const data = HelperUtils.readMetadata<BindConfig>(this, 'Bind');
     if (!data) return;
 
     // Bind on a stable root
@@ -408,7 +415,7 @@ export abstract class BaseElement extends HTMLElement {
    * Updated to unbind delegated listeners correctly.
    */
   private async unbindMethods() {
-    const data = HelperUtils.fetchOrCreate<BindConfig>(this, 'Bind');
+    const data = HelperUtils.readMetadata<BindConfig>(this, 'Bind');
     if (!data) return;
 
     const root: HTMLElement | ShadowRoot = this.isShadow ? this.shadowRoot : this;
@@ -437,7 +444,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method exposeMethods
    */
   private async exposeMethods() {
-    let data = HelperUtils.fetchOrCreate<MethodDetails>(this, 'Exposed')
+    let data = HelperUtils.readMetadata<MethodDetails>(this, 'Exposed')
 
     if (data) {
       data.forEach((value, key) => {
@@ -461,7 +468,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method bindEmitter
    */
   private async bindEmitter() {
-    let data = HelperUtils.fetchOrCreate<EventDetails>(this, 'Output')
+    let data = HelperUtils.readMetadata<EventDetails>(this, 'Output')
 
     if (!data) return;
 
@@ -496,7 +503,7 @@ export abstract class BaseElement extends HTMLElement {
    * // The click event on the host element will now trigger the handleClick method
    */
   private async bindHostEvents() {
-    const data = HelperUtils.fetchOrCreate<EventOptionMeta>(this, 'Host');
+    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Host');
 
     if (!data) return;
 
@@ -518,7 +525,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method unbindHostEvents
    */
   private async unbindHostEvents() {
-    const data = HelperUtils.fetchOrCreate<EventOptionMeta>(this, 'Host');
+    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Host');
 
     if (!data) return;
 
@@ -557,7 +564,7 @@ export abstract class BaseElement extends HTMLElement {
    * // The resize event on the window will now trigger the handleResize method
    */
   private async bindWindowEvents() {
-    const data = HelperUtils.fetchOrCreate<EventOptionMeta>(this, 'Window');
+    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Window');
 
     if (!data) return;
 
@@ -576,7 +583,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method unbindWindowEvents
    */
   private async unbindWindowEvents() {
-    const data = HelperUtils.fetchOrCreate<EventOptionMeta>(this, 'Window');
+    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Window');
     if (!data) return;
 
     data.forEach((value: EventOptionMeta) => {
@@ -597,7 +604,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method bindDocumentEvents
    */
   private async bindDocumentEvents() {
-    const data = HelperUtils.fetchOrCreate<EventOptionMeta>(this, 'Document');
+    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Document');
 
     if (!data) return;
 
@@ -616,7 +623,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method unbindDocumentEvents
    */
   private async unbindDocumentEvents() {
-    const data = HelperUtils.fetchOrCreate<EventOptionMeta>(this, 'Document');
+    const data = HelperUtils.readMetadata<EventOptionMeta>(this, 'Document');
 
     if (!data) return;
 
@@ -637,9 +644,9 @@ export abstract class BaseElement extends HTMLElement {
    * @method bindParameters
    */
   private async bindParameters() {
-    const data = HelperUtils.fetchOrCreate<ParameterConfig>(this, 'Param');
-    const params = new URLSearchParams(window.location.search);
-    if (data) {
+    const data = HelperUtils.readMetadata<ParameterConfig>(this, 'Param');
+    if (data.size > 0) {
+      const params = new URLSearchParams(window.location.search);
       data.forEach((value: ParameterConfig, key: string) => {
         this[key] = params.get(value.name)
       })
@@ -657,7 +664,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method bindState
    */
   private async bindState(element: BaseElement) {
-    let data = HelperUtils.fetchOrCreate<StateConfig>(element, 'State');
+    let data = HelperUtils.readMetadata<StateConfig>(element, 'State');
 
     data.forEach((value: StateConfig) => {
       const propertyKey = `_${value.prototype}`
@@ -692,7 +699,7 @@ export abstract class BaseElement extends HTMLElement {
    * @method bindElements
    */
   private async bindElements() {
-    const data = HelperUtils.fetchOrCreate<ElementConfigInternal>(this, 'Element');
+    const data = HelperUtils.readMetadata<ElementConfigInternal>(this, 'Element');
     if (!data) return;
 
     data.forEach((value) => {
