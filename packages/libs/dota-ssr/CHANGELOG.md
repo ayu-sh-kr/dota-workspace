@@ -1,5 +1,17 @@
 # @ayu-sh-kr/dota-ssr
 
+## 0.2.2
+
+### Patch Changes
+
+- f0663f6: Static generation reads `@Component` configuration through dota-core's metadata layer, the same place the decorator writes it. Components declared with `@Component` behave as before.
+- Updated dependencies [f0663f6]
+- Updated dependencies [f0663f6]
+- Updated dependencies [f0663f6]
+  - @ayu-sh-kr/dota-core@1.10.0
+  - @ayu-sh-kr/dota-router@0.2.0
+  - @ayu-sh-kr/dota-runtime@0.0.7
+
 ## 0.2.1
 
 ### Patch Changes
