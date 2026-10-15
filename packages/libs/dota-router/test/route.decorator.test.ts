@@ -1,6 +1,8 @@
 import "reflect-metadata";
 import {describe, expect, it} from "vitest";
+import {Metadata} from "@ayu-sh-kr/dota-core";
 import {Route} from "@dota/route.decorator";
+import {RouterMetadata} from "@dota/router-metadata";
 import {NavigationContext, RouteConfig} from "@dota/Types";
 
 class GuardedComponent extends HTMLElement {}
@@ -11,8 +13,8 @@ describe("Route", () => {
     Route({path: "/client"})(GuardedComponent);
     Route({path: "/static", ssr: true})(StaticComponent);
 
-    expect(Reflect.getOwnMetadata("Route", GuardedComponent)).toMatchObject({ssr: false});
-    expect(Reflect.getOwnMetadata("Route", StaticComponent)).toMatchObject({ssr: true});
+    expect(Metadata.for(GuardedComponent).own(RouterMetadata.route)).toMatchObject({ssr: false});
+    expect(Metadata.for(StaticComponent).own(RouterMetadata.route)).toMatchObject({ssr: true});
   });
 
   it("keeps declared guards and lifecycle hooks in route metadata", () => {
@@ -29,7 +31,7 @@ describe("Route", () => {
       afterLeave
     })(GuardedComponent);
 
-    const route = Reflect.getOwnMetadata("Route", GuardedComponent) as RouteConfig<HTMLElement>;
+    const route = Metadata.for(GuardedComponent).own(RouterMetadata.route) as RouteConfig<HTMLElement>;
     expect(route).toMatchObject({
       path: "/account",
       component: GuardedComponent,
@@ -49,7 +51,18 @@ describe("Route", () => {
 
     Route({path: "/account", seo})(GuardedComponent);
 
-    const route = Reflect.getOwnMetadata("Route", GuardedComponent) as RouteConfig<HTMLElement>;
+    const route = Metadata.for(GuardedComponent).own(RouterMetadata.route) as RouteConfig<HTMLElement>;
     expect(route.seo).toBe(seo);
+  });
+});
+
+describe("Route metadata", () => {
+  it("does not treat a subclass of a routed page as a route", async () => {
+    const {RouterUtils} = await import("@dota/RouterUtils");
+    class RoutedPage extends HTMLElement {}
+    class DerivedPage extends RoutedPage {}
+    Route({path: "/routed"})(RoutedPage);
+
+    expect(RouterUtils.prepareConfig([RoutedPage, DerivedPage]).map((route) => route.path)).toEqual(["/routed"]);
   });
 });
