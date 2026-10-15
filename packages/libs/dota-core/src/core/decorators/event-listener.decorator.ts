@@ -29,6 +29,17 @@ import {EventConfig, EventType} from "@dota/core/types";
 function EventListenerDecorator(config: EventConfig): MethodDecorator {
 
   return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+    // removeEventListener needs the exact function that was added, so keep one per instance.
+    const boundHandlers = new WeakMap<object, EventListener>();
+    const handlerFor = (instance: object): EventListener => {
+      let handler = boundHandlers.get(instance);
+      if (!handler) {
+        handler = descriptor.value.bind(instance) as EventListener;
+        boundHandlers.set(instance, handler);
+      }
+      return handler;
+    };
+
     const originalConnectedCallback: Function = target.connectedCallback;
 
     target.connectedCallback = function () {
@@ -37,9 +48,9 @@ function EventListenerDecorator(config: EventConfig): MethodDecorator {
       }
 
       if (config.type === EventType.WINDOW) {
-        window.addEventListener(config.name, descriptor.value.bind(this));
+        window.addEventListener(config.name, handlerFor(this));
       } else if (config.type === EventType.ROOT) {
-        this.addEventListener(config.name, descriptor.value.bind(this));
+        this.addEventListener(config.name, handlerFor(this));
       }
     }
 
@@ -48,9 +59,9 @@ function EventListenerDecorator(config: EventConfig): MethodDecorator {
     target.disconnectedCallback = function () {
 
       if (config.type === EventType.WINDOW) {
-        window.removeEventListener(config.name, descriptor.value.bind(this));
+        window.removeEventListener(config.name, handlerFor(this));
       } else if (config.type === EventType.ROOT) {
-        this.removeEventListener(config.name, descriptor.value.bind(this));
+        this.removeEventListener(config.name, handlerFor(this));
       }
 
       if (originalDisconnectedCallback) {
