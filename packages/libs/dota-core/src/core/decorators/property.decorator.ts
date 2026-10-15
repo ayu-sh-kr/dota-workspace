@@ -1,5 +1,5 @@
 import {PropertyConfig, PropertyDetails} from "@dota/core/types";
-import {HelperUtils} from "@dota/core/utils";
+import {CoreMetadata, Metadata} from "@dota/core/metadata";
 
 
 /**
@@ -26,19 +26,12 @@ import {HelperUtils} from "@dota/core/utils";
  */
 function PropertyDecorator(config: PropertyConfig): PropertyDecorator {
   return function (target: any, propertyKey: string | symbol) {
-
-    if (!target.constructor.observedAttributes) {
-      target.constructor.observedAttributes = [];
-    }
-
-    target.constructor.observedAttributes.push(config.name);
-
-    let data = HelperUtils.fetchOrCreate<PropertyDetails>(target, 'Property');
-
-    data.set(
-      config.name,
-      {name: config.name, prototype: propertyKey.toString(), default: config.default, type: config.type}
-    )
+    Metadata.for(target).add(CoreMetadata.properties, config.name, {
+      name: config.name,
+      prototype: propertyKey.toString(),
+      default: config.default,
+      type: config.type
+    });
   }
 }
 
