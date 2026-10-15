@@ -6,4 +6,3 @@ export * from "@dota/core/elements";
 export * from "@dota/core/utils";
 export * from "@dota/core/services"
 export * from "@dota/core/constants"
-export * from "@dota/core/metadata"
