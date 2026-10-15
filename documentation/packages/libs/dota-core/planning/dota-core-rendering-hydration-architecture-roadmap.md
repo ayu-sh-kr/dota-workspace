@@ -1950,14 +1950,14 @@ Goal: remove repeated metadata interpretation without changing rendering.
 
 Checklist:
 
-- [ ] Add non-mutating metadata read APIs.
+- [x] Add non-mutating metadata read APIs. See [metadata layer](metadata-layer.md).
 - [ ] Implement `ComponentDefinitionCompiler` and constructor `WeakMap` cache.
 - [ ] Normalize current decorator shapes into read-only definitions.
 - [ ] Precompute property lookups by public name and attribute.
 - [ ] Group view event bindings by event type.
 - [ ] Validate duplicate metadata once with useful errors.
-- [ ] Keep inherited metadata behavior explicit and tested.
-- [ ] Replace runtime `fetchOrCreate()` reads with definition reads.
+- [x] Keep inherited metadata behavior explicit and tested. See [metadata layer](metadata-layer.md).
+- [x] Replace runtime `fetchOrCreate()` reads with definition reads. See [metadata layer](metadata-layer.md).
 - [ ] Benchmark instance creation with decorated and undecorated components.
 
 Exit criteria:
