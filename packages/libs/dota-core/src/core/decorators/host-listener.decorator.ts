@@ -1,4 +1,5 @@
-import {EventOptions, HelperUtils, EventOptionMeta} from "@dota/core";
+import {CoreMetadata, Metadata} from "@dota/core/metadata";
+import {EventOptions, EventOptionMeta} from "@dota/core";
 
 
 /**
@@ -23,8 +24,7 @@ import {EventOptions, HelperUtils, EventOptionMeta} from "@dota/core";
  */
 function HostListenerDecorator(options: EventOptions): MethodDecorator {
   return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
-    const data = HelperUtils.fetchOrCreate<EventOptionMeta>(target, 'Host')
-    data.set(propertyKey.toString(), {
+    Metadata.for(target).add(CoreMetadata.hostListeners, propertyKey.toString(), {
       event: options.event,
       name: propertyKey.toString(),
       method: descriptor.value
