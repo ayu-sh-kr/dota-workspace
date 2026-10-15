@@ -24,8 +24,11 @@ or while reading the decorators for this plan.
 
 ## Design
 
-New directory `packages/libs/dota-core/src/core/metadata/`, with no imports from the rest of
-dota-core, so it can be used and tested standalone.
+New directory `packages/libs/dota-core/src/metadata/`, beside `src/core/` and imported as
+`@dota/metadata`. It has no imports from dota-core, so it can be used and tested standalone. It is
+split by concern: `MetadataKey` (typed keys), `MetadataOwner` (target to owner resolution),
+`MetadataStore` (raw storage and write version), `MetadataInheritance` (chain walk and merging),
+and `MetadataRecord` with `Metadata.for` (the fluent API).
 
 ### Keys: scoping
 
@@ -82,7 +85,8 @@ Metadata.for(Card).has(COMPONENT);
 ### Decorators
 
 Each decorator becomes one `Metadata.for(target).add(...)` call against an exported key in
-`metadata/keys.ts` (`CoreMetadata`). `@EventListener` previously patched `connectedCallback` and
+`core/constants/core-metadata.constants.ts` (`CoreMetadata`), which stays in core because the
+keys describe core decorators. `@EventListener` previously patched `connectedCallback` and
 `disconnectedCallback` on the prototype. It now only records metadata, and `BaseElement` binds it,
 so every decorator is metadata-only. For a TC39 migration, only the decorator signature changes, because
 `Metadata.for(context)` accepts the standard context.
