@@ -1,9 +1,11 @@
 import {mkdir, readFile, writeFile} from 'node:fs/promises';
+import {availableParallelism} from 'node:os';
 import {dirname, resolve} from 'node:path';
 import {performance as nodePerformance} from 'node:perf_hooks';
 import {createConsola, LogLevels} from 'consola';
 import type {ResolvedConfig} from 'vite';
 import {createPrerenderAssetReader} from './asset-reader';
+import {createPrerenderNetworkCache} from './network-cache';
 import {resolveSsgRoutes} from './route-output';
 import type {DotaSsgOptions, ResolvedDotaSsgRoute} from './types';
 import {prepareDeployment} from '../vite/deployment';
@@ -77,7 +79,9 @@ export async function generateStaticPages(
     };
     const renderingStarted = nodePerformance.now();
     const setupMs = renderingStarted - started;
-    const workerCount = Math.min(concurrency, routes.length);
+    // Each worker starts its own Vite server and transforms the application again, so workers
+    // beyond the available CPUs only compete for them; small build machines often have two.
+    const workerCount = Math.min(concurrency, routes.length, availableParallelism());
     logger.start(`[dota-ssr] prerendering ${routes.length} routes with ${workerCount} render worker${workerCount === 1 ? '' : 's'}`);
     if (workerCount > 1) {
       await server?.close();
@@ -95,8 +99,9 @@ export async function generateStaticPages(
       server ??= await createPrerenderServer(config, root, options.entry ?? '/src/main.ts',
         options.renderingModule ?? '@ayu-sh-kr/dota-rendering', logType);
       const readAsset = createPrerenderAssetReader(new Set(outputs));
+      const networkCache = createPrerenderNetworkCache();
       for (const route of routes) {
-        const result = await prerenderRoute(server, template, route, outputDirectory, options, readAsset);
+        const result = await prerenderRoute(server, template, route, outputDirectory, options, readAsset, networkCache);
         await writeRoute(route, result.html, result.timings, result.settled);
       }
     }

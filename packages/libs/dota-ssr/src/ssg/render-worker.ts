@@ -1,6 +1,7 @@
 import {parentPort, workerData} from 'node:worker_threads';
 import type {ViteDevServer} from 'vite';
 import {createPrerenderAssetReader} from './asset-reader';
+import {createPrerenderNetworkCache} from './network-cache';
 import {createPrerenderServer} from '../vite/prerender-server';
 import {prerenderRoute} from './prerender-runtime';
 import type {RenderWorkerData, RenderWorkerResponse} from './render-workers';
@@ -13,6 +14,7 @@ async function startWorker(): Promise<void> {
   const data = workerData as RenderWorkerData;
   const {config, root, options, template, outputDirectory, outputs} = data;
   const readAsset = createPrerenderAssetReader(new Set(outputs));
+  const networkCache = createPrerenderNetworkCache();
   let server: ViteDevServer;
   try {
     server = await createPrerenderServer(config, root, options.entry ?? '/src/main.ts',
@@ -30,7 +32,7 @@ async function startWorker(): Promise<void> {
         port.close();
         return;
       }
-      const result = await prerenderRoute(server, template, message.route, outputDirectory, options, readAsset);
+      const result = await prerenderRoute(server, template, message.route, outputDirectory, options, readAsset, networkCache);
       port.postMessage({type: 'rendered', ...result} satisfies RenderWorkerResponse);
     })().catch(error => {
       port.postMessage({type: 'error', message: error instanceof Error ? error.message : String(error)} satisfies RenderWorkerResponse);

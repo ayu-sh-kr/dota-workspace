@@ -1,10 +1,12 @@
 import {performance as nodePerformance} from 'node:perf_hooks';
 import {Window} from 'happy-dom';
 import {createServerModuleRunner, isRunnableDevEnvironment, type ViteDevServer} from 'vite';
+import {ESModulesEvaluator, type ModuleRunnerContext} from 'vite/module-runner';
 import {VIRTUAL_SSG_ENTRY} from '../vite/prerender-server';
 import {installPrerenderFetch, settlesBefore, type PrerenderFetchWaiter} from './prerender-fetch';
 import {installWindowGlobals} from './window-globals';
 import type {PrerenderAssetReader} from './asset-reader';
+import type {PrerenderNetworkCache} from './network-cache';
 import type {DotaSsgOptions, ResolvedDotaSsgRoute} from './types';
 import {HYDRATION_ROUTE_ATTRIBUTE, HYDRATION_ROUTE_VERSION_ATTRIBUTE, HYDRATION_ROUTE_VERSION} from '../route-marker';
 
@@ -57,6 +59,7 @@ export const DEFAULT_SETTLE_TIMEOUT = 30_000;
  * @param outputDirectory Built client directory used to resolve same-origin fetch requests.
  * @param options Plugin options containing readiness and optional settle policy.
  * @param readAsset Build-local asset cache excluding every generated route destination.
+ * @param networkCache Build-local cache of network responses shared by every route.
  * @returns Complete HTML, elapsed stage timings including cleanup, and whether settling finished.
  * @throws Error when the configured application readiness export is not a promise.
  */
@@ -66,13 +69,14 @@ export async function prerenderRoute(
   route: ResolvedDotaSsgRoute,
   outputDirectory: string,
   options: DotaSsgOptions,
-  readAsset: PrerenderAssetReader
+  readAsset: PrerenderAssetReader,
+  networkCache?: PrerenderNetworkCache
 ): Promise<PrerenderResult> {
   const runner = resolveSsrRunner(server);
   const started = nodePerformance.now();
   const timings: PrerenderTimings = {setup: 0, load: 0, ready: 0, settle: 0, serialize: 0, cleanup: 0, total: 0};
   const window = createPrerenderWindow(route.path);
-  const waitForFetches = installPrerenderFetch(window, outputDirectory, options.fetchBaseUrl, readAsset);
+  const waitForFetches = installPrerenderFetch(window, outputDirectory, options.fetchBaseUrl, readAsset, networkCache);
   const restoreGlobals = installWindowGlobals(window);
   window.document.write(template);
   window.document.close();
@@ -146,7 +150,8 @@ const SSR_RUNNERS = new WeakMap<object, SsrRunner>();
  * Clearing its cache drops evaluated modules only; unlike `moduleGraph.invalidateAll()`, it keeps
  * transformed code, so each route pays for module evaluation instead of a full re-transform.
  * Source-map interception stays off, as in Vite's `ssrLoadModule` runner: the default enables
- * Node source maps, which parses every module's inline map again on each route.
+ * Node source maps, which parses every module's inline map again on each route. Modules run
+ * through a {@link CompiledModuleEvaluator}, so each route evaluates them without recompiling.
  * @param server Prerender server whose SSR environment executes the application entry.
  * @returns Runner used to evaluate the virtual SSG entry for one route window.
  * @throws Error when the SSR environment cannot execute modules in this process.
@@ -158,9 +163,45 @@ function resolveSsrRunner(server: ViteDevServer): SsrRunner {
   if (!isRunnableDevEnvironment(environment)) {
     throw new Error('SSG requires a runnable Vite SSR environment');
   }
-  const runner = createServerModuleRunner(environment, {hmr: false, sourcemapInterceptor: false});
+  const runner = createServerModuleRunner(environment, {
+    hmr: false,
+    sourcemapInterceptor: false,
+    evaluator: new CompiledModuleEvaluator()
+  });
   SSR_RUNNERS.set(environment, runner);
   return runner;
+}
+
+/** Parameter names Vite's evaluator binds, in the order it passes the module context. */
+const MODULE_CONTEXT_KEYS = [
+  '__vite_ssr_exports__', '__vite_ssr_import_meta__', '__vite_ssr_import__',
+  '__vite_ssr_dynamic_import__', '__vite_ssr_exportAll__', '__vite_ssr_exportName__'
+] as const;
+
+/** Constructor of the async module wrappers Vite's evaluator compiles. */
+const AsyncFunction = (async () => undefined).constructor as new (...source: string[]) => (...context: unknown[]) => Promise<void>;
+
+/**
+ * Evaluates transformed modules like Vite's `ESModulesEvaluator`, compiling each module once.
+ * Every route clears the evaluated modules and runs them again against its own window. Vite
+ * compiles a new wrapper function for each evaluation, which makes V8 parse and compile the
+ * whole application, including its dependencies, on every route. The wrapper only receives
+ * the module context as arguments, so one compiled wrapper per transformed source can run
+ * again: each call still creates new module state, while V8 keeps the compiled code.
+ */
+export class CompiledModuleEvaluator extends ESModulesEvaluator {
+  /** Wrappers keyed by transformed source; Vite keeps the same source for every route. */
+  private readonly wrappers = new Map<string, (...context: unknown[]) => Promise<void>>();
+
+  override async runInlinedModule(context: ModuleRunnerContext, code: string): Promise<void> {
+    let wrapper = this.wrappers.get(code);
+    if (!wrapper) {
+      wrapper = new AsyncFunction(...MODULE_CONTEXT_KEYS, `"use strict";\n${code}`);
+      this.wrappers.set(code, wrapper);
+    }
+    await wrapper(...MODULE_CONTEXT_KEYS.map(key => context[key]));
+    Object.seal(context.__vite_ssr_exports__);
+  }
 }
 
 /**

@@ -59,7 +59,10 @@ export type DotaSsgDeploymentOptions =
  * existing client-rendered application path is unchanged unless the plugin is installed.
  */
 export interface DotaSsgOptions {
-  /** Maximum isolated render workers; defaults to 1. Values above 1 require independent routes and no settle callback. */
+  /**
+   * Maximum isolated render workers; defaults to 1 and never exceeds the machine's available CPUs.
+   * Values above 1 require independent routes and no settle callback.
+   */
   concurrency?: number;
   /** Worker startup, route/write, and shutdown timeout in milliseconds; defaults to 120000 in parallel mode. */
   renderTimeout?: number;

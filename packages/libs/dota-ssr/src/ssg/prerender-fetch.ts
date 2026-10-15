@@ -2,6 +2,7 @@ import {extname, isAbsolute, relative, resolve, sep} from 'node:path';
 import {performance as nodePerformance} from 'node:perf_hooks';
 import type {Window} from 'happy-dom';
 import {createPrerenderAssetReader, type PrerenderAssetReader} from './asset-reader';
+import type {PrerenderNetworkCache} from './network-cache';
 
 const CONTENT_TYPES: Readonly<Record<string, string>> = {
   '.css': 'text/css; charset=utf-8',
@@ -40,7 +41,7 @@ type PrerenderFetchContext = {
   staticRoot: string;
   /** Optional network destination for same-origin paths absent from the static output. */
   apiBaseUrl?: URL;
-  /** Original Happy DOM fetch used for cross-origin and API-forwarded requests. */
+  /** Cross-origin and API-forwarded fetch, answered from the build's network cache when one is given. */
   networkFetch: Window['fetch'];
   /** Deliveries of requests that must reach the page before the document can be serialized. */
   pendingRequests: Set<Promise<void>>;
@@ -62,6 +63,7 @@ type PrerenderFetchInit = Parameters<Window['fetch']>[1];
  * @param staticRoot Built output directory containing Vite's copied public files.
  * @param fetchBaseUrl Optional API origin used for missing relative paths.
  * @param readAsset Build-owned asset reader; omission reads uncached local files.
+ * @param networkCache Build-owned cache shared by every route; omission fetches every request.
  * @returns A waiter that resolves after all fetch promises started by this adapter settle,
  *   or at its optional deadline, with `true` when any request was still pending; its
  *   `close()` stops the adapter once the route is serialized.
@@ -71,9 +73,13 @@ export function installPrerenderFetch(
   window: Window,
   staticRoot: string,
   fetchBaseUrl?: string,
-  readAsset: PrerenderAssetReader = createPrerenderAssetReader(new Set(), 0)
+  readAsset: PrerenderAssetReader = createPrerenderAssetReader(new Set(), 0),
+  networkCache?: PrerenderNetworkCache
 ): PrerenderFetchWaiter {
-  const networkFetch = window.fetch.bind(window);
+  const windowFetch = window.fetch.bind(window);
+  const networkFetch: Window['fetch'] = networkCache
+    ? (input, init) => networkCache(window, windowFetch, input, init)
+    : windowFetch;
   const apiBaseUrl = fetchBaseUrl ? new window.URL(fetchBaseUrl) : undefined;
   const context: PrerenderFetchContext = {
     window,

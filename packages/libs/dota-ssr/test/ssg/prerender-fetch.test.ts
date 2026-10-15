@@ -5,6 +5,7 @@ import {join} from 'node:path';
 import {Window} from 'happy-dom';
 import {installPrerenderFetch} from '@dota/ssg/prerender-fetch';
 import {createPrerenderAssetReader, type PrerenderAssetReader} from '@dota/ssg/asset-reader';
+import {createPrerenderNetworkCache} from '@dota/ssg/network-cache';
 
 describe('installPrerenderFetch', () => {
   let testRoot: string;
@@ -70,6 +71,26 @@ describe('installPrerenderFetch', () => {
 
       expect(second).not.toBe(first);
       await expect(second.text()).resolves.toBe('shared content');
+    } finally {
+      await secondWindow.happyDOM.close();
+    }
+  });
+
+  it('downloads a cross-origin asset once for every route window sharing a network cache', async () => {
+    const secondWindow = new Window({url: 'http://dota.ssg/other'});
+    const networkCache = createPrerenderNetworkCache();
+    const networkFetch = vi.fn<Window['fetch']>().mockImplementation(async () => new window.Response('<svg/>'));
+    try {
+      for (const routeWindow of [window, secondWindow]) {
+        routeWindow.fetch = networkFetch;
+        installPrerenderFetch(routeWindow, staticRoot, undefined, undefined, networkCache);
+      }
+      const first = await window.fetch('https://api.iconify.design/mdi:github.svg');
+      const second = await secondWindow.fetch('https://api.iconify.design/mdi:github.svg');
+
+      expect(networkFetch).toHaveBeenCalledOnce();
+      await expect(first.text()).resolves.toBe('<svg/>');
+      await expect(second.text()).resolves.toBe('<svg/>');
     } finally {
       await secondWindow.happyDOM.close();
     }
