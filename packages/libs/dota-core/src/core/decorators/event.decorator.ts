@@ -1,4 +1,4 @@
-import {HelperUtils} from "@dota/core";
+import {CoreMetadata, Metadata} from "@dota/core/metadata";
 import {EventDetails} from "@dota/core/types";
 
 
@@ -25,13 +25,12 @@ import {EventDetails} from "@dota/core/types";
 function EventDecorator(name?: string): PropertyDecorator {
   return function (target: any, propertyKey: string | symbol) {
 
-    let data = HelperUtils.fetchOrCreate<EventDetails>(target, 'Output')
 
     const event = name ? name : `on${capitalize(propertyKey.toString())}`;
 
     const details: EventDetails = {eventName: event, propertyName: propertyKey.toString()}
 
-    data.set(propertyKey.toString(), details);
+    Metadata.for(target).add(CoreMetadata.emitters, propertyKey.toString(), details);
   }
 }
 
