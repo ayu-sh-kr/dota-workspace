@@ -1,14 +1,16 @@
 // @vitest-environment node
 import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
-import {tmpdir} from 'node:os';
+import {availableParallelism, tmpdir} from 'node:os';
 import {join} from 'node:path';
 import type {Window} from 'happy-dom';
 import {createConsola} from 'consola';
 import {createServer, createServerModuleRunner, type ResolvedConfig, type ViteDevServer} from 'vite';
 import type {DotaSsgOptions} from '@dota/ssg/types';
 import {generateStaticPages} from '@dota/ssg/generate';
+import {CompiledModuleEvaluator} from '@dota/ssg/prerender-runtime';
 
 vi.mock('node:fs/promises', {spy: true});
+vi.mock('node:os', {spy: true});
 vi.mock('consola', {spy: true});
 vi.mock('vite', async importOriginal => ({
   ...await importOriginal<typeof import('vite')>(),
@@ -187,6 +189,16 @@ describe('dotaSsg build output', () => {
     expect(server.ssrLoadModule).toHaveBeenCalledOnce();
   });
 
+  it('renders in this process when the machine has fewer CPUs than requested workers', async () => {
+    vi.mocked(availableParallelism).mockReturnValueOnce(1);
+
+    await build({routes: ['/a', '/b', '/c'], concurrency: 3});
+
+    expect(createServer).toHaveBeenCalledOnce();
+    expect(server.ssrLoadModule).toHaveBeenCalledTimes(3);
+    expect(await readFile(join(root, 'dist/c/index.html'), 'utf8')).toContain('path="/c"');
+  });
+
   it('creates a shared output directory once and keeps route windows isolated', async () => {
     const windows: Window[] = [];
     const settle = vi.fn<NonNullable<DotaSsgOptions['settle']>>(window => {
@@ -212,7 +224,11 @@ describe('dotaSsg build output', () => {
     expect(runner.import).toHaveBeenNthCalledWith(1, 'virtual:dota-ssg-entry');
     expect(runner.import).toHaveBeenNthCalledWith(2, 'virtual:dota-ssg-entry');
     expect(runner.clearCache.mock.invocationCallOrder[1]).toBeLessThan(runner.import.mock.invocationCallOrder[1]);
-    expect(createServerModuleRunner).toHaveBeenCalledExactlyOnceWith(server.environments.ssr, {hmr: false, sourcemapInterceptor: false});
+    expect(createServerModuleRunner).toHaveBeenCalledExactlyOnceWith(server.environments.ssr, {
+      hmr: false,
+      sourcemapInterceptor: false,
+      evaluator: expect.any(CompiledModuleEvaluator)
+    });
   });
 
   it('rejects an SSR environment that cannot run modules before installing globals', async () => {
