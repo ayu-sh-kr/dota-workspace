@@ -1,6 +1,7 @@
 import 'reflect-metadata';
-import { BaseElement, Component, HelperUtils } from '@dota/core';
-import { DotaElementConstructor } from '@dota/core/types';
+import { BaseElement, BeforeInit, Component, HelperUtils, Property, String, Watcher } from '@dota/core';
+import { BindConfig, DotaElementConstructor, PropertyDetails, StateConfig, WatcherOptionMeta } from '@dota/core/types';
+import { CoreMetadata, Metadata } from '@dota/core/metadata';
 import { defineAndCreate } from '../../Utils.ts';
 
 describe('HelperUtils.fetchOrCreate', () => {
@@ -318,5 +319,66 @@ describe('HelperUtils.toDotaElementConstructor', () => {
     const second = HelperUtils.toDotaElementConstructor(ValidComp);
 
     expect(first).toBe(second);
+  });
+});
+
+describe('HelperUtils.fetchOrCreate – compatibility with the metadata layer', () => {
+
+  it('exposes decorator metadata under the legacy appenders, including inherited entries', () => {
+    class Parent extends BaseElement {
+      @Property({ name: 'base', type: String })
+      base = '';
+
+      render() { return ``; }
+    }
+
+    class Child extends Parent {
+      @Property({ name: 'extra', type: String })
+      extra = '';
+    }
+
+    const map = HelperUtils.fetchOrCreate<PropertyDetails>(Child.prototype, 'Property');
+    expect([...map.keys()]).toEqual(['base', 'extra']);
+    expect(map.get('extra')?.prototype).toBe('extra');
+  });
+
+  it('returns hook functions for Before and After, as before', () => {
+    class Host {
+      @BeforeInit()
+      prepare() {}
+    }
+
+    expect(HelperUtils.fetchOrCreate<Function>(Host.prototype, 'Before').get('prepare')).toBe(Host.prototype.prepare);
+  });
+
+  it('returns per-property watcher maps for Watcher:<name>', () => {
+    class Host {
+      @Watcher(['width', 'height'])
+      onResize() {}
+    }
+
+    const width = HelperUtils.fetchOrCreate<WatcherOptionMeta>(Host.prototype, 'Watcher:width');
+    expect(width.get('onResize')?.value).toBe('width');
+    expect(HelperUtils.fetchOrCreate(Host.prototype, 'Watcher:depth').size).toBe(0);
+  });
+
+  it('writes through to the metadata layer', () => {
+    class Host {}
+    const handler = () => {};
+
+    HelperUtils.fetchOrCreate<BindConfig>(Host.prototype, 'Bind').set('onClick', { event: 'click', id: '.x' });
+    HelperUtils.fetchOrCreate<Function>(Host.prototype, 'After').set('ready', handler);
+
+    expect(Metadata.for(Host).get(CoreMetadata.bindings).get('onClick')?.id).toBe('.x');
+    expect(Metadata.for(Host).get(CoreMetadata.afterInit).get('ready')?.method).toBe(handler);
+  });
+
+  it('removes entries through delete', () => {
+    class Host {}
+    const map = HelperUtils.fetchOrCreate<StateConfig>(Host.prototype, 'State');
+    map.set('open', { prototype: 'open' });
+
+    expect(map.delete('open')).toBe(true);
+    expect(Metadata.for(Host).get(CoreMetadata.states).size).toBe(0);
   });
 });
