@@ -1,4 +1,6 @@
-import {ElementConfig, ElementConfigInternal, HelperUtils} from "@dota/core";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
+import {ElementConfig, ElementConfigInternal} from "@dota/core";
 
 /**
  * A decorator that binds a property to a specified element configuration.
@@ -23,8 +25,7 @@ import {ElementConfig, ElementConfigInternal, HelperUtils} from "@dota/core";
  */
 function ElementDecorator(config: ElementConfig): PropertyDecorator {
   return function (target, propertyKey) {
-    const data = HelperUtils.fetchOrCreate<ElementConfigInternal>(target, 'Element');
-    data.set(propertyKey.toString(), {
+    Metadata.for(target).add(CoreMetadata.elements, propertyKey.toString(), {
       ...config,
       property: propertyKey.toString(),
     })

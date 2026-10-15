@@ -1,4 +1,6 @@
-import {HelperUtils, ParameterConfig} from "@dota/core";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
+import {ParameterConfig} from "@dota/core";
 
 
 /**
@@ -21,10 +23,8 @@ import {HelperUtils, ParameterConfig} from "@dota/core";
  */
 function ParamDecorator(name?: string): PropertyDecorator {
   return function (target, propertyKey) {
-    const data = HelperUtils.fetchOrCreate<ParameterConfig>(target, 'Param');
-
     const param = name ? name : propertyKey.toString();
-    data.set(propertyKey.toString(), {name: param})
+    Metadata.for(target).add(CoreMetadata.params, propertyKey.toString(), {name: param});
   }
 }
 

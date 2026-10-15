@@ -1,4 +1,6 @@
-import {HelperUtils, StateConfig} from "@dota/core";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
+import {StateConfig} from "@dota/core";
 
 /**
  * Decorator to mark a property as a state property.
@@ -11,10 +13,8 @@ import {HelperUtils, StateConfig} from "@dota/core";
  */
 function StateDecorator(): PropertyDecorator {
   return function (target, propertyKey) {
-    const data = HelperUtils.fetchOrCreate<StateConfig>(target, 'State');
     const key = propertyKey.toString();
-
-    data.set(key, {prototype: key})
+    Metadata.for(target).add(CoreMetadata.states, key, {prototype: key});
   }
 }
 

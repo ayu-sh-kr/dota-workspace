@@ -1,13 +1,15 @@
 import 'reflect-metadata';
-import { BaseElement, Component, Emitter, HelperUtils } from '@dota/core';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
+import { BaseElement, Component, Emitter } from '@dota/core';
 import { EventEmitter } from '@dota/core';
 import { EventDetails } from '@dota/core/types';
 import { capitalize } from '@dota/core/decorators/event.decorator.ts';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
 
-function getOutputMetadata(target: any): Map<string, EventDetails> {
-  return HelperUtils.fetchOrCreate<EventDetails>(target, 'Output');
+function getOutputMetadata(target: any): ReadonlyMap<string, EventDetails> {
+  return Metadata.for(target).own(CoreMetadata.emitters);
 }
 
 describe('@Emitter decorator – metadata registration', () => {

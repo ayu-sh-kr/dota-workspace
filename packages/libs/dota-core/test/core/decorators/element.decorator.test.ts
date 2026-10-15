@@ -1,11 +1,13 @@
 import 'reflect-metadata';
-import { BaseElement, Component, HelperUtils } from '@dota/core';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
+import { BaseElement, Component } from '@dota/core';
 import { Element } from '@dota/core/decorators/element.decorator.ts';
 import { ElementConfigInternal } from '@dota/core/types';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
-function getElementMetadata(target: any): Map<string, ElementConfigInternal> {
-  return HelperUtils.fetchOrCreate<ElementConfigInternal>(target, 'Element');
+function getElementMetadata(target: any): ReadonlyMap<string, ElementConfigInternal> {
+  return Metadata.for(target).own(CoreMetadata.elements);
 }
 
 describe('@Element decorator – metadata registration', () => {

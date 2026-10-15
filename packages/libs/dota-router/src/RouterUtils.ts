@@ -1,5 +1,6 @@
 import {ComponentClass, RouteConfig, Router} from "@dota/Types";
-import 'reflect-metadata';
+import {Metadata} from "@ayu-sh-kr/dota-core";
+import {RouterMetadata} from "@dota/router-metadata";
 
 /** Preserves legacy path, rendering, and route-metadata helpers for applications. */
 export class RouterUtils {
@@ -80,17 +81,16 @@ export class RouterUtils {
    * Collects flat route metadata from decorated component classes.
    * Tree construction belongs to `configure`, which also receives the error route
    * needed for generated parents; keeping this method flat avoids a second hierarchy policy.
-   * @param elements - Component classes that may carry `Route` metadata.
+   * @param elements - Component classes that may carry `@Route` metadata.
    * @returns Flat route configurations in the same order as the supplied components.
    */
   static prepareConfig(elements: ComponentClass[]): RouteConfig<HTMLElement>[] {
     const routes: RouteConfig<HTMLElement>[] = [];
 
     for (const element of elements) {
-      if (element && Reflect.hasOwnMetadata('Route', element)) {
-        const config: RouteConfig<HTMLElement> = Reflect.getOwnMetadata('Route', element);
-        routes.push(config);
-      }
+      // Own value only: a subclass of a routed page is not itself a route.
+      const config = element ? Metadata.for(element).own(RouterMetadata.route) : undefined;
+      if (config) routes.push(config);
     }
 
     return routes;

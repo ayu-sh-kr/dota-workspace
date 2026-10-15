@@ -1,10 +1,13 @@
 import 'reflect-metadata';
-import { BaseElement, Component, AfterInit, BeforeInit, HelperUtils, Property, State } from '@dota/core';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
+import { BaseElement, Component, AfterInit, BeforeInit, Property, State } from '@dota/core';
 import { String } from '@dota/core';
+import type { MethodDetails } from '@dota/core/types';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
-function getAfterMetadata(target: any): Map<string, Function> {
-  return HelperUtils.fetchOrCreate<Function>(target, 'After');
+function getAfterMetadata(target: any): ReadonlyMap<string, MethodDetails> {
+  return Metadata.for(target).own(CoreMetadata.afterInit);
 }
 
 describe('@AfterInit decorator – metadata registration', () => {
@@ -17,7 +20,7 @@ describe('@AfterInit decorator – metadata registration', () => {
 
     const meta = getAfterMetadata(new Host());
     expect(meta.has('afterViewInit')).toBe(true);
-    expect(typeof meta.get('afterViewInit')).toBe('function');
+    expect(typeof meta.get('afterViewInit')?.method).toBe('function');
   });
 
   it('stores the exact function reference from the descriptor', () => {
@@ -26,7 +29,7 @@ describe('@AfterInit decorator – metadata registration', () => {
       afterViewInit() {}
     }
 
-    const stored = getAfterMetadata(new Host()).get('afterViewInit');
+    const stored = getAfterMetadata(new Host()).get('afterViewInit')?.method;
     expect(typeof stored).toBe('function');
   });
 
@@ -46,7 +49,7 @@ describe('@AfterInit decorator – metadata registration', () => {
 
     expect(metaA.has('afterViewInit')).toBe(true);
     expect(metaB.has('afterViewInit')).toBe(true);
-    expect(metaA.get('afterViewInit')).not.toBe(metaB.get('afterViewInit'));
+    expect(metaA.get('afterViewInit')?.method).not.toBe(metaB.get('afterViewInit')?.method);
   });
 });
 

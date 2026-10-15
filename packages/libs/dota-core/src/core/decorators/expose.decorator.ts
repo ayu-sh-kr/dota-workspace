@@ -1,4 +1,5 @@
-import {HelperUtils} from "@dota/core";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
 import {MethodDetails} from "@dota/core/types";
 
 /**
@@ -25,9 +26,8 @@ import {MethodDetails} from "@dota/core/types";
 function ExposeDecorator(): MethodDecorator {
   return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
 
-    let data = HelperUtils.fetchOrCreate<MethodDetails>(target, 'Exposed')
-
-    data.set(propertyKey.toString(), {name: propertyKey.toString(), method: descriptor.value});
+    const name = propertyKey.toString();
+    Metadata.for(target).add(CoreMetadata.exposed, name, {name, method: descriptor.value});
 
     return descriptor;
   }

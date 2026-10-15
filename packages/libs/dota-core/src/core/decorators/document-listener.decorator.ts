@@ -1,4 +1,6 @@
-import {EventOptionMeta, EventOptions, HelperUtils} from "@dota/core";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
+import {EventOptionMeta, EventOptions} from "@dota/core";
 
 /**
  * A method decorator that registers a method to listen for a specific event on a custom element.
@@ -22,8 +24,7 @@ import {EventOptionMeta, EventOptions, HelperUtils} from "@dota/core";
  */
 function DocumentListenerDecorator(option: EventOptions): MethodDecorator {
   return function (target, propertyKey, descriptor: PropertyDescriptor) {
-    const data = HelperUtils.fetchOrCreate<EventOptionMeta>(target, "Document")
-    data.set(propertyKey.toString(), {
+    Metadata.for(target).add(CoreMetadata.documentListeners, propertyKey.toString(), {
       name: propertyKey.toString(),
       method: descriptor.value,
       event: option.event

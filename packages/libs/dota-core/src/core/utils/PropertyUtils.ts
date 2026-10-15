@@ -1,5 +1,7 @@
-import {HelperUtils, Sanitizer} from "@dota/core";
-import type {BaseElement, PropertyDetails, PropertyType, WatcherOptionMeta} from "@dota/core";
+import {Sanitizer} from "@dota/core";
+import type {BaseElement, PropertyDetails, PropertyType} from "@dota/core";
+import {Metadata, type MetadataRecord} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
 
 /** Carries the quietly resolved property value and whether markup supplied it. */
 type InitialPropertyValue = {
@@ -11,6 +13,12 @@ type InitialPropertyValue = {
 
 export class PropertyUtils {
   private static readonly reflectingAttributes = new WeakMap<BaseElement, Set<string>>();
+  /** Reads an element's cached record when it is a BaseElement, resolving it otherwise. */
+  private static metadataOf(element: BaseElement): MetadataRecord {
+    return (element as any).__metadata ?? Metadata.for(element);
+  }
+
+  private static readonly watcherIndexes = new WeakMap<object, ReadonlyMap<string, readonly string[]>>();
 
   /**
    * Converts a reactive property value to the string required by the DOM attribute API.
@@ -88,7 +96,7 @@ export class PropertyUtils {
    * @returns Changed public property name, or undefined when no semantic value changed.
    */
   static bindAttribute(element: BaseElement, name: string, value: string): string | undefined {
-    const property = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property').get(name);
+    const property = PropertyUtils.metadataOf(element).get(CoreMetadata.properties).get(name);
     if (!property) return;
 
     const nextValue = Sanitizer.sanitize(value, property.type);
@@ -112,7 +120,7 @@ export class PropertyUtils {
    * @param element Component about to perform its initial mount or hydration attempt.
    */
   static seedInitialValues(element: BaseElement): void {
-    const properties = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property');
+    const properties = PropertyUtils.metadataOf(element).get(CoreMetadata.properties);
     properties.forEach((meta) => {
       const resolved = this.resolveInitialValue(element, meta).value;
       if (resolved === undefined || this.isEquivalentValue(element[meta.prototype], resolved, meta.type)) return;
@@ -176,7 +184,7 @@ export class PropertyUtils {
    * ```
    */
   static bindReactive(element: any) {
-    const data = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property');
+    const data = PropertyUtils.metadataOf(element).get(CoreMetadata.properties);
 
     data.forEach((meta: PropertyDetails) => {
       const publicKey = meta.prototype; // the actual property name, e.g. "duration"
@@ -271,14 +279,35 @@ export class PropertyUtils {
   }
 
   static bindWatchers(element: BaseElement, prototype: string) {
-    const watchers = HelperUtils.fetchOrCreate<WatcherOptionMeta>(element, `Watcher:${prototype}`);
-    if (watchers && watchers.size > 0) {
-      watchers.forEach((item: WatcherOptionMeta) => {
-        if (element[item.name] && typeof element[item.name] === 'function') {
-          item.method.call(element);
+    const methods = this.watcherIndex(element).get(prototype);
+    if (!methods) return;
+
+    for (const name of methods) {
+      const method = element[name];
+      if (typeof method === 'function') method.call(element);
+    }
+  }
+
+  /**
+   * Indexes a class's watchers by watched property. The index is keyed by the resolved watcher
+   * map, which the metadata layer reuses until a class is decorated again.
+   */
+  private static watcherIndex(element: BaseElement): ReadonlyMap<string, readonly string[]> {
+    const watchers = PropertyUtils.metadataOf(element).get(CoreMetadata.watchers);
+    let index = this.watcherIndexes.get(watchers);
+    if (!index) {
+      const built = new Map<string, string[]>();
+      watchers.forEach(({name, value}) => {
+        for (const property of value) {
+          const methods = built.get(property) ?? [];
+          methods.push(name);
+          built.set(property, methods);
         }
       });
+      index = built;
+      this.watcherIndexes.set(watchers, index);
     }
+    return index;
   }
 
   /**
@@ -299,7 +328,7 @@ export class PropertyUtils {
    * element.reactive // false
    */
   static unbindReactive(element: any) {
-    let data = HelperUtils.fetchOrCreate<PropertyDetails>(element, 'Property');
+    let data = PropertyUtils.metadataOf(element).get(CoreMetadata.properties);
 
     data.forEach((value: PropertyDetails) => {
       const propertyKey = `_${value.prototype}`;
@@ -315,26 +344,14 @@ export class PropertyUtils {
   }
 
   /**
-   * Unbinds watchers for a specific property on an element.
-   *
-   * This function clears all watchers associated with a specific property prototype.
-   * It retrieves the watcher metadata and clears the Map to remove all registered watchers.
-   *
-   * @function unbindWatchers
-   * @param {BaseElement} element - The element to unbind watchers from.
-   * @param {string} prototype - The property prototype key for which to unbind watchers.
-   *
-   * @example
-   * // Assuming `element` has watchers on 'someProperty'
-   * unbindWatchers(element, 'someProperty');
-   *
-   * // Now, watchers for 'someProperty' are removed
+   * Kept for compatibility; watchers are class metadata, so there is nothing per instance to
+   * unbind. Earlier versions cleared the class's watcher map, disabling the watchers of every
+   * instance.
+   * @deprecated Watchers stop with their instance; no call is needed.
+   * @param _element Ignored.
+   * @param _prototype Ignored.
    */
-  static unbindWatchers(element: BaseElement, prototype: string) {
-    const watchers = HelperUtils.fetchOrCreate<WatcherOptionMeta>(element, `Watcher:${prototype}`);
-    if (watchers && watchers.size > 0) {
-      watchers.clear();
-    }
+  static unbindWatchers(_element: BaseElement, _prototype: string) {
   }
 
 }

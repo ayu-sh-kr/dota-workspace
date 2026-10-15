@@ -1,10 +1,12 @@
 import 'reflect-metadata';
-import { BaseElement, Component, BindEvent, HelperUtils } from '@dota/core';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
+import { BaseElement, Component, BindEvent } from '@dota/core';
 import { BindConfig } from '@dota/core/types';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
-function getBindMetadata(target: any): Map<string, BindConfig> {
-  return HelperUtils.fetchOrCreate<BindConfig>(target, 'Bind');
+function getBindMetadata(target: any): ReadonlyMap<string, BindConfig> {
+  return Metadata.for(target).own(CoreMetadata.bindings);
 }
 
 describe('@BindEvent decorator – metadata registration', () => {

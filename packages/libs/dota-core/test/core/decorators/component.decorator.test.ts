@@ -1,18 +1,12 @@
 import 'reflect-metadata';
 import { BaseElement, Component, HelperUtils } from '@dota/core';
-import { ComponentConfig, MethodDetails } from '@dota/core/types';
+import { ComponentConfig } from '@dota/core/types';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
 function getComponentConfig(ctor: any): ComponentConfig {
-  return Reflect.getOwnMetadata('Component', ctor);
-}
-
-function getMethodMetadata(ctor: any): MethodDetails[] {
-  return Reflect.getOwnMetadata(ctor.name, ctor) ?? [];
-}
-
-function getShadowMetadata(ctor: any): boolean | undefined {
-  return Reflect.getOwnMetadata(ctor.name + ':shadow', ctor);
+  return Metadata.for(ctor).own(CoreMetadata.component)!;
 }
 
 describe('@Component decorator – ComponentConfig metadata', () => {
@@ -97,8 +91,9 @@ describe('@Component decorator – ComponentConfig metadata', () => {
       render() { return ``; }
     }
 
-    expect(Reflect.hasOwnMetadata('Component', TestComponent)).toBe(true);
-    expect(Reflect.hasOwnMetadata('Component', TestComponent.prototype)).toBe(false);
+    expect(Metadata.for(TestComponent).own(CoreMetadata.component)).toBeDefined();
+    expect(Metadata.for(TestComponent.prototype)).toBe(Metadata.for(TestComponent));
+    expect(Reflect.hasOwnMetadata('Component', TestComponent)).toBe(false);
   });
 
   it('two different classes store independent Component metadata', () => {
@@ -191,19 +186,6 @@ describe('@Component decorator – static constructor properties', () => {
     expect(HelperUtils.toDotaElementConstructor(TestComponent).__dotaShadow).toBeUndefined();
   });
 
-  it('stores the shadow flag separately under the name:shadow metadata key', () => {
-    @Component({ selector: 'static-named-shadow', shadow: true })
-    class TestComponent extends BaseElement {
-      constructor() {
-        super();
-      }
-
-      render() { return ``; }
-    }
-
-    expect(getShadowMetadata(TestComponent)).toBe(true);
-  });
-
   it('__dotaSelector on sibling classes are independent of each other', () => {
     @Component({ selector: 'static-sibling-a', shadow: false })
     class SiblingA extends BaseElement {
@@ -232,66 +214,10 @@ describe('@Component decorator – static constructor properties', () => {
   });
 });
 
-describe('@Component decorator – prototype method metadata', () => {
+describe('@Component decorator – no unused metadata', () => {
 
-  it('collects all prototype methods except the constructor', () => {
-    @Component({ selector: 'method-collection-basic', shadow: false })
-    class TestComponent extends BaseElement {
-      constructor() {
-        super();
-      }
-
-      render() { return ``; }
-      save() {}
-      load() {}
-    }
-
-    const methods = getMethodMetadata(TestComponent);
-    const names = methods.map(m => m.name);
-
-    expect(names).toContain('render');
-    expect(names).toContain('save');
-    expect(names).toContain('load');
-    expect(names).not.toContain('constructor');
-  });
-
-  it('stores the actual function reference for each method', () => {
-    @Component({ selector: 'method-fn-ref', shadow: false })
-    class TestComponent extends BaseElement {
-      constructor() {
-        super();
-      }
-
-      render() { return ``; }
-      doWork() {}
-    }
-
-    const methods = getMethodMetadata(TestComponent);
-    const doWork = methods.find(m => m.name === 'doWork');
-
-    expect(typeof doWork?.method).toBe('function');
-    expect(doWork?.method).toBe(TestComponent.prototype.doWork);
-  });
-
-  it('returns an empty method list when the component has no extra methods beyond render', () => {
-    @Component({ selector: 'method-render-only', shadow: false })
-    class TestComponent extends BaseElement {
-      constructor() {
-        super();
-      }
-
-      render() { return ``; }
-    }
-
-    const methods = getMethodMetadata(TestComponent);
-    const names = methods.map(m => m.name);
-
-    expect(names).toContain('render');
-    expect(names.filter(n => n !== 'render').length).toBe(0);
-  });
-
-  it('stores method metadata under the class name key on the constructor', () => {
-    @Component({ selector: 'method-key-check', shadow: false })
+  it('does not store a prototype method list or a ClassName:shadow key', () => {
+    @Component({ selector: 'no-method-metadata', shadow: true })
     class TestComponent extends BaseElement {
       constructor() {
         super();
@@ -301,41 +227,8 @@ describe('@Component decorator – prototype method metadata', () => {
       submit() {}
     }
 
-    expect(Reflect.hasOwnMetadata('TestComponent', TestComponent)).toBe(true);
-  });
-
-  it('method metadata of two sibling classes are stored independently', () => {
-    @Component({ selector: 'method-sibling-a', shadow: false })
-    class ComponentA extends BaseElement {
-      constructor() {
-        super();
-      }
-
-      render() {
-        return ``;
-      }
-
-      methodA() {
-      }
-    }
-
-    @Component({selector: 'method-sibling-b', shadow: false})
-    class ComponentB extends BaseElement {
-      constructor() {
-        super();
-      }
-
-      render() { return ``; }
-      methodB() {}
-    }
-
-    const namesA = getMethodMetadata(ComponentA).map(m => m.name);
-    const namesB = getMethodMetadata(ComponentB).map(m => m.name);
-
-    expect(namesA).toContain('methodA');
-    expect(namesA).not.toContain('methodB');
-    expect(namesB).toContain('methodB');
-    expect(namesB).not.toContain('methodA');
+    expect(Reflect.hasOwnMetadata('TestComponent', TestComponent)).toBe(false);
+    expect(Reflect.hasOwnMetadata('TestComponent:shadow', TestComponent)).toBe(false);
   });
 });
 

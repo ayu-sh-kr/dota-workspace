@@ -1,4 +1,4 @@
-import {HelperUtils, ComponentConfig, updateDocumentSEO} from "@ayu-sh-kr/dota-core";
+import {ComponentConfig, CoreMetadata, Metadata, updateDocumentSEO} from "@ayu-sh-kr/dota-core";
 import {ComponentClass, NavigationContext, RouteMatch, RouteRenderer} from "@dota/Types";
 
 /**
@@ -112,6 +112,12 @@ export function renderRoute<T extends HTMLElement>(
   rootElement.innerHTML = `<${componentConfig.selector}${message} path="${match.pathname}"></${componentConfig.selector}>`;
 }
 
+/**
+ * Reads the `@Component` configuration the renderer needs for a route's selector.
+ * Uses the class's own metadata, matching how `@Component` registers each class separately.
+ * @param component Route or root component class.
+ * @returns Its component configuration, or undefined when the class is not a `@Component`.
+ */
 function getComponentConfig(component: ComponentClass): ComponentConfig | undefined {
-  return HelperUtils.getComponentMetadata(component, "Component") as ComponentConfig | undefined;
+  return Metadata.for(component).own(CoreMetadata.component);
 }

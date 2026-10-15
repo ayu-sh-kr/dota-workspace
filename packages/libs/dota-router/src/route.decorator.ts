@@ -1,4 +1,6 @@
+import {Metadata} from "@ayu-sh-kr/dota-core";
 import {RouteConfig, RouteMeta} from "@dota/Types";
+import {RouterMetadata} from "@dota/router-metadata";
 
 /**
  * Declares a component as a route and preserves its transition behavior in metadata.
@@ -26,7 +28,7 @@ function RouteDecorator(config: RouteMeta) {
       afterLeave: config.afterLeave
     }
 
-    Reflect.defineMetadata('Route', routeConfig, target);
+    Metadata.for(target).set(RouterMetadata.route, routeConfig);
   }
 }
 

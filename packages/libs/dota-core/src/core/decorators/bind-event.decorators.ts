@@ -1,5 +1,6 @@
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
 import {BindConfig} from "@dota/core/types";
-import {HelperUtils} from "@dota/core";
 
 
 /**
@@ -29,8 +30,7 @@ import {HelperUtils} from "@dota/core";
 function BindEventDecorator(config: BindConfig): MethodDecorator {
   return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
 
-    let data = HelperUtils.fetchOrCreate<BindConfig>(target, 'Bind');
-    data.set(propertyKey.toString(), config);
+    Metadata.for(target).add(CoreMetadata.bindings, propertyKey.toString(), config);
 
     return descriptor;
   }

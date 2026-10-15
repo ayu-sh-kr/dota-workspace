@@ -1,6 +1,9 @@
 import "reflect-metadata";
 import {DotaElementConstructor, PropertyDetails, WatcherOptionMeta} from "@dota/core/types";
 import {BaseElement} from "@dota/core";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
+import {LegacyMetadataAdapters} from "@dota/core/utils/legacy-metadata.ts";
 
 
 export class HelperUtils {
@@ -16,19 +19,25 @@ export class HelperUtils {
    * @param {any} target - The target object to fetch or create metadata for.
    * @param {string} appender - The appender string used to construct the metadata key.
    * @returns {Map<string, T>} - The metadata Map associated with the target and appender.
+   * The appenders dota-core decorators used (`Property`, `Bind`, `Before`, `Watcher:<name>`, …)
+   * return a live view of the metadata layer, so reads include inherited metadata and writes
+   * reach the owning class. Other appenders keep the original `reflect-metadata` storage.
+   * @deprecated Use `Metadata.for(target)` with a `CoreMetadata` or `MetadataKey` key.
    */
   static fetchOrCreate<T>(target: any, appender: string): Map<string, T> {
     const key = `${target.constructor.name}:${appender}`
 
-    let data: Map<string, T>;
-    if (!Reflect.hasMetadata(key, target)) {
-      data = new Map<string, T>();
-      Reflect.defineMetadata(key, data, target);
+    // Appenders that dota-core decorators used to write now live in the metadata layer.
+    const view = LegacyMetadataAdapters.view<T>(target, appender);
+    if (view) {
+      if (!Reflect.hasMetadata(key, target)) Reflect.defineMetadata(key, view, target);
+      return view;
     }
 
-    data = Reflect.getMetadata(key, target);
-
-    return data;
+    if (!Reflect.hasMetadata(key, target)) {
+      Reflect.defineMetadata(key, new Map<string, T>(), target);
+    }
+    return Reflect.getMetadata(key, target);
   }
 
   /**
@@ -39,6 +48,10 @@ export class HelperUtils {
    * @returns {any} - The metadata associated with the specified decorator.
    */
   static getComponentMetadata(targetConstructor: Object, decoratorName: string): any {
+    if (decoratorName === 'Component' && typeof targetConstructor === 'function') {
+      const config = Metadata.for(targetConstructor).own(CoreMetadata.component);
+      if (config) return config;
+    }
     if (Reflect.hasOwnMetadata(decoratorName, targetConstructor)) {
       return Reflect.getOwnMetadata(decoratorName, targetConstructor);
     }

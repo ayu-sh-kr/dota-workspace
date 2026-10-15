@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import type {MountStrategy} from '@ayu-sh-kr/dota-core';
+import {CoreMetadata, Metadata, type MountStrategy} from '@ayu-sh-kr/dota-core';
 import {
   HYDRATION_TEMPLATE_ATTRIBUTE,
   HYDRATION_VERSION_ATTRIBUTE,
@@ -65,8 +65,8 @@ describe('dotaHydration', () => {
   it('captures the route before the root mount and preserves its node identity', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'ordered-route-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'ordered-route-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'ordered-route-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'ordered-route-page'});
 
     const root = document.createElement('ordered-route-root');
     root.id = 'ordered-route-root';
@@ -199,8 +199,8 @@ describe('dotaHydration', () => {
   it('skips only the initial route injection when the matching page is marked', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'hydration-route-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'hydration-route-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'hydration-route-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'hydration-route-page'});
     const root = document.createElement('hydration-route-root');
     root.id = 'hydration-route-root';
     root.innerHTML = `<hydration-route-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template" ${HYDRATION_VERSION_ATTRIBUTE}="2"></hydration-route-page>`;
@@ -237,8 +237,8 @@ describe('dotaHydration', () => {
   it('applies route SEO when the initial marked page is adopted', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'seo-route-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'seo-route-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'seo-route-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'seo-route-page'});
     const root = document.createElement('seo-route-root');
     root.id = 'seo-route-root';
     root.innerHTML = `<seo-route-page path="/article" ${HYDRATION_ROUTE_ATTRIBUTE}="true" ${HYDRATION_ROUTE_VERSION_ATTRIBUTE}="1"></seo-route-page>`;
@@ -275,8 +275,8 @@ describe('dotaHydration', () => {
   it('delegates an initial marked route when the route owns custom rendering', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'custom-render-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'custom-render-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'custom-render-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'custom-render-page'});
     const root = document.createElement('custom-render-root');
     root.id = 'custom-render-root';
     root.innerHTML = `<custom-render-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template" ${HYDRATION_VERSION_ATTRIBUTE}="2"></custom-render-page>`;
@@ -309,8 +309,8 @@ describe('dotaHydration', () => {
   it('preserves both the marked outlet and page through the complete initial handoff', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'handoff-route-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'handoff-route-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'handoff-route-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'handoff-route-page'});
     const rootView = () => html``;
     const pageView = (label: string) => html`<article>${label}</article>`;
     const serverRoot = document.createElement('handoff-route-root');
@@ -363,8 +363,8 @@ describe('dotaHydration', () => {
   it('warns on a captured route that disagrees with the initial client match, then delegates to next', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'mismatched-route-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'mismatched-route-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'mismatched-route-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'mismatched-route-page'});
     const root = document.createElement('mismatched-route-root');
     root.id = 'mismatched-route-root';
     root.innerHTML = `<mismatched-route-page path="/article" ${HYDRATION_ROUTE_ATTRIBUTE}="true" ${HYDRATION_ROUTE_VERSION_ATTRIBUTE}="1"></mismatched-route-page>`;
@@ -400,8 +400,8 @@ describe('dotaHydration', () => {
   it('throws on a captured route mismatch when configured with the strict policy', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'strict-mismatched-route-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'strict-mismatched-route-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'strict-mismatched-route-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'strict-mismatched-route-page'});
     const root = document.createElement('strict-mismatched-route-root');
     root.id = 'strict-mismatched-route-root';
     root.innerHTML = `<strict-mismatched-route-page path="/article" ${HYDRATION_ROUTE_ATTRIBUTE}="true" ${HYDRATION_ROUTE_VERSION_ATTRIBUTE}="1"></strict-mismatched-route-page>`;
@@ -435,8 +435,8 @@ describe('dotaHydration', () => {
   it('does not report a mismatch when the route intentionally owns custom rendering', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'no-warn-custom-render-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'no-warn-custom-render-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'no-warn-custom-render-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'no-warn-custom-render-page'});
     const root = document.createElement('no-warn-custom-render-root');
     root.id = 'no-warn-custom-render-root';
     root.innerHTML = `<no-warn-custom-render-page path="/" ${HYDRATION_TEMPLATE_ATTRIBUTE}="template" ${HYDRATION_VERSION_ATTRIBUTE}="2"></no-warn-custom-render-page>`;
@@ -469,8 +469,8 @@ describe('dotaHydration', () => {
   it('does not silently accept a future template-marker version with no route marker', async () => {
     class Root extends HTMLElement {}
     class Page extends HTMLElement {}
-    Reflect.defineMetadata('Component', {selector: 'future-marker-root'}, Root);
-    Reflect.defineMetadata('Component', {selector: 'future-marker-page'}, Page);
+    Metadata.for(Root).set(CoreMetadata.component, {selector: 'future-marker-root'});
+    Metadata.for(Page).set(CoreMetadata.component, {selector: 'future-marker-page'});
     const root = document.createElement('future-marker-root');
     root.id = 'future-marker-root';
     // Simulates output from a future template-marker version bump that shipped

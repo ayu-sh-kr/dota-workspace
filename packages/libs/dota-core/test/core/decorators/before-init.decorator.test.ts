@@ -1,10 +1,13 @@
 import 'reflect-metadata';
-import { BaseElement, Component, BeforeInit, HelperUtils, Property } from '@dota/core';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
+import { BaseElement, Component, BeforeInit, Property } from '@dota/core';
 import { String } from '@dota/core';
+import type { MethodDetails } from '@dota/core/types';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
-function getBeforeMetadata(target: any): Map<string, Function> {
-  return HelperUtils.fetchOrCreate<Function>(target, 'Before');
+function getBeforeMetadata(target: any): ReadonlyMap<string, MethodDetails> {
+  return Metadata.for(target).own(CoreMetadata.beforeInit);
 }
 
 describe('@BeforeInit decorator – metadata registration', () => {
@@ -17,7 +20,7 @@ describe('@BeforeInit decorator – metadata registration', () => {
 
     const meta = getBeforeMetadata(new Host());
     expect(meta.has('beforeViewInit')).toBe(true);
-    expect(typeof meta.get('beforeViewInit')).toBe('function');
+    expect(typeof meta.get('beforeViewInit')?.method).toBe('function');
   });
 
   it('stores the exact function reference from the descriptor', () => {
@@ -28,7 +31,7 @@ describe('@BeforeInit decorator – metadata registration', () => {
       beforeViewInit() { sentinel(); }
     }
 
-    const stored = getBeforeMetadata(new Host()).get('beforeViewInit');
+    const stored = getBeforeMetadata(new Host()).get('beforeViewInit')?.method;
     expect(typeof stored).toBe('function');
   });
 
@@ -48,7 +51,7 @@ describe('@BeforeInit decorator – metadata registration', () => {
 
     expect(metaA.has('beforeViewInit')).toBe(true);
     expect(metaB.has('beforeViewInit')).toBe(true);
-    expect(metaA.get('beforeViewInit')).not.toBe(metaB.get('beforeViewInit'));
+    expect(metaA.get('beforeViewInit')?.method).not.toBe(metaB.get('beforeViewInit')?.method);
   });
 });
 
