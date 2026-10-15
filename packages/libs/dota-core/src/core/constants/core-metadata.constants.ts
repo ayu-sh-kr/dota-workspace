@@ -11,7 +11,7 @@ import type {
   StateConfig,
   WatcherOptionMeta
 } from "@dota/core/types";
-import {MetadataKey} from "./metadata-key.ts";
+import {MetadataKey} from "@dota/metadata";
 
 /** `@EventListener` registration, keyed by method name. */
 export interface EventListenerMeta extends EventConfig {
