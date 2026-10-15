@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
 import { BaseElement, Component, Emitter } from '@dota/core';
 import { EventEmitter } from '@dota/core';
 import { EventDetails } from '@dota/core/types';
