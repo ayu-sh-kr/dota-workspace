@@ -24,13 +24,13 @@ describe('MDService.render', () => {
     expect(MDService.render('cached body', {bust: true})).not.toBe(first);
   });
 
-  it('highlights fenced code with highlight.js by default', () => {
-    expect(MDService.renderHtml('```js\nconst a = 1;\n```')).toContain('class="hljs language-js"');
+  it('renders escaped fenced code without a highlighter by default', () => {
+    expect(MDService.renderHtml('```html\n<p>\n```')).toBe('<pre><code class="language-html">&lt;p&gt;\n</code></pre>\n');
   });
 });
 
 describe('MDService.configure', () => {
-  it('uses a custom highlighter in place of highlight.js', () => {
+  it('uses a custom highlighter for fenced code', () => {
     MDService.configure({highlight: (code, language) => `<b data-lang="${language}">${code.trim()}</b>`});
 
     const html = MDService.renderHtml('```ts\nlet a\n```');
@@ -39,7 +39,7 @@ describe('MDService.configure', () => {
     expect(html).not.toContain('hljs');
   });
 
-  it('renders plain escaped code when highlighting is disabled', () => {
+  it('renders plain escaped code when highlighting is disabled explicitly', () => {
     MDService.configure({highlight: false});
 
     expect(MDService.renderHtml('```html\n<p>\n```')).toBe('<pre><code class="language-html">&lt;p&gt;\n</code></pre>\n');
@@ -58,6 +58,15 @@ describe('MDService.configure', () => {
 
     expect(html).toContain('&lt;em&gt;raw&lt;/em&gt;');
     expect(html).toContain('<hr data-label="section">');
+  });
+
+  it('accepts a plugin that installs its own highlighter', () => {
+    const highlighter = (md: ReturnType<typeof createMarkdown>) => {
+      md.set({highlight: (code: string, language: string) => `<pre><code class="plugin language-${language}">${code.trim()}</code></pre>`});
+    };
+    MDService.configure({plugins: [highlighter]});
+
+    expect(MDService.renderHtml('```ts\nlet a\n```')).toBe('<pre><code class="plugin language-ts">let a</code></pre>\n');
   });
 
   it('clears cached results rendered with the previous instance', () => {
