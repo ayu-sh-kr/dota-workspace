@@ -1,4 +1,4 @@
-import { Metadata, MetadataKey } from '@dota/core/metadata/index.ts';
+import { Metadata, MetadataKey } from '@dota/metadata/index.ts';
 
 const ENTRIES = MetadataKey.map<number>('test.entries');
 const LABEL = MetadataKey.value<string>('test.label');
@@ -156,6 +156,16 @@ describe('Metadata – standard decorator contexts', () => {
     Object.defineProperty(StandardChild, metadataSymbol, { value: metadata });
 
     expect([...Metadata.for(StandardChild).get(ENTRIES)]).toEqual([['legacy', 1], ['standard', 2]]);
+  });
+
+  it('prefers a class\'s standard metadata over its legacy metadata', () => {
+    const metadata = Object.create(null);
+    class Mixed {}
+    Metadata.for(Mixed).set(LABEL, 'legacy');
+    Metadata.for({ kind: 'class', metadata }).set(LABEL, 'standard');
+    Object.defineProperty(Mixed, metadataSymbol, { value: metadata });
+
+    expect(Metadata.for(Mixed).get(LABEL)).toBe('standard');
   });
 
   it('follows the metadata object prototype chain for context-only reads', () => {
