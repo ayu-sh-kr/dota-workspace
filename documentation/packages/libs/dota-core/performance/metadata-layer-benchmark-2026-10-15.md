@@ -105,3 +105,41 @@ removing the bundle hash. Webingo's 12 blog article pages now carry `content-cla
 `blog-markdown-view`. `BlogMarkdownViewComponent` extends `MdViewComponent`, and before the layer
 its inherited `@Property` metadata was invisible. Dota Web's only differences are popover IDs that
 come from `Math.random()` on every build. There are no other differences.
+
+## ayu-sh-kr portfolio
+
+This section measures the whole pull request: both dota-core rounds plus the dota-router and
+dota-ssr changes. *Before* is the full workspace at `master` (`ec91be7`); *after* is
+`feat/core-metadata-layer` (`9485229`). The portfolio was linked to each build's `dota-wrap`,
+`dota-ui`, and `dota-md` and built with `build:ssg`. Each build prerendered 96 routes, and both
+passed the portfolio's internal link check (2,633 links).
+
+Pages were measured with 20 interleaved runs at 4× CPU throttling. Each run loads `/`, then
+navigates on the client through `/blog`, `/blog/distributed-locks-redis`, `/showcase`,
+`/pricing`, and back to `/`.
+
+| Metric | Before | After | Δ | Before p20–p80 | After p20–p80 |
+| --- | ---: | ---: | ---: | --- | --- |
+| Ready (ms) | 1,378 | 1,373 | −0.4% | 1,276–1,445 | 1,311–1,445 |
+| Load script (ms) | 515 | 500 | −2.9% | 483–564 | 450–526 |
+| Load task time (ms) | 1,537 | 1,555 | +1.2% | 1,435–1,626 | 1,474–1,643 |
+| TBT (ms) | 917 | 919 | +0.2% | 857–1,000 | 839–1,013 |
+| Navigation script (ms) | 1,176 | 1,171 | −0.4% | 1,118–1,278 | 1,119–1,307 |
+| JS heap (MB) | 19.1 | 18.8 | **−1.5%** | 19.1–19.2 | 18.8–18.9 |
+| SSG prerender, 96 routes (s, median of 3) | 19.00 | 18.89 | −0.6% | 18.81–19.43 | 18.14–19.56 |
+
+Only the heap ranges separate. That is consistent with components no longer creating empty
+metadata maps per instance. Timing is unchanged within noise. A CPU profile of a load and four
+navigations attributes about 20 ms of 541 ms of JavaScript self time to dota-core's lifecycle
+(`connectedCallback`, `bindHTML`, and metadata lookups). The largest costs are in the
+portfolio itself:
+
+- `app-header`'s scroll listener `updateScrolledState`, which runs during route scroll resets
+  (47 ms).
+- `GeneralUtils.setBrowserTheme`, whose class toggles on `<html>` restyle the whole document
+  (36 ms).
+- `updateProgress` and the footer's one-second clock (31 ms together).
+
+The generated HTML is identical on all 96 pages. The only differences are the bundle hash and the
+footer clock, which prints the build time. The portfolio has no component subclasses, so the
+inheritance fix changes nothing there.
