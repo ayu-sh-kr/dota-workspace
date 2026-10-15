@@ -1,74 +1,31 @@
-import {EventConfig, EventType} from "@dota/core/types";
+import {EventConfig} from "@dota/core/types";
+import {CoreMetadata, Metadata} from "@dota/core/metadata";
 
 
 /**
- * A method decorator that adds event listeners to a custom element.
+ * A method decorator that listens for an event on the window or on the component host.
  *
- * The `EventListenerDecorator` function is used to add event listeners to a custom element.
- * It supports adding listeners to either the global window object or the element itself.
- * The decorator ensures that the event listeners are properly added and removed when the element
- * is connected to or disconnected from the DOM.
+ * The decorator only records the listener as class metadata. `BaseElement` adds the listener
+ * when the element connects and removes the same function when it disconnects, so handlers
+ * neither leak nor stack across reconnects. Subclasses inherit decorated listeners.
  *
- * @param {EventConfig} config - The configuration object for the event listener.
+ * @param {EventConfig} config - Event name, target (`EventType.WINDOW` or `EventType.ROOT`), and
+ * optional listener options.
  * @returns {MethodDecorator} - A method decorator function.
  *
  * @example
- * // Example of using EventListenerDecorator to add an event listener to a custom element
- * class MyElement extends HTMLElement {
- *   \@EventListenerDecorator({ name: 'click', type: EventType.ROOT })
- *   public handleClick(event: Event) {
- *     console.log('Element clicked', event);
+ * \@Component({ selector: 'my-element' })
+ * class MyElement extends BaseElement {
+ *   \@EventListener({ name: 'resize', type: EventType.WINDOW })
+ *   onResize(event: Event) {
+ *     console.log('Window resized', event);
  *   }
  * }
- *
- * // The event listener is now added to the element
- * const element = new MyElement();
- * document.body.appendChild(element);
- * // Clicking the element will trigger the handleClick method
  */
 function EventListenerDecorator(config: EventConfig): MethodDecorator {
-
   return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
-    // removeEventListener needs the exact function that was added, so keep one per instance.
-    const boundHandlers = new WeakMap<object, EventListener>();
-    const handlerFor = (instance: object): EventListener => {
-      let handler = boundHandlers.get(instance);
-      if (!handler) {
-        handler = descriptor.value.bind(instance) as EventListener;
-        boundHandlers.set(instance, handler);
-      }
-      return handler;
-    };
-
-    const originalConnectedCallback: Function = target.connectedCallback;
-
-    target.connectedCallback = function () {
-      if (originalConnectedCallback) {
-        originalConnectedCallback.apply(this);
-      }
-
-      if (config.type === EventType.WINDOW) {
-        window.addEventListener(config.name, handlerFor(this));
-      } else if (config.type === EventType.ROOT) {
-        this.addEventListener(config.name, handlerFor(this));
-      }
-    }
-
-    const originalDisconnectedCallback = target.disconnectedCallback;
-
-    target.disconnectedCallback = function () {
-
-      if (config.type === EventType.WINDOW) {
-        window.removeEventListener(config.name, handlerFor(this));
-      } else if (config.type === EventType.ROOT) {
-        this.removeEventListener(config.name, handlerFor(this));
-      }
-
-      if (originalDisconnectedCallback) {
-        originalDisconnectedCallback.apply(this);
-      }
-    };
-
+    const method = propertyKey.toString();
+    Metadata.for(target).add(CoreMetadata.eventListeners, method, {...config, method});
     return descriptor;
   }
 }
