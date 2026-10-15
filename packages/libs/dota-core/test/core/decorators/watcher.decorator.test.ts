@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { BaseElement, Component, Property, State, Watcher, HelperUtils } from '@dota/core';
+import { BaseElement, Component, Property, State, Watcher } from '@dota/core';
+import { CoreMetadata, Metadata } from '@dota/core/metadata';
 import { Number, String } from '@dota/core';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
@@ -14,8 +15,8 @@ describe('@Watcher decorator – metadata registration', () => {
       onSizeChange() {}
     }
 
-    const meta = HelperUtils.fetchOrCreate<any>(new Host(), 'Watcher:size');
-    expect(meta.has('onSizeChange')).toBe(true);
+    const meta = Metadata.for(Host).own(CoreMetadata.watchers);
+    expect(meta.get('onSizeChange')?.value).toEqual(['size']);
   });
 
   it('stores the method name and prototype reference', () => {
@@ -27,12 +28,11 @@ describe('@Watcher decorator – metadata registration', () => {
       onTitleChange() {}
     }
 
-    const meta = HelperUtils.fetchOrCreate<any>(new Host(), 'Watcher:title');
-    const record = meta.get('onTitleChange');
+    const record = Metadata.for(Host).own(CoreMetadata.watchers).get('onTitleChange');
 
     expect(record?.name).toBe('onTitleChange');
     expect(typeof record?.method).toBe('function');
-    expect(record?.value).toBe('title');
+    expect(record?.value).toEqual(['title']);
   });
 
   it('registers multiple watchers for the same property', () => {
@@ -47,9 +47,9 @@ describe('@Watcher decorator – metadata registration', () => {
       analyticsChange() {}
     }
 
-    const meta = HelperUtils.fetchOrCreate<any>(new Host(), 'Watcher:count');
-    expect(meta.has('logChange')).toBe(true);
-    expect(meta.has('analyticsChange')).toBe(true);
+    const meta = Metadata.for(Host).own(CoreMetadata.watchers);
+    expect(meta.get('logChange')?.value).toEqual(['count']);
+    expect(meta.get('analyticsChange')?.value).toEqual(['count']);
   });
 
   it('registers a watcher that watches multiple properties at once', () => {
@@ -64,11 +64,8 @@ describe('@Watcher decorator – metadata registration', () => {
       onDimensionsChange() {}
     }
 
-    const widthMeta = HelperUtils.fetchOrCreate<any>(new Host(), 'Watcher:width');
-    const heightMeta = HelperUtils.fetchOrCreate<any>(new Host(), 'Watcher:height');
-
-    expect(widthMeta.has('onDimensionsChange')).toBe(true);
-    expect(heightMeta.has('onDimensionsChange')).toBe(true);
+    const record = Metadata.for(Host).own(CoreMetadata.watchers).get('onDimensionsChange');
+    expect(record?.value).toEqual(['width', 'height']);
   });
 });
 
