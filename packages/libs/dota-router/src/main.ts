@@ -8,4 +8,5 @@ export type {RouteRenderErrorPolicy, RouteRendererOptions} from "@dota/coordinat
 export type {Coordinator} from "@dota/coordinator";
 export {runRouteGuards, runRouteLifecycleHooks} from "@dota/coordinator/navigation-lifecycle";
 export {Route} from "@dota/route.decorator";
+export {RouterMetadata} from "@dota/router-metadata";
 export * from "@dota/Types";
