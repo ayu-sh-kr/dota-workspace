@@ -3,7 +3,12 @@ import {DotaElementConstructor, PropertyDetails, WatcherOptionMeta} from "@dota/
 import {BaseElement} from "@dota/core";
 
 
+const EMPTY_METADATA: ReadonlyMap<string, unknown> = new Map<string, unknown>();
+
 export class HelperUtils {
+
+  /** Per-prototype memo of decorator metadata read by component instances. */
+  private static readonly instanceMetadataCache = new WeakMap<object, Map<string, ReadonlyMap<string, unknown>>>();
 
   /**
    * Fetches existing metadata or creates new metadata for a given target and appender.
@@ -29,6 +34,37 @@ export class HelperUtils {
     data = Reflect.getMetadata(key, target);
 
     return data;
+  }
+
+  /**
+   * Reads decorator metadata for a component instance without creating any.
+   *
+   * Decorators register metadata on the class prototype once, so lookups from instances
+   * are memoised per prototype. Unlike {@link fetchOrCreate}, a missing entry yields a
+   * shared empty map instead of defining a new map on the instance, which keeps
+   * connect, update, and property-set paths free of `reflect-metadata` traversals.
+   *
+   * @template T - The type of the metadata value.
+   * @param {object} instance - Component instance whose class metadata is read.
+   * @param {string} appender - Suffix of the `ClassName:appender` metadata key.
+   * @returns {ReadonlyMap<string, T>} - The class metadata, or an empty map when none exists.
+   */
+  static readMetadata<T>(instance: object, appender: string): ReadonlyMap<string, T> {
+    const prototype = Object.getPrototypeOf(instance);
+    let entries = this.instanceMetadataCache.get(prototype);
+    if (!entries) {
+      entries = new Map();
+      this.instanceMetadataCache.set(prototype, entries);
+    }
+
+    let data = entries.get(appender);
+    if (!data) {
+      const key = `${instance.constructor.name}:${appender}`;
+      data = Reflect.getMetadata(key, prototype) ?? EMPTY_METADATA;
+      entries.set(appender, data!);
+    }
+
+    return data as ReadonlyMap<string, T>;
   }
 
   /**
