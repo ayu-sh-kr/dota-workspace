@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import {Metadata} from '@dota/metadata';
+import {CoreMetadata} from '@dota/core/constants';
 import { BaseElement, Component, State } from '@dota/core';
 import { StateConfig } from '@dota/core/types';
 import { defineAndCreate, microtask } from '../../Utils.ts';
