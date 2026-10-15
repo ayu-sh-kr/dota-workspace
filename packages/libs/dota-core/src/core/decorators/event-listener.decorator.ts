@@ -1,5 +1,6 @@
 import {EventConfig} from "@dota/core/types";
-import {CoreMetadata, Metadata} from "@dota/core/metadata";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
 
 
 /**
