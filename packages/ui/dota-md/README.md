@@ -1,6 +1,6 @@
 # @ayu-sh-kr/dota-md
 
-Web component library for rendering Markdown in documentation and blog layouts. Built on `markdown-it` with syntax highlighting, anchor links, and an extracted Table of Contents.
+Web component library for rendering Markdown in documentation and blog layouts. Built on `markdown-it` with anchor links, an extracted Table of Contents, and a pluggable syntax highlighter.
 
 ## Installation
 
@@ -137,7 +137,7 @@ MDService.setCacheLimit(100);       // adjust max entries (default 50)
 
 ### Parser, highlighter, and plugins
 
-`MDService.configure()` rebuilds the shared markdown-it instance and clears the cache. Defaults: raw HTML, linkify, typographer, heading anchors, and highlight.js.
+`MDService.configure()` rebuilds the shared markdown-it instance and clears the cache. Defaults: raw HTML, linkify, typographer, and heading anchors.
 
 ```ts
 import footnote from 'markdown-it-footnote';
@@ -149,6 +149,35 @@ MDService.configure({
   plugins: [footnote, [container, 'tip']],          // plugin or [plugin, ...params]
 });
 ```
+
+### Syntax highlighting
+
+`dota-md` does not bundle a highlighter. Fenced code renders escaped, as `<pre><code class="language-ts">`, until the application provides one. You choose the library and bundle only the languages your content uses.
+
+Pass a function as `highlight`. Return highlighted HTML, or an empty string to keep the escaped code:
+
+```ts
+import hljs from 'highlight.js/lib/core';
+import typescript from 'highlight.js/lib/languages/typescript';
+
+hljs.registerLanguage('typescript', typescript);
+
+MDService.configure({
+  highlight: (code, lang) =>
+    hljs.getLanguage(lang) ? hljs.highlight(code, { language: lang }).value : '',
+});
+```
+
+A markdown-it highlighting plugin also works through `plugins`. For example, the core entry of `markdown-it-highlightjs` adds the `hljs` class that highlight.js themes style:
+
+```ts
+import hljs from 'highlight.js/lib/core';
+import highlightjs from 'markdown-it-highlightjs/core';
+
+MDService.configure({ plugins: [[highlightjs, { hljs, auto: true, code: true }]] });
+```
+
+Configure the highlighter before the first render, for example at the top of your application entry, so prerendered and client-rendered pages match. Import a highlight.js theme stylesheet yourself, such as `highlight.js/styles/github-dark.css`.
 
 `createMarkdown(setup)` returns the same configured instance for use outside the service. `MDService.setMd(instance)` accepts any markdown-it instance; the TOC is read from heading `id` attributes, so add `markdown-it-anchor` (as `createMarkdown` does) to keep TOC links working. TOC ids always match the rendered heading ids.
 
