@@ -1,10 +1,11 @@
 import 'reflect-metadata';
-import { BaseElement, Component, State, HelperUtils } from '@dota/core';
+import { CoreMetadata, Metadata } from '@dota/core/metadata';
+import { BaseElement, Component, State } from '@dota/core';
 import { StateConfig } from '@dota/core/types';
 import { defineAndCreate, microtask } from '../../Utils.ts';
 
-function getStateMetadata(target: any): Map<string, StateConfig> {
-  return HelperUtils.fetchOrCreate<StateConfig>(target, 'State');
+function getStateMetadata(target: any): ReadonlyMap<string, StateConfig> {
+  return Metadata.for(target).own(CoreMetadata.states);
 }
 
 describe('@State decorator – metadata registration', () => {
