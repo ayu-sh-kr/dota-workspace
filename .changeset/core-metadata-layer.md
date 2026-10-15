@@ -11,7 +11,7 @@ Decorators now store component metadata in a typed metadata layer, so subclasses
 - `@BindEvent` only matches elements inside the component. A matching ancestor outside it no longer triggers the handler.
 - `@EventListener` is bound by `BaseElement` and only applies to `BaseElement` subclasses.
 - `PropertyUtils.unbindWatchers` no longer removes a class's watchers for every instance. It is deprecated and does nothing.
-- `HelperUtils.fetchOrCreate` is deprecated. Decorators no longer write to it; read decorator metadata with `Metadata.for()`. `HelperUtils.getComponentMetadata(ctor, 'Component')` still works.
+- `HelperUtils.fetchOrCreate` is deprecated in favour of `Metadata.for()`, but it keeps working. The appenders the decorators used (`Property`, `Bind`, `Before`, `After`, `Watcher:<name>`, and so on) return a live view of the metadata layer: reads include inherited entries, and writes reach the class. `HelperUtils.getComponentMetadata(ctor, 'Component')` still works.
 - `@Component` no longer stores a list of prototype methods or a `ClassName:shadow` metadata key.
 
 Lifecycle events and hooks keep their previous microtask timing.
