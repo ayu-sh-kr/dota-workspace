@@ -29,6 +29,9 @@ import {DefaultApplicationEventListenerRegistry} from "@ayu-sh-kr/dota-wrap/even
 import {MdTocComponent, MdViewComponent} from "@ayu-sh-kr/dota-md";
 import {routeConfig} from "virtual:dota-routes";
 import {dotaHydration} from "@ayu-sh-kr/dota-wrap/ssr";
+import {configureMarkdown} from "@dota/configs/markdown.config.ts";
+
+configureMarkdown();
 
 const applicationEventService = ApplicationEventService.getInstance();
 const applicationEventPublisher = applicationEventService.getPublisher();
