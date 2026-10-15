@@ -1,4 +1,5 @@
-import {CoreMetadata, Metadata} from "@dota/core/metadata";
+import {Metadata} from "@dota/metadata";
+import {CoreMetadata} from "@dota/core/constants";
 
 /**
  * A method decorator that registers a method to be called before the initialization of a custom element.
