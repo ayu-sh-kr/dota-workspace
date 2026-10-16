@@ -6,7 +6,7 @@ The package separates Vite integration from static page generation:
 src/
   vite/              Build plugin, prerender Vite server, and Vercel configuration
   ssg/               Generation, rendering, workers, routes, assets, and fetch handling
-  ssr/               Reserved for future server-side rendering
+  ssr/               Prototype request-time rendering to HTML strings
   index.ts           Browser hydration entry
   route-marker.ts    Markers shared by generation and hydration
 ```
@@ -16,8 +16,9 @@ The Vite plugin validates options and passes the completed client build to
 writes, and timing logs. Vite server setup stays in `vite/prerender-server.ts`
 and is shared by sequential rendering and isolated workers.
 
-Tests follow the same `vite` and `ssg` ownership. The `ssr` directory contains
-only `.gitkeep` so Git preserves the empty directory; no SSR runtime is added.
+Tests follow the same `vite`, `ssg`, and `ssr` ownership. The `ssr` directory holds
+the [light-DOM string rendering prototype](light-dom-string-rendering.md), published
+as `@ayu-sh-kr/dota-ssr/server`.
 
 Public imports remain `@ayu-sh-kr/dota-ssr` for hydration and
 `@ayu-sh-kr/dota-ssr/vite` for the build plugin. The worker export retains its
