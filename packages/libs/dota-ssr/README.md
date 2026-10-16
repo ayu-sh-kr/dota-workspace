@@ -353,12 +353,51 @@ build when changing custom outputs. GitHub Pages does not gain server redirects
 or a SPA fallback from this option. Publishing and CI workflow configuration
 remain separate from generating these deployment files.
 
+## Request-time rendering prototype
+
+`@ayu-sh-kr/dota-ssr/server` renders Dota pages to HTML strings in Node without
+Happy DOM. Components are constructed against a minimal attribute-only element,
+seeded with Dota Core's property rules, given one awaited `serverLoad`, and
+serialized from their `html` templates. The engine sits behind a `RenderAdapter`
+contract so another engine can replace it.
+
+```ts
+import {createServer} from 'node:http';
+import {createRequestHandler, createStringAdapter, toNodeListener} from '@ayu-sh-kr/dota-ssr/server';
+
+const handler = createRequestHandler({
+  adapter: createStringAdapter({components: [TasksPage, TaskItem]}),
+  routes: [{path: '/tasks/:id', page: 'tasks-page'}],
+  template // HTML shell containing <!--dota-head--> and <!--dota-body-->
+});
+
+createServer(toNodeListener(handler)).listen(3000);
+```
+
+A page loads request data in `serverLoad(context)`. `context.fetch` resolves
+relative paths against the request origin, and `context.state` is shared by every
+component in that request. Loaded `@Property` values are written to the host as
+attributes, so the browser upgrades the same markup without a state script:
+
+```ts
+async serverLoad(context: RenderContext) {
+  this.tasks = await (await context.fetch('/api/tasks')).json();
+}
+```
+
+Import the `/server` entry before any component module, because Dota Core needs a
+global `HTMLElement` when it loads. A runnable example lives in
+`playground/light-dom`; build the libraries and run `pnpm run playground`.
+See the [light-DOM string rendering design](../../../documentation/packages/libs/dota-ssr/architecture/light-dom-string-rendering.md)
+for the contract and its current limits.
+
 ## Public API
 
 | Entry point | Main exports | Use |
 | --- | --- | --- |
 | `@ayu-sh-kr/dota-ssr` | `dotaHydration`, `DotaHydrationOptions`, route-marker constants | Browser-side adoption of compatible static markup and initial route hosts. |
 | `@ayu-sh-kr/dota-ssr/vite` | `dotaSsg`, route types and route resolvers | Build-time route rendering and output mapping. |
+| `@ayu-sh-kr/dota-ssr/server` | `createStringAdapter`, `createRequestHandler`, `toNodeListener`, `RenderAdapter`, `RenderContext` | Prototype request-time rendering to HTML strings without a DOM library. |
 
 The package is opt-in by design: adding it as a dependency does not change
 rendering until one of these functions is installed.
