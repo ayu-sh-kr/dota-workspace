@@ -1,5 +1,6 @@
 // @vitest-environment node
 import {createStringAdapter, type RenderContext} from '@dota/ssr/index';
+import {isServerRender} from '@ayu-sh-kr/dota-core';
 import {FIXTURE_COMPONENTS, TaskItemComponent} from '@test/ssr/string-adapter-fixtures';
 
 /** Builds a request context whose fetch answers `/api/tasks` from memory. */
@@ -59,6 +60,15 @@ describe('createStringAdapter', () => {
     const {html} = await adapter.render('state-reader', context);
 
     expect(html).toBe('<state-reader seen="ada"><p>ada</p></state-reader>');
+  });
+
+  it('emits client-only components as empty marked hosts and sets the server flag while rendering', async () => {
+    const adapter = createStringAdapter({components: FIXTURE_COMPONENTS});
+
+    const {html} = await adapter.render('render-flag-probe', createContext());
+
+    expect(html).toBe('<render-flag-probe><p>true</p><client-only-panel label="later" data-dota-csr=""></client-only-panel></render-flag-probe>');
+    expect(isServerRender()).toBe(false);
   });
 
   it('rejects a page selector that is not registered', async () => {
