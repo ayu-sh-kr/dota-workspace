@@ -1,8 +1,11 @@
 import './server-element';
 import {
+  CLIENT_ONLY_ATTRIBUTE,
   CoreMetadata,
   Metadata,
   PropertyUtils,
+  resolveComponentRenderMode,
+  setServerRender,
   type BaseElement,
   type DotaElementConstructor,
   type SEO
@@ -28,6 +31,8 @@ type HostMatch = {
 };
 
 const DEFAULT_MAX_DEPTH = 32;
+/** Renders in flight; the server-render flag stays set until the last one finishes. */
+let activeRenders = 0;
 const CUSTOM_ELEMENT_OPEN_TAG =
   /<([a-z][a-z0-9]*-[a-z0-9._-]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*)\s*>/gi;
 const ATTRIBUTE = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
@@ -38,6 +43,8 @@ const ENTITIES: Record<string, string> = {amp: '&', lt: '<', gt: '>', quot: '"',
  * Each host is constructed against a minimal attribute-only element, seeded with
  * Dota Core's property rules, given one awaited `serverLoad`, and rendered once.
  * Registered hosts inside the output are rendered the same way, concurrently.
+ * `@Component({mode: 'csr'})` hosts are emitted empty and marked, and Dota Core's
+ * server-render flag is set while any render is in flight.
  * @param options Components available to the engine and the nesting limit.
  * @throws Error when a component has no `@Component` selector.
  */
@@ -61,12 +68,18 @@ export function createStringAdapter(options: StringAdapterOptions): RenderAdapte
 
     const instance = new Component() as ServerComponent;
     host.attributes.forEach(([name, value]) => instance.setAttribute(name, value));
-    PropertyUtils.seedInitialValues(instance);
-    await instance.serverLoad?.(context);
-    reflectProperties(instance);
+    const clientOnly = resolveComponentRenderMode(Component) === 'csr';
+    if (clientOnly) {
+      // Matches BaseElement during a server render: an empty, marked host the browser mounts fresh.
+      instance.setAttribute(CLIENT_ONLY_ATTRIBUTE, '');
+    } else {
+      PropertyUtils.seedInitialValues(instance);
+      await instance.serverLoad?.(context);
+      reflectProperties(instance);
+    }
 
-    const rendered = await expandHosts(serializeOutput(instance.render()), context, depth + 1);
-    const content = Component.__dotaShadow
+    const rendered = clientOnly ? '' : await expandHosts(serializeOutput(instance.render()), context, depth + 1);
+    const content = clientOnly ? '' : Component.__dotaShadow
       ? `<template shadowrootmode="open">${rendered}</template>${await expandHosts(host.children, context, depth + 1)}`
       : rendered;
     const attributes = instance.getAttributeNames()
@@ -93,8 +106,15 @@ export function createStringAdapter(options: StringAdapterOptions): RenderAdapte
     name: 'string',
     async render(selector: string, context: RenderContext): Promise<RenderResult> {
       const page = {start: 0, end: 0, selector, attributes: [], children: ''};
-      const {html, instance} = await renderHost(page, context, 0);
-      return {html, head: instance.seo};
+      activeRenders += 1;
+      setServerRender(true);
+      try {
+        const {html, instance} = await renderHost(page, context, 0);
+        return {html, head: instance.seo};
+      } finally {
+        activeRenders -= 1;
+        if (activeRenders === 0) setServerRender(false);
+      }
     }
   };
 }
