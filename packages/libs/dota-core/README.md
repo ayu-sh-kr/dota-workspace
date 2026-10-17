@@ -352,6 +352,21 @@ export class NeatPotsBeam extends BaseElement {
 
 This guide provides a basic example of creating and using a web component with `dota-core`. For more advanced usage and features, refer to the library's API documentation.
 
+## Client-only components
+
+Components render wherever their page renders. Set `mode: 'csr'` to keep one out of SSG and SSR
+output: during a server render its host is left empty and marked `data-dota-csr`, and in the browser
+it mounts fresh instead of hydrating.
+
+```typescript
+@Component({selector: 'consent-notice', mode: 'csr'})
+export class ConsentNotice extends BaseElement {}
+```
+
+`resolveRouteRenderMode()`, `resolveComponentRenderMode()`, `setServerRender()` and
+`isServerRender()` expose the same contract to routers and server adapters. See the
+[render modes standard](../../../documentation/standards/hydration-ssr/render-modes.md).
+
 ## Lifecycle events
 
 Every `BaseElement` instance emits named lifecycle events through its `EventChannel`
