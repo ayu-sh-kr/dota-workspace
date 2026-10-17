@@ -59,7 +59,12 @@ node:http / connect middleware
    same steps, concurrently with its siblings, and replaces its tag's content. Light-DOM hosts drop
    authored children, matching the client mount. Shadow hosts emit
    `<template shadowrootmode="open">` and keep authored children for slots.
-8. The handler writes the page `seo` (from `DotaPageElement`) into `<!--dota-head-->` and the page
+8. Components declared `@Component({mode: 'csr'})` are emitted as empty hosts marked
+   `data-dota-csr`, without `serverLoad`, `render()`, or descendants, following the
+   [render modes standard](../../../../standards/hydration-ssr/render-modes.md). The adapter keeps Dota
+   Core's server-render flag set while any render is in flight, so `isServerRender()` is true in
+   component code.
+9. The handler writes the page `seo` (from `DotaPageElement`) into `<!--dota-head-->` and the page
    markup into `<!--dota-body-->` of the document shell.
 
 In the browser, `bootstrap()` upgrades the server-rendered hosts. Each host reads the reflected
