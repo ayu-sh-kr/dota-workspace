@@ -1,5 +1,18 @@
 # @ayu-sh-kr/dota-preloader-plugin
 
+## 0.1.0
+
+### Minor Changes
+
+- 87d1288: The route scanner reads `@Route({mode})` and emits it into `virtual:dota-routes` and the route metadata module, so SSG and the router receive each route's render mode.
+
+### Patch Changes
+
+- Updated dependencies [87d1288]
+- Updated dependencies [87d1288]
+  - @ayu-sh-kr/dota-core@1.11.0
+  - @ayu-sh-kr/dota-router@0.3.0
+
 ## 0.0.19
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @ayu-sh-kr/dota-router
 
+## 0.3.0
+
+### Minor Changes
+
+- 87d1288: `@Route` accepts `mode: 'ssr' | 'ssg' | 'csr'` and stores the resolved mode in route metadata and compiled route configs. The existing `ssr: true` flag keeps working and resolves to `'ssg'`; `mode` takes precedence when both are set.
+
+### Patch Changes
+
+- Updated dependencies [87d1288]
+  - @ayu-sh-kr/dota-core@1.11.0
+
 ## 0.2.0
 
 ### Minor Changes

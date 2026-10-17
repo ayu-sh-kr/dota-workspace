@@ -1,5 +1,17 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.2.4
+
+### Patch Changes
+
+- Updated dependencies [87d1288]
+- Updated dependencies [87d1288]
+- Updated dependencies [87d1288]
+  - @ayu-sh-kr/dota-core@1.11.0
+  - @ayu-sh-kr/dota-router@0.3.0
+  - @ayu-sh-kr/dota-ssr@0.3.0
+  - @ayu-sh-kr/dota-runtime@0.0.8
+
 ## 0.2.3
 
 ### Patch Changes
