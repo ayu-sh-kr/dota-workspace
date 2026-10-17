@@ -36,7 +36,9 @@ export function resolveSsgRoutes(routes: readonly DotaSsgRouteInput[]): Resolved
 }
 
 /**
- * Combines explicit routes with static `@Route({ssr: true})` metadata.
+ * Combines explicit routes with decorated routes whose render mode is `ssg`.
+ * `mode` wins; without it the legacy `ssr: true` still selects the route. `ssr` and
+ * `csr` routes are left to request-time rendering or the browser.
  * Explicit entries replace matching discovered paths before the final validation,
  * preserving caller-controlled output files without making build output nondeterministic.
  * @param decoratedRoutes Route metadata produced by the Dota Vite preloader.
@@ -48,8 +50,9 @@ export function resolveDecoratedSsgRoutes(
   decoratedRoutes: readonly DotaDecoratedRoute[],
   routes: readonly DotaSsgRouteInput[] = []
 ): ResolvedDotaSsgRoute[] {
+  // Mirrors Dota Core's resolveRouteRenderMode(); the build cannot load Dota Core without a DOM global.
   const decoratedInputs = decoratedRoutes
-    .filter(route => route.ssr === true)
+    .filter(route => (route.mode ?? (route.ssr === true ? 'ssg' : 'csr')) === 'ssg')
     .map(route => route.path);
   const dynamicRoute = decoratedInputs.find(path => path.split('/').some(segment => segment.startsWith(':')));
   if (dynamicRoute) {

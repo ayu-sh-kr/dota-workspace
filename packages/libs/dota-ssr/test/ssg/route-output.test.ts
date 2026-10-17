@@ -51,6 +51,18 @@ describe('resolveDecoratedSsgRoutes', () => {
     ]);
   });
 
+  it('selects only ssg routes, letting mode override the legacy ssr flag', () => {
+    const routes = resolveDecoratedSsgRoutes([
+      {path: '/legacy', ssr: true},
+      {path: '/static', mode: 'ssg'},
+      {path: '/server', mode: 'ssr', ssr: true},
+      {path: '/client', mode: 'csr'},
+      {path: '/plain'}
+    ]);
+
+    expect(routes.map(route => route.path)).toEqual(['/legacy', '/static']);
+  });
+
   it('rejects an opted-in dynamic decorated route before generating output', () => {
     expect(() => resolveDecoratedSsgRoutes([{path: '/projects/:id', ssr: true}])).toThrow(
       'Decorated SSG route must be concrete: /projects/:id'

@@ -20,6 +20,9 @@ connects them.
 
 ## Read in this order
 
+- **[Render modes](./render-modes.md)** — `@Route({mode})` and `@Component({mode: 'csr'})`: how
+  routes choose SSG, SSR, or CSR and how components opt out of server output.
+
 0. **[Overview / at-a-glance](./ssg-hydration-overview.md)** — one-page summary: socket map, the
    per-module change table, key design decisions, flows, and phasing. **Read this first for the
    shape.**

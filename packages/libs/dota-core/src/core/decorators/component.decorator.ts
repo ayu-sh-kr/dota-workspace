@@ -27,6 +27,7 @@ function ComponentDecorator(config: ComponentConfig): ClassDecorator {
 
     (target as DotaElementConstructor).__dotaSelector = config.selector;
     (target as DotaElementConstructor).__dotaShadow = config.shadow;
+    (target as DotaElementConstructor).__dotaMode = config.mode;
   }
 }
 

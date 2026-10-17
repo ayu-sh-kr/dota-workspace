@@ -66,14 +66,20 @@ custom `--ssg` flag without asking Vite to parse it as one of its own options.
 
 ## Selecting routes
 
-Mark a concrete page route with `ssr: true` to include it in autodetection.
-Routes remain client-only by default. Explicit `routes` can add a route or
-override the output file for an automatically discovered route.
+Mark a concrete page route with `mode: 'ssg'` to include it in autodetection.
+The legacy `ssr: true` flag is still accepted and means the same; `mode: 'ssr'`
+and `mode: 'csr'` routes are never prerendered. Routes remain client-only by
+default. Explicit `routes` can add a route or override the output file for an
+automatically discovered route.
 
 ```ts
-@Route({path: '/blogs', ssr: true})
+@Route({path: '/blogs', mode: 'ssg'})
 export class BlogPage extends DotaPageElement {}
 ```
+
+Components marked `@Component({mode: 'csr'})` are written as empty hosts with a
+`data-dota-csr` marker and mount in the browser instead of hydrating. See the
+[render modes standard](../../../documentation/standards/hydration-ssr/render-modes.md).
 
 Dynamic route declarations must be paired with concrete explicit paths. For
 example, a blog application can keep the reusable route declaration and expand
