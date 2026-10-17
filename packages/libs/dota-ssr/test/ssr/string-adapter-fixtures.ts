@@ -1,4 +1,4 @@
-import {BaseElement, Component, DotaPageElement, Number, Object as ObjectType, Property, String, type SEO} from '@ayu-sh-kr/dota-core';
+import {BaseElement, Component, DotaPageElement, isServerRender, Number, Object as ObjectType, Property, String, type SEO} from '@ayu-sh-kr/dota-core';
 import {html, keyed, nothing, when} from '@ayu-sh-kr/dota-rendering';
 import type {RenderContext} from '@dota/ssr/index';
 
@@ -87,6 +87,36 @@ export class StateReaderComponent extends BaseElement {
   }
 }
 
+/** Opts out of server output; its render must never run on the server. */
+@Component({selector: 'client-only-panel', shadow: false, mode: 'csr'})
+export class ClientOnlyPanelComponent extends BaseElement {
+  @Property({name: 'label', type: String}) label = '';
+
+  constructor() {
+    super();
+  }
+
+  serverLoad() {
+    throw new Error('serverLoad must not run for client-only components');
+  }
+
+  render() {
+    return html`<p>${isServerRender() ? 'server' : 'client'} ${this.label}</p><task-item label="nested"></task-item>`;
+  }
+}
+
+/** Reports the server-render flag it sees while rendering. */
+@Component({selector: 'render-flag-probe', shadow: false})
+export class RenderFlagProbeComponent extends BaseElement {
+  constructor() {
+    super();
+  }
+
+  render() {
+    return html`<p>${isServerRender()}</p><client-only-panel label="later"><b>authored</b></client-only-panel>`;
+  }
+}
+
 /** Includes itself without a base case, so only the depth limit can stop it. */
 @Component({selector: 'endless-loop', shadow: false})
 export class EndlessLoopComponent extends BaseElement {
@@ -100,4 +130,7 @@ export class EndlessLoopComponent extends BaseElement {
 }
 
 /** Every fixture component, as an application would register them. */
-export const FIXTURE_COMPONENTS = [TaskItemComponent, ShadowBadgeComponent, TasksPage, StateReaderComponent, EndlessLoopComponent];
+export const FIXTURE_COMPONENTS = [
+  TaskItemComponent, ShadowBadgeComponent, TasksPage, StateReaderComponent, EndlessLoopComponent,
+  ClientOnlyPanelComponent, RenderFlagProbeComponent
+];
