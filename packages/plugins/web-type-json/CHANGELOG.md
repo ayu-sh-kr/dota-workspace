@@ -1,5 +1,12 @@
 # @ayu-sh-kr/dota-web-type-json
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [87d1288]
+  - @ayu-sh-kr/dota-core@1.11.0
+
 ## 0.0.19
 
 ### Patch Changes

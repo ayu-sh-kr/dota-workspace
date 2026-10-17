@@ -1,5 +1,19 @@
 # @ayu-sh-kr/dota-ssr
 
+## 0.3.0
+
+### Minor Changes
+
+- 87d1288: SSG route autodetection now selects routes whose render mode is `'ssg'`: `mode: 'ssg'`, or the legacy `ssr: true` when `mode` is absent. Routes declared `mode: 'ssr'` or `'csr'` are not prerendered. Prerendering marks the process as a server render, so components declared `@Component({mode: 'csr'})` are written as empty `data-dota-csr` hosts.
+
+### Patch Changes
+
+- Updated dependencies [87d1288]
+- Updated dependencies [87d1288]
+  - @ayu-sh-kr/dota-core@1.11.0
+  - @ayu-sh-kr/dota-router@0.3.0
+  - @ayu-sh-kr/dota-runtime@0.0.8
+
 ## 0.2.3
 
 ### Patch Changes
