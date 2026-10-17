@@ -21,7 +21,7 @@ vi.mock('vite', async importOriginal => ({
 
 describe('dotaSsg build output', () => {
   let root: string;
-  const disableHydrationEmit = vi.fn();
+  const finishPrerender = vi.fn();
   const server = {
     pluginContainer: {resolveId: vi.fn()},
     ssrLoadModule: vi.fn<ViteDevServer['ssrLoadModule']>(),
@@ -67,7 +67,7 @@ describe('dotaSsg build output', () => {
       page.setAttribute('path', location.pathname);
       page.textContent = location.pathname;
       document.querySelector('app-root')!.append(page);
-      return {default: {applicationReady: Promise.resolve()}, disableHydrationEmit};
+      return {default: {applicationReady: Promise.resolve()}, finishPrerender};
     });
   });
 
@@ -108,12 +108,12 @@ describe('dotaSsg build output', () => {
     const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
     server.ssrLoadModule.mockImplementationOnce(async () => ({
       default: failure === 'missing' ? {} : {applicationReady: Promise.reject(new Error('startup failed'))},
-      disableHydrationEmit
+      finishPrerender
     }));
 
     await expect(build({routes: ['/']})).rejects.toThrow(failure === 'missing' ? 'applicationReady' : 'startup failed');
     expect(Object.getOwnPropertyDescriptor(globalThis, 'document')).toEqual(originalDocument);
-    expect(disableHydrationEmit).toHaveBeenCalledOnce();
+    expect(finishPrerender).toHaveBeenCalledOnce();
     expect(server.close).toHaveBeenCalledOnce();
     expect(writeFile).not.toHaveBeenCalled();
   });
@@ -135,7 +135,7 @@ describe('dotaSsg build output', () => {
 
     await expect(build({routes: ['/'], settle})).rejects.toBe(error);
     expect(Object.getOwnPropertyDescriptor(globalThis, 'document')).toEqual(originalDocument);
-    expect(disableHydrationEmit).toHaveBeenCalledOnce();
+    expect(finishPrerender).toHaveBeenCalledOnce();
     expect(server.close).toHaveBeenCalledOnce();
     expect(writeFile).not.toHaveBeenCalled();
   });
@@ -253,7 +253,7 @@ describe('dotaSsg build output', () => {
           });
         });
       });
-      return {default: {applicationReady: Promise.resolve()}, disableHydrationEmit};
+      return {default: {applicationReady: Promise.resolve()}, finishPrerender};
     });
 
     await build({routes: ['/']});
@@ -272,7 +272,7 @@ describe('dotaSsg build output', () => {
           document.querySelector('app-root')!.textContent = steps.join(' ');
         });
       });
-      return {default: {applicationReady: Promise.resolve()}, disableHydrationEmit};
+      return {default: {applicationReady: Promise.resolve()}, finishPrerender};
     });
 
     await build({routes: ['/']});
@@ -303,7 +303,7 @@ describe('dotaSsg build output', () => {
         void routeWindow.fetch('/poll.txt').then(response => response.text()).then(poll);
       };
       poll();
-      return {default: {applicationReady: Promise.resolve()}, disableHydrationEmit};
+      return {default: {applicationReady: Promise.resolve()}, finishPrerender};
     });
 
     await build({routes: ['/polling'], settleTimeout: 200});
@@ -359,7 +359,7 @@ describe('dotaSsg build output', () => {
         document.title = location.pathname === '/' ? 'Rendered root' : (previous.includes('Rendered root') ? 'Fresh root' : 'Stale shell');
         document.querySelector('app-root')!.textContent = shared;
       })();
-      return {default: {applicationReady}, disableHydrationEmit};
+      return {default: {applicationReady}, finishPrerender};
     });
 
     await build({routes: ['/', '/other']});
@@ -372,7 +372,7 @@ describe('dotaSsg build output', () => {
   it('marks only the first matching route host under a custom element', async () => {
     server.ssrLoadModule.mockImplementationOnce(async () => {
       document.body.innerHTML = '<div><span path="/"></span></div><app-root><article-page path="/other"></article-page><article-page path="/"></article-page><article-page path="/"></article-page></app-root>';
-      return {default: {applicationReady: Promise.resolve()}, disableHydrationEmit};
+      return {default: {applicationReady: Promise.resolve()}, finishPrerender};
     });
 
     await build({routes: ['/']});
