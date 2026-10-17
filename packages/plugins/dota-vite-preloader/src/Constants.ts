@@ -13,6 +13,7 @@ export class ASTFilterConstants {
   static COMPONENT_TAG_NAME_PROPERTY = 'selector';
   static ROUTE_PATH_NAME_PROPERTY = 'path';
   static ROUTE_SSR_NAME_PROPERTY = 'ssr';
+  static ROUTE_MODE_NAME_PROPERTY = 'mode';
   static ROUTE_DEFAULT_NAME_PROPERTY = 'default';
   static ROUTE_RENDER_NAME_PROPERTY = 'render';
 }

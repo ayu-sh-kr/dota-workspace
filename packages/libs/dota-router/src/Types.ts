@@ -1,4 +1,4 @@
-import type {SEO} from "@ayu-sh-kr/dota-core";
+import type {RouteRenderMode, SEO} from "@ayu-sh-kr/dota-core";
 
 /**
  * Common runtime contract implemented by browser-specific router adapters.
@@ -63,7 +63,12 @@ export type RouteMeta<T extends HTMLElement = HTMLElement> = {
   path: string;
   /** Head metadata applied as soon as this route becomes active. */
   seo?: SEO;
-  /** Enables build-time prerendering when an SSG integration consumes decorated routes. */
+  /**
+   * Where the route renders: `ssg` at build time, `ssr` per request, `csr` in the browser.
+   * Takes precedence over `ssr`; omitted routes fall back to the `ssr` flag, then `csr`.
+   */
+  mode?: RouteRenderMode;
+  /** Legacy build-time prerender opt-in, kept for compatibility; equivalent to `mode: 'ssg'`. */
   ssr?: boolean;
   default?: boolean;
   render?: (path: string) => void;
@@ -325,6 +330,8 @@ export type RouteConfig<T extends HTMLElement> = {
   component: ComponentClass;
   /** Head metadata declared by `@Route` and applied by the default route renderer. */
   seo?: SEO;
+  /** Resolved render mode of this route; see {@link RouteMeta.mode}. */
+  mode?: RouteRenderMode;
   /** Whether this concrete route is eligible for build-time prerendering. */
   ssr?: boolean;
   default?: boolean;

@@ -1,3 +1,4 @@
+import type {RouteRenderMode} from '@ayu-sh-kr/dota-core';
 import type {Window} from 'happy-dom';
 import type {LogType} from 'consola';
 
@@ -26,7 +27,9 @@ export type DotaSsgRouteInput = string | DotaSsgRoute;
 export type DotaDecoratedRoute = {
   /** Decorated application pathname considered by SSG route selection. */
   path: string;
-  /** Enables inclusion only when exactly `true`; omitted routes remain client-rendered. */
+  /** Explicit render mode; only `ssg` routes are prerendered, and it overrides `ssr`. */
+  mode?: RouteRenderMode;
+  /** Legacy opt-in equivalent to `mode: 'ssg'` when `mode` is absent. */
   ssr?: boolean;
 };
 

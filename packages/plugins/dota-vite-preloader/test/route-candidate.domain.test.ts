@@ -72,6 +72,7 @@ describe("route-candidate.domain", () => {
     expect(candidates[1]).toMatchObject({
       name: "DocsPage",
       path: "/docs",
+      mode: "ssr"
     });
     expect(candidates[1].render).toContain("return path");
     expect(candidates[1].render).toContain("path");
@@ -110,6 +111,16 @@ describe("route-candidate.domain", () => {
       {name: "HomePage", filePath: "test/fixtures/route.page.ts", path: "/", ssr: true},
       {name: "DocsPage", filePath: "test/fixtures/route.page.ts", path: "/docs"}
     ])).toBe('export const routeMetadata = [{"path":"/","ssr":true},{"path":"/docs","ssr":false}];');
+  });
+
+  it("carries an explicit render mode into the route config and metadata", async () => {
+    const candidates: DotaRouteCandidate[] = [
+      {name: "DocsPage", filePath: "test/fixtures/route.page.ts", path: "/docs", mode: "ssg"}
+    ];
+
+    expect(await prepareRouteConfigExport(candidates)).toContain("{ path: '/docs', component: DocsPage, mode: \"ssg\" }");
+    expect(prepareRouteMetadataExport(candidates)).toBe('export const routeMetadata = [{"path":"/docs","ssr":false,"mode":"ssg"}];');
+    expect(isRouteMetadataChanged(candidates, [{...candidates[0], mode: "ssr"}])).toBe(true);
   });
 
   it("detects route metadata changes correctly", () => {

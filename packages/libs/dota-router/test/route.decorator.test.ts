@@ -17,6 +17,20 @@ describe("Route", () => {
     expect(Metadata.for(StaticComponent).own(RouterMetadata.route)).toMatchObject({ssr: true});
   });
 
+  it("resolves the render mode, preferring mode over the legacy ssr flag", () => {
+    class ClientPage extends HTMLElement {}
+    class LegacyStaticPage extends HTMLElement {}
+    class ServerPage extends HTMLElement {}
+
+    Route({path: "/client"})(ClientPage);
+    Route({path: "/legacy", ssr: true})(LegacyStaticPage);
+    Route({path: "/server", mode: "ssr", ssr: true})(ServerPage);
+
+    expect(Metadata.for(ClientPage).own(RouterMetadata.route)).toMatchObject({mode: "csr"});
+    expect(Metadata.for(LegacyStaticPage).own(RouterMetadata.route)).toMatchObject({mode: "ssg", ssr: true});
+    expect(Metadata.for(ServerPage).own(RouterMetadata.route)).toMatchObject({mode: "ssr"});
+  });
+
   it("keeps declared guards and lifecycle hooks in route metadata", () => {
     const beforeEnter = (_context: NavigationContext) => true as const;
     const beforeLeave = (_context: NavigationContext) => "/sign-in";

@@ -15,8 +15,8 @@ type SsgApplicationModule = Record<string, unknown>;
 
 /** Virtual SSG preamble exports used to control marker emission around one render. */
 type SsgEntryModule = {
-  /** Restores client-default marker emission after the route window is disposed. */
-  disableHydrationEmit: () => void;
+  /** Restores client-default marker emission and clears the server-render flag after a route. */
+  finishPrerender: () => void;
   /** Application exports, including the configured readiness promise. */
   default: SsgApplicationModule;
 };
@@ -82,7 +82,7 @@ export async function prerenderRoute(
   window.document.close();
   // Re-evaluate modules against this route's window, but keep Vite's transform cache across routes.
   runner.clearCache();
-  let disableHydrationEmit: (() => void) | undefined;
+  let finishPrerender: (() => void) | undefined;
   let phaseStarted = nodePerformance.now();
   timings.setup = phaseStarted - started;
 
@@ -90,7 +90,7 @@ export async function prerenderRoute(
     const loaded = await runner.import(VIRTUAL_SSG_ENTRY) as SsgEntryModule;
     timings.load = nodePerformance.now() - phaseStarted;
     phaseStarted = nodePerformance.now();
-    disableHydrationEmit = loaded.disableHydrationEmit;
+    finishPrerender = loaded.finishPrerender;
     const application = loaded.default;
     const readyExport = options.readyExport ?? 'applicationReady';
     const ready = application[readyExport];
@@ -116,7 +116,7 @@ export async function prerenderRoute(
     const cleanupStarted = nodePerformance.now();
     waitForFetches.close();
     try {
-      disableHydrationEmit?.();
+      finishPrerender?.();
       await closePrerenderWindow(window);
     } finally {
       restoreGlobals();

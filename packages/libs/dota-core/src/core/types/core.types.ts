@@ -1,3 +1,4 @@
+import type {ComponentRenderMode} from "@dota/core/render/render-mode.ts";
 import {PropertyType} from "@dota/core/types/property.types.ts";
 
 /**
@@ -30,6 +31,11 @@ import {PropertyType} from "@dota/core/types/property.types.ts";
 export interface ComponentConfig {
   selector: string;
   shadow?: boolean
+  /**
+   * `'csr'` keeps the component out of SSG and SSR output; it mounts only in the
+   * browser and never hydrates. Defaults to `'inherit'`, following the page's mode.
+   */
+  mode?: ComponentRenderMode;
 }
 
 
@@ -501,6 +507,7 @@ export type BubbleOrOptions = boolean | CustomEventOptions
 export type DotaElementConstructor = CustomElementConstructor & {
   __dotaSelector?: string;
   __dotaShadow?: boolean;
+  __dotaMode?: ComponentRenderMode;
 }
 
 /** Metadata used to build Open Graph tags for compatible social platforms. */

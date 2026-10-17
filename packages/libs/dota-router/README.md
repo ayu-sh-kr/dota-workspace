@@ -180,6 +180,20 @@ const previousPath = RouterUtils.getPreviousPath();
 const currentPath = RouterUtils.getCurrentPath();
 ```
 
+## Render modes
+
+`@Route({mode})` declares where a page's HTML is produced: `'ssg'` at build time, `'ssr'` per
+request through a server adapter, or `'csr'` in the browser only. The legacy `ssr: true` flag still
+works and means `'ssg'`; `mode` wins when both are set, and routes with neither are `'csr'`.
+
+```ts
+@Route({path: '/blog', mode: 'ssg'})
+@Component({selector: 'blog-page'})
+export class BlogPage extends DotaPageElement {}
+```
+
+See the [render modes standard](../../../documentation/standards/hydration-ssr/render-modes.md).
+
 ## SSR / SSG output on first render
 
 `dota-router` renders every route — including the very first one — by writing the matched

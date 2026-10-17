@@ -1,4 +1,4 @@
-import {Metadata} from "@ayu-sh-kr/dota-core";
+import {Metadata, resolveRouteRenderMode} from "@ayu-sh-kr/dota-core";
 import {RouteConfig, RouteMeta} from "@dota/Types";
 import {RouterMetadata} from "@dota/router-metadata";
 
@@ -19,6 +19,7 @@ function RouteDecorator(config: RouteMeta) {
       path: config.path,
       component: target,
       seo: config.seo,
+      mode: resolveRouteRenderMode(config),
       ssr: config.ssr === true,
       default: config.default,
       render: config.render,

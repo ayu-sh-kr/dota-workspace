@@ -94,6 +94,7 @@ function copyRoute<T extends HTMLElement>(route: RouteConfig<T>, path: string): 
     component: route.component
   };
   if (route.seo != null) configuredRoute.seo = route.seo;
+  if (route.mode != null) configuredRoute.mode = route.mode;
   if (route.ssr) configuredRoute.ssr = true;
   if (route.default != null) configuredRoute.default = route.default;
   if (route.slug != null) configuredRoute.slug = route.slug;
@@ -120,6 +121,7 @@ function replaceRoute<T extends HTMLElement>(target: RouteConfig<T>, source: Rou
   const configuredRoute = copyRoute(source, path);
   target.path = configuredRoute.path;
   target.component = configuredRoute.component;
+  delete target.mode;
   delete target.ssr;
   delete target.seo;
   delete target.default;
@@ -129,6 +131,7 @@ function replaceRoute<T extends HTMLElement>(target: RouteConfig<T>, source: Rou
   delete target.beforeLeave;
   delete target.afterEnter;
   delete target.afterLeave;
+  if (configuredRoute.mode != null) target.mode = configuredRoute.mode;
   if (configuredRoute.ssr) target.ssr = true;
   if (configuredRoute.seo != null) target.seo = configuredRoute.seo;
   if (configuredRoute.default != null) target.default = configuredRoute.default;
