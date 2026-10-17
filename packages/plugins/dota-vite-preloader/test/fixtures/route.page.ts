@@ -20,6 +20,7 @@ export class HomePage extends BaseElement {
 
 @Route({
   path: "/docs",
+  mode: "ssr",
   render: path => {
     return path;
   }
