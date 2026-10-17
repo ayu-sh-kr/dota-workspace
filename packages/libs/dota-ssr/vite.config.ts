@@ -9,7 +9,9 @@ export default defineConfig({
       entry: {
         index: resolve(import.meta.dirname, 'src/index.ts'),
         'vite/index': resolve(import.meta.dirname, 'src/vite/index.ts'),
-        'ssg/render-worker': resolve(import.meta.dirname, 'src/ssg/render-worker.ts')
+        'ssg/render-worker': resolve(import.meta.dirname, 'src/ssg/render-worker.ts'),
+        'ssr/index': resolve(import.meta.dirname, 'src/ssr/index.ts'),
+        'ssr/server-element': resolve(import.meta.dirname, 'src/ssr/server-element.ts')
       },
       formats: ['cjs', 'es'],
       fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`
