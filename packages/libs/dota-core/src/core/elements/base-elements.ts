@@ -24,6 +24,7 @@ import {
   type RenderOutput
 } from "@ayu-sh-kr/dota-rendering";
 import {resolveMountStrategy} from "@dota/core/elements/render-strategy.ts";
+import {CLIENT_ONLY_ATTRIBUTE, isServerRender, resolveComponentRenderMode} from "@dota/core/render/render-mode.ts";
 import {
   afterMicrotask,
   bindEventListeners,
@@ -60,6 +61,8 @@ export abstract class BaseElement extends HTMLElement {
   private __pendingAttributeChanges: PendingAttributeChange[] = [];
   private __renderInstance?: RenderInstance;
   private __wasHydrated = false;
+  /** True when a server render left this client-only host empty. */
+  private __skippedServerRender = false;
 
   private __eventManagerService: EventManagerService<BaseElement>;
   private __applicationEventService = ApplicationEventService.getInstance();
@@ -179,7 +182,7 @@ export abstract class BaseElement extends HTMLElement {
    * listeners always inspect the final DOM for the current batch.
    */
   updateHTML() {
-    if (!this.__initialized) return;
+    if (!this.__initialized || this.__skippedServerRender) return;
 
     this.__updateScheduled = false;
     const attributeChanges = this.__pendingAttributeChanges.splice(0);
@@ -312,6 +315,21 @@ export abstract class BaseElement extends HTMLElement {
     // rebuilding the subtree and discarding descendant DOM state.
     if (this.__renderInstance) {
       updateRender(this.__renderInstance, this.render());
+      this.__wasHydrated = false;
+      return;
+    }
+
+    // Client-only components leave an empty, marked host in server HTML and later mount
+    // fresh in the browser, bypassing any hydration strategy because nothing was emitted.
+    const clientOnly = resolveComponentRenderMode(this) === 'csr';
+    this.__skippedServerRender = clientOnly && isServerRender();
+    if (this.__skippedServerRender) {
+      super.setAttribute(CLIENT_ONLY_ATTRIBUTE, '');
+      return;
+    }
+    if (clientOnly) {
+      this.removeAttribute(CLIENT_ONLY_ATTRIBUTE);
+      this.__renderInstance = mountRender(root, this.render());
       this.__wasHydrated = false;
       return;
     }
