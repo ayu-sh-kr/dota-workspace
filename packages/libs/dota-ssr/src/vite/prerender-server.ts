@@ -46,8 +46,14 @@ export async function createPrerenderServer(
         import {configureDotaRenderingLogger, setHydrationEmit} from ${JSON.stringify(renderingEntryUrl)};
         configureDotaRenderingLogger(${JSON.stringify(logType)});
         setHydrationEmit(true);
+        // Same global symbol as Dota Core's setServerRender(), so client-only components skip output.
+        const serverRenderFlag = Symbol.for('dota.core.server-render');
+        globalThis[serverRenderFlag] = true;
         const application = await import(${JSON.stringify(entryUrl)});
-        export const disableHydrationEmit = () => setHydrationEmit(false);
+        export const finishPrerender = () => {
+          setHydrationEmit(false);
+          globalThis[serverRenderFlag] = false;
+        };
         export default application;
       `;
     }
