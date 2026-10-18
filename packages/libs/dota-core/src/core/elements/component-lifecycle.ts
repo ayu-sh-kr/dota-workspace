@@ -1,6 +1,9 @@
 import type {MapMetadataKey, MetadataRecord} from "@dota/metadata";
 import {CoreMetadata} from "@dota/core/constants";
 import {EventType, type MethodDetails} from "@dota/core/types";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+
+const logger = createDotaLogger('dota-core', 'core/elements/component-lifecycle.ts');
 
 /**
  * Settled promise whose reactions run as microtasks. V8 schedules these internally, which is
@@ -16,8 +19,8 @@ const settled = Promise.resolve();
  * @param task Work deferred until the current synchronous lifecycle step completes.
  */
 export function afterMicrotask(ticks: 1 | 2, task: () => void): void {
-  const run = ticks === 1 ? task : () => { settled.then(task).catch((reason) => console.error(reason)); };
-  settled.then(run).catch((reason) => console.error(reason));
+  const run = ticks === 1 ? task : () => { settled.then(task).catch((reason) => logger.error('Deferred lifecycle task failed', reason)); };
+  settled.then(run).catch((reason) => logger.error('Deferred lifecycle task failed', reason));
 }
 
 /**
