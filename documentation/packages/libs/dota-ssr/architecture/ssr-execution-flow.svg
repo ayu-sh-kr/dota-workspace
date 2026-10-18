@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+<title id="title">One SSR engine, two ways in</title>
+<desc id="desc">Standalone owns the inputs. Wrap captures them from initializeApp. Solid violet arrows show execution or data flow. Companion editable Excalidraw scene has the same nodes and connections.</desc>
+<!-- Geometry preflight: standalone: x=60, y=110, w=440, h=68, cy=144, bottom=178; wrap: x=700, y=110, w=440, h=68, cy=144, bottom=178; handler: x=360, y=300, w=480, h=68, cy=334, bottom=368; adapter: x=360, y=460, w=480, h=68, cy=494, bottom=528; document: x=360, y=620, w=480, h=68, cy=654, bottom=688. Connectors use reserved orthogonal corridors. -->
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 1 1 L 10 5 L 1 9" fill="none" stroke="#6d28d9" stroke-width="1.6"/></marker></defs>
+<rect width="1200" height="820" fill="#fafafc"/>
+<g font-family="'DM Sans', 'Comic Sans MS', Helvetica, Arial, sans-serif" fill="#202028" text-rendering="geometricPrecision">
+<text x="60" y="48" font-size="26" fill="#202028">One SSR engine, two ways in</text>
+<text x="60" y="79" font-size="17" fill="#60606e">Standalone owns the inputs. Wrap captures them from initializeApp.</text>
+<path d="M 65 110 L 497 111 Q 501 112 500 117 L 499 174 Q 500 179 494 178 L 63 177 Q 59 178 60 172 L 61 114 Z" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.6"/>
+<path d="M 62 115 L 64 175 L 495 179" fill="none" stroke="#6d28d9" stroke-opacity=".24" stroke-width="1"/>
+<text x="280" y="151" text-anchor="middle" font-size="18">Standalone: routes + components</text>
+<path d="M 705 110 L 1137 111 Q 1141 112 1140 117 L 1139 174 Q 1140 179 1134 178 L 703 177 Q 699 178 700 172 L 701 114 Z" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.6"/>
+<path d="M 702 115 L 704 175 L 1135 179" fill="none" stroke="#6d28d9" stroke-opacity=".24" stroke-width="1"/>
+<text x="920" y="151" text-anchor="middle" font-size="18">Wrap: capture initializeApp</text>
+<path d="M 365 300 L 837 301 Q 841 302 840 307 L 839 364 Q 840 369 834 368 L 363 367 Q 359 368 360 362 L 361 304 Z" fill="#fff" stroke="#60606e" stroke-width="1.6"/>
+<path d="M 362 305 L 364 365 L 835 369" fill="none" stroke="#60606e" stroke-opacity=".24" stroke-width="1"/>
+<text x="600" y="341" text-anchor="middle" font-size="18">createRequestHandler: match request</text>
+<path d="M 365 460 L 837 461 Q 841 462 840 467 L 839 524 Q 840 529 834 528 L 363 527 Q 359 528 360 522 L 361 464 Z" fill="#fff" stroke="#60606e" stroke-width="1.6"/>
+<path d="M 362 465 L 364 525 L 835 529" fill="none" stroke="#60606e" stroke-opacity=".24" stroke-width="1"/>
+<text x="600" y="501" text-anchor="middle" font-size="18">String adapter: load → render → serialize</text>
+<path d="M 365 620 L 837 621 Q 841 622 840 627 L 839 684 Q 840 689 834 688 L 363 687 Q 359 688 360 682 L 361 624 Z" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.6"/>
+<path d="M 362 625 L 364 685 L 835 689" fill="none" stroke="#6d28d9" stroke-opacity=".24" stroke-width="1"/>
+<text x="600" y="661" text-anchor="middle" font-size="18">Document shell + SEO → HTML response</text>
+<path d="M 280 178 L 280 235 L 600 235 L 600 300" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<path d="M 920 178 L 920 235 L 600 235" fill="none" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M 600 368 L 600 460" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<path d="M 600 528 L 600 620" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<path d="M 840 334 L 925 334" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<text x="945" y="338" font-size="16" fill="#60606e">No match / method</text>
+<text x="945" y="361" font-size="16" fill="#60606e">Return to host</text>
+<text x="60" y="271" font-size="16" fill="#60606e">Explicit server API; no Wrap required</text>
+<text x="700" y="271" font-size="16" fill="#60606e">Lazy capture → flatten SSR routes</text>
+<text x="60" y="761" font-size="18" fill="#60606e">serverLoad is awaited; nested siblings load concurrently. Output is buffered.</text>
+<text x="60" y="790" font-size="16" fill="#60606e">CSR component → empty marked host. Browser hydration follows in the second chart.</text>
+</g>
+</svg>
