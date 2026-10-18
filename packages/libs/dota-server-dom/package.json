@@ -1,0 +1,75 @@
+{
+  "name": "@ayu-sh-kr/dota-server-dom",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.0.0",
+  "description": "Minimal DOM-free browser stand-ins for rendering web components on a server.",
+  "keywords": [
+    "dota",
+    "dom-shim",
+    "ssr",
+    "web-components"
+  ],
+  "author": {
+    "name": "ayu-sh-kr",
+    "email": "akjaiswal2003@gmail.com",
+    "url": "https://linkedin.com/in/ayu-sh-kr"
+  },
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "sideEffects": [
+    "./dist/install.mjs",
+    "./dist/install.cjs"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./install": {
+      "types": "./dist/install.d.ts",
+      "module": "./dist/install.mjs",
+      "import": "./dist/install.mjs",
+      "require": "./dist/install.cjs",
+      "default": "./dist/install.mjs"
+    },
+    "./node": {
+      "types": "./dist/node/index.d.ts",
+      "module": "./dist/node/index.mjs",
+      "import": "./dist/node/index.mjs",
+      "require": "./dist/node/index.cjs",
+      "default": "./dist/node/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "release": "pnpm run build && changeset publish",
+    "test": "tsc --noEmit && vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "package.json"
+  ]
+}
