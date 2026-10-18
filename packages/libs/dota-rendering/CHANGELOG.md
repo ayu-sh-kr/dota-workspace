@@ -1,5 +1,25 @@
 # @ayu-sh-kr/dota-rendering
 
+## 0.2.0
+
+### Minor Changes
+
+- d485d33: Add a DOM-free `@ayu-sh-kr/dota-rendering/server` entry that serializes `html` templates to HTML strings carrying the same durable hydration markers `hydrate()` adopts.
+
+  - `serializeOutput(output, scope?)` renders a `TemplateResult`, a legacy string, or `nothing`; with a scope it emits element indexes, `data-dh-a` attribute tokens, and child-part and keyed-entry comments.
+  - `escapeHtml(value)` escapes text and quoted attribute values.
+  - `tokenizeHtml(source)`, `decodeHtmlEntities(value)`, the token types, `TEMPLATE_ELEMENT`, and `SHADOW_ROOT_MODE_ATTRIBUTE` expose the lexical HTML support that server tooling needs to read the same markup.
+
+  The server entry imports the root entry, so both share one copy of values such as `nothing` and one set of types. The root entry and its bundled declarations are unchanged.
+
+- d485d33: Export the durable hydration marker format so other emitters, such as Dota SSR's string renderer, produce exactly what `hydrate()` adopts.
+
+  - `hydrationIdentity(tagName, strings, scope)` returns the four host attributes (`data-dh-c`, `data-dh-t`, `data-dh-v`, `data-dh-s`); `HYDRATION_IDENTITY_ATTRIBUTES` lists them for clearing.
+  - `childPartMarkers`, `keyedEntryMarkers`, and `attributePartToken` build the comment and `data-dh-a` formats; `hydrationScope(n)` and `isHydrationScope` define the `h0`, `h1`, … scope shape.
+  - The template conventions the renderer writes (`COMPONENT_START_MARKER`, `COMPONENT_END_MARKER`, `NODE_INDEX_ATTRIBUTE`, `COMPONENT_ATTRIBUTE`, `DYNAMIC_ATTRIBUTE`) are now public constants.
+
+  The renderer itself uses these, so emitted markup is unchanged.
+
 ## 0.1.6
 
 ### Patch Changes

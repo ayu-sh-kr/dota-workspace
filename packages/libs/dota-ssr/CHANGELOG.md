@@ -1,5 +1,43 @@
 # @ayu-sh-kr/dota-ssr
 
+## 0.4.0
+
+### Minor Changes
+
+- d485d33: Routes declared `@Route({mode: 'ssr'})` are now rendered on the server automatically, in development and in production, with no server code to write.
+
+  - `dotaSsr()` (from `@ayu-sh-kr/dota-ssr/vite`) renders `ssr` routes in `vite dev` and, on `vite build`, builds a self-contained server bundle and writes the deployment target's files: `node` (default, `node dist-server/server.mjs`), `vercel` (a function plus rewrites in `vercel.json`), `netlify` (a Functions API function), or `cloudflare-pages` (`_worker.js` and `_routes.json`). `github-pages` stays static and warns. Builds without `ssr` routes skip the server build.
+  - Components and routes come from the application entry: `captureApplication()` loads it and receives what `initializeApp()` declares, so nothing is listed twice. `createApplicationHandler()` turns that into a web-standard request handler that renders `ssr` routes into the built `index.html`, inside the root element, with page or route `seo` in the head.
+  - `createNodeServer()` from the new `@ayu-sh-kr/dota-ssr/node` entry serves built files (including prerendered pages), `ssr` routes, and the SPA fallback for client-rendered routes.
+  - Request handlers accept a per-request document shell, and `PageRoute.seo` supplies head metadata for pages without their own. When a page provides SEO, the shell's own title, description, social, icon, and canonical tags are replaced rather than duplicated.
+  - The server bundle is self-contained even when the application lists packages in `ssr.external`, and the shell is taken from the client build before SSG prerenders over `index.html`.
+  - `createNodeServer` answers a render error with 500 and logs it instead of serving the SPA shell, and components whose `render()` returns nothing render empty on the server as in the browser.
+
+- d485d33: Add a prototype request-time renderer at `@ayu-sh-kr/dota-ssr/server` that turns Dota pages into HTML strings in Node without Happy DOM.
+
+  - `createStringAdapter({components})` renders a page and its nested light-DOM and shadow components from their `html` templates, awaiting an optional `serverLoad(context)` on each component first.
+  - `createRequestHandler({adapter, routes, template})` matches `/path/:param` routes, gives components a request-scoped `fetch` and `state`, and writes page SEO and markup into a document shell. Page `seo.jsonLd` is written as a JSON-LD script the browser's `updateDocumentSEO` keeps in sync, and keywords are normalized as in the browser. `toNodeListener` serves it from `node:http` or connect middleware.
+  - Loaded `@Property` values are written to host attributes, so the browser upgrades the same markup without a serialized state script.
+  - Components declared `@Component({mode: 'csr'})` are emitted as empty `data-dota-csr` hosts, and Dota Core's server-render flag is set during a render.
+  - Output carries Dota Rendering's durable hydration markers and the page route marker by default, so `dotaHydration()` adopts the server DOM and later updates patch it in place. Pass `hydration: false` for plain HTML.
+  - Templates are compiled once per call site with an HTML tokenizer, which also finds nested component hosts. Tags inside comments, `<script>`, `<style>`, `<textarea>`, attribute values, and inert `<template>` content are never rendered as components.
+  - During a render, `window`, `document`, `location`, `history`, `localStorage`, `sessionStorage`, `matchMedia`, animation frames, and the observer classes exist as globals backed by the request, isolated between concurrent requests and removed afterwards. `runInBrowserScope` exposes this to custom engines. `customElements` is installed alongside `HTMLElement`.
+  - `ServerElement` reflects `id`, `className`, `classList`, `dataset`, `style`, and `toggleAttribute` into host attributes, dispatches events, keeps a small node tree, and supports `attachShadow`.
+  - Engines implement the `RenderAdapter` contract, so a DOM-backed or streaming engine can replace the string adapter.
+
+### Patch Changes
+
+- d485d33: The string renderer now uses Dota Rendering's `/server` entry for template serialization and HTML tokenizing, and `@ayu-sh-kr/dota-server-dom` for its server DOM and request-scoped browser globals. `@ayu-sh-kr/dota-ssr/server` still exports `serializeOutput`, `escapeHtml`, `runInBrowserScope`, `ServerElement`, `ServerShadowRoot`, `ServerDocument`, and `ServerCustomElementRegistry`, so no import changes are needed. Output is unchanged.
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+  - @ayu-sh-kr/dota-rendering@0.2.0
+  - @ayu-sh-kr/dota-core@1.12.0
+  - @ayu-sh-kr/dota-server-dom@0.1.0
+  - @ayu-sh-kr/dota-router@0.3.1
+  - @ayu-sh-kr/dota-runtime@0.0.9
+
 ## 0.3.0
 
 ### Minor Changes

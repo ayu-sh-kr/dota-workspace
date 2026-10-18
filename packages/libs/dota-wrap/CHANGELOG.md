@@ -1,5 +1,27 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.3.0
+
+### Minor Changes
+
+- d485d33: `dotaVitePlugins()` now includes request-time rendering for `@Route({mode: 'ssr'})` routes. It does nothing for applications without such routes, and `ssr: false` removes it. A top-level `deployment` option sets the hosting platform for both SSG and SSR output; SSR otherwise follows the SSG deployment target, then defaults to `node`.
+
+  When Dota SSR loads the application entry on a server, `initializeApp()` reports its components and routes instead of starting, and its returned promise never settles there, so startup code chained on it only runs in the browser.
+
+### Patch Changes
+
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+  - @ayu-sh-kr/dota-ssr@0.4.0
+  - @ayu-sh-kr/dota-rendering@0.2.0
+  - @ayu-sh-kr/dota-core@1.12.0
+  - @ayu-sh-kr/dota-router@0.3.1
+  - @ayu-sh-kr/dota-runtime@0.0.9
+
 ## 0.2.4
 
 ### Patch Changes
