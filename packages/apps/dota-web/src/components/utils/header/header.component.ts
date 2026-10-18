@@ -37,8 +37,9 @@ export class HeaderComponent extends BaseElement {
                 <nav class="app-header-nav">
                      <div class="flex min-w-0 items-center px-2 sm:px-3">
                         <a href="/"
-                           class="inline-flex items-center rounded-full px-2 text-xl sm:text-2xl font-extrabold tracking-tight
+                           class="inline-flex items-center gap-1 rounded-full px-2 text-xl sm:text-2xl font-extrabold tracking-tight
                                    text-foreground transition-colors duration-200 hover:text-primary">
+                            <span class="app-header-symbol" aria-hidden="true"></span>
                             Dota
                         </a>
                      </div>
@@ -57,7 +58,7 @@ export class HeaderComponent extends BaseElement {
                                 }).join("")}
                          </ul>
                       </div>
-                      <div class="flex items-center gap-x-1 justify-end rounded-full bg-surface p-1
+                      <div class="app-header-actions flex items-center gap-x-1 justify-end rounded-full bg-surface p-1
                               backdrop-blur-xl">
                         <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <github-button></github-button>
@@ -68,7 +69,7 @@ export class HeaderComponent extends BaseElement {
                         <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <ai-button></ai-button>
                         </span>
-                        <span class="inline-flex size-9 items-center justify-center rounded-full">
+                        <span class="inline-flex size-9 items-center justify-center rounded-full md:hidden">
                           <ham-burger-button></ham-burger-button>
                         </span>
                       </div>

@@ -1,4 +1,7 @@
 import {BaseElement, Component, HTML, Property, AfterInit, String} from "@ayu-sh-kr/dota-wrap/core";
+import {createDotaLogger} from '@ayu-sh-kr/dota-wrap';
+
+const logger = createDotaLogger('dota-web', 'components/utils/icons.component.ts');
 
 
 @Component({
@@ -52,7 +55,7 @@ export class IconsComponent extends BaseElement {
             }
         }
         else {
-            console.warn('Invalid Icon Name')
+            logger.warn(`Could not load icon "${this.name}" (HTTP ${response.status})`);
             this.innerHTML = '';
         }
     }

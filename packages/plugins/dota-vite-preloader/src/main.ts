@@ -1,6 +1,7 @@
 import {Plugin, ViteDevServer} from "vite";
 import {ComponentUtils} from "@dota/ComponentUtils.ts";
-import {consola, createConsola, LogLevels, LogType} from 'consola';
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+import type {LogType} from 'consola';
 import {VirtualImportID} from "@dota/Constants.ts";
 import {relative} from "node:path";
 import {SourceFileIndex} from "@ayu-sh-kr/dota-ast-utils";
@@ -18,7 +19,7 @@ import {
   prepareRouteConfigExport
 } from "@dota/domain";
 
-let logger = consola;
+let logger = createDotaLogger('dota-vite-preloader', 'main.ts');
 
 /**
  * Configuration options for the Dota Vite Preloader plugin.
@@ -41,17 +42,11 @@ export type PluginConfig = {
  * @param config - Plugin configuration with optional root path and log level
  * @returns Vite plugin instance with resolveId, load, and buildStart hooks
  */
-export default function dotaVitePreloader({root = process.cwd(), logType = 'info'}: PluginConfig): Plugin {
+export default function dotaVitePreloader({root = process.cwd(), logType}: PluginConfig): Plugin {
   // Plugin-scope cache: accessible from buildStart/resolveId/load/etc.
   let cachedCandidates: DotaComponentCandidate[] | null = null;
   let cachedRouteCandidates: DotaRouteCandidate[] | null = null;
-  logger = createConsola({
-    level: LogLevels[logType],
-    formatOptions: {
-      date: true,
-      colors: true
-    }
-  });
+  logger = createDotaLogger('dota-vite-preloader', 'main.ts', logType);
 
   async function ensureCandidatesLoaded() {
     if (!cachedCandidates) {
@@ -112,8 +107,8 @@ export default function dotaVitePreloader({root = process.cwd(), logType = 'info
     async buildStart() {
       cachedCandidates = await scanDotaComponents(root, logger); // Cache the candidates for potential later use
       cachedRouteCandidates = await extractRouteCandidatesFromComponents(cachedCandidates, root, logger);
-      logger.info(`Loaded Dota Component Candidates: ${cachedCandidates.length} components found.`);
-      logger.info(`Loaded Dota Route Candidates: ${cachedRouteCandidates.length} routes found.`);
+      logger.info(`Loaded ${cachedCandidates.length} components and ${cachedRouteCandidates.length} routes`);
+      logger.debug(`Component and route metadata loaded from ${root}`);
     },
 
     configureServer(server: ViteDevServer) {

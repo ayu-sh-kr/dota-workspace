@@ -5,6 +5,7 @@ import type {Server} from 'node:http';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createNodeServer} from '@dota/ssr/node';
+import {listeningUrl} from '@dota/ssr/node-server';
 
 let directory: string;
 let server: Server;
@@ -74,5 +75,15 @@ describe('createNodeServer', () => {
 
   it('rejects non-GET requests the handler does not answer', async () => {
     expect((await fetch(`${origin}/client`, {method: 'POST'})).status).toBe(405);
+  });
+});
+
+describe('listeningUrl', () => {
+  it('formats openable URLs for wildcard, IPv4, and IPv6 hosts', () => {
+    expect(listeningUrl({address: '::', family: 'IPv6', port: 3000})).toBe('http://localhost:3000');
+    expect(listeningUrl({address: '0.0.0.0', family: 'IPv4', port: 8080})).toBe('http://localhost:8080');
+    expect(listeningUrl({address: '127.0.0.1', family: 'IPv4', port: 4000})).toBe('http://127.0.0.1:4000');
+    expect(listeningUrl({address: '::1', family: 'IPv6', port: 4000})).toBe('http://[::1]:4000');
+    expect(listeningUrl('/tmp/dota.sock')).toBe('/tmp/dota.sock');
   });
 });

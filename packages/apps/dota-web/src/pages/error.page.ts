@@ -25,6 +25,7 @@ export class ErrorPage extends DotaPageElement {
 
   get seo(): SEO {
     return {
+      favicon: '/favicon.svg',
       title: '404 Page Not Found - Dota Web',
       description: 'The requested page could not be found on Dota Web. Return to the homepage or open the documentation to continue.',
       keywords: ['Dota Web', '404', 'Page Not Found', 'Error Page', 'Documentation'],

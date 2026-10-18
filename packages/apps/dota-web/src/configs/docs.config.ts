@@ -8,7 +8,7 @@ export interface DocEntry {
   section: string;
 }
 
-/** Every documentation page in reading order; navigation, prev/next, and SSG routes derive from it. */
+/** Every documentation page in reading order; navigation and prev/next links derive from it. */
 export const DOCS: readonly DocEntry[] = [
   {slug: 'getting-started', title: 'Getting Started', section: 'Introduction'},
   {slug: 'guides', title: 'Guides', section: 'Introduction'},
@@ -21,16 +21,7 @@ export const DOCS: readonly DocEntry[] = [
   {slug: 'core', title: 'Core', section: 'Concepts'},
   {slug: 'decorators', title: 'Decorators', section: 'Concepts'},
   {slug: 'life-cycle', title: 'Life Cycle', section: 'Concepts'},
-  {slug: 'ssg-ssr-csr', title: 'Start here', section: 'Server Rendering'},
-  {slug: 'ssr-html-first', title: '1. From URL to HTML', section: 'Server Rendering'},
-  {slug: 'ssr-component', title: '2. A server-ready component', section: 'Server Rendering'},
-  {slug: 'ssr-request', title: '3. Inside one SSR request', section: 'Server Rendering'},
-  {slug: 'ssr-templates', title: '4. Templates become HTML', section: 'Server Rendering'},
-  {slug: 'ssr-static-build', title: '5. SSG: render at build time', section: 'Server Rendering'},
-  {slug: 'ssr-hydration', title: '6. Make HTML interactive', section: 'Server Rendering'},
-  {slug: 'ssr-hosting', title: '7. Build and serve a mixed app', section: 'Server Rendering'},
-  {slug: 'ssr-package-map', title: '8. Packages and server limits', section: 'Server Rendering'},
-  {slug: 'ssr-file-reference', title: 'Reference: every changed file', section: 'Server Rendering'},
+  {slug: 'server-rendering', title: 'Server Rendering', section: 'Server Rendering'},
   {slug: 'rest-client', title: 'Rest Client', section: 'Tools'},
   {slug: 'router', title: 'Router', section: 'Tools'},
 ];
@@ -38,11 +29,18 @@ export const DOCS: readonly DocEntry[] = [
 /** Pathname of a documentation page. */
 export const docUrl = (slug: string): string => `/docs/${slug}`;
 
+const previousServerRenderingSlugs = new Set([
+  'ssg-ssr-csr', 'ssr-html-first', 'ssr-component', 'ssr-request',
+  'ssr-templates', 'ssr-static-build', 'ssr-hydration', 'ssr-hosting',
+  'ssr-package-map', 'ssr-file-reference',
+]);
+
 /**
  * Resolves the page for a docs pathname; `/docs` opens the first page.
  * @returns The matching entry, or `undefined` for an unknown slug.
  */
 export function findDoc(pathname: string): DocEntry | undefined {
   const slug = pathname.split('/').filter(Boolean)[1];
-  return slug ? DOCS.find(doc => doc.slug === slug) : DOCS[0];
+  if (!slug) return DOCS[0];
+  return DOCS.find(doc => doc.slug === (previousServerRenderingSlugs.has(slug) ? 'server-rendering' : slug));
 }

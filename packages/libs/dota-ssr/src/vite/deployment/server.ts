@@ -28,9 +28,24 @@ export async function prepareServerDeployment(target: DotaServerTarget, deployme
     case 'cloudflare-pages':
       return prepareCloudflarePages(deployment, logger);
     case 'github-pages':
-      logger.warn(`[dota-ssr] GitHub Pages only serves static files; ${deployment.routes.join(', ')} will render in the browser`);
+      logger.warn(`GitHub Pages only serves static files; ${deployment.routes.join(', ')} will render in the browser`);
       return;
   }
+}
+
+/**
+ * Removes the Node server from an earlier build before this one writes its own, as Vite's
+ * `emptyOutDir` does for client output, so a server built for other assets never outlives them.
+ * Only a directory whose `server.mjs` carries the generated notice is removed.
+ * @param root Project root that `serverOutDir` is resolved against.
+ * @param serverOutDir Configured Node server directory, `dist-server` by default.
+ */
+export async function removeStaleNodeServer(root: string, serverOutDir: string | undefined, logger: ConsolaInstance): Promise<void> {
+  const directory = resolve(root, serverOutDir ?? 'dist-server');
+  const entry = await readFile(resolve(directory, 'server.mjs'), 'utf8').catch(() => undefined);
+  if (!entry?.startsWith(GENERATED_NOTICE)) return;
+  await rm(directory, {recursive: true, force: true});
+  logger.debug(`Removed previous Node server ${relative(root, directory)}`);
 }
 
 /**
@@ -52,9 +67,9 @@ import {createNodeServer, handler} from './index.mjs';
 const clientDirectory = fileURLToPath(new URL(${JSON.stringify(`${clientDirectory}/`)}, import.meta.url));
 const fallback = fileURLToPath(new URL('./shell.html', import.meta.url));
 const port = Number(process.env.PORT ?? 3000);
-createNodeServer({handler, clientDirectory, fallback}).listen(port, () => console.log(\`Dota server listening on http://localhost:\${port}\`));
+createNodeServer({handler, clientDirectory, fallback}).listen(port);
 `, 'utf8');
-  logger.success(`[dota-ssr] Node server written to ${relative(root, directory)}; start it with \`node ${relative(root, directory)}/server.mjs\``);
+  logger.success(`Node server written to ${relative(root, directory)}; start it with \`node ${relative(root, directory)}/server.mjs\``);
 }
 
 /**
@@ -65,7 +80,7 @@ createNodeServer({handler, clientDirectory, fallback}).listen(port, () => consol
  */
 async function prepareVercel({root, bundleFile, routes}: ServerDeployment, logger: ConsolaInstance): Promise<void> {
   if (routes.includes('/')) {
-    logger.warn('[dota-ssr] Vercel serves the built index.html before rewrites, so "/" is served as the client shell rather than server-rendered');
+    logger.warn('Vercel serves the built index.html before rewrites, so "/" is served as the client shell rather than server-rendered');
   }
   const source = await readVercelConfigSource(root).catch(() => ({file: resolve(root, 'vercel.json'), text: '{}\n'}));
   const config = parseVercelConfig(source.text, source.file);
@@ -94,7 +109,7 @@ async function render(request) {
 export const GET = render;
 export const HEAD = render;
 `, 'utf8');
-  logger.success(`[dota-ssr] Vercel function written to ${relative(root, apiDirectory)}/dota-ssr.mjs with ${routes.length} rewrite${routes.length === 1 ? '' : 's'}`);
+  logger.success(`Vercel function written to ${relative(root, apiDirectory)}/dota-ssr.mjs with ${routes.length} rewrite${routes.length === 1 ? '' : 's'}`);
 }
 
 /**
@@ -115,7 +130,7 @@ export default async (request) => (await handler(request)) ?? new Response('Not 
 
 export const config = {path: ${JSON.stringify(paths)}};
 `, 'utf8');
-  logger.success(`[dota-ssr] Netlify function written to ${relative(root, directory)}`);
+  logger.success(`Netlify function written to ${relative(root, directory)}`);
 }
 
 /**
@@ -154,9 +169,9 @@ export default {
       ''
     ].join('\n'), 'utf8');
   } else if (!wrangler.includes('nodejs_compat')) {
-    logger.warn(`[dota-ssr] ${relative(root, wranglerFile)} must enable compatibility_flags = ["nodejs_compat"] for server rendering`);
+    logger.warn(`${relative(root, wranglerFile)} must enable compatibility_flags = ["nodejs_compat"] for server rendering`);
   }
-  logger.success(`[dota-ssr] Cloudflare Pages worker written to ${relative(root, directory)}`);
+  logger.success(`Cloudflare Pages worker written to ${relative(root, directory)}`);
 }
 
 /** Path of the Vite base without its trailing slash, for platform route patterns. */

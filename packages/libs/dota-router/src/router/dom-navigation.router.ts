@@ -8,6 +8,9 @@ import {
 } from "@dota/Types";
 import {NavigationCoordinator} from "@dota/coordinator/NavigationCoordinator";
 import {createRouteRenderer} from "@dota/coordinator/route-renderer";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+
+const logger = createDotaLogger('dota-router', 'router/dom-navigation.router.ts');
 
 /** Native Navigation API result tracked by fire-and-forget traversal commands. */
 type BrowserTraversalResult = ReturnType<Navigation["back"]>;
@@ -105,7 +108,7 @@ export class DomNavigationRouter<T extends HTMLElement> implements Router<T> {
 
     void traversal.finished.catch(error => {
       if (error instanceof DOMException && error.name === "AbortError") return;
-      console.error("[dota-router] History traversal failed.", error);
+      logger.error('History traversal failed.', error);
     });
   }
 

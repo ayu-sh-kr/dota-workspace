@@ -1,3 +1,12 @@
+.app-footer-symbol {
+  display: inline-block;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  flex-shrink: 0;
+  background: currentColor;
+  mask: url('/images/dota-symbol.svg') center / contain no-repeat;
+}
+
 .app-footer {
   position: relative;
   margin-block-start: var(--layout-section-compact);

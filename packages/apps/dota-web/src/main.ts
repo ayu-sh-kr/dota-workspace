@@ -20,7 +20,7 @@ import {
   ScrollDeckComponent,
   DotaAlertComponent
 } from "@ayu-sh-kr/dota-ui";
-import {initializeApp} from "@ayu-sh-kr/dota-wrap";
+import {createDotaLogger, initializeApp} from "@ayu-sh-kr/dota-wrap";
 import {Router, RouterService} from "@ayu-sh-kr/dota-wrap/router";
 import components from "virtual:dota-components";
 import {ApplicationEventService} from "@ayu-sh-kr/dota-wrap/core";
@@ -32,6 +32,8 @@ import {dotaHydration} from "@ayu-sh-kr/dota-wrap/ssr";
 import {markdownSetup} from "@dota/configs/markdown.config.ts";
 
 MDService.configure(markdownSetup);
+IconsComponent.baseUrl = `${import.meta.env.BASE_URL}assets/icons`;
+const logger = createDotaLogger('dota-web', 'main.ts');
 
 const applicationEventService = ApplicationEventService.getInstance();
 const applicationEventPublisher = applicationEventService.getPublisher();
@@ -84,7 +86,7 @@ export const applicationReady = initializeApp({
       })
   })
 
-applicationReady.catch(error => console.error(error))
+applicationReady.catch(error => logger.error('Application initialization failed', error))
 
 
 export {routerService, notificationService, applicationEventService, applicationEventPublisher, applicationEventListener}

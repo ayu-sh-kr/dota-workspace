@@ -39,7 +39,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
-  "dependencies": {},
+  "dependencies": {
+    "consola": "catalog:"
+  },
   "devDependencies": {
     "@microsoft/api-extractor": "catalog:",
     "@types/node": "catalog:",

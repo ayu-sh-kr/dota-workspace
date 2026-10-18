@@ -190,7 +190,7 @@
           "name": "app-icon",
           "source": {
             "file": "./src/components/utils/icons.component.ts",
-            "offset": 176
+            "offset": 316
           },
           "attributes": [
             {
@@ -201,7 +201,7 @@
               },
               "source": {
                 "file": "./src/components/utils/icons.component.ts",
-                "offset": 393
+                "offset": 533
               }
             },
             {
@@ -212,7 +212,7 @@
               },
               "source": {
                 "file": "./src/components/utils/icons.component.ts",
-                "offset": 327
+                "offset": 467
               }
             },
             {
@@ -223,7 +223,7 @@
               },
               "source": {
                 "file": "./src/components/utils/icons.component.ts",
-                "offset": 262
+                "offset": 402
               }
             }
           ],
@@ -234,7 +234,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/utils/icons.component.ts",
-                  "offset": 393
+                  "offset": 533
                 }
               },
               {
@@ -242,7 +242,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/utils/icons.component.ts",
-                  "offset": 327
+                  "offset": 467
                 }
               },
               {
@@ -250,7 +250,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/utils/icons.component.ts",
-                  "offset": 262
+                  "offset": 402
                 }
               }
             ]
@@ -743,7 +743,7 @@
           "name": "blog-content",
           "source": {
             "file": "./src/pages/blog-content.page.ts",
-            "offset": 522
+            "offset": 509
           },
           "attributes": [],
           "js": {
@@ -2154,7 +2154,7 @@
           "name": "docs-index-page",
           "source": {
             "file": "./src/pages/docs.page.ts",
-            "offset": 1380
+            "offset": 1422
           },
           "attributes": [],
           "js": {
@@ -2165,7 +2165,7 @@
           "name": "docs-page",
           "source": {
             "file": "./src/pages/docs.page.ts",
-            "offset": 1166
+            "offset": 1208
           },
           "attributes": [],
           "js": {
@@ -2187,7 +2187,7 @@
           "name": "docs-view",
           "source": {
             "file": "./src/components/docs/docs-view.component.ts",
-            "offset": 1360
+            "offset": 1378
           },
           "attributes": [
             {
@@ -2199,7 +2199,7 @@
               },
               "source": {
                 "file": "./src/components/docs/docs-view.component.ts",
-                "offset": 1698
+                "offset": 1716
               }
             }
           ],
@@ -2211,7 +2211,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/docs/docs-view.component.ts",
-                  "offset": 1698
+                  "offset": 1716
                 }
               }
             ]
@@ -3527,7 +3527,7 @@
           "name": "dota-icon",
           "source": {
             "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-            "offset": 4019
+            "offset": 2439
           },
           "attributes": [
             {
@@ -3539,7 +3539,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4427
+                "offset": 2998
               }
             },
             {
@@ -3551,7 +3551,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4162
+                "offset": 2733
               }
             },
             {
@@ -3562,7 +3562,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4286
+                "offset": 2857
               }
             },
             {
@@ -3573,7 +3573,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4511
+                "offset": 3082
               }
             },
             {
@@ -3585,7 +3585,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4101
+                "offset": 2672
               }
             },
             {
@@ -3596,7 +3596,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4223
+                "offset": 2794
               }
             },
             {
@@ -3607,7 +3607,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                "offset": 4353
+                "offset": 2924
               }
             }
           ],
@@ -3619,7 +3619,7 @@
                 "default": "null",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                  "offset": 4427
+                  "offset": 2998
                 }
               },
               {
@@ -3628,7 +3628,7 @@
                 "default": "",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                  "offset": 4162
+                  "offset": 2733
                 }
               },
               {
@@ -3636,7 +3636,7 @@
                 "type": "string",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                  "offset": 4286
+                  "offset": 2857
                 }
               },
               {
@@ -3644,7 +3644,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                  "offset": 4511
+                  "offset": 3082
                 }
               },
               {
@@ -3653,7 +3653,7 @@
                 "default": "",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                  "offset": 4101
+                  "offset": 2672
                 }
               },
               {
@@ -3661,7 +3661,7 @@
                 "type": "string",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                  "offset": 4223
+                  "offset": 2794
                 }
               },
               {
@@ -3669,7 +3669,7 @@
                 "type": "string",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/icon/icons.component.ts",
-                  "offset": 4353
+                  "offset": 2924
                 }
               }
             ]
@@ -3890,7 +3890,7 @@
           "name": "dota-popover",
           "source": {
             "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
-            "offset": 1919
+            "offset": 2069
           },
           "attributes": [
             {
@@ -3902,7 +3902,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
-                "offset": 2201
+                "offset": 2351
               }
             },
             {
@@ -3914,7 +3914,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
-                "offset": 2118
+                "offset": 2268
               }
             },
             {
@@ -3926,7 +3926,7 @@
               },
               "source": {
                 "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
-                "offset": 2026
+                "offset": 2176
               }
             }
           ],
@@ -3938,7 +3938,7 @@
                 "default": "",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
-                  "offset": 2201
+                  "offset": 2351
                 }
               },
               {
@@ -3947,7 +3947,7 @@
                 "default": "8",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
-                  "offset": 2118
+                  "offset": 2268
                 }
               },
               {
@@ -3956,7 +3956,7 @@
                 "default": "bottom",
                 "source": {
                   "file": "../../ui/dota-ui/src/components/popover/popover.component.ts",
-                  "offset": 2026
+                  "offset": 2176
                 }
               }
             ]

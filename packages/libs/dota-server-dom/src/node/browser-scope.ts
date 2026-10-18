@@ -31,6 +31,25 @@ let ownedGlobalNames: string[] = [];
 /** Answers request globals read outside any render (e.g. an old timer) while globals are installed. */
 let outsideRenderScope: BrowserScope | undefined;
 let lastFrameId = 0;
+/** Node built-ins displaced while globals are installed, restored on removal. */
+let displacedGlobals: [string, PropertyDescriptor][] = [];
+
+/**
+ * Node 25+ defines process-wide `localStorage` and `sessionStorage` accessors (the former is
+ * `undefined` without `--localstorage-file`). They would leak storage between requests, so
+ * renders shadow them; the getters are captured at load to tell them apart from Happy DOM's.
+ */
+const NODE_STORAGE_GETTERS = new Map(['localStorage', 'sessionStorage'].flatMap((name) => {
+  const getter = Object.getOwnPropertyDescriptor(globalThis, name)?.get;
+  return getter ? [[name, getter] as const] : [];
+}));
+
+/** Whether `name` is absent or is still Node's own process-wide storage accessor. */
+function isInstallable(name: string): boolean {
+  if (!(name in globalThis)) return true;
+  const getter = NODE_STORAGE_GETTERS.get(name);
+  return getter !== undefined && Object.getOwnPropertyDescriptor(globalThis, name)?.get === getter;
+}
 
 /** Globals whose value belongs to the current request; installed as getters. */
 const REQUEST_GLOBALS: Record<string, (scope: BrowserScope) => unknown> = {
@@ -105,11 +124,13 @@ function createBrowserScope(url: URL): BrowserScope {
  * `AsyncLocalStorage` (or the out-of-render scope), and writes are ignored, so assigning
  * `location` does nothing, like `location.assign`. Process globals become plain properties.
  * A name that already exists, from Happy DOM, Node, or the application, is skipped and never
- * replaced; every name defined is recorded in {@link ownedGlobalNames} for removal.
+ * replaced, except Node's process-wide storage, which is shadowed and later restored; every name defined is recorded in {@link ownedGlobalNames} for removal.
  */
 function installBrowserGlobals(): void {
   for (const [name, read] of Object.entries(REQUEST_GLOBALS)) {
-    if (name in globalThis) continue;
+    if (!isInstallable(name)) continue;
+    const displaced = Object.getOwnPropertyDescriptor(globalThis, name);
+    if (displaced) displacedGlobals.push([name, displaced]);
     Object.defineProperty(globalThis, name, {
       configurable: true,
       get: () => read(scopes.getStore() ?? (outsideRenderScope ??= createBrowserScope(new URL('http://localhost/')))),
@@ -128,11 +149,13 @@ function installBrowserGlobals(): void {
 /**
  * Removes the browser globals when the last render ends, so code outside a render sees a
  * plain Node environment again (`typeof window === 'undefined'`). Only the names
- * {@link installBrowserGlobals} recorded are deleted, so pre-existing globals survive, and
+ * {@link installBrowserGlobals} recorded are deleted, displaced Node storage is restored, and
  * the out-of-render scope is dropped so its document and storage do not outlive the renders.
  */
 function removeBrowserGlobals(): void {
   ownedGlobalNames.forEach((name) => delete (globalThis as Record<string, unknown>)[name]);
   ownedGlobalNames = [];
+  displacedGlobals.forEach(([name, descriptor]) => Object.defineProperty(globalThis, name, descriptor));
+  displacedGlobals = [];
   outsideRenderScope = undefined;
 }

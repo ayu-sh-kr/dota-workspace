@@ -38,7 +38,8 @@ describe('durable rendering and hydration', () => {
     hydrate(root, '<p>legacy</p>');
 
     expect(warning).toHaveBeenCalledWith(
-      '[dota-rendering] hydration mismatch; re-rendering the affected component',
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.* \[WARN\] \[dota-rendering:renderer\.ts\]$/),
+      'Hydration mismatch; re-rendering the affected component',
       expect.any(Error)
     );
     expect(root.innerHTML).toBe('<p>legacy</p>');
@@ -60,7 +61,8 @@ describe('durable rendering and hydration', () => {
     hydrate(clientRoot, view('client'));
 
     expect(warning).toHaveBeenCalledWith(
-      '[dota-rendering] hydration mismatch; re-rendering the affected component',
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.* \[WARN\] \[dota-rendering:renderer\.ts\]$/),
+      'Hydration mismatch; re-rendering the affected component',
       expect.any(Error)
     );
     expect(clientRoot.textContent).toBe('client');

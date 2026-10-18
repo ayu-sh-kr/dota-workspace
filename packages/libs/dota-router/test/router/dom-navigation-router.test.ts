@@ -405,7 +405,11 @@ describe('DomNavigationRouter', () => {
     router.back();
     await new Promise<void>(resolve => queueMicrotask(resolve));
 
-    expect(consoleError).toHaveBeenCalledWith('[dota-router] History traversal failed.', error);
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.* \[ERROR\] \[dota-router:router\/dom-navigation\.router\.ts\]$/),
+      'History traversal failed.',
+      error
+    );
     consoleError.mockRestore();
   });
 

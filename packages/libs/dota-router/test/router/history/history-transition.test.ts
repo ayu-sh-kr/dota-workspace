@@ -202,7 +202,8 @@ describe("history transition workflows", () => {
 
     expect(coordinator.navigate).not.toHaveBeenCalled();
     expect(consoleError).toHaveBeenCalledWith(
-      `[dota-router] Navigation stopped after ${HISTORY_REDIRECT_LIMIT} redirects.`
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.* \[ERROR\] \[dota-router:router\/history\/history-transition\.ts\]$/),
+      `Navigation stopped after ${HISTORY_REDIRECT_LIMIT} redirects.`
     );
   });
 

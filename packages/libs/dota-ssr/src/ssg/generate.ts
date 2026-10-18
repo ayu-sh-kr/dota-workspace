@@ -2,7 +2,7 @@ import {mkdir, readFile, writeFile} from 'node:fs/promises';
 import {availableParallelism} from 'node:os';
 import {dirname, resolve} from 'node:path';
 import {performance as nodePerformance} from 'node:perf_hooks';
-import {createConsola, LogLevels} from 'consola';
+import {createDotaLogger, resolveDotaLogType} from '@ayu-sh-kr/dota-common-utils';
 import type {ResolvedConfig} from 'vite';
 import {createPrerenderAssetReader} from './asset-reader';
 import {createPrerenderNetworkCache} from './network-cache';
@@ -26,14 +26,15 @@ export async function generateStaticPages(
   options: DotaSsgOptions & Required<Pick<DotaSsgOptions, 'concurrency' | 'renderTimeout'>>
 ): Promise<void> {
   const {concurrency, renderTimeout} = options;
-  const logType = options.logType ?? 'info';
-  const logger = createConsola({level: LogLevels[logType], formatOptions: {date: true, colors: true}});
+  const logType = resolveDotaLogType('dota-ssr', options.logType);
+  const logger = createDotaLogger('dota-ssr', 'ssg/generate.ts', logType);
   const started = nodePerformance.now();
   const root = options.root ?? config.root;
   const outputDirectory = resolve(root, config.build.outDir);
   if (!options.autoDetectRoutes && !options.routes?.length) {
     await prepareDeployment(root, outputDirectory, [], options, config.base);
-    logger.info(`[dota-ssr] no routes selected; SSG finished in ${(nodePerformance.now() - started).toFixed(0)}ms`);
+    logger.info('No routes selected for prerendering');
+    logger.debug(`Deployment prepared in ${(nodePerformance.now() - started).toFixed(0)}ms`);
     return;
   }
   const templateFile = resolve(outputDirectory, options.template ?? 'index.html');
@@ -71,18 +72,18 @@ export async function generateStaticPages(
       const writeMs = nodePerformance.now() - writeStarted;
       const total = timings.total + writeMs;
       routeTimes.push({path: route.path, total});
-      logger.info(`[dota-ssr] ${route.path}: ${total.toFixed(0)}ms (render ${timings.total.toFixed(0)}ms, write ${writeMs.toFixed(0)}ms)`);
+      logger.debug(`${route.path}: ${total.toFixed(0)}ms (render ${timings.total.toFixed(0)}ms, write ${writeMs.toFixed(0)}ms; output ${outputFile})`);
       if (!settled) {
-        logger.warn(`[dota-ssr] ${route.path}: still loading after ${options.settleTimeout ?? DEFAULT_SETTLE_TIMEOUT}ms or ${MAX_SETTLE_PASSES} settle passes; wrote the page as rendered so far`);
+        logger.warn(`${route.path}: still loading after ${options.settleTimeout ?? DEFAULT_SETTLE_TIMEOUT}ms or ${MAX_SETTLE_PASSES} settle passes; wrote the page as rendered so far`);
       }
-      logger.debug(`[dota-ssr] ${route.path} stages: setup ${timings.setup.toFixed(0)}ms, load ${timings.load.toFixed(0)}ms, ready ${timings.ready.toFixed(0)}ms, settle ${timings.settle.toFixed(0)}ms, serialize ${timings.serialize.toFixed(0)}ms, cleanup ${timings.cleanup.toFixed(0)}ms`);
+      logger.debug(`${route.path} stages: setup ${timings.setup.toFixed(0)}ms, load ${timings.load.toFixed(0)}ms, ready ${timings.ready.toFixed(0)}ms, settle ${timings.settle.toFixed(0)}ms, serialize ${timings.serialize.toFixed(0)}ms, cleanup ${timings.cleanup.toFixed(0)}ms`);
     };
     const renderingStarted = nodePerformance.now();
     const setupMs = renderingStarted - started;
     // Each worker starts its own Vite server and transforms the application again, so workers
     // beyond the available CPUs only compete for them; small build machines often have two.
     const workerCount = Math.min(concurrency, routes.length, availableParallelism());
-    logger.start(`[dota-ssr] prerendering ${routes.length} routes with ${workerCount} render worker${workerCount === 1 ? '' : 's'}`);
+    logger.debug(`Prerendering ${routes.length} routes with ${workerCount} render worker${workerCount === 1 ? '' : 's'}`);
     if (workerCount > 1) {
       await server?.close();
       server = undefined;
@@ -111,10 +112,11 @@ export async function generateStaticPages(
     await server?.close();
     server = undefined;
     const finishingMs = nodePerformance.now() - finishingStarted;
-    logger.success(`[dota-ssr] prerendered ${routes.length} routes in ${((nodePerformance.now() - started) / 1000).toFixed(2)}s (setup ${setupMs.toFixed(0)}ms, render/workers + writes ${renderingMs.toFixed(0)}ms, deployment + shutdown ${finishingMs.toFixed(0)}ms)`);
+    logger.success(`Prerendered ${routes.length} routes in ${((nodePerformance.now() - started) / 1000).toFixed(2)}s`);
+    logger.debug(`Timings: setup ${setupMs.toFixed(0)}ms, render/workers + writes ${renderingMs.toFixed(0)}ms, deployment + shutdown ${finishingMs.toFixed(0)}ms`);
     if (routeTimes.length) {
       const slowest = routeTimes.sort((left, right) => right.total - left.total).slice(0, 3);
-      logger.info(`[dota-ssr] slowest routes: ${slowest.map(route => `${route.path} ${route.total.toFixed(0)}ms`).join(', ')}`);
+      logger.debug(`Slowest routes: ${slowest.map(route => `${route.path} ${route.total.toFixed(0)}ms`).join(', ')}`);
     }
   } finally {
     await server?.close();

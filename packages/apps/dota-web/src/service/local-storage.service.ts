@@ -1,4 +1,7 @@
 
+import {createDotaLogger} from '@ayu-sh-kr/dota-wrap';
+
+const logger = createDotaLogger('dota-web', 'service/local-storage.service.ts');
 
 export class LocalStorageService {
 
@@ -27,7 +30,7 @@ export class LocalStorageService {
     try {
       return JSON.parse(storedValue) as T[];
     } catch (e) {
-      console.error(`Failed to parse list from localStorage key: ${key}`);
+      logger.error(`Failed to parse list from localStorage key: ${key}`, e);
       return [];
     }
   }

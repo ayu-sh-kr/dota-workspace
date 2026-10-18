@@ -5,7 +5,7 @@ import { GeneralUtils } from "@dota/utils/GeneralUtils.ts";
 import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 
-@Route({path: '/blogs/content/:category/:blog', mode: 'ssr'})
+@Route({path: '/blogs/content/:category/:blog'})
 @Component({
   selector: "blog-content",
   shadow: false
@@ -32,6 +32,7 @@ export class BlogContentPage extends DotaPageElement {
 
     return {
       title: `${blogTitle}`,
+      favicon: '/favicon.svg',
       description: `Read the full content of our blog about ${blogTitle}.`,
       keywords: ['Dota', 'Blog Content', 'Development', 'Tools', 'Web Development', 'Programming', 'Software Development'],
       og: {

@@ -3,7 +3,7 @@ import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {availableParallelism, tmpdir} from 'node:os';
 import {join} from 'node:path';
 import type {Window} from 'happy-dom';
-import {createConsola} from 'consola';
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
 import {createServer, createServerModuleRunner, type ResolvedConfig, type ViteDevServer} from 'vite';
 import type {DotaSsgOptions} from '@dota/ssg/types';
 import {generateStaticPages} from '@dota/ssg/generate';
@@ -11,7 +11,7 @@ import {CompiledModuleEvaluator} from '@dota/ssg/prerender-runtime';
 
 vi.mock('node:fs/promises', {spy: true});
 vi.mock('node:os', {spy: true});
-vi.mock('consola', {spy: true});
+vi.mock('@ayu-sh-kr/dota-common-utils', {spy: true});
 vi.mock('vite', async importOriginal => ({
   ...await importOriginal<typeof import('vite')>(),
   createServer: vi.fn(),
@@ -293,7 +293,7 @@ describe('dotaSsg build output', () => {
   it('writes a still-loading page with a warning once settleTimeout passes', async () => {
     await writeFile(join(root, 'dist/poll.txt'), 'poll');
     const logger = {info: vi.fn(), debug: vi.fn(), start: vi.fn(), success: vi.fn(), warn: vi.fn()};
-    vi.mocked(createConsola).mockReturnValueOnce(logger as unknown as ReturnType<typeof createConsola>);
+    vi.mocked(createDotaLogger).mockReturnValueOnce(logger as unknown as ReturnType<typeof createDotaLogger>);
     let polls = 0;
     server.ssrLoadModule.mockImplementationOnce(async () => {
       const routeWindow = globalThis.window as unknown as Window;
@@ -317,7 +317,7 @@ describe('dotaSsg build output', () => {
 
   it('does not warn when a page settles before settleTimeout', async () => {
     const logger = {info: vi.fn(), debug: vi.fn(), start: vi.fn(), success: vi.fn(), warn: vi.fn()};
-    vi.mocked(createConsola).mockReturnValueOnce(logger as unknown as ReturnType<typeof createConsola>);
+    vi.mocked(createDotaLogger).mockReturnValueOnce(logger as unknown as ReturnType<typeof createDotaLogger>);
 
     await build({routes: ['/quiet'], settleTimeout: 200});
 
@@ -326,22 +326,22 @@ describe('dotaSsg build output', () => {
 
   it('logs route timings, stage details, and a summary after server shutdown', async () => {
     const logger = {info: vi.fn(), debug: vi.fn(), start: vi.fn(), success: vi.fn()};
-    vi.mocked(createConsola).mockReturnValueOnce(logger as unknown as ReturnType<typeof createConsola>);
+    vi.mocked(createDotaLogger).mockReturnValueOnce(logger as unknown as ReturnType<typeof createDotaLogger>);
     logger.success.mockImplementation(() => {
       expect(server.close).toHaveBeenCalledOnce();
     });
 
     await build({routes: ['/timed']});
 
-    expect(logger.info).toHaveBeenCalledWith(expect.stringMatching(/^\[dota-ssr\] \/timed: \d+ms \(render \d+ms, write \d+ms\)$/));
+    expect(logger.debug).toHaveBeenCalledWith(expect.stringMatching(/^\/timed: \d+ms \(render \d+ms, write \d+ms; output /));
     expect(logger.debug).toHaveBeenCalledWith(expect.stringMatching(/setup \d+ms, load \d+ms, ready \d+ms, settle \d+ms, serialize \d+ms, cleanup \d+ms/));
-    expect(logger.success).toHaveBeenCalledWith(expect.stringMatching(/prerendered 1 routes in \d+\.\d{2}s \(setup \d+ms, render\/workers \+ writes \d+ms, deployment \+ shutdown \d+ms\)/));
-    expect(logger.info).toHaveBeenCalledWith(expect.stringMatching(/slowest routes: \/timed \d+ms/));
+    expect(logger.success).toHaveBeenCalledWith(expect.stringMatching(/Prerendered 1 routes in \d+\.\d{2}s/));
+    expect(logger.debug).toHaveBeenCalledWith(expect.stringMatching(/Slowest routes: \/timed \d+ms/));
   });
 
   it('does not report successful timing totals when a route fails', async () => {
     const logger = {info: vi.fn(), debug: vi.fn(), start: vi.fn(), success: vi.fn()};
-    vi.mocked(createConsola).mockReturnValueOnce(logger as unknown as ReturnType<typeof createConsola>);
+    vi.mocked(createDotaLogger).mockReturnValueOnce(logger as unknown as ReturnType<typeof createDotaLogger>);
     server.ssrLoadModule.mockRejectedValueOnce(new Error('entry failed'));
 
     await expect(build({routes: ['/failed']})).rejects.toThrow('entry failed');

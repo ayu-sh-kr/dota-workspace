@@ -133,7 +133,10 @@ describe("createRouteRenderer", () => {
 
     renderer(match, context("/contact", true));
 
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining("Discarding server-rendered output"));
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.* \[WARN\] \[dota-router:coordinator\/route-renderer\.ts\]$/),
+      expect.stringContaining('Discarding server-rendered output')
+    );
     expect(root.innerHTML).toContain("dota-contact");
   });
 
@@ -164,7 +167,10 @@ describe("createRouteRenderer", () => {
     );
 
     expect(() => renderer(match, context("/contact"))).not.toThrow();
-    expect(error).toHaveBeenCalledWith("Root element not found for selector: app-root");
+    expect(error).toHaveBeenCalledWith(
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.* \[ERROR\] \[dota-router:coordinator\/route-renderer\.ts\]$/),
+      'Root element not found for selector: app-root'
+    );
   });
 
   it("throws on a missing root element when configured with the strict error policy", () => {

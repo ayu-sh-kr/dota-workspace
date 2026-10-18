@@ -16,7 +16,7 @@ abstract class DocsRoutePage extends DotaPageElement {
   get seo(): SEO {
     const title = `${findDoc(window.location.pathname)?.title ?? 'Not found'} | Dota Docs`;
     const description = 'Guides and reference for building web components with Dota.';
-    return {title, description, keywords: ['Dota', 'Web Components', 'Documentation'], og: {title, description}};
+    return {title, description, favicon: '/favicon.svg', keywords: ['Dota', 'Web Components', 'Documentation'], og: {title, description}};
   }
 
   render(): TemplateResult {
@@ -24,8 +24,8 @@ abstract class DocsRoutePage extends DotaPageElement {
   }
 }
 
-/** Documentation page at `/docs/<slug>`; SSG prerenders one per entry in `DOCS`. */
-@Route({path: '/docs/:slug'})
+/** Documentation page at `/docs/<slug>`; the server renders each requested document. */
+@Route({path: '/docs/:slug', mode: 'ssr'})
 @Component({
   selector: 'docs-page',
   shadow: false
@@ -33,7 +33,7 @@ abstract class DocsRoutePage extends DotaPageElement {
 export class DocsPage extends DocsRoutePage {}
 
 /** `/docs` entry point; renders the first documentation page. */
-@Route({path: '/docs', mode: 'ssg'})
+@Route({path: '/docs', mode: 'ssr'})
 @Component({
   selector: 'docs-index-page',
   shadow: false

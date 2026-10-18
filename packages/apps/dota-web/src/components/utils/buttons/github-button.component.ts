@@ -15,8 +15,10 @@ export class GithubButtonComponent extends BaseElement {
     // language=HTML
     return `
       <span id="github-button" class="active:scale-95 cursor-pointer">
-        <a href="https://github.com/ayu-sh-kr" target="_blank">
-            <dota-icon name="mdi:github" color="none" variant="ghost" size="md"/>
+        <a href="https://github.com/ayu-sh-kr" target="_blank"
+           class="inline-flex size-9 items-center justify-center rounded-full text-foreground hover:bg-raised"
+           aria-label="GitHub">
+            <dota-icon name="mdi:github" color="none" variant="ghost" size="lg"></dota-icon>
         </a>
       </span>
     `;

@@ -13,9 +13,11 @@ import {
 } from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 import type {ApplicationEvent} from "@ayu-sh-kr/dota-event";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
 
 const INTERACTIVE_SELECTOR = "a[href], button, input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex='-1'])";
 const CUSTOM_ELEMENT_NAME = /^[a-z][.0-9_a-z]*-[.0-9_a-z-]*$/;
+const logger = createDotaLogger('dota-ui', 'components/popover/popover.component.ts');
 const PLACEMENTS = new Set<Placement>([
   "top", "top-start", "top-end", "right", "right-start", "right-end",
   "bottom", "bottom-start", "bottom-end", "left", "left-start", "left-end",
@@ -129,7 +131,7 @@ class PopoverComponent extends BaseElement {
       this.createdPanel = panel;
       return panel;
     } catch {
-      console.warn(`[dota-popover] Invalid anchored-selector: "${this.anchoredSelector}".`);
+      logger.warn(`Invalid anchored-selector: "${this.anchoredSelector}".`);
       return null;
     }
   }

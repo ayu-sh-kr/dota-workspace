@@ -36,6 +36,7 @@
     "test": "tsc --noEmit && vitest run"
   },
   "dependencies": {
+    "@ayu-sh-kr/dota-common-utils": "workspace:*",
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-ast-utils": "workspace:*",

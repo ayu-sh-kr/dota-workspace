@@ -1,4 +1,4 @@
-import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, DocumentListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {MDService} from "@ayu-sh-kr/dota-md";
@@ -52,6 +52,28 @@ export class DocsViewComponent extends BaseElement {
     const doc = this.doc;
     if (!doc || this.querySelector('[data-md-content] > *')) return;
     MDService.render(await this.loader.loadDoc(doc.slug), {publish: true});
+  }
+
+  /**
+   * Closes the floating document list when the reader clicks elsewhere.
+   * @param event Document click used to identify clicks outside the menu.
+   */
+  @DocumentListener({event: 'click'})
+  closeMobileNavOnOutsideClick(event: Event): void {
+    const menu = this.querySelector<HTMLDetailsElement>('[data-mobile-doc-nav]');
+    if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+  }
+
+  /**
+   * Closes the document list on Escape and returns focus to its trigger.
+   * @param event Document key press while the menu may be open.
+   */
+  @DocumentListener({event: 'keydown'})
+  closeMobileNavOnEscape(event: KeyboardEvent): void {
+    const menu = this.querySelector<HTMLDetailsElement>('[data-mobile-doc-nav]');
+    if (event.key !== 'Escape' || !menu?.open) return;
+    menu.open = false;
+    menu.querySelector('summary')?.focus();
   }
 
   private get doc(): DocEntry | undefined {
@@ -149,8 +171,8 @@ export class DocsViewComponent extends BaseElement {
           <div class="mx-auto flex h-14 max-w-screen-2xl items-center justify-between gap-3 px-4 lg:px-6">
             <div class="flex min-w-0 items-center gap-2 text-sm">
               <a href="/" class="text-lg font-extrabold">Dota</a>
-              <span class="text-gray-300 dark:text-gray-600">/</span>
-              <a href="${docUrl(DOCS[0].slug)}" class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">Docs</a>
+              <span class="hidden text-gray-300 sm:inline dark:text-gray-600">/</span>
+              <a href="${docUrl(DOCS[0].slug)}" class="hidden text-gray-500 hover:text-gray-900 sm:inline dark:text-gray-400 dark:hover:text-gray-100">Docs</a>
             </div>
             <div class="flex shrink-0 items-center gap-1.5">
               <docs-theme-picker></docs-theme-picker>
@@ -167,10 +189,23 @@ export class DocsViewComponent extends BaseElement {
           </aside>
 
           <main class="min-w-0 px-4 py-8 sm:px-8 lg:px-12">
-            <details class="mb-6 rounded-lg border border-gray-200 lg:hidden dark:border-gray-800">
-              <summary class="cursor-pointer px-4 py-2.5 text-sm font-medium">${doc?.section ?? 'Docs'} · ${doc?.title ?? 'Menu'}</summary>
-              <div class="border-t border-gray-200 px-2 py-4 dark:border-gray-800">${this.renderNav()}</div>
-            </details>
+            <div class="mx-auto mb-6 max-w-3xl lg:hidden">
+              <details data-mobile-doc-nav class="group relative w-fit max-w-full">
+                <summary class="button-secondary button-compact list-none select-none group-open:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
+                         aria-label="Browse documentation pages">
+                  <svg class="size-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M4 5h12M4 10h12M4 15h8"/>
+                  </svg>
+                  Browse docs
+                  <svg class="size-4 text-muted transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z"/>
+                  </svg>
+                </summary>
+                <div class="absolute left-0 top-full z-30 mt-2 max-h-[70dvh] w-[calc(100vw-2rem)] max-w-sm overflow-y-auto overscroll-contain rounded-card border border-default bg-surface p-4 shadow-lift sm:w-96">
+                  ${this.renderNav()}
+                </div>
+              </details>
+            </div>
 
             <article class="group/article mx-auto max-w-3xl">
               ${doc ? html`

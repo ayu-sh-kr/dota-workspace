@@ -59,7 +59,7 @@ describe('renderer public API', () => {
 
     render(document.createElement('div'), '<p>legacy</p>');
 
-    expect(debug).toHaveBeenCalledWith('[dota-rendering] mounting render session', {
+    expect(debug).toHaveBeenCalledWith('Mounting render session', {
       output: 'legacy',
       hydrationMarkers: false
     });

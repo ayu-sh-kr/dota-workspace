@@ -1,5 +1,8 @@
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
 import {applicationEventPublisher} from "@dota/main.ts";
+import {createDotaLogger} from '@ayu-sh-kr/dota-wrap';
+
+const logger = createDotaLogger('dota-web', 'utils/GeneralUtils.ts');
 
 export type PlatformToken = {
   tokens: string[],
@@ -70,7 +73,7 @@ export class GeneralUtils {
     const data = GeneralUtils.extractParenthesisBlocks(userAgent);
     const platformTokens = data[0].split(";");
 
-    console.log(platformTokens)
+    logger.debug('Detected platform tokens', platformTokens);
     return {
       tokens: platformTokens,
       kernel: platformTokens[0],

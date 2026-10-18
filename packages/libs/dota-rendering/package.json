@@ -38,6 +38,7 @@
     "package.json"
   ],
   "dependencies": {
+    "@ayu-sh-kr/dota-common-utils": "workspace:*",
     "consola": "catalog:"
   },
   "scripts": {

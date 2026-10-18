@@ -49,6 +49,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ayu-sh-kr/dota-common-utils": "workspace:*",
     "@ayu-sh-kr/dota-ast-utils": "workspace:*",
     "@swc/core": "catalog:",
     "consola": "catalog:",

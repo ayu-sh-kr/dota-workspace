@@ -37,7 +37,7 @@ export class DarkModeButtonComponent extends BaseElement {
               class="inline-flex size-9 items-center justify-center rounded-full text-primary hover:bg-raised
                       active:scale-95 cursor-pointer"
               aria-label="Switch to ${isDarkTheme ? 'light' : 'dark'} mode">
-        <dota-icon name="${icon}" color="${this.color}" variant="ghost" size="md"></dota-icon>
+        <dota-icon name="${icon}" color="${this.color}" variant="ghost" size="lg"></dota-icon>
       </button>
     `;
   }

@@ -1,5 +1,8 @@
 import {ComponentConfig, CoreMetadata, Metadata, updateDocumentSEO} from "@ayu-sh-kr/dota-core";
 import {ComponentClass, NavigationContext, RouteMatch, RouteRenderer} from "@dota/Types";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+
+const logger = createDotaLogger('dota-router', 'coordinator/route-renderer.ts');
 
 /**
  * Marker attributes a hydration-aware layer (`dota-ssr`) stamps onto server-rendered
@@ -33,12 +36,12 @@ export type RouteRendererOptions = {
 
 /**
  * Reports a render-time configuration failure per the selected policy.
- * @param message Failure description, consistent with the prior `console.error` wording.
+ * @param message Failure description for the package logger.
  * @param policy `warn` (default) logs only; `throw` raises so the transition surfaces it.
  */
 function reportRenderError(message: string, policy: RouteRenderErrorPolicy): void {
   if (policy === 'throw') throw new Error(message);
-  console.error(message);
+  logger.error(message);
 }
 
 /**
@@ -101,7 +104,7 @@ export function renderRoute<T extends HTMLElement>(
   }
 
   if (context.initial && hasMarkedServerOutput(rootElement)) {
-    console.warn(
+    logger.warn(
       `[dota-router] Discarding server-rendered output in #${rootConfig.selector} on the initial render. ` +
       "dota-router does not preserve hydration markers on its own — wrap this app with dota-wrap's " +
       "initializeApp() and the dotaHydration() plugin, or prerendered HTML will always be dropped on first load."

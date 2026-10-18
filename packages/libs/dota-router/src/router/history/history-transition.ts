@@ -7,6 +7,9 @@ import type {
   NavigationResult,
   PreparedHistoryTransition
 } from "@dota/Types";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+
+const logger = createDotaLogger('dota-router', 'router/history/history-transition.ts');
 
 const DOTA_HISTORY_STATE_KEY = "__dotaRouter";
 
@@ -142,7 +145,7 @@ export function navigateHistory<T extends HTMLElement>(
   redirectCount = 0
 ): void {
   if (redirectCount > HISTORY_REDIRECT_LIMIT) {
-    console.error(`[dota-router] Navigation stopped after ${HISTORY_REDIRECT_LIMIT} redirects.`);
+    logger.error(`Navigation stopped after ${HISTORY_REDIRECT_LIMIT} redirects.`);
     return;
   }
 
@@ -157,7 +160,7 @@ export function navigateHistory<T extends HTMLElement>(
 
     if (isAcceptedHistoryResult(result)) {
       runtime.acceptedPosition = destinationPosition;
-      if (result.status === "failed") console.error("[dota-router] Navigation lifecycle failed.", result.error);
+      if (result.status === "failed") logger.error('Navigation lifecycle failed.', result.error);
       return;
     }
 
@@ -202,7 +205,7 @@ export async function handleHistoryPopState<T extends HTMLElement>(
 
   if (isAcceptedHistoryResult(result)) {
     runtime.acceptedPosition = selectedEntry?.position;
-    if (result.status === "failed") console.error("[dota-router] History traversal lifecycle failed.", result.error);
+    if (result.status === "failed") logger.error('History traversal lifecycle failed.', result.error);
     return;
   }
 
@@ -214,7 +217,7 @@ export async function handleHistoryPopState<T extends HTMLElement>(
 
   if (result.status === "cancelled" || result.status === "failed") {
     if (selectedEntry && restoreAcceptedHistoryEntry(runtime, selectedEntry.position)) return;
-    console.error("[dota-router] Cannot restore a rejected external history entry without router position metadata.");
+    logger.error('Cannot restore a rejected external history entry without router position metadata.');
   }
 }
 

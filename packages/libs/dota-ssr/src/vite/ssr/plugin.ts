@@ -1,10 +1,11 @@
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {createConsola, LogLevels} from 'consola';
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+import type {ConsolaInstance} from 'consola';
 import type {Plugin, ResolvedConfig, ViteDevServer} from 'vite';
 import {toNodeListener} from '../../ssr/node-listener';
 import type {ApplicationHandler, PageRoute, RequestHandler} from '../../ssr/types';
-import {prepareServerDeployment} from '../deployment/server';
+import {prepareServerDeployment, removeStaleNodeServer} from '../deployment/server';
 import {buildServerBundle, ownModule, readServerRoutes} from './server-build';
 import type {DotaSsrOptions} from './types';
 
@@ -27,7 +28,7 @@ type ServerModule = {
  * @param options Entry, deployment target, and output settings.
  */
 export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
-  const logger = createConsola({level: LogLevels[options.logType ?? 'info'], formatOptions: {date: true, colors: true}});
+  const logger = createDotaLogger('dota-ssr', 'vite/ssr/plugin.ts', options.logType);
   let config: ResolvedConfig;
   let declaresServerRoutes = false;
   /** The built shell as Vite wrote it, captured before SSG replaces it with the prerendered home page. */
@@ -54,25 +55,27 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
       sequential: true,
       async handler() {
         if (config.command !== 'build' || config.build.ssr || options.deployment === false) return;
-        if (!declaresServerRoutes) {
-          logger.debug('[dota-ssr] no route declares mode: \'ssr\'; skipping the server build');
-          return;
-        }
         const target = options.deployment ?? 'node';
         const root = options.root ?? config.root;
+        await removeStaleNodeServer(root, options.serverOutDir, logger);
+        if (!declaresServerRoutes) {
+          logger.debug('No route declares mode: \'ssr\'; skipping the server build');
+          return;
+        }
         const outputDirectory = resolve(root, config.build.outDir);
         const template = builtShell ?? await readFile(resolve(outputDirectory, options.template ?? 'index.html'), 'utf8');
-        logger.start(`[dota-ssr] building the server for ${target}`);
+        logger.debug(`Building the server for ${target} from ${root}`);
         const started = performance.now();
         const bundleFile = await buildServerBundle(config, root, options, target, template);
         const built = performance.now();
         const routes = await readServerRoutes(bundleFile);
-        logger.info(`[dota-ssr] server bundle built in ${(built - started).toFixed(0)}ms; application read in ${(performance.now() - built).toFixed(0)}ms`);
+        logger.debug(`Server bundle ${bundleFile} built in ${(built - started).toFixed(0)}ms; application read in ${(performance.now() - built).toFixed(0)}ms`);
         if (routes.length === 0) {
-          logger.info('[dota-ssr] the application has no ssr routes; no server output written');
+          logger.info('No SSR routes; no server output written');
           return;
         }
-        logger.info(`[dota-ssr] server-rendered routes: ${routes.join(', ')}`);
+        logger.info(`SSR ready for ${routes.length} routes`);
+        logger.debug(`Server-rendered routes: ${routes.join(', ')}`);
         await prepareServerDeployment(target, {root, outputDirectory, bundleFile, shell: template, routes, base: config.base, options}, logger);
       }
     }
@@ -86,7 +89,7 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
  * If capture fails, for example because the entry has browser-only module code, server
  * rendering is off until the next change.
  */
-function installDevMiddleware(server: ViteDevServer, options: DotaSsrOptions, logger: ReturnType<typeof createConsola>): void {
+function installDevMiddleware(server: ViteDevServer, options: DotaSsrOptions, logger: ConsolaInstance): void {
   const root = options.root ?? server.config.root;
   const entryFile = resolve(root, (options.entry ?? '/src/main.ts').replace(/^[/\\]+/, ''));
   const templateFile = resolve(root, 'index.html');
@@ -110,7 +113,8 @@ function installDevMiddleware(server: ViteDevServer, options: DotaSsrOptions, lo
     const routes = ssr.resolveServerRoutes(await application.application());
     foundNoServerRoutes = routes.length === 0;
     if (foundNoServerRoutes) return undefined;
-    logger.info(`[dota-ssr] rendering on the server in dev: ${routes.map((route) => route.path).join(', ')}`);
+    logger.info(`SSR active for ${routes.length} routes in dev`);
+    logger.debug(`Server-rendered routes: ${routes.map((route) => route.path).join(', ')}`);
     return application;
   };
 
@@ -124,7 +128,7 @@ function installDevMiddleware(server: ViteDevServer, options: DotaSsrOptions, lo
   server.middlewares.use(async (request, response, next) => {
     if ((request.method !== 'GET' && request.method !== 'HEAD') || !request.headers.accept?.includes('text/html')) return next();
     handler ??= createHandler().catch(async (error: unknown) => {
-      const message = `[dota-ssr] server rendering is off until the next change: ${error instanceof Error ? error.message : String(error)}`;
+      const message = `Server rendering is off until the next change: ${error instanceof Error ? error.message : String(error)}`;
       if (await declaresServerRoutes()) logger.warn(message);
       else logger.debug(message);
       return undefined;

@@ -2,7 +2,7 @@ import {Component, AfterInit, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 
 
-@Route({path: '/blogs', mode: 'ssr'})
+@Route({path: '/blogs', mode: 'ssg'})
 @Component({
   selector: 'blog-page',
   shadow: false
@@ -15,6 +15,7 @@ export class BlogPage extends DotaPageElement {
 
   get seo(): SEO {
     return {
+      favicon: '/favicon.svg',
       title: 'Blogs - Dota',
       description: 'Read our latest blogs about Dota, the ultimate tool for developers.',
       keywords: ['Dota', 'Blogs', 'Development', 'Tools', 'Web Development', 'Programming', 'Software Development'],

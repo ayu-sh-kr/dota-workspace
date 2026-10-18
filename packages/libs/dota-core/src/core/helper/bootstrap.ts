@@ -1,4 +1,7 @@
 import {DotaElementConstructor} from "@dota/core";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+
+const logger = createDotaLogger('dota-core', 'core/helper/bootstrap.ts');
 
 /**
  * Bootstraps custom elements by defining them with the custom elements' registry.
@@ -27,7 +30,7 @@ export const bootstrap = (elements: DotaElementConstructor[]) => {
       if (!customElements.get(selector)) {
         customElements.define(selector, element);
       } else {
-        console.warn(`Custom element with selector '${selector}' is already defined.`);
+        logger.warn(`Custom element with selector '${selector}' is already defined.`);
       }
     }
   })
