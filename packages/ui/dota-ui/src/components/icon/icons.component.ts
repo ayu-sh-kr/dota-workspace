@@ -2,6 +2,8 @@ import {BaseElement, Component, HTML, Object as ObjectType, Property, String} fr
 import {LifecycleEventConstants} from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 import type {ApplicationEvent} from "@ayu-sh-kr/dota-event";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+import {loadCachedIcon} from './icon-cache';
 import {
   IconStyle,
   type IconColor,
@@ -10,67 +12,22 @@ import {
   type IconVariant,
 } from "@dota/components/icon/icons.config.ts";
 
-const SVG_CACHE = new Map<string, string>();
-const SVG_INFLIGHT = new Map<string, Promise<string | null>>();
 const ICON_NAME_PATTERN = /^[a-z0-9-]+:[a-z0-9-]+$/i;
+const logger = createDotaLogger('dota-ui', 'components/icon/icons.component.ts');
 
 /**
- * Removes executable and externally-loading content from Iconify SVG markup.
- * The component injects the resulting SVG into light DOM, so this keeps the
- * cached asset limited to presentational SVG elements and attributes.
- * @param rawSvg Markup returned by Iconify for one validated icon name.
- * @returns Safe serialized SVG markup, or `null` when the response is not an SVG.
- */
-function sanitizeSvg(rawSvg: string): string | null {
-  const document = new DOMParser().parseFromString(rawSvg, 'image/svg+xml');
-  const svg = document.documentElement;
-  if (svg.localName !== 'svg' || document.querySelector('parsererror')) return null;
-
-  svg.querySelectorAll('script, style, foreignObject, iframe, object, embed, audio, video').forEach(element => element.remove());
-  [svg, ...svg.querySelectorAll('*')].forEach(element => {
-    [...element.attributes].forEach(attribute => {
-      const name = attribute.name.toLowerCase();
-      const value = attribute.value.trim().toLowerCase();
-      if (name.startsWith('on') || (name === 'href' || name === 'xlink:href') && !value.startsWith('#')) {
-        element.removeAttribute(attribute.name);
-      }
-    });
-  });
-
-  svg.removeAttribute('style');
-  svg.removeAttribute('class');
-  return new XMLSerializer().serializeToString(svg);
-}
-
-/**
- * Fetches one Iconify SVG and shares its sanitized result across all instances.
- * Keeping in-flight work by name prevents duplicate requests while preserving a
- * failed request as a retryable miss instead of permanently caching the failure.
+ * Loads a sanitized SVG from the configured source and shared persistent cache.
+ * A local source can replace Iconify without changing component instances.
  * @param name A validated `collection:icon` identifier.
+ * @param baseUrl Directory containing named SVG assets, without a trailing slash.
  * @returns Sanitized SVG markup, or `null` if the icon cannot be loaded safely.
  */
-function fetchSvg(name: string): Promise<string | null> {
-  const cached = SVG_CACHE.get(name);
-  if (cached) return Promise.resolve(cached);
-
-  const inFlight = SVG_INFLIGHT.get(name);
-  if (inFlight) return inFlight;
-
-  const promise = fetch(`https://api.iconify.design/${name}.svg`)
-    .then(response => response.ok ? response.text() : null)
-    .then(rawSvg => rawSvg ? sanitizeSvg(rawSvg) : null)
-    .then(svg => {
-      if (svg) SVG_CACHE.set(name, svg);
-      return svg;
-    })
+function fetchSvg(name: string, baseUrl: string): Promise<string | null> {
+  return loadCachedIcon(`${baseUrl.replace(/\/$/, '')}/${name}.svg`)
     .catch(error => {
-      console.warn(`[dota-icon] Could not load "${name}".`, error);
+      logger.warn(`Could not load icon "${name}".`, error);
       return null;
-    })
-    .finally(() => SVG_INFLIGHT.delete(name));
-
-  SVG_INFLIGHT.set(name, promise);
-  return promise;
+    });
 }
 
 /**
@@ -83,7 +40,8 @@ function fetchSvg(name: string): Promise<string | null> {
  * `aria-label` gives the icon an accessible image name; without it, the SVG is hidden as
  * decorative content. Unsupported style values fall back safely to their defaults.
  *
- * State: a module-level cache retains sanitized SVG markup and shares in-flight fetches.
+ * State: sanitized SVGs persist for seven days in browser storage and share in-flight work.
+ * Failed refreshes retain stale SVGs; blocked storage falls back to memory caching.
  * Events: connection and reactive attribute changes load the current icon; a name change
  * cannot overwrite a later selection after its request resolves. No custom events emit.
  * Lifecycle and integration: light DOM lets consumer Tailwind classes apply to the SVG.
@@ -93,6 +51,9 @@ function fetchSvg(name: string): Promise<string | null> {
   shadow: false,
 })
 class IconsComponent extends BaseElement {
+
+  /** Asset directory used by every instance; defaults to Iconify. Set before app initialization. */
+  static baseUrl = 'https://api.iconify.design';
 
   @Property({name: 'name', type: String})
   name = '';
@@ -163,7 +124,7 @@ class IconsComponent extends BaseElement {
       return;
     }
 
-    const svgText = await fetchSvg(name);
+    const svgText = await fetchSvg(name, IconsComponent.baseUrl);
     if (name !== this.name || !svgText) {
       if (name === this.name) container.replaceChildren();
       return;
