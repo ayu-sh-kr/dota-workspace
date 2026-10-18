@@ -129,8 +129,56 @@ export class EndlessLoopComponent extends BaseElement {
   }
 }
 
+/** Writes registered tags where the HTML parser would not create elements, plus one live host. */
+@Component({selector: 'markup-probe', shadow: false})
+export class MarkupProbeComponent extends BaseElement {
+  constructor() {
+    super();
+  }
+
+  render() {
+    return html`<!-- <task-item label="comment"></task-item> --><script>const tag = '<task-item label="script"></task-item>';</script><template><task-item label="inert"></task-item></template><p title="<task-item>"></p><task-item label="live" label="duplicate"></task-item>`;
+  }
+}
+
+/** Reads request-backed browser globals and mutates its host through element APIs. */
+@Component({selector: 'browser-probe', shadow: false})
+export class BrowserProbeComponent extends BaseElement {
+  @Property({name: 'seen', type: String}) seen = '';
+
+  constructor() {
+    super();
+  }
+
+  async serverLoad(context: RenderContext) {
+    await context.fetch('/api/wait');
+    this.classList.add('ready');
+    this.dataset.theme = 'dark';
+    this.style.setProperty('--gap', '1rem');
+    // `String` and `Number` here are Dota Core property types, so the count is built without them.
+    localStorage.setItem('visits', `${parseInt(localStorage.getItem('visits') ?? '0', 10) + 1}`);
+    this.seen = [window.location.pathname, document.location.search, localStorage.getItem('visits'), matchMedia('(min-width: 1px)').matches].join('|');
+  }
+
+  render() {
+    return html`<p>${this.seen}</p>`;
+  }
+}
+
+/** Uses the legacy string render contract, which the client can only re-render. */
+@Component({selector: 'legacy-note', shadow: false})
+export class LegacyNoteComponent extends BaseElement {
+  constructor() {
+    super();
+  }
+
+  render() {
+    return '<p>legacy</p>';
+  }
+}
+
 /** Every fixture component, as an application would register them. */
 export const FIXTURE_COMPONENTS = [
   TaskItemComponent, ShadowBadgeComponent, TasksPage, StateReaderComponent, EndlessLoopComponent,
-  ClientOnlyPanelComponent, RenderFlagProbeComponent
+  ClientOnlyPanelComponent, RenderFlagProbeComponent, MarkupProbeComponent, BrowserProbeComponent, LegacyNoteComponent
 ];
