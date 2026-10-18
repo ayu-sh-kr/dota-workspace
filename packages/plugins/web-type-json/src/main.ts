@@ -13,7 +13,7 @@ import fg from "fast-glob";
 import {readFile, writeFile} from "node:fs/promises";
 import {resolve} from "node:path";
 import type {ClassDeclaration} from "@swc/core";
-import {createConsola, LogLevels} from "consola";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
 import type {ConsolaInstance} from "consola";
 import {ComponentMetadataUtils} from "./utils/ComponentMetadataUtils.ts";
 import {ComponentSourceUtils} from "./utils/ComponentSourceUtils.ts";
@@ -43,7 +43,7 @@ export type {
 } from "./Types.ts";
 
 
-let log: ConsolaInstance = createConsola();
+let log: ConsolaInstance = createDotaLogger('dota-web-type-json', 'main.ts');
 
 /**
  * Resets plugin state for test isolation and future stateful implementations.
@@ -421,18 +421,12 @@ export default function dotaWebTypeJson(config: WebTypeJsonPluginConfig = {}): P
   const {
     root = process.cwd(),
     outFile = "web-types.json",
-    logType = "info",
+    logType,
     scanRoots = [root],
   } = config;
   const customElementsManifest = CustomElementsManifestUtils.normalizeConfig(config.customElementsManifest);
 
-  log = createConsola({
-    level: LogLevels[logType],
-    formatOptions: {
-      date: true,
-      colors: true,
-    },
-  });
+  log = createDotaLogger('dota-web-type-json', 'main.ts', logType);
 
   /**
    * Coordinates one source scan with every enabled serializer and artifact writer.
