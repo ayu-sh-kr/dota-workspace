@@ -1194,7 +1194,7 @@ function moveInclusiveRange(start: Node, end: Node, before: Node): void {
  */
 export function patch(instance: RenderInstance, output: RenderOutput): CommitResult {
   const result = instance.update(output);
-  getDotaRenderingLogger().debug('[dota-rendering] patched render session', result);
+  getDotaRenderingLogger().debug('Patched render session', result);
   return result;
 }
 
@@ -1216,7 +1216,7 @@ export function update(instance: RenderInstance, output: RenderOutput): CommitRe
  * @returns Stateful renderer session used by patch() and update().
  */
 export function render(root: NativeRenderRoot, output: RenderOutput): RenderInstance {
-  getDotaRenderingLogger().debug('[dota-rendering] mounting render session', {
+  getDotaRenderingLogger().debug('Mounting render session', {
     output: isTemplateResult(output) ? 'template' : 'legacy',
     hydrationMarkers: emitDurableMarkers
   });
@@ -1278,7 +1278,7 @@ export function hydrate(
   output: RenderOutput,
   options: HydrationOptions = {}
 ): RenderInstance {
-  getDotaRenderingLogger().debug('[dota-rendering] adopting hydrated render session');
+  getDotaRenderingLogger().debug('Adopting hydrated render session');
   try {
     return new RenderSession(new NativeRoot(root), output, 'hydrate');
   } catch (error) {
@@ -1305,7 +1305,7 @@ export function setHydrationMismatchPolicy(policy: HydrationMismatchPolicy): voi
  * @param error Failure captured while adopting the serialized component output.
  */
 export function warnHydrationMismatch(error: unknown): void {
-  console.warn('[dota-rendering] hydration mismatch; re-rendering the affected component', error);
+  getDotaRenderingLogger().warn('Hydration mismatch; re-rendering the affected component', error);
 }
 
 /**
@@ -1316,7 +1316,7 @@ export function warnHydrationMismatch(error: unknown): void {
  */
 export function setHydrationEmit(enabled: boolean): void {
   emitDurableMarkers = enabled;
-  getDotaRenderingLogger().debug('[dota-rendering] durable hydration markers', enabled ? 'enabled' : 'disabled');
+  getDotaRenderingLogger().debug('Durable hydration markers', enabled ? 'enabled' : 'disabled');
 }
 
 export {html} from './template';
