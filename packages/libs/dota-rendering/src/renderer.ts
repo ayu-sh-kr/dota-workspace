@@ -15,24 +15,25 @@ import type {
   RenderOutput,
   TemplateResult
 } from './types';
+import {HYDRATION_ATTRIBUTE_PART, HYDRATION_SCOPE_ATTRIBUTE} from './template-id';
 import {
-  HYDRATION_ATTRIBUTE_PART,
-  HYDRATION_COMPONENT_ATTRIBUTE,
-  HYDRATION_SCOPE_ATTRIBUTE,
-  HYDRATION_TEMPLATE_ATTRIBUTE,
-  HYDRATION_VERSION_ATTRIBUTE,
-  MARKER_VERSION,
-  templateId
-} from './template-id';
+  attributePartToken,
+  childPartMarkers,
+  COMPONENT_ATTRIBUTE,
+  COMPONENT_END_MARKER,
+  COMPONENT_START_MARKER,
+  DYNAMIC_ATTRIBUTE,
+  HYDRATION_IDENTITY_ATTRIBUTES,
+  hydrationIdentity,
+  hydrationScope,
+  isHydrationScope,
+  keyedEntryMarkers,
+  NODE_INDEX_ATTRIBUTE
+} from './hydration-markers';
 import {getDotaRenderingLogger} from './logger';
 
-const COMPONENT_START_MARKER = '<!--dota-component-start-->';
-const COMPONENT_END_MARKER = '<!--dota-component-end-->';
-const COMPONENT_ATTRIBUTE = 'data-dota-component';
-const NODE_INDEX_ATTRIBUTE = 'data-dota-index';
 /** `Node.DOCUMENT_FRAGMENT_NODE`, without relying on a global `Node` in non-browser runtimes. */
 const DOCUMENT_FRAGMENT_NODE = 11;
-const DYNAMIC_ATTRIBUTE = 'data-dota-dynamic';
 /** Supplies a unique parser-token namespace to every mounted template strategy. */
 let templateMarkerId = 0;
 /** Supplies a unique durable marker scope to every statically rendered component. */
@@ -120,10 +121,10 @@ interface RenderRoot {
   hydrationNodes(): Node[];
   /**
    * Stamps a component host when durable build-time output is requested.
-   * @param id Static template identity used to validate later hydration.
+   * @param strings Static strings of the mounted template, which identify it for hydration.
    * @param scope Component-owned marker namespace shared by the rendered tree.
    */
-  stampHydrationIdentity(id: string, scope: string): void;
+  stampHydrationIdentity(strings: TemplateStringsArray, scope: string): void;
   /** Removes stale host identity after a hydrated template changes structure. */
   clearHydrationIdentity(): void;
 }
@@ -253,24 +254,18 @@ class NativeRoot implements RenderRoot {
 
   /**
    * Writes template identity to the light-DOM host or a shadow root's host.
-   * @param id Static template identity used to validate later hydration.
+   * @param strings Static strings of the mounted template, which identify it for hydration.
    * @param scope Component-owned marker namespace shared by the rendered tree.
    */
-  stampHydrationIdentity(id: string, scope: string): void {
+  stampHydrationIdentity(strings: TemplateStringsArray, scope: string): void {
     const host = this.root instanceof ShadowRoot ? this.root.host : this.root;
-    host.setAttribute(HYDRATION_COMPONENT_ATTRIBUTE, host.localName);
-    host.setAttribute(HYDRATION_TEMPLATE_ATTRIBUTE, id);
-    host.setAttribute(HYDRATION_VERSION_ATTRIBUTE, String(MARKER_VERSION));
-    host.setAttribute(HYDRATION_SCOPE_ATTRIBUTE, scope);
+    Object.entries(hydrationIdentity(host.localName, strings, scope)).forEach(([name, value]) => host.setAttribute(name, value));
   }
 
   /** Clears identity that no longer describes a client-replaced template. */
   clearHydrationIdentity(): void {
     const host = this.root instanceof ShadowRoot ? this.root.host : this.root;
-    host.removeAttribute(HYDRATION_COMPONENT_ATTRIBUTE);
-    host.removeAttribute(HYDRATION_TEMPLATE_ATTRIBUTE);
-    host.removeAttribute(HYDRATION_VERSION_ATTRIBUTE);
-    host.removeAttribute(HYDRATION_SCOPE_ATTRIBUTE);
+    HYDRATION_IDENTITY_ATTRIBUTES.forEach((name) => host.removeAttribute(name));
   }
 }
 
@@ -336,10 +331,10 @@ class RangeRoot implements RenderRoot {
 
   /**
    * Nested ranges do not own a component host identity.
-   * @param _id Ignored because nested ranges have no host identity.
+   * @param _strings Ignored because nested ranges have no host identity.
    * @param _scope Ignored because nested ranges reuse their parent marker scope.
    */
-  stampHydrationIdentity(_id: string, _scope: string): void {}
+  stampHydrationIdentity(_strings: TemplateStringsArray, _scope: string): void {}
 
   /** Nested ranges do not own a component host identity. */
   clearHydrationIdentity(): void {}
@@ -535,12 +530,9 @@ class TemplateStrategy implements RenderStrategy {
         const matchIndex = match.index ?? 0;
         replacement.append(text.data.slice(cursor, matchIndex));
         const index = Number(match[1]);
-        const start = emitDurableMarkers
-          ? ownerDocument.createComment(`dh:${this.hydrationScope}:p${index}`)
-          : ownerDocument.createTextNode('');
-        const end = emitDurableMarkers
-          ? ownerDocument.createComment(`/dh:${this.hydrationScope}:p${index}`)
-          : ownerDocument.createTextNode('');
+        const markers = emitDurableMarkers ? childPartMarkers(this.hydrationScope!, index) : undefined;
+        const start = markers ? ownerDocument.createComment(markers.start) : ownerDocument.createTextNode('');
+        const end = markers ? ownerDocument.createComment(markers.end) : ownerDocument.createTextNode('');
         replacement.append(start, end);
         text.parentElement?.setAttribute(DYNAMIC_ATTRIBUTE, '');
         recordRenderPart(parts, index, {kind: 'child', index, start, end});
@@ -731,12 +723,9 @@ class TemplateStrategy implements RenderStrategy {
         continue;
       }
       const ownerDocument = part.end.ownerDocument;
-      const start: PartBoundary = emitDurableMarkers
-        ? ownerDocument.createComment(`dh:${this.hydrationScope}:k${part.index}:${position}`)
-        : ownerDocument.createTextNode('');
-      const end: PartBoundary = emitDurableMarkers
-        ? ownerDocument.createComment(`/dh:${this.hydrationScope}:k${part.index}:${position}`)
-        : ownerDocument.createTextNode('');
+      const markers = emitDurableMarkers ? keyedEntryMarkers(this.hydrationScope!, part.index, position) : undefined;
+      const start: PartBoundary = markers ? ownerDocument.createComment(markers.start) : ownerDocument.createTextNode('');
+      const end: PartBoundary = markers ? ownerDocument.createComment(markers.end) : ownerDocument.createTextNode('');
       part.end.parentNode?.insertBefore(start, part.end);
       part.end.parentNode?.insertBefore(end, part.end);
       rangesByKey.set(entry.key, {start, end, instance: new RenderSession(new RangeRoot(start, end), entry.value, 'mount', this.hydrationScope)});
@@ -795,7 +784,7 @@ class TemplateStrategy implements RenderStrategy {
     const {fragment, attributeNames} = this.parseTemplate(output);
     this.partsByIndex = this.findParts(fragment, attributeNames);
     this.applyIndexes(output.values.map((_, index) => index), output.values);
-    if (emitDurableMarkers) this.root.stampHydrationIdentity(templateId(output.strings), this.hydrationScope!);
+    if (emitDurableMarkers) this.root.stampHydrationIdentity(output.strings, this.hydrationScope!);
     else this.root.clearHydrationIdentity();
     this.root.replaceChildren(fragment);
   }
@@ -821,7 +810,7 @@ class TemplateStrategy implements RenderStrategy {
     const liveElements = collectTopLevelHydrationElements(this.root.hydrationNodes(), this.hydrationScope!);
     for (const part of adoptedAttributes) {
       const nodeIndex = part.element.getAttribute(NODE_INDEX_ATTRIBUTE);
-      const markers = part.valueIndexes.map((index) => `${this.hydrationScope}:p${index}`);
+      const markers = part.valueIndexes.map((index) => attributePartToken(this.hydrationScope!, index));
       const element = liveElements.find((candidate) =>
         candidate.getAttribute(NODE_INDEX_ATTRIBUTE) === nodeIndex &&
         markers.every((marker) => candidate.getAttribute(HYDRATION_ATTRIBUTE_PART)?.split(/\s+/).includes(marker))
@@ -958,7 +947,7 @@ function recordRenderPart(parts: Map<number, RenderPart[]>, index: number, part:
  */
 function appendMarkerTokens(element: Element, attribute: string, indexes: readonly number[], scope: string): void {
   const markers = new Set(element.getAttribute(attribute)?.split(/\s+/).filter(Boolean) ?? []);
-  indexes.forEach((index) => markers.add(`${scope}:p${index}`));
+  indexes.forEach((index) => markers.add(attributePartToken(scope, index)));
   element.setAttribute(attribute, [...markers].join(' '));
 }
 
@@ -969,7 +958,7 @@ function appendMarkerTokens(element: Element, attribute: string, indexes: readon
  * @returns A unique scope while durable output is enabled, otherwise undefined.
  */
 function createHydrationScope(): string | undefined {
-  return emitDurableMarkers ? `h${hydrationScopeId++}` : undefined;
+  return emitDurableMarkers ? hydrationScope(hydrationScopeId++) : undefined;
 }
 
 /**
@@ -984,7 +973,7 @@ function readHydrationScope(root: RenderRoot): string {
   if (!(root instanceof NativeRoot)) throw new Error('Hydration scope is required for a component root');
   const host = root.root instanceof ShadowRoot ? root.root.host : root.root;
   const scope = host.getAttribute(HYDRATION_SCOPE_ATTRIBUTE);
-  if (!scope || !/^h\d+$/.test(scope)) throw new Error('Missing hydration scope');
+  if (!isHydrationScope(scope)) throw new Error('Missing hydration scope');
   return scope;
 }
 
