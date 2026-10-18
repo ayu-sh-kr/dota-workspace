@@ -12,10 +12,22 @@ const render = (props: Partial<IconsComponent> = {}) => {
 };
 afterEach(() => {
   document.body.innerHTML = '';
+  IconsComponent.baseUrl = 'https://api.iconify.design';
   vi.restoreAllMocks();
 });
 
 describe('IconsComponent', () => {
+  it('loads same-origin cached assets when the application configures a source', async () => {
+    IconsComponent.baseUrl = '/assets/icons/';
+    const fetch = vi.spyOn(window, 'fetch').mockResolvedValue(new Response('<svg><path/></svg>'));
+    const el = render({name: 'mdi:local-cache-test'});
+
+    el.onConnected();
+    await flush();
+
+    expect(el.querySelector('svg')).not.toBeNull();
+    expect(fetch).toHaveBeenCalledWith('/assets/icons/mdi:local-cache-test.svg');
+  });
   it('renders a decorative root by default and falls back invalid style tokens', () => {
     const el = render({
       name: 'mdi:home',
@@ -82,7 +94,8 @@ describe('IconsComponent', () => {
     expect(fetch).toHaveBeenCalledWith('https://api.iconify.design/mdi:network-failure-test.svg');
     expect(el.querySelector('svg')).toBeNull();
     expect(warn).toHaveBeenCalledWith(
-      '[dota-icon] Could not load "mdi:network-failure-test".',
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.* \[WARN\] \[dota-ui:components\/icon\/icons\.component\.ts\]$/),
+      'Could not load icon "mdi:network-failure-test".',
       expect.any(Error),
     );
   });
