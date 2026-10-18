@@ -1,0 +1,82 @@
+import {createReadStream} from 'node:fs';
+import {readFileSync} from 'node:fs';
+import {stat} from 'node:fs/promises';
+import {createServer, type Server} from 'node:http';
+import {extname, resolve, sep} from 'node:path';
+import {toNodeListener} from './node-listener';
+import type {RequestHandler} from './types';
+
+/** Options for {@link createNodeServer}. */
+export interface NodeServerOptions {
+  /** Answers `ssr` routes; resolves `undefined` for everything else. */
+  readonly handler: RequestHandler;
+  /** Built client directory (Vite's `outDir`), including prerendered `ssg` pages. */
+  readonly clientDirectory: string;
+  /** Shell served for unmatched paths so `csr` routes boot in the browser; defaults to `index.html`. */
+  readonly fallback?: string;
+}
+
+const CONTENT_TYPES: Record<string, string> = {
+  '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml',
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp',
+  '.avif': 'image/avif', '.ico': 'image/x-icon', '.woff': 'font/woff', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
+  '.xml': 'application/xml', '.webmanifest': 'application/manifest+json', '.map': 'application/json'
+};
+
+/**
+ * HTTP server for a built Dota application, covering all three render modes:
+ * a built file (assets and prerendered `ssg` pages, including `/path/index.html`) wins,
+ * then `ssr` routes are rendered per request, then the SPA shell answers so `csr` routes
+ * start in the browser. A client `index.html` identical to the fallback shell is never served
+ * as a page, so a server-rendered `/` is not shadowed. A render error is logged and answered with 500, never the shell,
+ * so failures stay visible. Paths never resolve outside `clientDirectory`.
+ * @returns An unstarted `http.Server`; call `listen()`.
+ */
+export function createNodeServer(options: NodeServerOptions): Server {
+  const root = resolve(options.clientDirectory);
+  const fallback = resolve(root, options.fallback ?? 'index.html');
+  const render = toNodeListener(options.handler);
+  // A client `index.html` that is still the unrendered shell is not a page: serving it would
+  // shadow a server-rendered `/`. A prerendered home page differs from the shell and is served.
+  const shell = readFileSync(fallback, 'utf8');
+  const unrenderedIndex = resolve(root, 'index.html');
+  const isShell = (file: string) => file === unrenderedIndex && file !== fallback && readFileSync(file, 'utf8') === shell;
+  const shellIndex = isShell(unrenderedIndex) ? unrenderedIndex : undefined;
+
+  return createServer(async (request, response) => {
+    try {
+      const pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname);
+      const found = request.method === 'GET' || request.method === 'HEAD' ? await findFile(root, pathname) : undefined;
+      const file = found === shellIndex ? undefined : found;
+      if (file) return sendFile(file, request.method === 'HEAD', response);
+      await render(request, response, (error?: unknown) => {
+        if (error) {
+          console.error('[dota-ssr] render failed', request.url, error);
+          return void response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
+        }
+        if (request.method !== 'GET' && request.method !== 'HEAD') return void response.writeHead(405).end();
+        sendFile(fallback, request.method === 'HEAD', response);
+      });
+    } catch {
+      if (!response.headersSent) response.writeHead(400).end();
+    }
+  });
+}
+
+/** The first existing file for a path: itself, `<path>/index.html`, then `<path>.html`. */
+async function findFile(root: string, pathname: string): Promise<string | undefined> {
+  const base = resolve(root, `.${pathname}`);
+  if (base !== root && !base.startsWith(root + sep)) return undefined;
+  for (const candidate of [base, resolve(base, 'index.html'), `${base}.html`]) {
+    const info = await stat(candidate).catch(() => undefined);
+    if (info?.isFile()) return candidate;
+  }
+  return undefined;
+}
+
+function sendFile(file: string, headOnly: boolean, response: import('node:http').ServerResponse): void {
+  response.writeHead(200, {'content-type': CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream'});
+  if (headOnly) response.end();
+  else createReadStream(file).on('error', () => response.destroy()).pipe(response);
+}
