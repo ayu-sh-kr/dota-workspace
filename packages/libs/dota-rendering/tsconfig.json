@@ -14,6 +14,7 @@
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
     "paths": {
+      "@ayu-sh-kr/dota-rendering": ["./src/main.ts"],
       "@dota/*": ["./src/*"],
       "@test/*": ["./test/*"]
     }
