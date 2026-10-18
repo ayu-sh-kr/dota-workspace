@@ -6,13 +6,17 @@ export default defineConfig({
   build: {
     target: ['chrome107', 'edge107', 'firefox104', 'safari16'],
     lib: {
-      entry: resolve(import.meta.dirname, 'src/main.ts'),
+      entry: {
+        index: resolve(import.meta.dirname, 'src/main.ts'),
+        'server/index': resolve(import.meta.dirname, 'src/server/index.ts')
+      },
       formats: ['cjs', 'es'],
-      fileName: (format) => format === 'es' ? 'index.mjs' : 'index.cjs'
+      fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`
     },
     minify: false,
     rolldownOptions: {
-      external: ['consola']
+      // The server entry imports the root by package name so both share one runtime copy and one set of types.
+      external: ['consola', '@ayu-sh-kr/dota-rendering']
     }
   },
   resolve: {
@@ -20,5 +24,10 @@ export default defineConfig({
       '@dota': resolve(import.meta.dirname, 'src')
     }
   },
-  plugins: [dts({insertTypesEntry: true, bundleTypes: true})]
+  plugins: [
+    // The root is one bundled declaration file, which Dota Wrap re-exports as `/rendering`.
+    dts({insertTypesEntry: true, bundleTypes: true, exclude: ['src/server/**']}),
+    // Server declarations stay unbundled and keep the package import, so they reuse the root's types.
+    dts({include: ['src/server/**'], entryRoot: 'src', aliasesExclude: ['@ayu-sh-kr/dota-rendering']})
+  ]
 });
