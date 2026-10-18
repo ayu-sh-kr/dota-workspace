@@ -1,5 +1,8 @@
-import {bootstrap} from '@ayu-sh-kr/dota-core';
+import {bootstrap, setMountStrategy} from '@ayu-sh-kr/dota-core';
+import {dotaHydration} from '@ayu-sh-kr/dota-ssr';
 import {COMPONENTS} from './components';
 
-// Upgrading the server-rendered hosts re-renders them from their attributes.
+// There is no router here, so only the mount-strategy socket is wired: each host
+// adopts its server-rendered DOM through the durable markers instead of re-rendering.
+dotaHydration({mismatch: 'warn'}).setup?.({setMountStrategy, wrapRouteRenderer: () => {}});
 bootstrap(COMPONENTS);
