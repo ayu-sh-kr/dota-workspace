@@ -11,7 +11,8 @@ export default defineConfig({
         'vite/index': resolve(import.meta.dirname, 'src/vite/index.ts'),
         'ssg/render-worker': resolve(import.meta.dirname, 'src/ssg/render-worker.ts'),
         'ssr/index': resolve(import.meta.dirname, 'src/ssr/index.ts'),
-        'ssr/server-element': resolve(import.meta.dirname, 'src/ssr/server-element.ts')
+        'ssr/server-globals': resolve(import.meta.dirname, 'src/ssr/server-globals.ts'),
+        'ssr/node': resolve(import.meta.dirname, 'src/ssr/node.ts')
       },
       formats: ['cjs', 'es'],
       fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`
@@ -25,6 +26,8 @@ export default defineConfig({
         '@ayu-sh-kr/dota-rendering',
         '@ayu-sh-kr/dota-router',
         '@ayu-sh-kr/dota-runtime',
+        /^@ayu-sh-kr\/dota-rendering\//,
+        /^@ayu-sh-kr\/dota-server-dom(\/.*)?$/,
         'consola',
         'happy-dom',
         'vite',
