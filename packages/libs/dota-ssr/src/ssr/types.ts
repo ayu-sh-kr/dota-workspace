@@ -1,4 +1,5 @@
 import type {DotaElementConstructor, SEO} from '@ayu-sh-kr/dota-core';
+import type {CapturedApplication} from '../application-capture';
 
 /**
  * Request-scoped services a server render exposes to components.
@@ -36,8 +37,8 @@ export interface RenderResult {
 
 /**
  * Engine boundary between request orchestration and component rendering.
- * The string adapter is the default; an engine backed by a DOM implementation,
- * streaming output, or hydration markers can replace it by honouring this contract.
+ * The string adapter is the default; an engine backed by a DOM implementation or
+ * streaming output can replace it by honouring this contract.
  */
 export interface RenderAdapter {
   /** Identifies the engine in diagnostics. */
@@ -57,6 +58,12 @@ export interface StringAdapterOptions {
   readonly components: readonly DotaElementConstructor[];
   /** Nesting limit that stops self-including components; defaults to 32. */
   readonly maxDepth?: number;
+  /**
+   * Emits Dota Rendering's durable hydration markers and the page route marker, so a
+   * client using `dotaHydration()` adopts the server DOM. Defaults to `true`; `false`
+   * produces plain HTML that the client re-renders on upgrade.
+   */
+  readonly hydration?: boolean;
 }
 
 /** Maps a URL pattern such as `/users/:id` to the page component that renders it. */
@@ -65,7 +72,12 @@ export interface PageRoute {
   readonly path: string;
   /** Custom-element selector of the page component. */
   readonly page: string;
+  /** Route-level head metadata, used when the page has no `seo` of its own. */
+  readonly seo?: SEO;
 }
+
+/** Document shell, or a function returning it per request (Vite dev transforms it per URL). */
+export type DocumentTemplate = string | ((url: URL) => string | Promise<string>);
 
 /** Options for the request handler that orchestrates a page render. */
 export interface RequestHandlerOptions {
@@ -74,10 +86,26 @@ export interface RequestHandlerOptions {
   /** Page routes checked in order; the first match wins. */
   readonly routes: readonly PageRoute[];
   /** Document shell containing the head and body outlet comments. */
-  readonly template: string;
+  readonly template: DocumentTemplate;
   /** Fetch used for component requests; defaults to the global fetch. */
   readonly fetch?: typeof fetch;
 }
 
 /** Answers a page request, or resolves `undefined` so the server can fall through. */
 export type RequestHandler = (request: Request) => Promise<Response | undefined>;
+
+/** Options for {@link ApplicationHandler}. */
+export interface ApplicationHandlerOptions {
+  /** Built `index.html` or a per-request shell; outlets are added when missing. */
+  readonly template: DocumentTemplate;
+  /** Fetch used for component requests; defaults to the global fetch. */
+  readonly fetch?: typeof fetch;
+  /** See {@link StringAdapterOptions.hydration}; defaults to `true`. */
+  readonly hydration?: boolean;
+}
+
+/** Request handler for a whole application, plus access to the captured application. */
+export type ApplicationHandler = RequestHandler & {
+  /** Captures the application on first call and returns the same result afterwards. */
+  readonly application: () => Promise<CapturedApplication>;
+};
