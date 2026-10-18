@@ -48,4 +48,18 @@ describe('applyMarkdownThemeToElement', () => {
     expect([...link.classList]).toEqual(['own', 'underline', 'text-accent']);
     expect(root.querySelector('code')!.className).toBe('hljs');
   });
+
+  it('leaves prerendered elements that already carry the theme untouched', async () => {
+    const root = document.createElement('div');
+    root.innerHTML = applyMarkdownTheme('<p>a <code>b</code></p>', theme, 'primary');
+    const writes: string[] = [];
+    new MutationObserver((records) => records.forEach((record) => writes.push(record.attributeName ?? '')))
+      .observe(root, {subtree: true, attributes: true});
+
+    applyMarkdownThemeToElement(root, theme, 'primary', {theme, color: 'primary'});
+    await Promise.resolve();
+
+    expect(writes).toEqual([]);
+    expect(root.querySelector('code')!.className).toBe('font-mono');
+  });
 });
