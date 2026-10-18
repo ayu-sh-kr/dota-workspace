@@ -59,11 +59,21 @@ class PopoverComponent extends BaseElement {
   private isOpen = false;
   private isPositionOnly = false;
   private panelId = "";
-  private content: string;
+  private content: string | undefined;
 
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
+  }
+
+  /**
+   * Captures the authored trigger and panel markup before the first mount.
+   * Reading it here rather than in the constructor also works where children are not yet
+   * visible during element upgrade (as in happy-dom prerendering).
+   */
+  connectedCallback() {
+    this.content ??= this.innerHTML;
+    super.connectedCallback();
   }
 
   @OnEvent(LifecycleEventConstants.CONNECTED, true)
@@ -93,7 +103,7 @@ class PopoverComponent extends BaseElement {
   private initializePopover() {
     this.stopAutoUpdate();
     this.panel = this.resolvePanel();
-    this.isPositionOnly = !this.content.trim();
+    this.isPositionOnly = !this.content?.trim();
 
     if (!this.panel) return;
 
@@ -234,7 +244,7 @@ class PopoverComponent extends BaseElement {
   }
 
   render(): string {
-    return this.content;
+    return this.content ?? "";
   }
 }
 
