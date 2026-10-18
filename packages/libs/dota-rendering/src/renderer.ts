@@ -36,6 +36,10 @@ import {getDotaRenderingLogger} from './logger';
 const DOCUMENT_FRAGMENT_NODE = 11;
 /** Supplies a unique parser-token namespace to every mounted template strategy. */
 let templateMarkerId = 0;
+/** Supplies a unique parser-token namespace to every cached template parse. */
+let parsedTemplateId = 0;
+/** Pristine parses shared by every mount of one template in one document; mounts clone them. */
+const PARSED_TEMPLATES = new WeakMap<Document, WeakMap<TemplateStringsArray, CachedTemplate>>();
 /** Supplies a unique durable marker scope to every statically rendered component. */
 let hydrationScopeId = 0;
 /** Enables serialization-safe boundaries only while the build-time renderer is active. */
@@ -70,6 +74,22 @@ type ParsedTemplate = {
   fragment: DocumentFragment;
   /** Original attribute names keyed by the neutral placeholders in the fragment. */
   attributeNames: ReadonlyMap<string, string>;
+};
+
+/** One template's parse, retained untouched so later mounts skip the HTML parser. */
+type CachedTemplate = ParsedTemplate & {
+  /** Parser-token prefix written into the cached fragment. */
+  markerPrefix: string;
+  /** Finds interpolation indexes written with {@link markerPrefix}. */
+  markerPattern: RegExp;
+};
+
+/** Parsed durable marker kinds that delimit ranges owned by one component scope. */
+type HydrationMarkerMatchers = {
+  childStart: RegExp;
+  childEnd: RegExp;
+  keyedStart: RegExp;
+  keyedEnd: RegExp;
 };
 
 /** Paired durable child boundaries recovered from one component-owned marker scope. */
@@ -117,6 +137,11 @@ interface RenderRoot {
    * @param value Complete trusted legacy render string.
    */
   writeHTML(value: string): void;
+  /**
+   * Reports whether the boundary already holds exactly this serialized markup.
+   * @param value Complete trusted legacy render string.
+   */
+  hasHTML(value: string): boolean;
   /** Returns element and comment descendants in document order for marker adoption. */
   hydrationNodes(): Node[];
   /**
@@ -247,6 +272,11 @@ class NativeRoot implements RenderRoot {
     this.root.innerHTML = value;
   }
 
+  /** Compares against the root's current serialization; an empty root never matches. */
+  hasHTML(value: string): boolean {
+    return this.root.firstChild !== null && this.root.innerHTML === value;
+  }
+
   /** Collects marker-bearing descendants without including the root host itself. */
   hydrationNodes(): Node[] {
     return collectDescendants(this.root);
@@ -308,6 +338,11 @@ class RangeRoot implements RenderRoot {
     this.replaceChildren(template.content);
   }
 
+  /** Nested ranges always rewrite; their markup is not serialized as one string. */
+  hasHTML(_value: string): boolean {
+    return false;
+  }
+
   /** Removes every owned sibling while retaining stable start and end boundaries. */
   clear(): void {
     let node = this.start.nextSibling;
@@ -353,7 +388,10 @@ class StringStrategy implements RenderStrategy {
    */
   constructor(private readonly root: RenderRoot, output: LegacyRenderOutput) {
     this.output = output;
-    root.writeHTML(typeof output === 'string' ? output : '');
+    const markup = typeof output === 'string' ? output : '';
+    // Server-rendered light DOM that already matches is kept, so its nodes, and parts bound
+    // to them by an ancestor's hydration, survive the component's first mount.
+    if (!root.hasHTML(markup)) root.writeHTML(markup);
   }
 
   /**
@@ -437,10 +475,10 @@ class RenderSession implements RenderInstance {
 class TemplateStrategy implements RenderStrategy {
   /** Runtime mutation targets grouped by the values that can schedule them. */
   private partsByIndex = new Map<number, RenderPart[]>();
-  /** Mount-local token prevents authored text from colliding with interpolation markers. */
+  /** Mount-local token keeps element locators unique across every mounted template. */
   private readonly markerPrefix = `dota-render-${templateMarkerId++}-value-`;
-  /** Finds interpolation indexes created by this strategy's private marker prefix. */
-  private readonly markerPattern = new RegExp(`${this.markerPrefix}(\\d+)`, 'g');
+  /** Finds interpolation indexes in the parse currently being indexed or patched. */
+  private markerPattern = new RegExp(`${this.markerPrefix}(\\d+)`, 'g');
 
   /** Last committed structured output used by diff() as the patch baseline. */
   public output: TemplateResult;
@@ -807,21 +845,30 @@ class TemplateStrategy implements RenderStrategy {
       }
     }
 
-    const liveElements = collectTopLevelHydrationElements(this.root.hydrationNodes(), this.hydrationScope!);
+    const hydrationNodes = this.root.hydrationNodes();
+    const liveElementsByIndex = new Map<string | null, Element[]>();
+    for (const element of collectTopLevelHydrationElements(hydrationNodes, this.hydrationScope!)) {
+      const nodeIndex = element.getAttribute(NODE_INDEX_ATTRIBUTE);
+      const candidates = liveElementsByIndex.get(nodeIndex);
+      if (candidates) candidates.push(element);
+      else liveElementsByIndex.set(nodeIndex, [element]);
+    }
     for (const part of adoptedAttributes) {
       const nodeIndex = part.element.getAttribute(NODE_INDEX_ATTRIBUTE);
       const markers = part.valueIndexes.map((index) => attributePartToken(this.hydrationScope!, index));
-      const element = liveElements.find((candidate) =>
-        candidate.getAttribute(NODE_INDEX_ATTRIBUTE) === nodeIndex &&
-        markers.every((marker) => candidate.getAttribute(HYDRATION_ATTRIBUTE_PART)?.split(/\s+/).includes(marker))
-      );
+      const element = liveElementsByIndex.get(nodeIndex)?.find((candidate) => {
+        const tokens = candidate.getAttribute(HYDRATION_ATTRIBUTE_PART)?.split(/\s+/) ?? [];
+        return markers.every((marker) => tokens.includes(marker));
+      });
       if (!element) throw new Error(`Missing hydration attribute markers for part ${markers.join(', ')}`);
 
       part.element = element;
+      // The server wrote its own locator; re-resolving a replaced element must search for that one.
+      part.locator = element.getAttribute(DYNAMIC_ATTRIBUTE) ?? part.locator;
       part.valueIndexes.forEach((index) => recordRenderPart(adoptedParts, index, part));
     }
 
-    for (const {index, start, end} of collectHydrationChildParts(this.root.hydrationNodes(), this.hydrationScope!)) {
+    for (const {index, start, end} of collectHydrationChildParts(hydrationNodes, this.hydrationScope!)) {
       const part: ChildPart = {kind: 'child', index, start, end};
       this.adoptChildRepresentation(part, output.values[index]);
       recordRenderPart(adoptedParts, index, part);
@@ -843,43 +890,19 @@ class TemplateStrategy implements RenderStrategy {
    * @throws Error when a dynamic attribute value is not enclosed in quotes.
    */
   private parseTemplate(output: TemplateResult): ParsedTemplate {
-    const template = this.root.ownerDocument.createElement('template');
-    const source = [COMPONENT_START_MARKER];
-    output.strings.forEach((staticSegment, index) => {
-      source.push(staticSegment);
-      if (index < output.strings.length - 1) source.push(`${this.markerPrefix}${index}`);
-    });
-    source.push(COMPONENT_END_MARKER);
-
-    const attributeNames = new Map<string, string>();
-    const quotedAttributePattern = new RegExp(
-      `([^\\s"'<>/=]+)(\\s*=\\s*)(?:"([^"]*${this.markerPrefix}\\d+[^"]*)"|'([^']*${this.markerPrefix}\\d+[^']*)')`,
-      'g'
-    );
-    const templateSource = source.join('').replace(
-      quotedAttributePattern,
-      (match, name: string, assignment: string, doubleQuotedValue: string | undefined,
-        singleQuotedValue: string | undefined, offset: number, complete: string) => {
-        if (complete.lastIndexOf('<', offset) < complete.lastIndexOf('>', offset)) return match;
-        const placeholder = `data-dota-attribute-${this.markerPrefix}${attributeNames.size}`;
-        attributeNames.set(placeholder, name);
-        const quote = doubleQuotedValue === undefined ? "'" : '"';
-        return `${placeholder}${assignment}${quote}${doubleQuotedValue ?? singleQuotedValue}${quote}`;
-      }
-    );
-    const unquotedAttributePattern = new RegExp(
-      `([^\\s"'<>/=]+)\\s*=\\s*[^\\s"'<>]*${this.markerPrefix}\\d+[^\\s"'<>]*`,
-      'g'
-    );
-    for (const match of templateSource.matchAll(unquotedAttributePattern)) {
-      const offset = match.index;
-      if (templateSource.lastIndexOf('<', offset) > templateSource.lastIndexOf('>', offset)) {
-        throw new Error(`Dynamic attribute "${match[1]}" must use a quoted value`);
-      }
+    const ownerDocument = this.root.ownerDocument;
+    let documentTemplates = PARSED_TEMPLATES.get(ownerDocument);
+    if (!documentTemplates) {
+      documentTemplates = new WeakMap();
+      PARSED_TEMPLATES.set(ownerDocument, documentTemplates);
     }
-
-    template.innerHTML = templateSource;
-    return {fragment: template.content, attributeNames};
+    let cached = documentTemplates.get(output.strings);
+    if (!cached) {
+      cached = parseTemplateSource(ownerDocument, output.strings, `dota-template-${parsedTemplateId++}-value-`);
+      documentTemplates.set(output.strings, cached);
+    }
+    this.markerPattern = cached.markerPattern;
+    return {fragment: cached.fragment.cloneNode(true) as DocumentFragment, attributeNames: cached.attributeNames};
   }
 
   /**
@@ -920,6 +943,55 @@ class TemplateStrategy implements RenderStrategy {
     if (ownedNodes.length === 1 && ownedNodes[0] instanceof Text) part.text = ownedNodes[0];
     else if (ownedNodes.length > 0) throw new Error(`Invalid hydration text range for part p${part.index}`);
   }
+}
+
+/**
+ * Parses one template's static strings with neutral placeholders for dynamic attributes.
+ * The result is cached and cloned per mount, so it must not be mutated by its callers.
+ * @param ownerDocument Document whose parser and nodes the cached fragment uses.
+ * @param strings Static strings whose structure is parsed.
+ * @param markerPrefix Parser-token prefix unique to this cached parse.
+ * @returns Pristine fragment, placeholder-to-attribute mapping, and its marker pattern.
+ * @throws Error when a dynamic attribute value is not enclosed in quotes.
+ */
+function parseTemplateSource(ownerDocument: Document, strings: TemplateStringsArray, markerPrefix: string): CachedTemplate {
+  const template = ownerDocument.createElement('template');
+  const source = [COMPONENT_START_MARKER];
+  strings.forEach((staticSegment, index) => {
+    source.push(staticSegment);
+    if (index < strings.length - 1) source.push(`${markerPrefix}${index}`);
+  });
+  source.push(COMPONENT_END_MARKER);
+
+  const attributeNames = new Map<string, string>();
+  const quotedAttributePattern = new RegExp(
+    `([^\\s"'<>/=]+)(\\s*=\\s*)(?:"([^"]*${markerPrefix}\\d+[^"]*)"|'([^']*${markerPrefix}\\d+[^']*)')`,
+    'g'
+  );
+  const templateSource = source.join('').replace(
+    quotedAttributePattern,
+    (match, name: string, assignment: string, doubleQuotedValue: string | undefined,
+      singleQuotedValue: string | undefined, offset: number, complete: string) => {
+      if (complete.lastIndexOf('<', offset) < complete.lastIndexOf('>', offset)) return match;
+      const placeholder = `data-dota-attribute-${markerPrefix}${attributeNames.size}`;
+      attributeNames.set(placeholder, name);
+      const quote = doubleQuotedValue === undefined ? "'" : '"';
+      return `${placeholder}${assignment}${quote}${doubleQuotedValue ?? singleQuotedValue}${quote}`;
+    }
+  );
+  const unquotedAttributePattern = new RegExp(
+    `([^\\s"'<>/=]+)\\s*=\\s*[^\\s"'<>]*${markerPrefix}\\d+[^\\s"'<>]*`,
+    'g'
+  );
+  for (const match of templateSource.matchAll(unquotedAttributePattern)) {
+    const offset = match.index;
+    if (templateSource.lastIndexOf('<', offset) > templateSource.lastIndexOf('>', offset)) {
+      throw new Error(`Dynamic attribute "${match[1]}" must use a quoted value`);
+    }
+  }
+
+  template.innerHTML = templateSource;
+  return {fragment: template.content, attributeNames, markerPattern: new RegExp(`${markerPrefix}(\\d+)`, 'g'), markerPrefix};
 }
 
 /**
@@ -977,6 +1049,28 @@ function readHydrationScope(root: RenderRoot): string {
   return scope;
 }
 
+/** Compiled marker patterns per scope; hydration tests every comment against all four. */
+const HYDRATION_MARKER_MATCHERS = new Map<string, HydrationMarkerMatchers>();
+
+/**
+ * Compiles, once per scope, the patterns that recognize its durable range boundaries.
+ * @param scope Marker namespace stamped on the component currently hydrating.
+ * @returns Anchored patterns for child and keyed start and end comments.
+ */
+function hydrationMarkerMatchers(scope: string): HydrationMarkerMatchers {
+  let matchers = HYDRATION_MARKER_MATCHERS.get(scope);
+  if (!matchers) {
+    matchers = {
+      childStart: new RegExp(`^dh:${scope}:p(\\d+)$`),
+      childEnd: new RegExp(`^/dh:${scope}:p(\\d+)$`),
+      keyedStart: new RegExp(`^dh:${scope}:k(\\d+):(\\d+)$`),
+      keyedEnd: new RegExp(`^/dh:${scope}:k(\\d+):(\\d+)$`)
+    };
+    HYDRATION_MARKER_MATCHERS.set(scope, matchers);
+  }
+  return matchers;
+}
+
 /**
  * Parses one component-owned child start boundary without accepting nested scopes.
  * @param marker Durable comment text encountered during DOM traversal.
@@ -984,7 +1078,7 @@ function readHydrationScope(root: RenderRoot): string {
  * @returns The child interpolation index, or undefined when the marker belongs elsewhere.
  */
 function parseHydrationChildStart(marker: string, scope: string): number | undefined {
-  const match = marker.match(new RegExp(`^dh:${scope}:p(\\d+)$`));
+  const match = marker.match(hydrationMarkerMatchers(scope).childStart);
   return match ? Number(match[1]) : undefined;
 }
 
@@ -995,7 +1089,7 @@ function parseHydrationChildStart(marker: string, scope: string): number | undef
  * @returns The child interpolation index, or undefined when the marker belongs elsewhere.
  */
 function parseHydrationChildEnd(marker: string, scope: string): number | undefined {
-  const match = marker.match(new RegExp(`^/dh:${scope}:p(\\d+)$`));
+  const match = marker.match(hydrationMarkerMatchers(scope).childEnd);
   return match ? Number(match[1]) : undefined;
 }
 
@@ -1006,7 +1100,7 @@ function parseHydrationChildEnd(marker: string, scope: string): number | undefin
  * @returns The keyed range address, or undefined when the marker belongs elsewhere.
  */
 function parseHydrationKeyedStart(marker: string, scope: string): HydrationKeyedAddress | undefined {
-  const match = marker.match(new RegExp(`^dh:${scope}:k(\\d+):(\\d+)$`));
+  const match = marker.match(hydrationMarkerMatchers(scope).keyedStart);
   return match ? {partIndex: Number(match[1]), position: Number(match[2])} : undefined;
 }
 
@@ -1017,7 +1111,7 @@ function parseHydrationKeyedStart(marker: string, scope: string): HydrationKeyed
  * @returns The keyed range address, or undefined when the marker belongs elsewhere.
  */
 function parseHydrationKeyedEnd(marker: string, scope: string): HydrationKeyedAddress | undefined {
-  const match = marker.match(new RegExp(`^/dh:${scope}:k(\\d+):(\\d+)$`));
+  const match = marker.match(hydrationMarkerMatchers(scope).keyedEnd);
   return match ? {partIndex: Number(match[1]), position: Number(match[2])} : undefined;
 }
 
