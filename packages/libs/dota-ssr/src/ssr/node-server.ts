@@ -3,6 +3,8 @@ import {readFileSync} from 'node:fs';
 import {stat} from 'node:fs/promises';
 import {createServer, type Server} from 'node:http';
 import {extname, resolve, sep} from 'node:path';
+import type {AddressInfo} from 'node:net';
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
 import {toNodeListener} from './node-listener';
 import type {RequestHandler} from './types';
 
@@ -23,6 +25,7 @@ const CONTENT_TYPES: Record<string, string> = {
   '.avif': 'image/avif', '.ico': 'image/x-icon', '.woff': 'font/woff', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml', '.webmanifest': 'application/manifest+json', '.map': 'application/json'
 };
+const logger = createDotaLogger('dota-ssr', 'ssr/node-server.ts');
 
 /**
  * HTTP server for a built Dota application, covering all three render modes:
@@ -44,7 +47,7 @@ export function createNodeServer(options: NodeServerOptions): Server {
   const isShell = (file: string) => file === unrenderedIndex && file !== fallback && readFileSync(file, 'utf8') === shell;
   const shellIndex = isShell(unrenderedIndex) ? unrenderedIndex : undefined;
 
-  return createServer(async (request, response) => {
+  const server = createServer(async (request, response) => {
     try {
       const pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname);
       const found = request.method === 'GET' || request.method === 'HEAD' ? await findFile(root, pathname) : undefined;
@@ -52,7 +55,7 @@ export function createNodeServer(options: NodeServerOptions): Server {
       if (file) return sendFile(file, request.method === 'HEAD', response);
       await render(request, response, (error?: unknown) => {
         if (error) {
-          console.error('[dota-ssr] render failed', request.url, error);
+          logger.error(`Render failed for ${request.url ?? '/'}`, error);
           return void response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
         }
         if (request.method !== 'GET' && request.method !== 'HEAD') return void response.writeHead(405).end();
@@ -62,6 +65,11 @@ export function createNodeServer(options: NodeServerOptions): Server {
       if (!response.headersSent) response.writeHead(400).end();
     }
   });
+  server.on('listening', () => {
+    logger.info(`SSR server listening on ${listeningUrl(server.address())}`);
+    logger.debug(`Serving client files from ${root} with fallback ${fallback}`);
+  });
+  return server;
 }
 
 /** The first existing file for a path: itself, `<path>/index.html`, then `<path>.html`. */
@@ -79,4 +87,15 @@ function sendFile(file: string, headOnly: boolean, response: import('node:http')
   response.writeHead(200, {'content-type': CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream'});
   if (headOnly) response.end();
   else createReadStream(file).on('error', () => response.destroy()).pipe(response);
+}
+
+/**
+ * Formats a listening address as a URL a terminal can open; wildcard hosts become `localhost`.
+ * @param address Value of `server.address()`: a TCP address, a pipe path, or `null`.
+ */
+export function listeningUrl(address: AddressInfo | string | null): string {
+  if (!address || typeof address === 'string') return address ?? 'an unknown address';
+  const wildcard = address.address === '::' || address.address === '0.0.0.0';
+  const host = wildcard ? 'localhost' : address.family === 'IPv6' ? `[${address.address}]` : address.address;
+  return `http://${host}:${address.port}`;
 }
