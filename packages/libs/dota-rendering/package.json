@@ -23,6 +23,13 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
       "default": "./dist/index.mjs"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "module": "./dist/server/index.mjs",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.cjs",
+      "default": "./dist/server/index.mjs"
     }
   },
   "files": [
