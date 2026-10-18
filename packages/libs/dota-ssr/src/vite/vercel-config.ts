@@ -13,14 +13,16 @@ type VercelRedirect = {
 };
 
 /** Parsed Vercel configuration whose unrelated settings must survive SSG updates. */
-type VercelConfig = {
+export type VercelConfig = {
   /** Existing redirect entries, validated as an array before generated entries are merged. */
   redirects?: unknown;
+  /** Existing rewrite entries; SSR rewrites are merged ahead of them. */
+  rewrites?: unknown;
   [key: string]: unknown;
 };
 
 /** Vercel configuration file and the text already read while locating it. */
-type VercelConfigSource = {
+export type VercelConfigSource = {
   /** Absolute file path used for parse errors and the conditional write. */
   file: string;
   /** Current JSON text used to avoid a second read and unnecessary writes. */
@@ -91,7 +93,7 @@ export function createVercelRedirects(routes: readonly ResolvedDotaSsgRoute[]): 
  * @returns The resolved configuration file and its current text.
  * @throws Error when discovery reaches the filesystem root without a `vercel.json` file.
  */
-async function readVercelConfigSource(root: string, configuredFile?: string): Promise<VercelConfigSource> {
+export async function readVercelConfigSource(root: string, configuredFile?: string): Promise<VercelConfigSource> {
   if (configuredFile) {
     const file = isAbsolute(configuredFile) ? configuredFile : resolve(root, configuredFile);
     return {file, text: await readFile(file, 'utf8')};
@@ -123,7 +125,7 @@ async function readVercelConfigSource(root: string, configuredFile?: string): Pr
  * @returns Parsed configuration ready for generated redirect replacement.
  * @throws Error when JSON is invalid or does not contain an object.
  */
-function parseVercelConfig(text: string, configFile: string): VercelConfig {
+export function parseVercelConfig(text: string, configFile: string): VercelConfig {
   try {
     const config = JSON.parse(text) as unknown;
     if (!config || typeof config !== 'object' || Array.isArray(config)) {
