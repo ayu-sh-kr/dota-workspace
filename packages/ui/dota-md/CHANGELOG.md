@@ -1,5 +1,16 @@
 # @ayu-sh-kr/dota-md
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+- Updated dependencies [d485d33]
+  - @ayu-sh-kr/dota-rendering@0.2.0
+  - @ayu-sh-kr/dota-core@1.12.0
+  - @ayu-sh-kr/dota-web-type-json@0.0.21
+
 ## 0.2.2
 
 ### Patch Changes
