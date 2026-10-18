@@ -41,6 +41,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@ayu-sh-kr/dota-common-utils": "workspace:*",
     "@ayu-sh-kr/dota-core": "workspace:*",
     "reflect-metadata": "catalog:"
   },
