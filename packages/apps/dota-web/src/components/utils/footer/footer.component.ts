@@ -18,7 +18,10 @@ export class FooterComponent extends BaseElement {
           <div class="layout-card-grid">
             <!-- Logo and Copyright -->
             <div>
-              <h1 class="text-3xl font-semibold text-foreground text-start">Dota</h1>
+              <a href="/" class="inline-flex items-center gap-1 text-3xl font-semibold text-foreground hover:text-primary transition-colors">
+                <span class="app-footer-symbol" aria-hidden="true"></span>
+                Dota
+              </a>
             </div>
 
             <!-- Overview -->
