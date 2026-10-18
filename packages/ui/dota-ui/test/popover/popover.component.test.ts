@@ -154,6 +154,9 @@ describe('PopoverComponent', () => {
     invalid.onConnected();
 
     expect(floatingUiMocks.autoUpdate).toHaveBeenCalledTimes(autoUpdateCallsBeforeInvalidSelector);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Invalid anchored-selector'));
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}T.* \[WARN\] \[dota-ui:components\/popover\/popover\.component\.ts\]$/),
+      expect.stringContaining('Invalid anchored-selector')
+    );
   });
 });
