@@ -53,13 +53,11 @@ export default defineConfig({
     dotaWebTypeJson({
       root: resolve(import.meta.dirname),
       outFile: 'web-types.json',
-      logType: 'info'
     }),
     eventMapGenerator({
       root: resolve(import.meta.dirname),
       outFile: 'src/event-map.d.ts',
       moduleSpecifier: '@ayu-sh-kr/dota-event',
-      logType: 'info',
     }),
   ]
 })
