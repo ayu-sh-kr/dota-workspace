@@ -195,6 +195,7 @@ Optional follow-ups are reusable render realms, route-specific component bundles
 - [Current source layout](../architecture/source-layout.md)
 - [SSG build performance audit and implemented optimizations](ssg-build-performance-audit.md)
 - [Initial route hydration roadmap](initial-route-hydration-roadmap.md)
+- [Request-time render benchmark: prebuilt server bundle, warm workers, and the `reflect-metadata` leak](../performance/ssr-request-render-benchmark-2026-10-15.md)
 - [Dota Wrap SSR and Vite composition](../../dota-wrap/configuration/ssr-and-vite-plugin-composition.md)
 - [Hydration and SSR lifecycle audit](../../../../standards/audits/hydration-ssr-lifecycle-consistency-audit.md)
 
