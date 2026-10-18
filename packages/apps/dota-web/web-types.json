@@ -74,7 +74,7 @@
           "name": "app-error",
           "source": {
             "file": "./src/pages/error.page.ts",
-            "offset": 369
+            "offset": 382
           },
           "attributes": [
             {
@@ -85,7 +85,7 @@
               },
               "source": {
                 "file": "./src/pages/error.page.ts",
-                "offset": 513
+                "offset": 526
               }
             },
             {
@@ -96,7 +96,7 @@
               },
               "source": {
                 "file": "./src/pages/error.page.ts",
-                "offset": 450
+                "offset": 463
               }
             },
             {
@@ -108,7 +108,7 @@
               },
               "source": {
                 "file": "./src/pages/error.page.ts",
-                "offset": 578
+                "offset": 591
               }
             }
           ],
@@ -119,7 +119,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/pages/error.page.ts",
-                  "offset": 513
+                  "offset": 526
                 }
               },
               {
@@ -127,7 +127,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/pages/error.page.ts",
-                  "offset": 450
+                  "offset": 463
                 }
               },
               {
@@ -136,7 +136,7 @@
                 "default": "404",
                 "source": {
                   "file": "./src/pages/error.page.ts",
-                  "offset": 578
+                  "offset": 591
                 }
               }
             ]
@@ -743,7 +743,7 @@
           "name": "blog-content",
           "source": {
             "file": "./src/pages/blog-content.page.ts",
-            "offset": 509
+            "offset": 522
           },
           "attributes": [],
           "js": {
@@ -786,7 +786,7 @@
           "name": "blog-page",
           "source": {
             "file": "./src/pages/blog.page.ts",
-            "offset": 252
+            "offset": 254
           },
           "attributes": [],
           "js": {
@@ -1321,7 +1321,7 @@
           "name": "chat-page",
           "source": {
             "file": "./src/pages/chat.page.ts",
-            "offset": 422
+            "offset": 435
           },
           "attributes": [],
           "js": {
@@ -1656,7 +1656,7 @@
           "name": "community-page",
           "source": {
             "file": "./src/pages/community.page.ts",
-            "offset": 347
+            "offset": 349
           },
           "attributes": [],
           "js": {
@@ -2154,7 +2154,7 @@
           "name": "docs-index-page",
           "source": {
             "file": "./src/pages/docs.page.ts",
-            "offset": 1378
+            "offset": 1380
           },
           "attributes": [],
           "js": {
@@ -4053,7 +4053,7 @@
           "name": "home-page",
           "source": {
             "file": "./src/pages/home/home.page.ts",
-            "offset": 414
+            "offset": 416
           },
           "attributes": [],
           "js": {
@@ -4768,7 +4768,7 @@
           "name": "resource-page",
           "source": {
             "file": "./src/pages/resource.page.ts",
-            "offset": 292
+            "offset": 305
           },
           "attributes": [],
           "js": {
