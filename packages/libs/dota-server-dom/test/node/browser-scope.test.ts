@@ -35,6 +35,19 @@ describe('runInBrowserScope', () => {
     expect(fast).toEqual(['/fast', '/fast', '/fast', 1, 1]);
   });
 
+  it('shadows Node web storage during a render and restores it afterwards', async () => {
+    const before = Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage');
+
+    const stored = await runInBrowserScope(new URL('http://localhost/'), async () => {
+      sessionStorage.setItem('key', 'value');
+      localStorage.setItem('key', 'value');
+      return [sessionStorage.length, localStorage.length];
+    });
+
+    expect(stored).toEqual([1, 1]);
+    expect(Object.getOwnPropertyDescriptor(globalThis, 'sessionStorage')).toEqual(before);
+  });
+
   it('keeps globals installed until the last overlapping scope ends', async () => {
     let releaseOuter!: () => void;
     const outer = runInBrowserScope(new URL('http://localhost/outer'), () => new Promise<void>((resolve) => releaseOuter = resolve));
