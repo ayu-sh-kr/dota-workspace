@@ -1,4 +1,5 @@
 import type {LogType} from 'consola';
+import {resolveDotaLogType} from '@ayu-sh-kr/dota-common-utils';
 import type {Plugin} from 'vite';
 import dotaVitePreloader from '../preloader-plugin';
 import eventMapGenerator, {type EventMapGeneratorPluginConfig} from '../event-map-generator';
@@ -6,13 +7,13 @@ import dotaWebTypeJson, {type WebTypeJsonPluginConfig} from '../web-type-json';
 import dotaSsg, {dotaSsr, type DotaServerTarget, type DotaSsgOptions, type DotaSsrOptions} from '../ssg';
 
 /** Options forwarded to the wrapped Dota preloader plugin. */
-export type DotaVitePreloaderOptions = Record<string, never>;
+export type DotaVitePreloaderOptions = {logType?: LogType};
 
 /** Options forwarded to the wrapped event-map generator. */
-export type DotaEventMapOptions = Omit<EventMapGeneratorPluginConfig, 'root' | 'scanRoots' | 'logType'>;
+export type DotaEventMapOptions = Omit<EventMapGeneratorPluginConfig, 'root' | 'scanRoots'>;
 
 /** Options forwarded to the wrapped Web Types generator. */
-export type DotaWebTypesOptions = Omit<WebTypeJsonPluginConfig, 'root' | 'scanRoots' | 'logType'>;
+export type DotaWebTypesOptions = Omit<WebTypeJsonPluginConfig, 'root' | 'scanRoots'>;
 
 /**
  * Coordinates the Dota Vite plugins while leaving each plugin's nested options
@@ -25,6 +26,8 @@ export type DotaVitePluginsOptions = {
   scanRoots?: string[];
   /** Default log level applied unless a nested plugin overrides it. */
   logType?: LogType;
+  /** Package-specific defaults, keyed by package slug such as `dota-ssr`. */
+  packageLogTypes?: Record<string, LogType>;
   /** Preloader options, or `false` to omit the default preloader. */
   preloader?: DotaVitePreloaderOptions | false;
   /** Event-map options, or `false` to omit event-map generation. */
@@ -58,13 +61,12 @@ export type DotaVitePluginsOptions = {
 export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] {
   const root = options.root ?? process.cwd();
   const scanRoots = options.scanRoots ?? [root];
-  const logType = options.logType ?? 'info';
   const plugins: Plugin[] = [];
 
   if (options.preloader !== false) {
     plugins.push(dotaVitePreloader({
       root,
-      logType,
+      logType: resolveDotaLogType('dota-vite-preloader', options.preloader?.logType, options.logType, options.packageLogTypes?.['dota-vite-preloader']),
       ...options.preloader,
     }));
   }
@@ -73,7 +75,7 @@ export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] 
     plugins.push(eventMapGenerator({
       root,
       scanRoots,
-      logType,
+      logType: resolveDotaLogType('dota-event-map-generator', options.eventMap?.logType, options.logType, options.packageLogTypes?.['dota-event-map-generator']),
       moduleSpecifier: '@ayu-sh-kr/dota-wrap/event',
       ...options.eventMap,
     }));
@@ -83,7 +85,7 @@ export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] 
     plugins.push(dotaWebTypeJson({
       root,
       scanRoots,
-      logType,
+      logType: resolveDotaLogType('dota-web-type-json', options.webTypes?.logType, options.logType, options.packageLogTypes?.['dota-web-type-json']),
       ...options.webTypes,
     }));
   }
@@ -91,7 +93,7 @@ export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] 
   if (options.ssg !== false && options.ssg !== undefined) {
     plugins.push(dotaSsg({
       root,
-      logType,
+      logType: resolveDotaLogType('dota-ssr', options.ssg.logType, options.logType, options.packageLogTypes?.['dota-ssr']),
       ...(options.deployment && options.deployment !== 'node' ? {deployment: options.deployment} : {}),
       ...options.ssg,
     }));
@@ -100,7 +102,7 @@ export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] 
   if (options.ssr !== false) {
     plugins.push(dotaSsr({
       root,
-      logType,
+      logType: resolveDotaLogType('dota-ssr', options.ssr?.logType, options.logType, options.packageLogTypes?.['dota-ssr']),
       deployment: options.deployment ?? ssgDeploymentTarget(options.ssg),
       ...options.ssr,
     }));
