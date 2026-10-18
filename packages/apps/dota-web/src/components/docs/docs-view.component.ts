@@ -162,7 +162,7 @@ export class DocsViewComponent extends BaseElement {
         </header>
 
         <div class="mx-auto grid max-w-screen-2xl lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[15rem_minmax(0,1fr)_14rem]">
-          <aside class="sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-gray-200 px-4 py-8 lg:block dark:border-gray-800">
+          <aside class="no-scrollbar sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-gray-200 px-4 py-8 lg:block dark:border-gray-800" tabindex="0" aria-label="Documentation navigation">
             ${this.renderNav()}
           </aside>
 
@@ -182,7 +182,7 @@ export class DocsViewComponent extends BaseElement {
           </main>
 
           <md-toc header-height="72" color="indigo"
-                  container-class="sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto py-4 xl:flex xl:flex-col"></md-toc>
+                  container-class="no-scrollbar sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto py-4 xl:flex xl:flex-col"></md-toc>
         </div>
       </div>
     `;
