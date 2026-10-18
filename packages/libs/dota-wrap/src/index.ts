@@ -12,13 +12,17 @@ import {
   createRouteRenderer,
 } from '@ayu-sh-kr/dota-router';
 import {getApplicationCaptureHook} from '@ayu-sh-kr/dota-ssr';
+import {configureDotaLogging, createDotaLogger, type DotaLoggingOptions} from '@ayu-sh-kr/dota-common-utils';
 import type {DotaRuntimeContext, DotaRuntimePlugin} from './runtime-plugin';
+
+const logger = createDotaLogger('dota-wrap', 'index.ts');
 
 export * from './core';
 export * from './event';
 export * from './rest';
 export * from './router';
 export * from './runtime-plugin';
+export {configureDotaLogging, createDotaLogger, DotaLogType, resolveDotaLogType, type DotaLoggingOptions} from '@ayu-sh-kr/dota-common-utils';
 
 /** Export map returned by eager or lazily imported application modules. */
 export type AnyModule = Record<string, unknown>;
@@ -29,6 +33,8 @@ export type AnyModule = Record<string, unknown>;
  * component registration, default mount, and route-rendering behavior.
  */
 export type AppConfig = {
+  /** Runtime logging defaults for all Dota packages and individual package overrides. */
+  logging?: DotaLoggingOptions;
   /** Component modules or already resolved constructors registered by Dota Core. */
   modules: Record<string, unknown> | DotaElementConstructor[];
   /** Additional constructors supplied by external UI packages. */
@@ -162,6 +168,7 @@ export async function initializeApp(config: AppConfig): Promise<{
   components: ComponentClass[],
   routerService: RouterService<Router<HTMLElement>>
 }> {
+  if (config.logging) configureDotaLogging(config.logging);
   // A server loading this entry (Dota SSR) receives the configuration instead; the
   // application never starts there, so browser-only startup code never runs.
   const captureHook = getApplicationCaptureHook();
@@ -202,7 +209,7 @@ export async function initializeApp(config: AppConfig): Promise<{
   });
 
   const components = await registerComponents(config.modules, config.externalComponents);
-  console.info(`${components.length} Components registered.`);
+  logger.debug(`${components.length} components registered`);
 
   const routerService = await registerRoutes(
     components,
@@ -214,8 +221,8 @@ export async function initializeApp(config: AppConfig): Promise<{
     routeRenderer
   );
   routerService.init();
-  console.info(`${routerService._routes.length} Routes registered.`);
+  logger.debug(`${routerService._routes.length} routes registered`);
 
-  console.info('Application initialized.');
+  logger.info('Application initialized');
   return { components, routerService };
 }
