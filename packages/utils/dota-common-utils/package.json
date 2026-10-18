@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "dota-common-utils provides a collection of utility methods for use across dota ecosystem projects and beyond.",
   "author": {
     "name": "ayu-sh-kr",
