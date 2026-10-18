@@ -25,6 +25,8 @@ dist-ssr
 
 **/node_modules/
 **/dist/
+**/dist-server/
+**/.cache/icons/
 /.pnpm-store/
 /output/playwright/
 /tool-scripts/
