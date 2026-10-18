@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="810" viewBox="0 0 1200 810" role="img" aria-labelledby="title desc">
+<title id="title">Shared templates. Server HTML. Existing hydration.</title>
+<desc id="desc">One template contract connects two execution paths. Solid violet arrows show execution or data flow. Companion editable Excalidraw scene has the same nodes and connections.</desc>
+<!-- Geometry preflight: template: x=380, y=90, w=440, h=68, cy=124, bottom=158; serialize: x=60, y=270, w=440, h=68, cy=304, bottom=338; client: x=700, y=270, w=440, h=68, cy=304, bottom=338; html: x=60, y=440, w=440, h=68, cy=474, bottom=508; hydrate: x=700, y=440, w=440, h=68, cy=474, bottom=508; patch: x=700, y=610, w=440, h=68, cy=644, bottom=678. Connectors use reserved orthogonal corridors. -->
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 1 1 L 10 5 L 1 9" fill="none" stroke="#6d28d9" stroke-width="1.6"/></marker></defs>
+<rect width="1200" height="810" fill="#fafafc"/>
+<g font-family="'DM Sans', 'Comic Sans MS', Helvetica, Arial, sans-serif" fill="#202028" text-rendering="geometricPrecision">
+<text x="60" y="48" font-size="26" fill="#202028">Shared templates. Server HTML. Existing hydration.</text>
+<text x="60" y="79" font-size="17" fill="#60606e">One template contract connects two execution paths.</text>
+<path d="M 385 90 L 817 91 Q 821 92 820 97 L 819 154 Q 820 159 814 158 L 383 157 Q 379 158 380 152 L 381 94 Z" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.6"/>
+<path d="M 382 95 L 384 155 L 815 159" fill="none" stroke="#6d28d9" stroke-opacity=".24" stroke-width="1"/>
+<text x="600" y="131" text-anchor="middle" font-size="18">Existing html → TemplateResult</text>
+<path d="M 65 270 L 497 271 Q 501 272 500 277 L 499 334 Q 500 339 494 338 L 63 337 Q 59 338 60 332 L 61 274 Z" fill="#fff" stroke="#60606e" stroke-width="1.6"/>
+<path d="M 62 275 L 64 335 L 495 339" fill="none" stroke="#60606e" stroke-opacity=".24" stroke-width="1"/>
+<text x="280" y="311" text-anchor="middle" font-size="18">Server: custom plan + serializer</text>
+<path d="M 705 270 L 1137 271 Q 1141 272 1140 277 L 1139 334 Q 1140 339 1134 338 L 703 337 Q 699 338 700 332 L 701 274 Z" fill="#fff" stroke="#60606e" stroke-width="1.6"/>
+<path d="M 702 275 L 704 335 L 1135 339" fill="none" stroke="#60606e" stroke-opacity=".24" stroke-width="1"/>
+<text x="920" y="311" text-anchor="middle" font-size="18">Client: component.render()</text>
+<path d="M 65 440 L 497 441 Q 501 442 500 447 L 499 504 Q 500 509 494 508 L 63 507 Q 59 508 60 502 L 61 444 Z" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.6"/>
+<path d="M 62 445 L 64 505 L 495 509" fill="none" stroke="#6d28d9" stroke-opacity=".24" stroke-width="1"/>
+<text x="280" y="481" text-anchor="middle" font-size="18">HTML + identity + scoped markers</text>
+<path d="M 705 440 L 1137 441 Q 1141 442 1140 447 L 1139 504 Q 1140 509 1134 508 L 703 507 Q 699 508 700 502 L 701 444 Z" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.6"/>
+<path d="M 702 445 L 704 505 L 1135 509" fill="none" stroke="#6d28d9" stroke-opacity=".24" stroke-width="1"/>
+<text x="920" y="481" text-anchor="middle" font-size="18">Existing Rendering hydrate(): adopt DOM</text>
+<path d="M 705 610 L 1137 611 Q 1141 612 1140 617 L 1139 674 Q 1140 679 1134 678 L 703 677 Q 699 678 700 672 L 701 614 Z" fill="#fff" stroke="#60606e" stroke-width="1.6"/>
+<path d="M 702 615 L 704 675 L 1135 679" fill="none" stroke="#60606e" stroke-opacity=".24" stroke-width="1"/>
+<text x="920" y="651" text-anchor="middle" font-size="18">Existing renderer: patch future updates</text>
+<path d="M 600 158 L 600 210 L 280 210 L 280 270" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<path d="M 600 210 L 920 210 L 920 270" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<path d="M 280 338 L 280 440" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<path d="M 920 338 L 920 440" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<path d="M 500 474 L 700 474" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<path d="M 920 508 L 920 610" fill="none" stroke="#6d28d9" stroke-width="1.7" marker-end="url(#arrow)"/>
+<text x="60" y="588" font-size="18" fill="#60606e">Shared marker helpers live in Rendering.</text>
+<text x="60" y="619" font-size="16" fill="#60606e">data-dh-t / v / s + dh:h0:p0 ranges</text>
+<text x="60" y="652" font-size="16" fill="#60606e">The server writer is new; adoption is reused.</text>
+<text x="60" y="755" font-size="17" fill="#60606e">Hydration plugin validates identity before adoption. Invalid markers → warn + remount, or throw.</text>
+<text x="60" y="789" font-size="16" fill="#60606e">SSG reaches the same marker contract through Happy DOM and the existing browser renderer.</text>
+</g>
+</svg>
+
