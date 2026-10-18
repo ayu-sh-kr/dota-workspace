@@ -33,6 +33,9 @@ import {
 } from "@dota/core/elements/component-lifecycle.ts";
 import {Metadata, type MetadataRecord} from "@dota/metadata";
 import {CoreMetadata} from "@dota/core/constants";
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+
+const logger = createDotaLogger('dota-core', 'core/elements/base-elements.ts');
 
 
 /**
@@ -125,7 +128,7 @@ export abstract class BaseElement extends HTMLElement {
       this.__classApplicationEventManager.bind();
       this.__classScopedApplicationEventManager.bind();
     } catch (reason) {
-      console.error(reason);
+      logger.error('Element lifecycle failed', reason);
       return;
     }
 
@@ -160,7 +163,7 @@ export abstract class BaseElement extends HTMLElement {
       this.__classApplicationEventManager.unbind();
       this.__classScopedApplicationEventManager.unbind();
     } catch (reason) {
-      console.error(reason);
+      logger.error('Element lifecycle failed', reason);
       return;
     }
 
