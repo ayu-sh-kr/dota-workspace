@@ -1,13 +1,13 @@
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 /** Classes of the `<summary>` button that opens an appearance menu. */
-export const MENU_TRIGGER = 'flex h-8 cursor-pointer list-none items-center gap-2 rounded-md border border-gray-200 px-2.5 text-xs font-medium text-gray-700 select-none hover:bg-gray-50 group-open:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 dark:group-open:bg-gray-800 [&::-webkit-details-marker]:hidden';
+export const MENU_TRIGGER = 'button-secondary button-compact list-none select-none group-open:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden';
 
 /** Classes of the floating panel below an appearance menu trigger. */
-export const MENU_PANEL = 'absolute right-0 top-full z-50 mt-2 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-700 dark:bg-gray-900';
+export const MENU_PANEL = 'absolute right-0 top-full z-50 mt-2 rounded-card border border-default bg-surface p-1.5 shadow-lg';
 
 /** Chevron shown in a menu trigger; it flips while the menu is open. */
-export const menuChevron = (): TemplateResult => html`<svg class="h-3 w-3 text-gray-400 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z"/></svg>`;
+export const menuChevron = (): TemplateResult => html`<svg class="h-4 w-4 text-muted transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z"/></svg>`;
 
 /**
  * Closes the menu rendered by `host` when a click lands outside it. Because every menu does
