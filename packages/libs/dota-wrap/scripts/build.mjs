@@ -7,6 +7,7 @@ import dts from 'vite-plugin-dts';
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const internalPackages = [
+  '@ayu-sh-kr/dota-common-utils',
   '@ayu-sh-kr/dota-core',
   '@ayu-sh-kr/dota-event',
   '@ayu-sh-kr/dota-event-map-generator',
