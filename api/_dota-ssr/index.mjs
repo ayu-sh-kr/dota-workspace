@@ -1079,7 +1079,7 @@ function installServerGlobals() {
 installServerGlobals();
 //#endregion
 //#region ../../../node_modules/.pnpm/consola@3.4.2/node_modules/consola/dist/core.mjs
-function isPlainObject$1(value) {
+function isPlainObject$1$1(value) {
 	if (value === null || typeof value !== "object") return false;
 	const prototype = Object.getPrototypeOf(value);
 	if (prototype !== null && prototype !== Object.prototype && Object.getPrototypeOf(prototype) !== null) return false;
@@ -1087,8 +1087,8 @@ function isPlainObject$1(value) {
 	if (Symbol.toStringTag in value) return Object.prototype.toString.call(value) === "[object Module]";
 	return true;
 }
-function _defu(baseObject, defaults, namespace = ".", merger) {
-	if (!isPlainObject$1(defaults)) return _defu(baseObject, {}, namespace, merger);
+function _defu$1(baseObject, defaults, namespace = ".", merger) {
+	if (!isPlainObject$1$1(defaults)) return _defu$1(baseObject, {}, namespace, merger);
 	const object = Object.assign({}, defaults);
 	for (const key in baseObject) {
 		if (key === "__proto__" || key === "constructor") continue;
@@ -1096,35 +1096,35 @@ function _defu(baseObject, defaults, namespace = ".", merger) {
 		if (value === null || value === void 0) continue;
 		if (merger && merger(object, key, value, namespace)) continue;
 		if (Array.isArray(value) && Array.isArray(object[key])) object[key] = [...value, ...object[key]];
-		else if (isPlainObject$1(value) && isPlainObject$1(object[key])) object[key] = _defu(value, object[key], (namespace ? `${namespace}.` : "") + key.toString(), merger);
+		else if (isPlainObject$1$1(value) && isPlainObject$1$1(object[key])) object[key] = _defu$1(value, object[key], (namespace ? `${namespace}.` : "") + key.toString(), merger);
 		else object[key] = value;
 	}
 	return object;
 }
-function createDefu(merger) {
-	return (...arguments_) => arguments_.reduce((p, c) => _defu(p, c, "", merger), {});
+function createDefu$1(merger) {
+	return (...arguments_) => arguments_.reduce((p, c) => _defu$1(p, c, "", merger), {});
 }
-function isPlainObject(obj) {
+function isPlainObject$2(obj) {
 	return Object.prototype.toString.call(obj) === "[object Object]";
 }
-function isLogObj(arg) {
-	if (!isPlainObject(arg)) return false;
+function isLogObj$1(arg) {
+	if (!isPlainObject$2(arg)) return false;
 	if (!arg.message && !arg.args) return false;
 	if (arg.stack) return false;
 	return true;
 }
-function _normalizeLogLevel(input, types = {}, defaultLevel = 3) {
+function _normalizeLogLevel$1(input, types = {}, defaultLevel = 3) {
 	if (input === void 0) return defaultLevel;
 	if (typeof input === "number") return input;
 	if (types[input] && types[input].level !== void 0) return types[input].level;
 	return defaultLevel;
 }
-function createConsola$1(options = {}) {
-	return new Consola(options);
+function createConsola$3(options = {}) {
+	return new Consola$1(options);
 }
-var LogLevels, LogTypes, defu, paused, queue, Consola;
+var LogLevels$1, LogTypes$1, defu$1, paused$1, queue$1, Consola$1;
 var init_core$2 = __esmMin((() => {
-	LogLevels = {
+	LogLevels$1 = {
 		silent: Number.NEGATIVE_INFINITY,
 		fatal: 0,
 		error: 0,
@@ -1140,26 +1140,26 @@ var init_core$2 = __esmMin((() => {
 		trace: 5,
 		verbose: Number.POSITIVE_INFINITY
 	};
-	LogTypes = {
+	LogTypes$1 = {
 		silent: { level: -1 },
-		fatal: { level: LogLevels.fatal },
-		error: { level: LogLevels.error },
-		warn: { level: LogLevels.warn },
-		log: { level: LogLevels.log },
-		info: { level: LogLevels.info },
-		success: { level: LogLevels.success },
-		fail: { level: LogLevels.fail },
-		ready: { level: LogLevels.info },
-		start: { level: LogLevels.info },
-		box: { level: LogLevels.info },
-		debug: { level: LogLevels.debug },
-		trace: { level: LogLevels.trace },
-		verbose: { level: LogLevels.verbose }
+		fatal: { level: LogLevels$1.fatal },
+		error: { level: LogLevels$1.error },
+		warn: { level: LogLevels$1.warn },
+		log: { level: LogLevels$1.log },
+		info: { level: LogLevels$1.info },
+		success: { level: LogLevels$1.success },
+		fail: { level: LogLevels$1.fail },
+		ready: { level: LogLevels$1.info },
+		start: { level: LogLevels$1.info },
+		box: { level: LogLevels$1.info },
+		debug: { level: LogLevels$1.debug },
+		trace: { level: LogLevels$1.trace },
+		verbose: { level: LogLevels$1.verbose }
 	};
-	defu = createDefu();
-	paused = false;
-	queue = [];
-	Consola = class Consola {
+	defu$1 = createDefu$1();
+	paused$1 = false;
+	queue$1 = [];
+	Consola$1 = class Consola$1 {
 		options;
 		_lastLog;
 		_mockFn;
@@ -1169,14 +1169,14 @@ var init_core$2 = __esmMin((() => {
 		* @param {Partial<ConsolaOptions>} [options={}] - Configuration options for the Consola instance.
 		*/
 		constructor(options = {}) {
-			const types = options.types || LogTypes;
-			this.options = defu({
+			const types = options.types || LogTypes$1;
+			this.options = defu$1({
 				...options,
 				defaults: { ...options.defaults },
-				level: _normalizeLogLevel(options.level, types),
+				level: _normalizeLogLevel$1(options.level, types),
 				reporters: [...options.reporters || []]
 			}, {
-				types: LogTypes,
+				types: LogTypes$1,
 				throttle: 1e3,
 				throttleMin: 5,
 				formatOptions: {
@@ -1211,7 +1211,7 @@ var init_core$2 = __esmMin((() => {
 		* @param {number} level - The new log level to set.
 		*/
 		set level(level) {
-			this.options.level = _normalizeLogLevel(level, this.options.types, this.options.level);
+			this.options.level = _normalizeLogLevel$1(level, this.options.types, this.options.level);
 		}
 		/**
 		* Displays a prompt to the user and returns the response.
@@ -1233,7 +1233,7 @@ var init_core$2 = __esmMin((() => {
 		* @returns {ConsolaInstance} A new Consola instance. See {@link ConsolaInstance}.
 		*/
 		create(options) {
-			const instance = new Consola({
+			const instance = new Consola$1({
 				...this.options,
 				...options
 			});
@@ -1357,14 +1357,14 @@ var init_core$2 = __esmMin((() => {
 		* Pauses logging, queues incoming logs until resumed.
 		*/
 		pauseLogs() {
-			paused = true;
+			paused$1 = true;
 		}
 		/**
 		* Resumes logging, processing any queued logs.
 		*/
 		resumeLogs() {
-			paused = false;
-			const _queue = queue.splice(0);
+			paused$1 = false;
+			const _queue = queue$1.splice(0);
 			for (const item of _queue) item[0]._logFn(item[1], item[2]);
 		}
 		/**
@@ -1383,8 +1383,8 @@ var init_core$2 = __esmMin((() => {
 		}
 		_wrapLogFn(defaults, isRaw) {
 			return (...args) => {
-				if (paused) {
-					queue.push([
+				if (paused$1) {
+					queue$1.push([
 						this,
 						defaults,
 						args,
@@ -1401,9 +1401,9 @@ var init_core$2 = __esmMin((() => {
 				date: /* @__PURE__ */ new Date(),
 				args: [],
 				...defaults,
-				level: _normalizeLogLevel(defaults.level, this.options.types)
+				level: _normalizeLogLevel$1(defaults.level, this.options.types)
 			};
-			if (!isRaw && args.length === 1 && isLogObj(args[0])) Object.assign(logObj, args[0]);
+			if (!isRaw && args.length === 1 && isLogObj$1(args[0])) Object.assign(logObj, args[0]);
 			else logObj.args = [...args];
 			if (logObj.message) {
 				logObj.args.unshift(logObj.message);
@@ -1457,13 +1457,13 @@ var init_core$2 = __esmMin((() => {
 			for (const reporter of this.options.reporters) reporter.log(logObj, { options: this.options });
 		}
 	};
-	Consola.prototype.add = Consola.prototype.addReporter;
-	Consola.prototype.remove = Consola.prototype.removeReporter;
-	Consola.prototype.clear = Consola.prototype.removeReporter;
-	Consola.prototype.withScope = Consola.prototype.withTag;
-	Consola.prototype.mock = Consola.prototype.mockTypes;
-	Consola.prototype.pause = Consola.prototype.pauseLogs;
-	Consola.prototype.resume = Consola.prototype.resumeLogs;
+	Consola$1.prototype.add = Consola$1.prototype.addReporter;
+	Consola$1.prototype.remove = Consola$1.prototype.removeReporter;
+	Consola$1.prototype.clear = Consola$1.prototype.removeReporter;
+	Consola$1.prototype.withScope = Consola$1.prototype.withTag;
+	Consola$1.prototype.mock = Consola$1.prototype.mockTypes;
+	Consola$1.prototype.pause = Consola$1.prototype.pauseLogs;
+	Consola$1.prototype.resume = Consola$1.prototype.resumeLogs;
 }));
 //#endregion
 //#region ../../../node_modules/.pnpm/consola@3.4.2/node_modules/consola/dist/shared/consola.DRwqZj3T.mjs
@@ -1723,7 +1723,7 @@ var init_consola_DXBYu_KD = __esmMin((() => {
 //#region ../../../node_modules/.pnpm/consola@3.4.2/node_modules/consola/dist/chunks/prompt.mjs
 var prompt_exports = /* @__PURE__ */ __exportAll$1({
 	kCancel: () => kCancel,
-	prompt: () => prompt
+	prompt: () => prompt$1
 });
 function getDefaultExportFromCjs(x) {
 	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
@@ -1984,14 +1984,14 @@ function d$1(t, u) {
 function ce() {
 	return g.platform !== "win32" ? g.env.TERM !== "linux" : !!g.env.CI || !!g.env.WT_SESSION || !!g.env.TERMINUS_SUBLIME || g.env.ConEmuTask === "{cmd::Cmder}" || g.env.TERM_PROGRAM === "Terminus-Sublime" || g.env.TERM_PROGRAM === "vscode" || g.env.TERM === "xterm-256color" || g.env.TERM === "alacritty" || g.env.TERMINAL_EMULATOR === "JetBrains-JediTerm";
 }
-async function prompt(message, opts = {}) {
+async function prompt$1(message, opts = {}) {
 	const handleCancel = (value) => {
 		if (typeof value !== "symbol" || value.toString() !== "Symbol(clack:cancel)") return value;
 		switch (opts.cancel) {
 			case "reject": {
 				const error = /* @__PURE__ */ new Error("Prompt cancelled.");
 				error.name = "ConsolaPromptCancelledError";
-				if (Error.captureStackTrace) Error.captureStackTrace(error, prompt);
+				if (Error.captureStackTrace) Error.captureStackTrace(error, prompt$1);
 				throw error;
 			}
 			case "undefined": return;
@@ -2696,10 +2696,10 @@ function getColor(color = "white") {
 function getBgColor(color = "bgWhite") {
 	return colors[`bg${color[0].toUpperCase()}${color.slice(1)}`] || colors.bgWhite;
 }
-function createConsola(options = {}) {
+function createConsola$2(options = {}) {
 	let level = _getDefaultLogLevel();
 	if (process.env.CONSOLA_LEVEL) level = Number.parseInt(process.env.CONSOLA_LEVEL) ?? level;
-	return createConsola$1({
+	return createConsola$3({
 		level,
 		defaults: { level },
 		stdout: process.stdout,
@@ -2710,12 +2710,12 @@ function createConsola(options = {}) {
 	});
 }
 function _getDefaultLogLevel() {
-	if (g$1) return LogLevels.debug;
-	if (R) return LogLevels.warn;
-	return LogLevels.info;
+	if (g$1) return LogLevels$1.debug;
+	if (R) return LogLevels$1.warn;
+	return LogLevels$1.info;
 }
 var r$1, i$1, o$1, t$1, f$2, l$1, I, T, a$1, g$1, R, A, C, y, _, c$1, O, D, L, S, u$1, N, F, regex, emojiRegex, segmenter, defaultIgnorableCodePointRegex, TYPE_COLOR_MAP, LEVEL_COLOR_MAP, unicode, s$1, TYPE_ICONS, FancyReporter;
-var init_dist$7 = __esmMin((() => {
+var init_dist$8 = __esmMin((() => {
 	init_core$2();
 	init_consola_DRwqZj3T();
 	init_consola_DXBYu_KD();
@@ -2945,7 +2945,7 @@ ${indent}`);
 			return isBadge ? "\n" + line + "\n" : line;
 		}
 	};
-	createConsola();
+	createConsola$2();
 }));
 //#endregion
 //#region ../../libs/dota-rendering/dist/index.mjs
@@ -3310,9 +3310,52 @@ function hydrationIdentity(tagName, strings, scope) {
 		[HYDRATION_SCOPE_ATTRIBUTE]: scope
 	};
 }
+/**
+* Resolves logging in order: plugin setting, package environment, wrapper setting, global environment, default.
+* An unrecognized environment value is ignored so it cannot accidentally suppress diagnostics.
+* @param packageName Package slug without the @ayu-sh-kr scope.
+* @param override Explicit setting from a plugin or host integration.
+* @param globalOverride Setting supplied by the wrapper for all plugins.
+* @param packageOverride Package setting supplied by the wrapper.
+* @returns The selected Consola log type.
+*/
+function resolveDotaLogType$2(packageName, override, globalOverride, packageOverride) {
+	const environment = globalThis.process?.env;
+	const packageKey = `DOTA_${packageName.replace(/^dota-/, "").replace(/-/g, "_").toUpperCase()}_LOG_TYPE`;
+	for (const candidate of [
+		override,
+		environment?.[packageKey],
+		packageOverride ?? state$2.settings.packages?.[packageName],
+		globalOverride ?? state$2.settings.logType,
+		environment?.DOTA_LOG_TYPE
+	]) if (candidate && Object.hasOwn(LogLevels$1, candidate)) return candidate;
+	return "info";
+}
+/**
+* Creates a package logger with a stable source tag, timestamp, and Consola severity.
+* @param packageName Package slug used for its environment variable and output tag.
+* @param sourceFile Source file or subsystem that produced the diagnostic.
+* @param override Explicit plugin or wrapper level, if supplied.
+*/
+function createDotaLogger$2(packageName, sourceFile, override) {
+	const logger = createConsola$2({
+		level: LogLevels$1[resolveDotaLogType$2(packageName, override)],
+		formatOptions: {
+			date: true,
+			colors: true
+		},
+		reporters: [reporter$2]
+	}).withTag(`${packageName}:${sourceFile}`);
+	state$2.entries.add({
+		packageName,
+		override,
+		logger: new WeakRef(logger)
+	});
+	return logger;
+}
 /** Returns the renderer-scoped logger used by rendering internals. */
 function getDotaRenderingLogger() {
-	return logger;
+	return logger$8;
 }
 /**
 * Registers one runtime part under an interpolation index.
@@ -3586,7 +3629,7 @@ function moveInclusiveRange(start, end, before) {
 */
 function patch(instance, output) {
 	const result = instance.update(output);
-	getDotaRenderingLogger().debug("[dota-rendering] patched render session", result);
+	getDotaRenderingLogger().debug("Patched render session", result);
 	return result;
 }
 /**
@@ -3606,7 +3649,7 @@ function update(instance, output) {
 * @returns Stateful renderer session used by patch() and update().
 */
 function render(root, output) {
-	getDotaRenderingLogger().debug("[dota-rendering] mounting render session", {
+	getDotaRenderingLogger().debug("Mounting render session", {
 		output: isTemplateResult(output) ? "template" : "legacy",
 		hydrationMarkers: emitDurableMarkers
 	});
@@ -3665,7 +3708,7 @@ function deferRender(initialOutput, createSession) {
 * @throws TypeError when strict mismatch handling rejects legacy string output or `nothing`.
 */
 function hydrate(root, output, options = {}) {
-	getDotaRenderingLogger().debug("[dota-rendering] adopting hydrated render session");
+	getDotaRenderingLogger().debug("Adopting hydrated render session");
 	try {
 		return new RenderSession(new NativeRoot(root), output, "hydrate");
 	} catch (error) {
@@ -3679,11 +3722,11 @@ function hydrate(root, output, options = {}) {
 * @param error Failure captured while adopting the serialized component output.
 */
 function warnHydrationMismatch(error) {
-	console.warn("[dota-rendering] hydration mismatch; re-rendering the affected component", error);
+	getDotaRenderingLogger().warn("Hydration mismatch; re-rendering the affected component", error);
 }
-var nothing, FLATTEN_PLANS_BY_CALL_SITE, HYDRATION_TEMPLATE_ATTRIBUTE, HYDRATION_VERSION_ATTRIBUTE, HYDRATION_COMPONENT_ATTRIBUTE, HYDRATION_SCOPE_ATTRIBUTE, HYDRATION_ATTRIBUTE_PART, IDS_BY_STRINGS, COMPONENT_START_MARKER, COMPONENT_END_MARKER, NODE_INDEX_ATTRIBUTE, COMPONENT_ATTRIBUTE, DYNAMIC_ATTRIBUTE, HYDRATION_IDENTITY_ATTRIBUTES, logger, DOCUMENT_FRAGMENT_NODE, templateMarkerId, hydrationScopeId, emitDurableMarkers, hydrationMismatchPolicy, NativeRoot, RangeRoot, StringStrategy, RenderSession, TemplateStrategy;
-var init_dist$6 = __esmMin((() => {
-	init_dist$7();
+var nothing, FLATTEN_PLANS_BY_CALL_SITE, HYDRATION_TEMPLATE_ATTRIBUTE, HYDRATION_VERSION_ATTRIBUTE, HYDRATION_COMPONENT_ATTRIBUTE, HYDRATION_SCOPE_ATTRIBUTE, HYDRATION_ATTRIBUTE_PART, IDS_BY_STRINGS, COMPONENT_START_MARKER, COMPONENT_END_MARKER, NODE_INDEX_ATTRIBUTE, COMPONENT_ATTRIBUTE, DYNAMIC_ATTRIBUTE, HYDRATION_IDENTITY_ATTRIBUTES, reporter$2, stateKey$2, globalState$2, state$2, logger$8, DOCUMENT_FRAGMENT_NODE, templateMarkerId, hydrationScopeId, emitDurableMarkers, hydrationMismatchPolicy, NativeRoot, RangeRoot, StringStrategy, RenderSession, TemplateStrategy;
+var init_dist$7 = __esmMin((() => {
+	init_dist$8();
 	nothing = Symbol("dota-rendering.nothing");
 	FLATTEN_PLANS_BY_CALL_SITE = /* @__PURE__ */ new WeakMap();
 	HYDRATION_TEMPLATE_ATTRIBUTE = "data-dh-t";
@@ -3703,13 +3746,17 @@ var init_dist$6 = __esmMin((() => {
 		HYDRATION_VERSION_ATTRIBUTE,
 		HYDRATION_SCOPE_ATTRIBUTE
 	];
-	logger = createConsola({
-		level: LogLevels.silent,
-		formatOptions: {
-			date: true,
-			colors: true
-		}
-	});
+	reporter$2 = { log(record) {
+		const prefix = `${record.date.toISOString()} [${record.type.toUpperCase()}] [${record.tag}]`;
+		(record.type === "fatal" || record.type === "error" || record.type === "fail" ? console.error : record.type === "warn" ? console.warn : console.log)(prefix, ...record.args);
+	} };
+	stateKey$2 = Symbol.for("@ayu-sh-kr/dota-common-utils/logging");
+	globalState$2 = globalThis;
+	state$2 = globalState$2[stateKey$2] ??= {
+		settings: {},
+		entries: /* @__PURE__ */ new Set()
+	};
+	logger$8 = createDotaLogger$2("dota-rendering", "renderer.ts");
 	DOCUMENT_FRAGMENT_NODE = 11;
 	templateMarkerId = 0;
 	hydrationScopeId = 0;
@@ -4353,6 +4400,78 @@ var init_dist$6 = __esmMin((() => {
 			if (ownedNodes.length === 1 && ownedNodes[0] instanceof Text) part.text = ownedNodes[0];
 			else if (ownedNodes.length > 0) throw new Error(`Invalid hydration text range for part p${part.index}`);
 		}
+	};
+}));
+//#endregion
+//#region ../../utils/dota-common-utils/dist/index.mjs
+/**
+* Resolves logging in order: plugin setting, package environment, wrapper setting, global environment, default.
+* An unrecognized environment value is ignored so it cannot accidentally suppress diagnostics.
+* @param packageName Package slug without the @ayu-sh-kr scope.
+* @param override Explicit setting from a plugin or host integration.
+* @param globalOverride Setting supplied by the wrapper for all plugins.
+* @param packageOverride Package setting supplied by the wrapper.
+* @returns The selected Consola log type.
+*/
+function resolveDotaLogType$1(packageName, override, globalOverride, packageOverride) {
+	const environment = globalThis.process?.env;
+	const packageKey = `DOTA_${packageName.replace(/^dota-/, "").replace(/-/g, "_").toUpperCase()}_LOG_TYPE`;
+	for (const candidate of [
+		override,
+		environment?.[packageKey],
+		packageOverride ?? state$1.settings.packages?.[packageName],
+		globalOverride ?? state$1.settings.logType,
+		environment?.DOTA_LOG_TYPE
+	]) if (candidate && Object.hasOwn(LogLevels$1, candidate)) return candidate;
+	return "info";
+}
+/**
+* Applies wrap's runtime logging preferences to existing and future package loggers.
+* Package environment variables still take precedence, and explicit logger overrides remain highest.
+* @param settings Global level and optional package-specific levels.
+*/
+function configureDotaLogging(settings) {
+	state$1.settings = settings;
+	for (const entry of state$1.entries) {
+		const logger = entry.logger.deref();
+		if (logger) logger.level = LogLevels$1[resolveDotaLogType$1(entry.packageName, entry.override)];
+		else state$1.entries.delete(entry);
+	}
+}
+/**
+* Creates a package logger with a stable source tag, timestamp, and Consola severity.
+* @param packageName Package slug used for its environment variable and output tag.
+* @param sourceFile Source file or subsystem that produced the diagnostic.
+* @param override Explicit plugin or wrapper level, if supplied.
+*/
+function createDotaLogger$1(packageName, sourceFile, override) {
+	const logger = createConsola$2({
+		level: LogLevels$1[resolveDotaLogType$1(packageName, override)],
+		formatOptions: {
+			date: true,
+			colors: true
+		},
+		reporters: [reporter$1]
+	}).withTag(`${packageName}:${sourceFile}`);
+	state$1.entries.add({
+		packageName,
+		override,
+		logger: new WeakRef(logger)
+	});
+	return logger;
+}
+var reporter$1, stateKey$1, globalState$1, state$1;
+var init_dist$6 = __esmMin((() => {
+	init_dist$8();
+	reporter$1 = { log(record) {
+		const prefix = `${record.date.toISOString()} [${record.type.toUpperCase()}] [${record.tag}]`;
+		(record.type === "fatal" || record.type === "error" || record.type === "fail" ? console.error : record.type === "warn" ? console.warn : console.log)(prefix, ...record.args);
+	} };
+	stateKey$1 = Symbol.for("@ayu-sh-kr/dota-common-utils/logging");
+	globalState$1 = globalThis;
+	state$1 = globalState$1[stateKey$1] ??= {
+		settings: {},
+		entries: /* @__PURE__ */ new Set()
 	};
 }));
 //#endregion
@@ -6424,9 +6543,9 @@ function resolveMountStrategy() {
 */
 function afterMicrotask(ticks, task) {
 	const run = ticks === 1 ? task : () => {
-		settled.then(task).catch((reason) => console.error(reason));
+		settled.then(task).catch((reason) => logger$1$3.error("Deferred lifecycle task failed", reason));
 	};
-	settled.then(run).catch((reason) => console.error(reason));
+	settled.then(run).catch((reason) => logger$1$3.error("Deferred lifecycle task failed", reason));
 }
 /**
 * Calls a component's `@BeforeInit` or `@AfterInit` hooks in declaration order, base class first.
@@ -6586,12 +6705,13 @@ function applyHeadTag(tag) {
 	}
 	if (!existing) document.head.appendChild(element);
 }
-var MetadataKey, MetadataOwner, MetadataStore, EMPTY_ENTRIES, MetadataInheritance, MetadataRecord, records, Metadata, LifecycleEventConstants, CoreMetadata, GeneralUtils$1, CLIENT_ONLY_ATTRIBUTE, SERVER_RENDER_FLAG, StringType, NumberType, BooleanType, ObjectType, EventType, bootstrap, EventEmitter, Sanitizer, LegacyMetadataMap, LegacyMetadataAdapters, HelperUtils, PropertyUtils, EventManagerService, ApplicationEventService, KeyUtils, defaultMountStrategy, activeMountStrategy, hasInstalledMountStrategy, settled, BaseElement, SEO_JSON_LD_ATTRIBUTE, DotaPageElement;
+var MetadataKey, MetadataOwner, MetadataStore, EMPTY_ENTRIES, MetadataInheritance, MetadataRecord, records, Metadata, LifecycleEventConstants, CoreMetadata, GeneralUtils$1, CLIENT_ONLY_ATTRIBUTE, SERVER_RENDER_FLAG, StringType, NumberType, BooleanType, ObjectType, EventType, logger$2$2, bootstrap, EventEmitter, Sanitizer, LegacyMetadataMap, LegacyMetadataAdapters, HelperUtils, PropertyUtils, EventManagerService, ApplicationEventService, KeyUtils, defaultMountStrategy, activeMountStrategy, hasInstalledMountStrategy, logger$1$3, settled, logger$7, BaseElement, SEO_JSON_LD_ATTRIBUTE, DotaPageElement;
 var init_dist$4 = __esmMin((() => {
+	init_dist$7();
 	init_dist$6();
 	require_Reflect();
 	init_dist$5();
-	init_dist$6();
+	init_dist$7();
 	MetadataKey = {
 		/**
 		* Creates a key for a single value per class.
@@ -6953,12 +7073,13 @@ for(target) {
 		EventType[EventType["ROOT"] = 1] = "ROOT";
 		return EventType;
 	}({});
+	logger$2$2 = createDotaLogger$1("dota-core", "core/helper/bootstrap.ts");
 	bootstrap = (elements) => {
 		elements.forEach((element) => {
 			if (element.__dotaSelector) {
 				const selector = element.__dotaSelector;
 				if (!customElements.get(selector)) customElements.define(selector, element);
-				else console.warn(`Custom element with selector '${selector}' is already defined.`);
+				else logger$2$2.warn(`Custom element with selector '${selector}' is already defined.`);
 			}
 		});
 	};
@@ -7721,7 +7842,9 @@ for(target) {
 	defaultMountStrategy = (_host, root, output) => render(root, output);
 	activeMountStrategy = defaultMountStrategy;
 	hasInstalledMountStrategy = false;
+	logger$1$3 = createDotaLogger$1("dota-core", "core/elements/component-lifecycle.ts");
 	settled = Promise.resolve();
+	logger$7 = createDotaLogger$1("dota-core", "core/elements/base-elements.ts");
 	BaseElement = class extends HTMLElement {
 		isShadow;
 		shadowRoot;
@@ -7787,7 +7910,7 @@ for(target) {
 				this.__classApplicationEventManager.bind();
 				this.__classScopedApplicationEventManager.bind();
 			} catch (reason) {
-				console.error(reason);
+				logger$7.error("Element lifecycle failed", reason);
 				return;
 			}
 			afterMicrotask(2, () => {
@@ -7813,7 +7936,7 @@ for(target) {
 				this.__classApplicationEventManager.unbind();
 				this.__classScopedApplicationEventManager.unbind();
 			} catch (reason) {
-				console.error(reason);
+				logger$7.error("Element lifecycle failed", reason);
 				return;
 			}
 			afterMicrotask(2, () => {
@@ -8310,6 +8433,23 @@ var ownedGlobalNames = [];
 /** Answers request globals read outside any render (e.g. an old timer) while globals are installed. */
 var outsideRenderScope;
 var lastFrameId = 0;
+/** Node built-ins displaced while globals are installed, restored on removal. */
+var displacedGlobals = [];
+/**
+* Node 25+ defines process-wide `localStorage` and `sessionStorage` accessors (the former is
+* `undefined` without `--localstorage-file`). They would leak storage between requests, so
+* renders shadow them; the getters are captured at load to tell them apart from Happy DOM's.
+*/
+var NODE_STORAGE_GETTERS = new Map(["localStorage", "sessionStorage"].flatMap((name) => {
+	const getter = Object.getOwnPropertyDescriptor(globalThis, name)?.get;
+	return getter ? [[name, getter]] : [];
+}));
+/** Whether `name` is absent or is still Node's own process-wide storage accessor. */
+function isInstallable(name) {
+	if (!(name in globalThis)) return true;
+	const getter = NODE_STORAGE_GETTERS.get(name);
+	return getter !== void 0 && Object.getOwnPropertyDescriptor(globalThis, name)?.get === getter;
+}
 /** Globals whose value belongs to the current request; installed as getters. */
 var REQUEST_GLOBALS = {
 	document: (scope) => scope.document,
@@ -8379,11 +8519,13 @@ function createBrowserScope(url) {
 * `AsyncLocalStorage` (or the out-of-render scope), and writes are ignored, so assigning
 * `location` does nothing, like `location.assign`. Process globals become plain properties.
 * A name that already exists, from Happy DOM, Node, or the application, is skipped and never
-* replaced; every name defined is recorded in {@link ownedGlobalNames} for removal.
+* replaced, except Node's process-wide storage, which is shadowed and later restored; every name defined is recorded in {@link ownedGlobalNames} for removal.
 */
 function installBrowserGlobals() {
 	for (const [name, read] of Object.entries(REQUEST_GLOBALS)) {
-		if (name in globalThis) continue;
+		if (!isInstallable(name)) continue;
+		const displaced = Object.getOwnPropertyDescriptor(globalThis, name);
+		if (displaced) displacedGlobals.push([name, displaced]);
 		Object.defineProperty(globalThis, name, {
 			configurable: true,
 			get: () => read(scopes.getStore() ?? (outsideRenderScope ??= createBrowserScope(new URL("http://localhost/")))),
@@ -8404,17 +8546,19 @@ function installBrowserGlobals() {
 /**
 * Removes the browser globals when the last render ends, so code outside a render sees a
 * plain Node environment again (`typeof window === 'undefined'`). Only the names
-* {@link installBrowserGlobals} recorded are deleted, so pre-existing globals survive, and
+* {@link installBrowserGlobals} recorded are deleted, displaced Node storage is restored, and
 * the out-of-render scope is dropped so its document and storage do not outlive the renders.
 */
 function removeBrowserGlobals() {
 	ownedGlobalNames.forEach((name) => delete globalThis[name]);
 	ownedGlobalNames = [];
+	displacedGlobals.forEach(([name, descriptor]) => Object.defineProperty(globalThis, name, descriptor));
+	displacedGlobals = [];
 	outsideRenderScope = void 0;
 }
 //#endregion
 //#region ../../libs/dota-rendering/dist/server/index.mjs
-init_dist$6();
+init_dist$7();
 /** Attribute that turns a `<template>` into a declarative shadow root, whose content is live. */
 var SHADOW_ROOT_MODE_ATTRIBUTE = "shadowrootmode";
 /** `<tbody>`: the element the parser inserts between `<table>` and a direct `<tr>`. */
@@ -9072,7 +9216,7 @@ function wrapInMarkers({ start, end }, content) {
 }
 //#endregion
 //#region ../../libs/dota-ssr/dist/ssr/index.mjs
-init_dist$6();
+init_dist$7();
 var DEFAULT_MAX_DEPTH = 32;
 /** Provisional scope token; renumbered to `h0`, `h1`, … in document order once the page is complete. */
 var SCOPE_TOKEN = /(\d+)/g;
@@ -9514,7 +9658,7 @@ function selectorOf(component) {
 }
 //#endregion
 //#region \0virtual:dota-ssr-template
-var _virtual_dota_ssr_template_default = "<!doctype html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\"/>\n    <link rel=\"icon\" type=\"jpg\" href=\"/images/logo.png\"/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n    <title>Dota Web</title>\n    <style>html.dark { background-color: #020617; color-scheme: dark; }</style>\n    <script>\n        // Apply the saved theme before first paint; mirrors GeneralUtils.getBrowserTheme().\n        (function () {\n            var theme = localStorage.getItem('theme');\n            var dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;\n            if (dark) document.documentElement.classList.add('dark', 'bg-slate-950');\n        })();\n    <\/script>\n  <script type=\"module\" crossorigin src=\"/assets/index-CyPNR3Ev.js\"><\/script>\n  <link rel=\"stylesheet\" crossorigin href=\"/assets/index-BQwRmwO4.css\">\n</head>\n<body>\n<div id=\"app\">\n    <app-root id=\"app-root\"></app-root>\n    <notification-holder id=\"dota-notification\" position=\"bottom-right\"></notification-holder>\n    <dota-alert></dota-alert>\n</div>\n</body>\n</html>\n";
+var _virtual_dota_ssr_template_default = "<!doctype html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\"/>\n    <link rel=\"icon\" type=\"image/svg+xml\" sizes=\"any\" href=\"/favicon.svg\"/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n    <title>Dota Web</title>\n    <style>html.dark { background-color: #020617; color-scheme: dark; }</style>\n    <script>\n        // Apply the saved theme before first paint; mirrors GeneralUtils.getBrowserTheme().\n        (function () {\n            var theme = localStorage.getItem('theme');\n            var dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;\n            if (dark) document.documentElement.classList.add('dark', 'bg-slate-950');\n        })();\n    <\/script>\n  <script type=\"module\" crossorigin src=\"/assets/index-BorV35nN.js\"><\/script>\n  <link rel=\"stylesheet\" crossorigin href=\"/assets/index-B1dlKzRy.css\">\n</head>\n<body>\n<div id=\"app\">\n    <app-root id=\"app-root\"></app-root>\n    <notification-holder id=\"dota-notification\" position=\"bottom-right\"></notification-holder>\n    <dota-alert></dota-alert>\n</div>\n</body>\n</html>\n";
 //#endregion
 //#region src/style.css
 var init_style = __esmMin((() => {}));
@@ -9534,7 +9678,7 @@ var init_event = __esmMin((() => {
 //#endregion
 //#region ../../libs/dota-wrap/dist/rendering/index.mjs
 var init_rendering = __esmMin((() => {
-	init_dist$6();
+	init_dist$7();
 }));
 //#endregion
 //#region ../../libs/dota-router/dist/index.mjs
@@ -9753,12 +9897,12 @@ function hasMarkedServerOutput(root) {
 }
 /**
 * Reports a render-time configuration failure per the selected policy.
-* @param message Failure description, consistent with the prior `console.error` wording.
+* @param message Failure description for the package logger.
 * @param policy `warn` (default) logs only; `throw` raises so the transition surfaces it.
 */
 function reportRenderError(message, policy) {
 	if (policy === "throw") throw new Error(message);
-	console.error(message);
+	logger$2$1.error(message);
 }
 /**
 * Creates the DOM presentation callback consumed by either browser coordinator.
@@ -9805,7 +9949,7 @@ function renderRoute(root, match, context, options) {
 		reportRenderError(`Component metadata not found for path: ${match.pathname}`, policy);
 		return;
 	}
-	if (context.initial && hasMarkedServerOutput(rootElement)) console.warn(`[dota-router] Discarding server-rendered output in #${rootConfig.selector} on the initial render. dota-router does not preserve hydration markers on its own — wrap this app with dota-wrap's initializeApp() and the dotaHydration() plugin, or prerendered HTML will always be dropped on first load.`);
+	if (context.initial && hasMarkedServerOutput(rootElement)) logger$2$1.warn(`[dota-router] Discarding server-rendered output in #${rootConfig.selector} on the initial render. dota-router does not preserve hydration markers on its own — wrap this app with dota-wrap's initializeApp() and the dotaHydration() plugin, or prerendered HTML will always be dropped on first load.`);
 	const message = match.matched ? "" : ` message="Path not found"`;
 	rootElement.innerHTML = `<${componentConfig.selector}${message} path="${match.pathname}"></${componentConfig.selector}>`;
 }
@@ -9928,7 +10072,7 @@ function restoreAcceptedHistoryEntry(runtime, selectedPosition, redirectTo, redi
 */
 function navigateHistory(runtime, path, redirectCount = 0) {
 	if (redirectCount > 10) {
-		console.error(`[dota-router] Navigation stopped after 10 redirects.`);
+		logger$1$2.error(`Navigation stopped after 10 redirects.`);
 		return;
 	}
 	const controller = beginHistoryTransition(runtime);
@@ -9941,7 +10085,7 @@ function navigateHistory(runtime, path, redirectCount = 0) {
 		if (!settleHistoryTransition(runtime, controller)) return;
 		if (isAcceptedHistoryResult(result)) {
 			runtime.acceptedPosition = destinationPosition;
-			if (result.status === "failed") console.error("[dota-router] Navigation lifecycle failed.", result.error);
+			if (result.status === "failed") logger$1$2.error("Navigation lifecycle failed.", result.error);
 			return;
 		}
 		if (result.status === "redirected") {
@@ -9975,7 +10119,7 @@ async function handleHistoryPopState(runtime, event) {
 	if (!settleHistoryTransition(runtime, controller)) return;
 	if (isAcceptedHistoryResult(result)) {
 		runtime.acceptedPosition = selectedEntry?.position;
-		if (result.status === "failed") console.error("[dota-router] History traversal lifecycle failed.", result.error);
+		if (result.status === "failed") logger$1$2.error("History traversal lifecycle failed.", result.error);
 		return;
 	}
 	if (result.status === "redirected") {
@@ -9985,7 +10129,7 @@ async function handleHistoryPopState(runtime, event) {
 	}
 	if (result.status === "cancelled" || result.status === "failed") {
 		if (selectedEntry && restoreAcceptedHistoryEntry(runtime, selectedEntry.position)) return;
-		console.error("[dota-router] Cannot restore a rejected external history entry without router position metadata.");
+		logger$1$2.error("Cannot restore a rejected external history entry without router position metadata.");
 	}
 }
 /**
@@ -10169,9 +10313,10 @@ function RouteDecorator(config) {
 		Metadata.for(target).set(RouterMetadata.route, routeConfig);
 	};
 }
-var RouterMetadata, RouterUtils, RESOLVER_ORIGIN, HistoryCoordinator, HYDRATION_MARKER_ATTRIBUTES, DOTA_HISTORY_STATE_KEY, DomHistoryRouter, DotaRouterService;
+var RouterMetadata, RouterUtils, RESOLVER_ORIGIN, HistoryCoordinator, logger$2$1, HYDRATION_MARKER_ATTRIBUTES, logger$1$2, DOTA_HISTORY_STATE_KEY, DomHistoryRouter, DotaRouterService;
 var init_dist$3 = __esmMin((() => {
 	init_dist$4();
+	init_dist$6();
 	RouterMetadata = { 
 	/** `@Route` configuration of a page component; read as the class's own value, never inherited. */
 route: MetadataKey.value("dota.router.route") };
@@ -10358,7 +10503,9 @@ route: MetadataKey.value("dota.router.route") };
 			else window.history.pushState(state, "", url.href);
 		}
 	};
+	logger$2$1 = createDotaLogger$1("dota-router", "coordinator/route-renderer.ts");
 	HYDRATION_MARKER_ATTRIBUTES = ["data-dh-route", "data-dh-t"];
+	logger$1$2 = createDotaLogger$1("dota-router", "router/history/history-transition.ts");
 	DOTA_HISTORY_STATE_KEY = "__dotaRouter";
 	DomHistoryRouter = class {
 		/**
@@ -10444,6 +10591,7 @@ route: MetadataKey.value("dota.router.route") };
 			window.dispatchEvent(new PopStateEvent("popstate", { state: null }));
 		}
 	};
+	createDotaLogger$1("dota-router", "router/dom-navigation.router.ts");
 	DotaRouterService = class DotaRouterService {
 		/**
 		* Retains compiled router dependencies until adapter initialization.
@@ -10520,706 +10668,16 @@ var init_router = __esmMin((() => {
 	init_dist$3();
 }));
 //#endregion
-//#region src/service/local-storage.service.ts
-var LocalStorageService;
-var init_local_storage_service = __esmMin((() => {
-	LocalStorageService = class {
-		static get(key) {
-			return localStorage.getItem(key);
-		}
-		static add(key, value) {
-			localStorage.setItem(key, value);
-		}
-		/**
-		* Stores a list at the specified key
-		*/
-		static addList(key, list) {
-			localStorage.setItem(key, JSON.stringify(list));
-		}
-		/**
-		* Retrieves a list from the specified key
-		*/
-		static getList(key) {
-			const storedValue = localStorage.getItem(key);
-			if (!storedValue) return [];
-			try {
-				return JSON.parse(storedValue);
-			} catch (e) {
-				console.error(`Failed to parse list from localStorage key: ${key}`);
-				return [];
-			}
-		}
-		/**
-		* Adds an item to the end of a list at the specified key
-		*/
-		static pushToList(key, item) {
-			const list = this.getList(key);
-			list.push(item);
-			this.addList(key, list);
-			return list;
-		}
-		/**
-		* Removes and returns the last item from a list at the specified key
-		*/
-		static popFromList(key) {
-			const list = this.getList(key);
-			if (list.length === 0) return void 0;
-			const item = list.pop();
-			this.addList(key, list);
-			return item;
-		}
-		static replaceList(key, values) {
-			localStorage.setItem(key, JSON.stringify(values));
-		}
-	};
-}));
-//#endregion
-//#region src/utils/GeneralUtils.ts
-var GeneralUtils;
-var init_GeneralUtils = __esmMin((() => {
-	init_local_storage_service();
-	GeneralUtils = class GeneralUtils {
-		static toggleDarkMode() {
-			const isDarkMode = document.documentElement.classList.toggle("dark");
-			LocalStorageService.add("theme", isDarkMode ? "dark" : "light");
-			window.dispatchEvent(new CustomEvent("themeChange", { detail: { isDarkMode: GeneralUtils.isDarkMode() } }));
-		}
-		static isDarkMode() {
-			return document.documentElement.classList.contains("dark");
-		}
-		static getBrowserTheme() {
-			const theme = LocalStorageService.get("theme");
-			if (theme) return theme;
-			if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
-			return "light";
-		}
-		static setBrowserTheme(theme) {
-			if (theme === "dark") document.documentElement.classList.add("dark");
-			else document.documentElement.classList.remove("dark");
-		}
-		static scrollToTop(behavior = "smooth") {
-			window.scrollTo({
-				top: 0,
-				behavior
-			});
-		}
-		static extractParenthesisBlocks(input) {
-			const regex = /\(([^)]+)\)/g;
-			const matches = [];
-			let match;
-			while ((match = regex.exec(input)) !== null) matches.push(match[1]);
-			return matches;
-		}
-		static detectDeviceType() {
-			const userAgent = navigator.userAgent;
-			const platformTokens = GeneralUtils.extractParenthesisBlocks(userAgent)[0].split(";");
-			console.log(platformTokens);
-			return {
-				tokens: platformTokens,
-				kernel: platformTokens[0],
-				os: platformTokens[1],
-				architecture: platformTokens[2]
-			};
-		}
-	};
-}));
-//#endregion
-//#region \0@oxc-project+runtime@0.142.0/helpers/esm/decorate.js
-function __decorate$2(decorators, target, key, desc) {
-	var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-	if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-	else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-	return c > 3 && r && Object.defineProperty(target, key, r), r;
-}
-var init_decorate = __esmMin((() => {}));
-//#endregion
-//#region src/pages/home/home.page.ts
-var HomePage;
-var init_home_page = __esmMin((() => {
-	init_core$1();
-	init_event();
-	init_rendering();
-	init_router();
-	init_GeneralUtils();
-	init_decorate();
-	HomePage = class HomePage extends DotaPageElement {
-		constructor() {
-			super();
-		}
-		get seo() {
-			return {
-				title: "Dota Web - A Cutting-Edge Web Application",
-				description: "Dota Web is a cutting-edge web application built with the Dota framework, designed to provide an exceptional user experience. It features a sleek and modern design, seamless navigation, and lightning-fast performance. With Dota Web, you can explore a wide range of features and functionalities that cater to your needs, whether you're looking for a powerful tool for work or a fun platform for entertainment.",
-				keywords: [
-					"Dota Web",
-					"Dota Framework",
-					"Web Application",
-					"Modern Design",
-					"Seamless Navigation",
-					"Fast Performance"
-				],
-				og: {
-					title: "Dota Web - A Cutting-Edge Web Application",
-					description: "Experience the future of web applications with Dota Web, built on the powerful Dota framework. Enjoy a sleek design, seamless navigation, and lightning-fast performance."
-				}
-			};
-		}
-		async onConnected() {
-			GeneralUtils.scrollToTop("smooth");
-		}
-		render() {
-			return html`
-           <app-header></app-header>
-           <main>
-             <app-hero></app-hero>
-             <app-feature></app-feature>
-             <code-section></code-section>
-             <reactive-dota></reactive-dota>
-             <capability-section></capability-section>
-             <emitter-section></emitter-section>
-             <device-section></device-section>
-             <our-tools></our-tools>
-             <client-section></client-section>
-             <faq-section></faq-section>
-             <app-footer></app-footer>
-           </main>
-        `;
-		}
-	};
-	__decorate$2([OnEventDecorator$1("connected", true)], HomePage.prototype, "onConnected", null);
-	HomePage = __decorate$2([RouteDecorator({
-		path: "/",
-		mode: "ssg"
-	}), ComponentDecorator({
-		selector: "home-page",
-		shadow: false
-	})], HomePage);
-}));
-//#endregion
-//#region src/configs/docs.config.ts
-/**
-* Resolves the page for a docs pathname; `/docs` opens the first page.
-* @returns The matching entry, or `undefined` for an unknown slug.
-*/
-function findDoc(pathname) {
-	const slug = pathname.split("/").filter(Boolean)[1];
-	return slug ? DOCS.find((doc) => doc.slug === slug) : DOCS[0];
-}
-var DOCS, docUrl;
-var init_docs_config = __esmMin((() => {
-	DOCS = [
-		{
-			slug: "getting-started",
-			title: "Getting Started",
-			section: "Introduction"
-		},
-		{
-			slug: "guides",
-			title: "Guides",
-			section: "Introduction"
-		},
-		{
-			slug: "component-registration",
-			title: "Component Registration",
-			section: "Guide"
-		},
-		{
-			slug: "component-definition",
-			title: "Component Definition",
-			section: "Guide"
-		},
-		{
-			slug: "property-binding",
-			title: "Property Binding",
-			section: "Guide"
-		},
-		{
-			slug: "event-binding",
-			title: "Event Binding",
-			section: "Guide"
-		},
-		{
-			slug: "event-emitter",
-			title: "Event Emitter",
-			section: "Guide"
-		},
-		{
-			slug: "reactivity",
-			title: "Reactivity",
-			section: "Guide"
-		},
-		{
-			slug: "core",
-			title: "Core",
-			section: "Concepts"
-		},
-		{
-			slug: "decorators",
-			title: "Decorators",
-			section: "Concepts"
-		},
-		{
-			slug: "life-cycle",
-			title: "Life Cycle",
-			section: "Concepts"
-		},
-		{
-			slug: "ssg-ssr-csr",
-			title: "Start here",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-html-first",
-			title: "1. From URL to HTML",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-component",
-			title: "2. A server-ready component",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-request",
-			title: "3. Inside one SSR request",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-templates",
-			title: "4. Templates become HTML",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-static-build",
-			title: "5. SSG: render at build time",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-hydration",
-			title: "6. Make HTML interactive",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-hosting",
-			title: "7. Build and serve a mixed app",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-package-map",
-			title: "8. Packages and server limits",
-			section: "Server Rendering"
-		},
-		{
-			slug: "ssr-file-reference",
-			title: "Reference: every changed file",
-			section: "Server Rendering"
-		},
-		{
-			slug: "rest-client",
-			title: "Rest Client",
-			section: "Tools"
-		},
-		{
-			slug: "router",
-			title: "Router",
-			section: "Tools"
-		}
-	];
-	docUrl = (slug) => `/docs/${slug}`;
-}));
-//#endregion
-//#region src/pages/docs.page.ts
-var DocsRoutePage, DocsPage, DocsIndexPage;
-var init_docs_page = __esmMin((() => {
-	init_core$1();
-	init_router();
-	init_rendering();
-	init_docs_config();
-	init_decorate();
-	DocsRoutePage = class extends DotaPageElement {
-		constructor() {
-			super();
-		}
-		get seo() {
-			const title = `${findDoc(window.location.pathname)?.title ?? "Not found"} | Dota Docs`;
-			const description = "Guides and reference for building web components with Dota.";
-			return {
-				title,
-				description,
-				keywords: [
-					"Dota",
-					"Web Components",
-					"Documentation"
-				],
-				og: {
-					title,
-					description
-				}
-			};
-		}
-		render() {
-			return html`<docs-view slug="${findDoc(window.location.pathname)?.slug ?? ""}"></docs-view>`;
-		}
-	};
-	DocsPage = class DocsPage extends DocsRoutePage {};
-	DocsPage = __decorate$2([RouteDecorator({ path: "/docs/:slug" }), ComponentDecorator({
-		selector: "docs-page",
-		shadow: false
-	})], DocsPage);
-	DocsIndexPage = class DocsIndexPage extends DocsRoutePage {};
-	DocsIndexPage = __decorate$2([RouteDecorator({
-		path: "/docs",
-		mode: "ssg"
-	}), ComponentDecorator({
-		selector: "docs-index-page",
-		shadow: false
-	})], DocsIndexPage);
-}));
-//#endregion
-//#region src/pages/error.page.ts
-var ErrorPage;
-var init_error_page = __esmMin((() => {
-	init_core$1();
-	init_event();
-	init_router();
-	init_GeneralUtils();
-	init_decorate();
-	ErrorPage = class ErrorPage extends DotaPageElement {
-		path;
-		message;
-		status = 404;
-		constructor() {
-			super();
-		}
-		get seo() {
-			return {
-				title: "404 Page Not Found - Dota Web",
-				description: "The requested page could not be found on Dota Web. Return to the homepage or open the documentation to continue.",
-				keywords: [
-					"Dota Web",
-					"404",
-					"Page Not Found",
-					"Error Page",
-					"Documentation"
-				],
-				og: {
-					title: "404 Page Not Found - Dota Web",
-					description: "The requested page could not be found on Dota Web. Return to the homepage or open the documentation to continue."
-				}
-			};
-		}
-		afterViewInit() {
-			GeneralUtils.scrollToTop("instant");
-		}
-		render() {
-			return HTML`
-        <div class="relative flex flex-col justify-center items-center h-screen font-dm gap-y-2 md:gap-y-4 lg:gap-y-6 p-3">
-        <span class="absolute top-4 right-4">
-          <dark-mode-button></dark-mode-button>
-        </span>
-            <dota-icon class="scale-150" name="emojione-monotone:confounded-face" color="purple" variant="link"
-                       size="2xl"></dota-icon>
-            <h1 class="text-5xl sm:text-7xl py-4 text-center font-semibold text-purple-600">404</h1>
-            <p class="text-center text-2xl sm:text-3xl text-gray-500 dark:text-gray-100 font-medium">Page Not Found</p>
-            <p class="max-sm:text-sm lg:text-lg font-medium text-gray-900 dark:text-gray-200 text-center">
-                The document you're looking for doesn't exist or has been
-                moved to another location.
-            </p>
-            <div class="items-center flex gap-2">
-                <a href="/"
-                   class="bg-purple-600 text-white flex items-center gap-1 px-5 py-3 rounded-lg">
-                    <dota-icon name="mdi:home" variant="ghost" size="md"></dota-icon>
-                    Go Home
-                </a>
-
-                <a href="/docs/getting-started"
-                   class="bg-gray-200 dark:bg-slate-800 dark:text-white px-5 py-3 rounded-lg flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 24 24">
-                        <path fill="currentColor"
-                              d="M8.385 12.308h7.23v-1h-7.23zm0 2.769h7.23v-1h-7.23zm0 2.77h4.23v-1h-4.23zM5 21V3h9.5L19 7.5V21zm9-13V4H6v16h12V8zM6 4v4zv16z"/>
-                    </svg>
-                    Documentation
-                </a>
-            </div>
-        </div>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "path",
-		type: StringType
-	})], ErrorPage.prototype, "path", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "message",
-		type: StringType
-	})], ErrorPage.prototype, "message", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "status",
-		type: StringType
-	})], ErrorPage.prototype, "status", void 0);
-	__decorate$2([OnEventDecorator$1("connected")], ErrorPage.prototype, "afterViewInit", null);
-	ErrorPage = __decorate$2([RouteDecorator({
-		path: "/error",
-		mode: "csr"
-	}), ComponentDecorator({
-		selector: "app-error",
-		shadow: false
-	})], ErrorPage);
-}));
-//#endregion
-//#region src/app.component.ts
-var AppComponent;
-var init_app_component = __esmMin((() => {
-	init_home_page();
-	init_docs_page();
-	init_error_page();
-	init_GeneralUtils();
-	init_core$1();
-	init_rendering();
-	init_decorate();
-	AppComponent = class AppComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		afterViewInit() {
-			const browserTheme = GeneralUtils.getBrowserTheme();
-			GeneralUtils.setBrowserTheme(browserTheme);
-		}
-		render() {
-			return html``;
-		}
-	};
-	__decorate$2([AfterInitDecorator()], AppComponent.prototype, "afterViewInit", null);
-	AppComponent = __decorate$2([ComponentDecorator({
-		selector: "app-root",
-		shadow: false
-	})], AppComponent);
-}));
-//#endregion
-//#region src/pages/resource.page.ts
-var ResourcePage;
-var init_resource_page = __esmMin((() => {
-	init_core$1();
-	init_router();
-	init_GeneralUtils();
-	init_decorate();
-	ResourcePage = class ResourcePage extends BaseElement {
-		constructor() {
-			super();
-		}
-		afterViewInit() {
-			GeneralUtils.scrollToTop("instant");
-		}
-		render() {
-			return `
-      <app-header></app-header>
-      <resource-section></resource-section>
-      <app-footer></app-footer>
-`;
-		}
-	};
-	__decorate$2([AfterInitDecorator()], ResourcePage.prototype, "afterViewInit", null);
-	ResourcePage = __decorate$2([RouteDecorator({
-		path: "/resources",
-		mode: "csr"
-	}), ComponentDecorator({
-		selector: "resource-page",
-		shadow: false
-	})], ResourcePage);
-}));
-//#endregion
-//#region src/pages/community.page.ts
-var CommunityPage;
-var init_community_page = __esmMin((() => {
-	init_event();
-	init_core$1();
-	init_router();
-	init_GeneralUtils();
-	init_decorate();
-	CommunityPage = class CommunityPage extends BaseElement {
-		constructor() {
-			super();
-		}
-		afterViewInit() {
-			GeneralUtils.scrollToTop("instant");
-		}
-		render() {
-			return `
-      <div class="relative isolate">
-        <cloud-chamber color="purple" vapor-intensity="1.7" vapor-density="1.35" vapor-glow="1.4"></cloud-chamber>
-        <div class="relative z-10">
-          <app-header></app-header>
-          <page-wrapper>
-            <community-component></community-component>
-            <social-section></social-section>
-          </page-wrapper>
-          <app-footer></app-footer>
-        </div>
-      </div>
-    `;
-		}
-	};
-	__decorate$2([OnEventDecorator$1("connected")], CommunityPage.prototype, "afterViewInit", null);
-	CommunityPage = __decorate$2([RouteDecorator({
-		path: "/community",
-		mode: "ssr"
-	}), ComponentDecorator({
-		selector: "community-page",
-		shadow: false
-	})], CommunityPage);
-}));
-//#endregion
-//#region src/pages/blog.page.ts
-var BlogPage;
-var init_blog_page = __esmMin((() => {
-	init_core$1();
-	init_router();
-	init_decorate();
-	BlogPage = class BlogPage extends DotaPageElement {
-		constructor() {
-			super();
-		}
-		get seo() {
-			return {
-				title: "Blogs - Dota",
-				description: "Read our latest blogs about Dota, the ultimate tool for developers.",
-				keywords: [
-					"Dota",
-					"Blogs",
-					"Development",
-					"Tools",
-					"Web Development",
-					"Programming",
-					"Software Development"
-				],
-				og: {
-					title: "Blogs - Dota",
-					description: "Read our latest blogs about Dota, the ultimate tool for developers."
-				}
-			};
-		}
-		afterViewInit() {
-			window.scrollTo({
-				top: 0,
-				behavior: "instant"
-			});
-		}
-		render() {
-			return `
-      <app-header></app-header>
-      <page-wrapper>
-        <blog-section></blog-section>
-      </page-wrapper>
-      <app-footer></app-footer>
-    `;
-		}
-	};
-	__decorate$2([AfterInitDecorator()], BlogPage.prototype, "afterViewInit", null);
-	BlogPage = __decorate$2([RouteDecorator({
-		path: "/blogs",
-		mode: "ssr"
-	}), ComponentDecorator({
-		selector: "blog-page",
-		shadow: false
-	})], BlogPage);
-}));
-//#endregion
-//#region src/utils/blog-route.utils.ts
-/**
-* Resolves blog identity from the path-based article URL used by SSG.
-* Query parameters remain supported so older links continue to load while
-* generated pages use one deterministic pathname per article.
-* @param pathname Current browser pathname.
-* @param search Current browser query string used by legacy links.
-* @returns Decoded category and Markdown filename, or empty values when absent.
-*/
-function resolveBlogRouteParams(pathname, search) {
-	const segments = pathname.split("/").filter(Boolean);
-	if (segments[0] === "blogs" && segments[1] === "content" && segments.length >= 4) return {
-		category: decodeRouteSegment(segments[2]),
-		blog: segments.slice(3).map(decodeRouteSegment).join("/")
-	};
-	const query = new URLSearchParams(search);
-	return {
-		category: query.get("category") ?? "",
-		blog: query.get("blog") ?? ""
-	};
-}
-/** Decodes one URL segment while preserving malformed user input for fallback handling. */
-function decodeRouteSegment(segment) {
-	try {
-		return decodeURIComponent(segment);
-	} catch {
-		return segment;
-	}
-}
-var init_blog_route_utils = __esmMin((() => {}));
-//#endregion
-//#region src/pages/blog-content.page.ts
-var BlogContentPage;
-var init_blog_content_page = __esmMin((() => {
-	init_core$1();
-	init_router();
-	init_GeneralUtils();
-	init_blog_route_utils();
-	init_event();
-	init_decorate();
-	BlogContentPage = class BlogContentPage extends DotaPageElement {
-		theme = "apple";
-		color = "lime";
-		constructor() {
-			super();
-		}
-		/** Builds SEO metadata from the path or legacy query parameters for this article. */
-		get seo() {
-			const { blog, category } = resolveBlogRouteParams(window.location.pathname, window.location.search);
-			const blogTitle = blog && category ? blog.replaceAll("-", " ").replace(".md", "") + ` | ${category}` : "Blog Content";
-			return {
-				title: `${blogTitle}`,
-				description: `Read the full content of our blog about ${blogTitle}.`,
-				keywords: [
-					"Dota",
-					"Blog Content",
-					"Development",
-					"Tools",
-					"Web Development",
-					"Programming",
-					"Software Development"
-				],
-				og: {
-					title: `${blogTitle} - Dota`,
-					description: `Read the full content of our blog about ${blogTitle}.`
-				}
-			};
-		}
-		afterViewInit() {
-			GeneralUtils.scrollToTop("instant");
-			this.updateSEO();
-		}
-		render() {
-			return `
-      <app-header></app-header>
-      <page-wrapper>
-        <blog-view theme="${this.theme}" color="${this.color}" max-width="max-w-5xl"></blog-view>
-      </page-wrapper>
-      <app-footer></app-footer>
-    `;
-		}
-	};
-	__decorate$2([ParamDecorator("theme")], BlogContentPage.prototype, "theme", void 0);
-	__decorate$2([ParamDecorator("color")], BlogContentPage.prototype, "color", void 0);
-	__decorate$2([OnEventDecorator$1("connected", true)], BlogContentPage.prototype, "afterViewInit", null);
-	BlogContentPage = __decorate$2([RouteDecorator({
-		path: "/blogs/content/:category/:blog",
-		mode: "ssr"
-	}), ComponentDecorator({
-		selector: "blog-content",
-		shadow: false
-	})], BlogContentPage);
+//#region ../../libs/dota-ssr/dist/index.mjs
+var init_dist$2 = __esmMin((() => {
+	init_application_capture_BSUuDzEw();
+	init_dist$4();
+	init_dist$7();
 }));
 //#endregion
 //#region ../../libs/dota-rest/dist/index.mjs
 var RequestInterceptorProcessor, RestUtils, ResponseEntity, ResponseVoid, RestResponseResolver, RestRequestRetriever, RestRequestBuilder, RestClient;
-var init_dist$2 = __esmMin((() => {
+var init_dist$1 = __esmMin((() => {
 	RequestInterceptorProcessor = class {
 		interceptors;
 		constructor(interceptors = []) {
@@ -11634,9 +11092,809 @@ var init_dist$2 = __esmMin((() => {
 	};
 }));
 //#endregion
+//#region ../../libs/dota-wrap/dist/index.mjs
+/**
+* Resolves eager or lazy module records into browser custom-element constructors.
+* Non-component exports are ignored so generated virtual modules may expose related
+* helpers without changing application registration.
+* @param modules Eager exports or lazy import functions supplied by the application.
+* @returns Constructors whose prototypes inherit from the active browser HTMLElement.
+*/
+async function extractComponent(modules) {
+	const entries = Object.values(modules);
+	const loadedModules = await Promise.all(entries.map(async (entry) => {
+		if (typeof entry === "function") return await entry() ?? {};
+		return entry ?? {};
+	}));
+	const components = [];
+	for (const mod of loadedModules) for (const exported of Object.values(mod)) if (typeof exported === "function" && exported.prototype instanceof HTMLElement) components.push(exported);
+	return components;
+}
+/**
+* Registers application and external component constructors with Dota Core.
+* Module loading finishes before one bootstrap call so custom-element upgrades occur
+* only after runtime plugins have configured the application sockets.
+* @param modules Generated module map or already resolved application constructors.
+* @param externalComponents Additional constructors supplied by UI libraries.
+* @returns Complete constructor list passed to bootstrap.
+*/
+/** Collects the application's components, external UI components included, without registering them. */
+async function resolveComponents(modules, externalComponents = []) {
+	const components = Array.isArray(modules) ? [...modules] : await extractComponent(modules);
+	components.push(...externalComponents);
+	return components;
+}
+async function registerComponents(modules, externalComponents = []) {
+	const components = await resolveComponents(modules, externalComponents);
+	bootstrap(components);
+	return components;
+}
+/**
+* Creates a router service from the registered components and optional explicit routes.
+* The renderer parameter is additive DI; omission preserves Dota Router's default
+* component-tag presentation behavior for existing callers.
+* @param components Constructors available to metadata-based route discovery.
+* @param errorRoute Fallback route for unresolved destinations.
+* @param defaultRoute Application default destination.
+* @param root Component whose host owns the route outlet.
+* @param routes Optional explicit flat route declarations.
+* @param globalHooks Application-wide navigation guards and observers.
+* @param renderer Optional presentation strategy supplied by runtime plugins.
+* @returns Deferred router service ready for initialization.
+*/
+async function registerRoutes(components, errorRoute, defaultRoute, root, routes = [], globalHooks, renderer) {
+	return DotaRouterService.fromComponents({
+		router: DomHistoryRouter,
+		components: [...components],
+		routes: routes.length > 0 ? [...routes] : void 0,
+		errorRoute,
+		defaultRoute,
+		root,
+		globalHooks,
+		renderer
+	});
+}
+/**
+* Composes runtime extensions, registers elements, and initializes application routing.
+* Plugin setup intentionally precedes custom-element definition so an existing static
+* document can hydrate during upgrade instead of taking the default client mount path.
+* When Dota SSR loads the entry on a server, the configuration is reported to it and the
+* returned promise never settles, so code chained on it only ever runs in the browser.
+* @param config Components, routes, root, hooks, and opt-in runtime plugins.
+* @returns Registered constructors and initialized router service.
+*/
+async function initializeApp(config) {
+	if (config.logging) configureDotaLogging(config.logging);
+	const captureHook = getApplicationCaptureHook();
+	if (captureHook) {
+		const components = await resolveComponents(config.modules, config.externalComponents);
+		captureHook({
+			components,
+			routes: config.routes?.length ? config.routes : RouterUtils.prepareConfig(components),
+			errorRoute: config.errorRoute,
+			defaultRoute: config.defaultRoute,
+			root: config.root
+		});
+		return new Promise(() => {});
+	}
+	let routeRenderer = createRouteRenderer(config.root);
+	let mountStrategyOwner = null;
+	let currentPlugin = "<unknown>";
+	const runtimeContext = {
+		setMountStrategy(strategy) {
+			if (mountStrategyOwner !== null) throw new Error(`dota-wrap: two hydration-capable plugins both claim the exclusive mount strategy slot: "${mountStrategyOwner}" (already registered) and "${currentPlugin}" (attempted). Remove one from the plugins array — they cannot coexist.`);
+			mountStrategyOwner = currentPlugin;
+			setMountStrategy(strategy);
+		},
+		wrapRouteRenderer(wrapper) {
+			routeRenderer = wrapper(routeRenderer, config.root);
+		}
+	};
+	config.plugins?.forEach((plugin) => {
+		currentPlugin = plugin.name;
+		plugin.setup?.(runtimeContext);
+	});
+	const components = await registerComponents(config.modules, config.externalComponents);
+	logger$5.debug(`${components.length} components registered`);
+	const routerService = await registerRoutes(components, config.errorRoute, config.defaultRoute, config.root, config.routes ?? [], config.globalHooks, routeRenderer);
+	routerService.init();
+	logger$5.debug(`${routerService._routes.length} routes registered`);
+	logger$5.info("Application initialized");
+	return {
+		components,
+		routerService
+	};
+}
+var logger$5;
+var init_dist = __esmMin((() => {
+	init_dist$4();
+	init_dist$3();
+	init_dist$2();
+	init_dist$6();
+	init_dist$4();
+	init_dist$3();
+	init_dist$5();
+	init_dist$1();
+	logger$5 = createDotaLogger$1("dota-wrap", "index.ts");
+}));
+//#endregion
+//#region src/service/local-storage.service.ts
+var logger$4, LocalStorageService;
+var init_local_storage_service = __esmMin((() => {
+	init_dist();
+	logger$4 = createDotaLogger$1("dota-web", "service/local-storage.service.ts");
+	LocalStorageService = class {
+		static get(key) {
+			return localStorage.getItem(key);
+		}
+		static add(key, value) {
+			localStorage.setItem(key, value);
+		}
+		/**
+		* Stores a list at the specified key
+		*/
+		static addList(key, list) {
+			localStorage.setItem(key, JSON.stringify(list));
+		}
+		/**
+		* Retrieves a list from the specified key
+		*/
+		static getList(key) {
+			const storedValue = localStorage.getItem(key);
+			if (!storedValue) return [];
+			try {
+				return JSON.parse(storedValue);
+			} catch (e) {
+				logger$4.error(`Failed to parse list from localStorage key: ${key}`, e);
+				return [];
+			}
+		}
+		/**
+		* Adds an item to the end of a list at the specified key
+		*/
+		static pushToList(key, item) {
+			const list = this.getList(key);
+			list.push(item);
+			this.addList(key, list);
+			return list;
+		}
+		/**
+		* Removes and returns the last item from a list at the specified key
+		*/
+		static popFromList(key) {
+			const list = this.getList(key);
+			if (list.length === 0) return void 0;
+			const item = list.pop();
+			this.addList(key, list);
+			return item;
+		}
+		static replaceList(key, values) {
+			localStorage.setItem(key, JSON.stringify(values));
+		}
+	};
+}));
+//#endregion
+//#region src/utils/GeneralUtils.ts
+var logger$3, GeneralUtils;
+var init_GeneralUtils = __esmMin((() => {
+	init_local_storage_service();
+	init_dist();
+	logger$3 = createDotaLogger$1("dota-web", "utils/GeneralUtils.ts");
+	GeneralUtils = class GeneralUtils {
+		static toggleDarkMode() {
+			const isDarkMode = document.documentElement.classList.toggle("dark");
+			LocalStorageService.add("theme", isDarkMode ? "dark" : "light");
+			window.dispatchEvent(new CustomEvent("themeChange", { detail: { isDarkMode: GeneralUtils.isDarkMode() } }));
+		}
+		static isDarkMode() {
+			return document.documentElement.classList.contains("dark");
+		}
+		static getBrowserTheme() {
+			const theme = LocalStorageService.get("theme");
+			if (theme) return theme;
+			if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+			return "light";
+		}
+		static setBrowserTheme(theme) {
+			if (theme === "dark") document.documentElement.classList.add("dark");
+			else document.documentElement.classList.remove("dark");
+		}
+		static scrollToTop(behavior = "smooth") {
+			window.scrollTo({
+				top: 0,
+				behavior
+			});
+		}
+		static extractParenthesisBlocks(input) {
+			const regex = /\(([^)]+)\)/g;
+			const matches = [];
+			let match;
+			while ((match = regex.exec(input)) !== null) matches.push(match[1]);
+			return matches;
+		}
+		static detectDeviceType() {
+			const userAgent = navigator.userAgent;
+			const platformTokens = GeneralUtils.extractParenthesisBlocks(userAgent)[0].split(";");
+			logger$3.debug("Detected platform tokens", platformTokens);
+			return {
+				tokens: platformTokens,
+				kernel: platformTokens[0],
+				os: platformTokens[1],
+				architecture: platformTokens[2]
+			};
+		}
+	};
+}));
+//#endregion
+//#region \0@oxc-project+runtime@0.142.0/helpers/esm/decorate.js
+function __decorate$2(decorators, target, key, desc) {
+	var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+	if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+	else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+	return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+var init_decorate = __esmMin((() => {}));
+//#endregion
+//#region src/pages/home/home.page.ts
+var HomePage;
+var init_home_page = __esmMin((() => {
+	init_core$1();
+	init_event();
+	init_rendering();
+	init_router();
+	init_GeneralUtils();
+	init_decorate();
+	HomePage = class HomePage extends DotaPageElement {
+		constructor() {
+			super();
+		}
+		get seo() {
+			return {
+				favicon: "/favicon.svg",
+				title: "Dota Web - A Cutting-Edge Web Application",
+				description: "Dota Web is a cutting-edge web application built with the Dota framework, designed to provide an exceptional user experience. It features a sleek and modern design, seamless navigation, and lightning-fast performance. With Dota Web, you can explore a wide range of features and functionalities that cater to your needs, whether you're looking for a powerful tool for work or a fun platform for entertainment.",
+				keywords: [
+					"Dota Web",
+					"Dota Framework",
+					"Web Application",
+					"Modern Design",
+					"Seamless Navigation",
+					"Fast Performance"
+				],
+				og: {
+					title: "Dota Web - A Cutting-Edge Web Application",
+					description: "Experience the future of web applications with Dota Web, built on the powerful Dota framework. Enjoy a sleek design, seamless navigation, and lightning-fast performance."
+				}
+			};
+		}
+		async onConnected() {
+			GeneralUtils.scrollToTop("smooth");
+		}
+		render() {
+			return html`
+           <app-header></app-header>
+           <main>
+             <app-hero></app-hero>
+             <app-feature></app-feature>
+             <code-section></code-section>
+             <reactive-dota></reactive-dota>
+             <capability-section></capability-section>
+             <emitter-section></emitter-section>
+             <device-section></device-section>
+             <our-tools></our-tools>
+             <client-section></client-section>
+             <faq-section></faq-section>
+             <app-footer></app-footer>
+           </main>
+        `;
+		}
+	};
+	__decorate$2([OnEventDecorator$1("connected", true)], HomePage.prototype, "onConnected", null);
+	HomePage = __decorate$2([RouteDecorator({
+		path: "/",
+		mode: "ssg"
+	}), ComponentDecorator({
+		selector: "home-page",
+		shadow: false
+	})], HomePage);
+}));
+//#endregion
+//#region src/configs/docs.config.ts
+/**
+* Resolves the page for a docs pathname; `/docs` opens the first page.
+* @returns The matching entry, or `undefined` for an unknown slug.
+*/
+function findDoc(pathname) {
+	const slug = pathname.split("/").filter(Boolean)[1];
+	if (!slug) return DOCS[0];
+	return DOCS.find((doc) => doc.slug === (previousServerRenderingSlugs.has(slug) ? "server-rendering" : slug));
+}
+var DOCS, docUrl, previousServerRenderingSlugs;
+var init_docs_config = __esmMin((() => {
+	DOCS = [
+		{
+			slug: "getting-started",
+			title: "Getting Started",
+			section: "Introduction"
+		},
+		{
+			slug: "guides",
+			title: "Guides",
+			section: "Introduction"
+		},
+		{
+			slug: "component-registration",
+			title: "Component Registration",
+			section: "Guide"
+		},
+		{
+			slug: "component-definition",
+			title: "Component Definition",
+			section: "Guide"
+		},
+		{
+			slug: "property-binding",
+			title: "Property Binding",
+			section: "Guide"
+		},
+		{
+			slug: "event-binding",
+			title: "Event Binding",
+			section: "Guide"
+		},
+		{
+			slug: "event-emitter",
+			title: "Event Emitter",
+			section: "Guide"
+		},
+		{
+			slug: "reactivity",
+			title: "Reactivity",
+			section: "Guide"
+		},
+		{
+			slug: "core",
+			title: "Core",
+			section: "Concepts"
+		},
+		{
+			slug: "decorators",
+			title: "Decorators",
+			section: "Concepts"
+		},
+		{
+			slug: "life-cycle",
+			title: "Life Cycle",
+			section: "Concepts"
+		},
+		{
+			slug: "server-rendering",
+			title: "Server Rendering",
+			section: "Server Rendering"
+		},
+		{
+			slug: "rest-client",
+			title: "Rest Client",
+			section: "Tools"
+		},
+		{
+			slug: "router",
+			title: "Router",
+			section: "Tools"
+		}
+	];
+	docUrl = (slug) => `/docs/${slug}`;
+	previousServerRenderingSlugs = /* @__PURE__ */ new Set([
+		"ssg-ssr-csr",
+		"ssr-html-first",
+		"ssr-component",
+		"ssr-request",
+		"ssr-templates",
+		"ssr-static-build",
+		"ssr-hydration",
+		"ssr-hosting",
+		"ssr-package-map",
+		"ssr-file-reference"
+	]);
+}));
+//#endregion
+//#region src/pages/docs.page.ts
+var DocsRoutePage, DocsPage, DocsIndexPage;
+var init_docs_page = __esmMin((() => {
+	init_core$1();
+	init_router();
+	init_rendering();
+	init_docs_config();
+	init_decorate();
+	DocsRoutePage = class extends DotaPageElement {
+		constructor() {
+			super();
+		}
+		get seo() {
+			const title = `${findDoc(window.location.pathname)?.title ?? "Not found"} | Dota Docs`;
+			const description = "Guides and reference for building web components with Dota.";
+			return {
+				title,
+				description,
+				favicon: "/favicon.svg",
+				keywords: [
+					"Dota",
+					"Web Components",
+					"Documentation"
+				],
+				og: {
+					title,
+					description
+				}
+			};
+		}
+		render() {
+			return html`<docs-view slug="${findDoc(window.location.pathname)?.slug ?? ""}"></docs-view>`;
+		}
+	};
+	DocsPage = class DocsPage extends DocsRoutePage {};
+	DocsPage = __decorate$2([RouteDecorator({
+		path: "/docs/:slug",
+		mode: "ssr"
+	}), ComponentDecorator({
+		selector: "docs-page",
+		shadow: false
+	})], DocsPage);
+	DocsIndexPage = class DocsIndexPage extends DocsRoutePage {};
+	DocsIndexPage = __decorate$2([RouteDecorator({
+		path: "/docs",
+		mode: "ssr"
+	}), ComponentDecorator({
+		selector: "docs-index-page",
+		shadow: false
+	})], DocsIndexPage);
+}));
+//#endregion
+//#region src/pages/error.page.ts
+var ErrorPage;
+var init_error_page = __esmMin((() => {
+	init_core$1();
+	init_event();
+	init_router();
+	init_GeneralUtils();
+	init_decorate();
+	ErrorPage = class ErrorPage extends DotaPageElement {
+		path;
+		message;
+		status = 404;
+		constructor() {
+			super();
+		}
+		get seo() {
+			return {
+				favicon: "/favicon.svg",
+				title: "404 Page Not Found - Dota Web",
+				description: "The requested page could not be found on Dota Web. Return to the homepage or open the documentation to continue.",
+				keywords: [
+					"Dota Web",
+					"404",
+					"Page Not Found",
+					"Error Page",
+					"Documentation"
+				],
+				og: {
+					title: "404 Page Not Found - Dota Web",
+					description: "The requested page could not be found on Dota Web. Return to the homepage or open the documentation to continue."
+				}
+			};
+		}
+		afterViewInit() {
+			GeneralUtils.scrollToTop("instant");
+		}
+		render() {
+			return HTML`
+        <div class="relative flex flex-col justify-center items-center h-screen font-dm gap-y-2 md:gap-y-4 lg:gap-y-6 p-3">
+        <span class="absolute top-4 right-4">
+          <dark-mode-button></dark-mode-button>
+        </span>
+            <dota-icon class="scale-150" name="emojione-monotone:confounded-face" color="purple" variant="link"
+                       size="2xl"></dota-icon>
+            <h1 class="text-5xl sm:text-7xl py-4 text-center font-semibold text-purple-600">404</h1>
+            <p class="text-center text-2xl sm:text-3xl text-gray-500 dark:text-gray-100 font-medium">Page Not Found</p>
+            <p class="max-sm:text-sm lg:text-lg font-medium text-gray-900 dark:text-gray-200 text-center">
+                The document you're looking for doesn't exist or has been
+                moved to another location.
+            </p>
+            <div class="items-center flex gap-2">
+                <a href="/"
+                   class="bg-purple-600 text-white flex items-center gap-1 px-5 py-3 rounded-lg">
+                    <dota-icon name="mdi:home" variant="ghost" size="md"></dota-icon>
+                    Go Home
+                </a>
+
+                <a href="/docs/getting-started"
+                   class="bg-gray-200 dark:bg-slate-800 dark:text-white px-5 py-3 rounded-lg flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="24" viewBox="0 0 24 24">
+                        <path fill="currentColor"
+                              d="M8.385 12.308h7.23v-1h-7.23zm0 2.769h7.23v-1h-7.23zm0 2.77h4.23v-1h-4.23zM5 21V3h9.5L19 7.5V21zm9-13V4H6v16h12V8zM6 4v4zv16z"/>
+                    </svg>
+                    Documentation
+                </a>
+            </div>
+        </div>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		name: "path",
+		type: StringType
+	})], ErrorPage.prototype, "path", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "message",
+		type: StringType
+	})], ErrorPage.prototype, "message", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "status",
+		type: StringType
+	})], ErrorPage.prototype, "status", void 0);
+	__decorate$2([OnEventDecorator$1("connected")], ErrorPage.prototype, "afterViewInit", null);
+	ErrorPage = __decorate$2([RouteDecorator({
+		path: "/error",
+		mode: "csr"
+	}), ComponentDecorator({
+		selector: "app-error",
+		shadow: false
+	})], ErrorPage);
+}));
+//#endregion
+//#region src/app.component.ts
+var AppComponent;
+var init_app_component = __esmMin((() => {
+	init_home_page();
+	init_docs_page();
+	init_error_page();
+	init_GeneralUtils();
+	init_core$1();
+	init_rendering();
+	init_decorate();
+	AppComponent = class AppComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		afterViewInit() {
+			const browserTheme = GeneralUtils.getBrowserTheme();
+			GeneralUtils.setBrowserTheme(browserTheme);
+		}
+		render() {
+			return html``;
+		}
+	};
+	__decorate$2([AfterInitDecorator()], AppComponent.prototype, "afterViewInit", null);
+	AppComponent = __decorate$2([ComponentDecorator({
+		selector: "app-root",
+		shadow: false
+	})], AppComponent);
+}));
+//#endregion
+//#region src/pages/resource.page.ts
+var ResourcePage;
+var init_resource_page = __esmMin((() => {
+	init_core$1();
+	init_router();
+	init_GeneralUtils();
+	init_decorate();
+	ResourcePage = class ResourcePage extends BaseElement {
+		constructor() {
+			super();
+		}
+		afterViewInit() {
+			GeneralUtils.scrollToTop("instant");
+		}
+		render() {
+			return `
+      <app-header></app-header>
+      <resource-section></resource-section>
+      <app-footer></app-footer>
+`;
+		}
+	};
+	__decorate$2([AfterInitDecorator()], ResourcePage.prototype, "afterViewInit", null);
+	ResourcePage = __decorate$2([RouteDecorator({
+		path: "/resources",
+		mode: "csr"
+	}), ComponentDecorator({
+		selector: "resource-page",
+		shadow: false
+	})], ResourcePage);
+}));
+//#endregion
+//#region src/pages/community.page.ts
+var CommunityPage;
+var init_community_page = __esmMin((() => {
+	init_event();
+	init_core$1();
+	init_router();
+	init_GeneralUtils();
+	init_decorate();
+	CommunityPage = class CommunityPage extends BaseElement {
+		constructor() {
+			super();
+		}
+		afterViewInit() {
+			GeneralUtils.scrollToTop("instant");
+		}
+		render() {
+			return `
+      <div class="relative isolate">
+        <cloud-chamber color="purple" vapor-intensity="1.7" vapor-density="1.35" vapor-glow="1.4"></cloud-chamber>
+        <div class="relative z-10">
+          <app-header></app-header>
+          <page-wrapper>
+            <community-component></community-component>
+            <social-section></social-section>
+          </page-wrapper>
+          <app-footer></app-footer>
+        </div>
+      </div>
+    `;
+		}
+	};
+	__decorate$2([OnEventDecorator$1("connected")], CommunityPage.prototype, "afterViewInit", null);
+	CommunityPage = __decorate$2([RouteDecorator({
+		path: "/community",
+		mode: "ssr"
+	}), ComponentDecorator({
+		selector: "community-page",
+		shadow: false
+	})], CommunityPage);
+}));
+//#endregion
+//#region src/pages/blog.page.ts
+var BlogPage;
+var init_blog_page = __esmMin((() => {
+	init_core$1();
+	init_router();
+	init_decorate();
+	BlogPage = class BlogPage extends DotaPageElement {
+		constructor() {
+			super();
+		}
+		get seo() {
+			return {
+				favicon: "/favicon.svg",
+				title: "Blogs - Dota",
+				description: "Read our latest blogs about Dota, the ultimate tool for developers.",
+				keywords: [
+					"Dota",
+					"Blogs",
+					"Development",
+					"Tools",
+					"Web Development",
+					"Programming",
+					"Software Development"
+				],
+				og: {
+					title: "Blogs - Dota",
+					description: "Read our latest blogs about Dota, the ultimate tool for developers."
+				}
+			};
+		}
+		afterViewInit() {
+			window.scrollTo({
+				top: 0,
+				behavior: "instant"
+			});
+		}
+		render() {
+			return `
+      <app-header></app-header>
+      <page-wrapper>
+        <blog-section></blog-section>
+      </page-wrapper>
+      <app-footer></app-footer>
+    `;
+		}
+	};
+	__decorate$2([AfterInitDecorator()], BlogPage.prototype, "afterViewInit", null);
+	BlogPage = __decorate$2([RouteDecorator({
+		path: "/blogs",
+		mode: "ssg"
+	}), ComponentDecorator({
+		selector: "blog-page",
+		shadow: false
+	})], BlogPage);
+}));
+//#endregion
+//#region src/utils/blog-route.utils.ts
+/**
+* Resolves blog identity from the path-based article URL used by SSG.
+* Query parameters remain supported so older links continue to load while
+* generated pages use one deterministic pathname per article.
+* @param pathname Current browser pathname.
+* @param search Current browser query string used by legacy links.
+* @returns Decoded category and Markdown filename, or empty values when absent.
+*/
+function resolveBlogRouteParams(pathname, search) {
+	const segments = pathname.split("/").filter(Boolean);
+	if (segments[0] === "blogs" && segments[1] === "content" && segments.length >= 4) return {
+		category: decodeRouteSegment(segments[2]),
+		blog: segments.slice(3).map(decodeRouteSegment).join("/")
+	};
+	const query = new URLSearchParams(search);
+	return {
+		category: query.get("category") ?? "",
+		blog: query.get("blog") ?? ""
+	};
+}
+/** Decodes one URL segment while preserving malformed user input for fallback handling. */
+function decodeRouteSegment(segment) {
+	try {
+		return decodeURIComponent(segment);
+	} catch {
+		return segment;
+	}
+}
+var init_blog_route_utils = __esmMin((() => {}));
+//#endregion
+//#region src/pages/blog-content.page.ts
+var BlogContentPage;
+var init_blog_content_page = __esmMin((() => {
+	init_core$1();
+	init_router();
+	init_GeneralUtils();
+	init_blog_route_utils();
+	init_event();
+	init_decorate();
+	BlogContentPage = class BlogContentPage extends DotaPageElement {
+		theme = "apple";
+		color = "lime";
+		constructor() {
+			super();
+		}
+		/** Builds SEO metadata from the path or legacy query parameters for this article. */
+		get seo() {
+			const { blog, category } = resolveBlogRouteParams(window.location.pathname, window.location.search);
+			const blogTitle = blog && category ? blog.replaceAll("-", " ").replace(".md", "") + ` | ${category}` : "Blog Content";
+			return {
+				title: `${blogTitle}`,
+				favicon: "/favicon.svg",
+				description: `Read the full content of our blog about ${blogTitle}.`,
+				keywords: [
+					"Dota",
+					"Blog Content",
+					"Development",
+					"Tools",
+					"Web Development",
+					"Programming",
+					"Software Development"
+				],
+				og: {
+					title: `${blogTitle} - Dota`,
+					description: `Read the full content of our blog about ${blogTitle}.`
+				}
+			};
+		}
+		afterViewInit() {
+			GeneralUtils.scrollToTop("instant");
+			this.updateSEO();
+		}
+		render() {
+			return `
+      <app-header></app-header>
+      <page-wrapper>
+        <blog-view theme="${this.theme}" color="${this.color}" max-width="max-w-5xl"></blog-view>
+      </page-wrapper>
+      <app-footer></app-footer>
+    `;
+		}
+	};
+	__decorate$2([ParamDecorator("theme")], BlogContentPage.prototype, "theme", void 0);
+	__decorate$2([ParamDecorator("color")], BlogContentPage.prototype, "color", void 0);
+	__decorate$2([OnEventDecorator$1("connected", true)], BlogContentPage.prototype, "afterViewInit", null);
+	BlogContentPage = __decorate$2([RouteDecorator({ path: "/blogs/content/:category/:blog" }), ComponentDecorator({
+		selector: "blog-content",
+		shadow: false
+	})], BlogContentPage);
+}));
+//#endregion
 //#region ../../libs/dota-wrap/dist/rest/index.mjs
 var init_rest = __esmMin((() => {
-	init_dist$2();
+	init_dist$1();
 }));
 //#endregion
 //#region src/constants/prompt.ts
@@ -11849,15 +12107,110 @@ function escapeHtml$1$1(value) {
 		"'": "&#39;"
 	})[character]);
 }
+function isPlainObject$1(value) {
+	if (value === null || typeof value !== "object") return false;
+	const prototype = Object.getPrototypeOf(value);
+	if (prototype !== null && prototype !== Object.prototype && Object.getPrototypeOf(prototype) !== null) return false;
+	if (Symbol.iterator in value) return false;
+	if (Symbol.toStringTag in value) return Object.prototype.toString.call(value) === "[object Module]";
+	return true;
+}
+function _defu(baseObject, defaults, namespace = ".", merger) {
+	if (!isPlainObject$1(defaults)) return _defu(baseObject, {}, namespace, merger);
+	const object = Object.assign({}, defaults);
+	for (const key in baseObject) {
+		if (key === "__proto__" || key === "constructor") continue;
+		const value = baseObject[key];
+		if (value === null || value === void 0) continue;
+		if (merger && merger(object, key, value, namespace)) continue;
+		if (Array.isArray(value) && Array.isArray(object[key])) object[key] = [...value, ...object[key]];
+		else if (isPlainObject$1(value) && isPlainObject$1(object[key])) object[key] = _defu(value, object[key], (namespace ? `${namespace}.` : "") + key.toString(), merger);
+		else object[key] = value;
+	}
+	return object;
+}
+function createDefu(merger) {
+	return (...arguments_) => arguments_.reduce((p, c) => _defu(p, c, "", merger), {});
+}
+function isPlainObject(obj) {
+	return Object.prototype.toString.call(obj) === "[object Object]";
+}
+function isLogObj(arg) {
+	if (!isPlainObject(arg)) return false;
+	if (!arg.message && !arg.args) return false;
+	if (arg.stack) return false;
+	return true;
+}
+function _normalizeLogLevel(input, types = {}, defaultLevel = 3) {
+	if (input === void 0) return defaultLevel;
+	if (typeof input === "number") return input;
+	if (types[input] && types[input].level !== void 0) return types[input].level;
+	return defaultLevel;
+}
+function createConsola$1(options = {}) {
+	return new Consola(options);
+}
+function createConsola(options = {}) {
+	return createConsola$1({
+		reporters: options.reporters || [new BrowserReporter({})],
+		prompt(message, options2 = {}) {
+			if (options2.type === "confirm") return Promise.resolve(confirm(message));
+			return Promise.resolve(prompt(message));
+		},
+		...options
+	});
+}
 /**
-* Removes executable and externally-loading content from Iconify SVG markup.
-* The component injects the resulting SVG into light DOM, so this keeps the
-* cached asset limited to presentational SVG elements and attributes.
-* @param rawSvg Markup returned by Iconify for one validated icon name.
-* @returns Safe serialized SVG markup, or `null` when the response is not an SVG.
+* Resolves logging in order: plugin setting, package environment, wrapper setting, global environment, default.
+* An unrecognized environment value is ignored so it cannot accidentally suppress diagnostics.
+* @param packageName Package slug without the @ayu-sh-kr scope.
+* @param override Explicit setting from a plugin or host integration.
+* @param globalOverride Setting supplied by the wrapper for all plugins.
+* @param packageOverride Package setting supplied by the wrapper.
+* @returns The selected Consola log type.
 */
-function sanitizeSvg(rawSvg) {
-	const document = new DOMParser().parseFromString(rawSvg, "image/svg+xml");
+function resolveDotaLogType(packageName, override, globalOverride, packageOverride) {
+	const environment = globalThis.process?.env;
+	const packageKey = `DOTA_${packageName.replace(/^dota-/, "").replace(/-/g, "_").toUpperCase()}_LOG_TYPE`;
+	for (const candidate of [
+		override,
+		environment?.[packageKey],
+		packageOverride ?? state.settings.packages?.[packageName],
+		globalOverride ?? state.settings.logType,
+		environment?.DOTA_LOG_TYPE
+	]) if (candidate && Object.hasOwn(LogLevels, candidate)) return candidate;
+	return "info";
+}
+/**
+* Creates a package logger with a stable source tag, timestamp, and Consola severity.
+* @param packageName Package slug used for its environment variable and output tag.
+* @param sourceFile Source file or subsystem that produced the diagnostic.
+* @param override Explicit plugin or wrapper level, if supplied.
+*/
+function createDotaLogger(packageName, sourceFile, override) {
+	const logger = createConsola({
+		level: LogLevels[resolveDotaLogType(packageName, override)],
+		formatOptions: {
+			date: true,
+			colors: true
+		},
+		reporters: [reporter]
+	}).withTag(`${packageName}:${sourceFile}`);
+	state.entries.add({
+		packageName,
+		override,
+		logger: new WeakRef(logger)
+	});
+	return logger;
+}
+/**
+* Removes executable and externally-loading content before SVG enters light DOM.
+* Cached values are sanitized again because browser storage can be modified.
+* @param markup SVG received from the network or persistent cache.
+* @returns Presentational SVG markup, or null for malformed responses.
+*/
+function sanitizeIcon(markup) {
+	const document = new DOMParser().parseFromString(markup, "image/svg+xml");
 	const svg = document.documentElement;
 	if (svg.localName !== "svg" || document.querySelector("parsererror")) return null;
 	svg.querySelectorAll("script, style, foreignObject, iframe, object, embed, audio, video").forEach((element) => element.remove());
@@ -11873,26 +12226,97 @@ function sanitizeSvg(rawSvg) {
 	return new XMLSerializer().serializeToString(svg);
 }
 /**
-* Fetches one Iconify SVG and shares its sanitized result across all instances.
-* Keeping in-flight work by name prevents duplicate requests while preserving a
-* failed request as a retryable miss instead of permanently caching the failure.
+* Loads an icon through memory, persistent browser storage, then its source URL.
+* Seven-day entries survive hard refreshes; failures retain stale SVGs and wait
+* before retrying. Storage failures never prevent rendering. Concurrent calls share work.
+* @param url Same-origin asset URL or the default Iconify URL.
+* @returns Sanitized SVG, or null when no usable cached or network value exists.
+*/
+function loadCachedIcon(url) {
+	const inFlight = pending.get(url);
+	if (inFlight) return inFlight;
+	const promise = loadIcon(url).finally(() => pending.delete(url));
+	pending.set(url, promise);
+	return promise;
+}
+/**
+* Applies TTL and failure cooldown without turning persistence into a prerequisite.
+* @param url Cache identity and fetch destination.
+* @returns A fresh icon or the last usable stale entry when fetching fails.
+*/
+async function loadIcon(url) {
+	const key = PREFIX + url;
+	const retryKey = `${key}:retry-after`;
+	let cached = memory.get(url);
+	if (!cached) {
+		try {
+			const stored = JSON.parse(window.localStorage.getItem(key) ?? "null");
+			if (stored && typeof stored.svg === "string" && Number.isFinite(stored.expiresAt)) {
+				const svg = sanitizeIcon(stored.svg);
+				if (svg) cached = {
+					svg,
+					expiresAt: stored.expiresAt
+				};
+			}
+		} catch {}
+		if (cached) memory.set(url, cached);
+	}
+	if (cached && cached.expiresAt > Date.now()) return cached.svg;
+	let retryAt = retryAfter.get(url) ?? 0;
+	try {
+		const stored = Number(window.localStorage.getItem(retryKey));
+		if (Number.isFinite(stored)) retryAt = Math.max(retryAt, stored);
+	} catch {}
+	if (retryAt > Date.now()) return cached?.svg ?? null;
+	const deferRetry = (delay = RETRY_DELAY) => {
+		const until = Date.now() + delay;
+		retryAfter.set(url, until);
+		try {
+			window.localStorage.setItem(retryKey, JSON.stringify(until));
+		} catch {}
+	};
+	try {
+		const response = await fetch(url);
+		if (!response.ok) {
+			const header = response.headers.get("retry-after");
+			const delay = header && /^\d+$/.test(header) ? Number(header) * 1e3 : Date.parse(header ?? "") - Date.now();
+			deferRetry(Math.max(RETRY_DELAY, Number.isFinite(delay) ? delay : 0));
+			return cached?.svg ?? null;
+		}
+		const svg = sanitizeIcon(await response.text());
+		if (!svg) {
+			deferRetry();
+			return cached?.svg ?? null;
+		}
+		const entry = {
+			svg,
+			expiresAt: Date.now() + TTL
+		};
+		memory.set(url, entry);
+		retryAfter.delete(url);
+		try {
+			window.localStorage.setItem(key, JSON.stringify(entry));
+			window.localStorage.removeItem(retryKey);
+		} catch {}
+		return svg;
+	} catch (error) {
+		deferRetry();
+		if (cached) return cached.svg;
+		throw error;
+	}
+}
+/**
+* Loads a sanitized SVG from the configured source and shared persistent cache.
+* A local source can replace Iconify without changing component instances.
 * @param name A validated `collection:icon` identifier.
+* @param baseUrl Directory containing named SVG assets, without a trailing slash.
 * @returns Sanitized SVG markup, or `null` if the icon cannot be loaded safely.
 */
-function fetchSvg(name) {
-	const cached = SVG_CACHE.get(name);
-	if (cached) return Promise.resolve(cached);
-	const inFlight = SVG_INFLIGHT.get(name);
-	if (inFlight) return inFlight;
-	const promise = fetch(`https://api.iconify.design/${name}.svg`).then((response) => response.ok ? response.text() : null).then((rawSvg) => rawSvg ? sanitizeSvg(rawSvg) : null).then((svg) => {
-		if (svg) SVG_CACHE.set(name, svg);
-		return svg;
-	}).catch((error) => {
-		console.warn(`[dota-icon] Could not load "${name}".`, error);
+function fetchSvg(name, baseUrl) {
+	return loadCachedIcon(`${baseUrl.replace(/\/$/, "")}/${name}.svg`).catch((error) => {
+		logger$1$1.warn(`Could not load icon "${name}".`, error);
 		return null;
-	}).finally(() => SVG_INFLIGHT.delete(name));
-	SVG_INFLIGHT.set(name, promise);
-	return promise;
+	});
 }
 /**
 * Escapes text before it is placed in the component's HTML-string template.
@@ -13329,7 +13753,7 @@ function partitionBreadcrumb(crumbs, budget, foldMin) {
 		folded
 	};
 }
-var __commonJSMin, EVENTS_METADATA_KEY, ModalStyle, ModalComponent, CardComponent, CardTitleComponent, CardHeaderComponent, CardDescriptionComponent, CardFooterComponent, UIConfig, BadgeStyle, BadgeComponent, ScaffoldStyle, ScaffoldComponent, IconStyle, SVG_CACHE, SVG_INFLIGHT, ICON_NAME_PATTERN, IconsComponent$1, AccordionStyle, AccordionComponent, ChipStyle, ChipComponent, AvatarStyle, AvatarComponent, AvatarWrapper, ButtonStyle, ButtonComponent, min, max, round, floor$1, createCoords, oppositeSideMap, oppositeAlignmentMap, yAxisSides, lrPlacement, rlPlacement, tbPlacement, btPlacement, computePosition$1, flip$1, originSides, offset$1, shift$1, invalidOverflowDisplayValues, tableElements, topLayerSelectors, transformProperties, willChangeValues, containValues, lastTraversableNodeNames, noOffsets, SCROLLBAR_MAX, absoluteOrFixed, getElementRects, platform, offset, shift, flip, computePosition, INTERACTIVE_SELECTOR, CUSTOM_ELEMENT_NAME, PLACEMENTS, PopoverComponent, PlaceholderStyle, PlaceholderComponent, BlobsComponent, BLOB_A, BLOB_B, BLOB_C, BLOB_D, CIRCULAR_BLOB_A, CIRCULAR_BLOB_B, CIRCULAR_BLOB_C, CIRCULAR_BLOB_D, BLOBS$1, COLOR_PLACEMENTS, BlobSeparatorComponent, ORB_CENTER_OFFSET, ORB_RADIUS_DEFAULT, ORB_RADIUS_XL, ORB_RADIUS_CENTER_DEFAULT, ORB_RADIUS_CENTER_XL, BASE_SPEED, NUM_DEPTH_BUCKETS, BUCKET_ALPHA_SCALE, BUCKET_SIZE_SCALE, ORB_SIZE_MAP, ORB_COLOR_MAP, GLOW_LIGHT_ALPHAS, GLOW_LIGHT_POSITIONS, GLOW_DARK_ALPHAS, GLOW_DARK_POSITIONS, isDarkMode, OrbBackgroundComponent, TAU$1, MOTE_COUNT, VAPOR_TEXTURE_WIDTH, VAPOR_TEXTURE_HEIGHT, VAPOR_FIELD_LAYER_COUNT, CloudChamberComponent, DotaCarouselStyle, DotaCarouselComponent, DotaSlideStyle, DotaSlideComponent, ScrollDeckStyle, ScrollDeckComponent, TAU, PULSE_LIFE, PULSE_SPAWN_STEP, TRACER_COUNT, EFFECT_RADIUS, CursorDisplacementComponent, BreadcrumbStyle, BreadcrumbMachine, BreadcrumbComponent, AlertService, Alert, GLYPHS, ALERT_BUTTON_BASE, DotaAlertComponent;
+var __commonJSMin, EVENTS_METADATA_KEY, ModalStyle, ModalComponent, CardComponent, CardTitleComponent, CardHeaderComponent, CardDescriptionComponent, CardFooterComponent, UIConfig, BadgeStyle, BadgeComponent, ScaffoldStyle, ScaffoldComponent, LogLevels, LogTypes, defu, paused, queue, Consola, BrowserReporter, reporter, stateKey, globalState, state, TTL, RETRY_DELAY, PREFIX, memory, pending, retryAfter, IconStyle, _IconsComponent, ICON_NAME_PATTERN, logger$1$1, IconsComponent$1, AccordionStyle, AccordionComponent, ChipStyle, ChipComponent, AvatarStyle, AvatarComponent, AvatarWrapper, ButtonStyle, ButtonComponent, min, max, round, floor$1, createCoords, oppositeSideMap, oppositeAlignmentMap, yAxisSides, lrPlacement, rlPlacement, tbPlacement, btPlacement, computePosition$1, flip$1, originSides, offset$1, shift$1, invalidOverflowDisplayValues, tableElements, topLayerSelectors, transformProperties, willChangeValues, containValues, lastTraversableNodeNames, noOffsets, SCROLLBAR_MAX, absoluteOrFixed, getElementRects, platform, offset, shift, flip, computePosition, INTERACTIVE_SELECTOR, CUSTOM_ELEMENT_NAME, logger$2, PLACEMENTS, PopoverComponent, PlaceholderStyle, PlaceholderComponent, BlobsComponent, BLOB_A, BLOB_B, BLOB_C, BLOB_D, CIRCULAR_BLOB_A, CIRCULAR_BLOB_B, CIRCULAR_BLOB_C, CIRCULAR_BLOB_D, BLOBS$1, COLOR_PLACEMENTS, BlobSeparatorComponent, ORB_CENTER_OFFSET, ORB_RADIUS_DEFAULT, ORB_RADIUS_XL, ORB_RADIUS_CENTER_DEFAULT, ORB_RADIUS_CENTER_XL, BASE_SPEED, NUM_DEPTH_BUCKETS, BUCKET_ALPHA_SCALE, BUCKET_SIZE_SCALE, ORB_SIZE_MAP, ORB_COLOR_MAP, GLOW_LIGHT_ALPHAS, GLOW_LIGHT_POSITIONS, GLOW_DARK_ALPHAS, GLOW_DARK_POSITIONS, isDarkMode, OrbBackgroundComponent, TAU$1, MOTE_COUNT, VAPOR_TEXTURE_WIDTH, VAPOR_TEXTURE_HEIGHT, VAPOR_FIELD_LAYER_COUNT, CloudChamberComponent, DotaCarouselStyle, DotaCarouselComponent, DotaSlideStyle, DotaSlideComponent, ScrollDeckStyle, ScrollDeckComponent, TAU, PULSE_LIFE, PULSE_SPAWN_STEP, TRACER_COUNT, EFFECT_RADIUS, CursorDisplacementComponent, BreadcrumbStyle, BreadcrumbMachine, BreadcrumbComponent, AlertService, Alert, GLYPHS, ALERT_BUTTON_BASE, DotaAlertComponent;
 var init_dota_ui = __esmMin((() => {
 	init_dist$4();
 	__commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
@@ -15145,6 +15569,399 @@ var init_dota_ui = __esmMin((() => {
 		selector: "app-scaffold",
 		shadow: false
 	})], ScaffoldComponent);
+	LogLevels = {
+		silent: Number.NEGATIVE_INFINITY,
+		fatal: 0,
+		error: 0,
+		warn: 1,
+		log: 2,
+		info: 3,
+		success: 3,
+		fail: 3,
+		ready: 3,
+		start: 3,
+		box: 3,
+		debug: 4,
+		trace: 5,
+		verbose: Number.POSITIVE_INFINITY
+	};
+	LogTypes = {
+		silent: { level: -1 },
+		fatal: { level: LogLevels.fatal },
+		error: { level: LogLevels.error },
+		warn: { level: LogLevels.warn },
+		log: { level: LogLevels.log },
+		info: { level: LogLevels.info },
+		success: { level: LogLevels.success },
+		fail: { level: LogLevels.fail },
+		ready: { level: LogLevels.info },
+		start: { level: LogLevels.info },
+		box: { level: LogLevels.info },
+		debug: { level: LogLevels.debug },
+		trace: { level: LogLevels.trace },
+		verbose: { level: LogLevels.verbose }
+	};
+	defu = createDefu();
+	paused = false;
+	queue = [];
+	Consola = class Consola {
+		options;
+		_lastLog;
+		_mockFn;
+		/**
+		* Creates an instance of Consola with specified options or defaults.
+		*
+		* @param {Partial<ConsolaOptions>} [options={}] - Configuration options for the Consola instance.
+		*/
+		constructor(options = {}) {
+			const types = options.types || LogTypes;
+			this.options = defu({
+				...options,
+				defaults: { ...options.defaults },
+				level: _normalizeLogLevel(options.level, types),
+				reporters: [...options.reporters || []]
+			}, {
+				types: LogTypes,
+				throttle: 1e3,
+				throttleMin: 5,
+				formatOptions: {
+					date: true,
+					colors: false,
+					compact: true
+				}
+			});
+			for (const type in types) {
+				const defaults = {
+					type,
+					...this.options.defaults,
+					...types[type]
+				};
+				this[type] = this._wrapLogFn(defaults);
+				this[type].raw = this._wrapLogFn(defaults, true);
+			}
+			if (this.options.mockFn) this.mockTypes();
+			this._lastLog = {};
+		}
+		/**
+		* Gets the current log level of the Consola instance.
+		*
+		* @returns {number} The current log level.
+		*/
+		get level() {
+			return this.options.level;
+		}
+		/**
+		* Sets the minimum log level that will be output by the instance.
+		*
+		* @param {number} level - The new log level to set.
+		*/
+		set level(level) {
+			this.options.level = _normalizeLogLevel(level, this.options.types, this.options.level);
+		}
+		/**
+		* Displays a prompt to the user and returns the response.
+		* Throw an error if `prompt` is not supported by the current configuration.
+		*
+		* @template T
+		* @param {string} message - The message to display in the prompt.
+		* @param {T} [opts] - Optional options for the prompt. See {@link PromptOptions}.
+		* @returns {promise<T>} A promise that infer with the prompt options. See {@link PromptOptions}.
+		*/
+		prompt(message, opts) {
+			if (!this.options.prompt) throw new Error("prompt is not supported!");
+			return this.options.prompt(message, opts);
+		}
+		/**
+		* Creates a new instance of Consola, inheriting options from the current instance, with possible overrides.
+		*
+		* @param {Partial<ConsolaOptions>} options - Optional overrides for the new instance. See {@link ConsolaOptions}.
+		* @returns {ConsolaInstance} A new Consola instance. See {@link ConsolaInstance}.
+		*/
+		create(options) {
+			const instance = new Consola({
+				...this.options,
+				...options
+			});
+			if (this._mockFn) instance.mockTypes(this._mockFn);
+			return instance;
+		}
+		/**
+		* Creates a new Consola instance with the specified default log object properties.
+		*
+		* @param {InputLogObject} defaults - Default properties to include in any log from the new instance. See {@link InputLogObject}.
+		* @returns {ConsolaInstance} A new Consola instance. See {@link ConsolaInstance}.
+		*/
+		withDefaults(defaults) {
+			return this.create({
+				...this.options,
+				defaults: {
+					...this.options.defaults,
+					...defaults
+				}
+			});
+		}
+		/**
+		* Creates a new Consola instance with a specified tag, which will be included in every log.
+		*
+		* @param {string} tag - The tag to include in each log of the new instance.
+		* @returns {ConsolaInstance} A new Consola instance. See {@link ConsolaInstance}.
+		*/
+		withTag(tag) {
+			return this.withDefaults({ tag: this.options.defaults.tag ? this.options.defaults.tag + ":" + tag : tag });
+		}
+		/**
+		* Adds a custom reporter to the Consola instance.
+		* Reporters will be called for each log message, depending on their implementation and log level.
+		*
+		* @param {ConsolaReporter} reporter - The reporter to add. See {@link ConsolaReporter}.
+		* @returns {Consola} The current Consola instance.
+		*/
+		addReporter(reporter) {
+			this.options.reporters.push(reporter);
+			return this;
+		}
+		/**
+		* Removes a custom reporter from the Consola instance.
+		* If no reporter is specified, all reporters will be removed.
+		*
+		* @param {ConsolaReporter} reporter - The reporter to remove. See {@link ConsolaReporter}.
+		* @returns {Consola} The current Consola instance.
+		*/
+		removeReporter(reporter) {
+			if (reporter) {
+				const i = this.options.reporters.indexOf(reporter);
+				if (i !== -1) return this.options.reporters.splice(i, 1);
+			} else this.options.reporters.splice(0);
+			return this;
+		}
+		/**
+		* Replaces all reporters of the Consola instance with the specified array of reporters.
+		*
+		* @param {ConsolaReporter[]} reporters - The new reporters to set. See {@link ConsolaReporter}.
+		* @returns {Consola} The current Consola instance.
+		*/
+		setReporters(reporters) {
+			this.options.reporters = Array.isArray(reporters) ? reporters : [reporters];
+			return this;
+		}
+		wrapAll() {
+			this.wrapConsole();
+			this.wrapStd();
+		}
+		restoreAll() {
+			this.restoreConsole();
+			this.restoreStd();
+		}
+		/**
+		* Overrides console methods with Consola logging methods for consistent logging.
+		*/
+		wrapConsole() {
+			for (const type in this.options.types) {
+				if (!console["__" + type]) console["__" + type] = console[type];
+				console[type] = this[type].raw;
+			}
+		}
+		/**
+		* Restores the original console methods, removing Consola overrides.
+		*/
+		restoreConsole() {
+			for (const type in this.options.types) if (console["__" + type]) {
+				console[type] = console["__" + type];
+				delete console["__" + type];
+			}
+		}
+		/**
+		* Overrides standard output and error streams to redirect them through Consola.
+		*/
+		wrapStd() {
+			this._wrapStream(this.options.stdout, "log");
+			this._wrapStream(this.options.stderr, "log");
+		}
+		_wrapStream(stream, type) {
+			if (!stream) return;
+			if (!stream.__write) stream.__write = stream.write;
+			stream.write = (data) => {
+				this[type].raw(String(data).trim());
+			};
+		}
+		/**
+		* Restores the original standard output and error streams, removing the Consola redirection.
+		*/
+		restoreStd() {
+			this._restoreStream(this.options.stdout);
+			this._restoreStream(this.options.stderr);
+		}
+		_restoreStream(stream) {
+			if (!stream) return;
+			if (stream.__write) {
+				stream.write = stream.__write;
+				delete stream.__write;
+			}
+		}
+		/**
+		* Pauses logging, queues incoming logs until resumed.
+		*/
+		pauseLogs() {
+			paused = true;
+		}
+		/**
+		* Resumes logging, processing any queued logs.
+		*/
+		resumeLogs() {
+			paused = false;
+			const _queue = queue.splice(0);
+			for (const item of _queue) item[0]._logFn(item[1], item[2]);
+		}
+		/**
+		* Replaces logging methods with mocks if a mock function is provided.
+		*
+		* @param {ConsolaOptions["mockFn"]} mockFn - The function to use for mocking logging methods. See {@link ConsolaOptions["mockFn"]}.
+		*/
+		mockTypes(mockFn) {
+			const _mockFn = mockFn || this.options.mockFn;
+			this._mockFn = _mockFn;
+			if (typeof _mockFn !== "function") return;
+			for (const type in this.options.types) {
+				this[type] = _mockFn(type, this.options.types[type]) || this[type];
+				this[type].raw = this[type];
+			}
+		}
+		_wrapLogFn(defaults, isRaw) {
+			return (...args) => {
+				if (paused) {
+					queue.push([
+						this,
+						defaults,
+						args,
+						isRaw
+					]);
+					return;
+				}
+				return this._logFn(defaults, args, isRaw);
+			};
+		}
+		_logFn(defaults, args, isRaw) {
+			if ((defaults.level || 0) > this.level) return false;
+			const logObj = {
+				date: /* @__PURE__ */ new Date(),
+				args: [],
+				...defaults,
+				level: _normalizeLogLevel(defaults.level, this.options.types)
+			};
+			if (!isRaw && args.length === 1 && isLogObj(args[0])) Object.assign(logObj, args[0]);
+			else logObj.args = [...args];
+			if (logObj.message) {
+				logObj.args.unshift(logObj.message);
+				delete logObj.message;
+			}
+			if (logObj.additional) {
+				if (!Array.isArray(logObj.additional)) logObj.additional = logObj.additional.split("\n");
+				logObj.args.push("\n" + logObj.additional.join("\n"));
+				delete logObj.additional;
+			}
+			logObj.type = typeof logObj.type === "string" ? logObj.type.toLowerCase() : "log";
+			logObj.tag = typeof logObj.tag === "string" ? logObj.tag : "";
+			const resolveLog = (newLog = false) => {
+				const repeated = (this._lastLog.count || 0) - this.options.throttleMin;
+				if (this._lastLog.object && repeated > 0) {
+					const args2 = [...this._lastLog.object.args];
+					if (repeated > 1) args2.push(`(repeated ${repeated} times)`);
+					this._log({
+						...this._lastLog.object,
+						args: args2
+					});
+					this._lastLog.count = 1;
+				}
+				if (newLog) {
+					this._lastLog.object = logObj;
+					this._log(logObj);
+				}
+			};
+			clearTimeout(this._lastLog.timeout);
+			const diffTime = this._lastLog.time && logObj.date ? logObj.date.getTime() - this._lastLog.time.getTime() : 0;
+			this._lastLog.time = logObj.date;
+			if (diffTime < this.options.throttle) try {
+				const serializedLog = JSON.stringify([
+					logObj.type,
+					logObj.tag,
+					logObj.args
+				]);
+				const isSameLog = this._lastLog.serialized === serializedLog;
+				this._lastLog.serialized = serializedLog;
+				if (isSameLog) {
+					this._lastLog.count = (this._lastLog.count || 0) + 1;
+					if (this._lastLog.count > this.options.throttleMin) {
+						this._lastLog.timeout = setTimeout(resolveLog, this.options.throttle);
+						return;
+					}
+				}
+			} catch {}
+			resolveLog(true);
+		}
+		_log(logObj) {
+			for (const reporter of this.options.reporters) reporter.log(logObj, { options: this.options });
+		}
+	};
+	Consola.prototype.add = Consola.prototype.addReporter;
+	Consola.prototype.remove = Consola.prototype.removeReporter;
+	Consola.prototype.clear = Consola.prototype.removeReporter;
+	Consola.prototype.withScope = Consola.prototype.withTag;
+	Consola.prototype.mock = Consola.prototype.mockTypes;
+	Consola.prototype.pause = Consola.prototype.pauseLogs;
+	Consola.prototype.resume = Consola.prototype.resumeLogs;
+	BrowserReporter = class {
+		options;
+		defaultColor;
+		levelColorMap;
+		typeColorMap;
+		constructor(options) {
+			this.options = { ...options };
+			this.defaultColor = "#7f8c8d";
+			this.levelColorMap = {
+				0: "#c0392b",
+				1: "#f39c12",
+				3: "#00BCD4"
+			};
+			this.typeColorMap = { success: "#2ecc71" };
+		}
+		_getLogFn(level) {
+			if (level < 1) return console.__error || console.error;
+			if (level === 1) return console.__warn || console.warn;
+			return console.__log || console.log;
+		}
+		log(logObj) {
+			const consoleLogFn = this._getLogFn(logObj.level);
+			const type = logObj.type === "log" ? "" : logObj.type;
+			const tag = logObj.tag || "";
+			const style = `
+      background: ${this.typeColorMap[logObj.type] || this.levelColorMap[logObj.level] || this.defaultColor};
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+    `;
+			const badge = `%c${[tag, type].filter(Boolean).join(":")}`;
+			if (typeof logObj.args[0] === "string") consoleLogFn(`${badge}%c ${logObj.args[0]}`, style, "", ...logObj.args.slice(1));
+			else consoleLogFn(badge, style, ...logObj.args);
+		}
+	};
+	createConsola();
+	reporter = { log(record) {
+		const prefix = `${record.date.toISOString()} [${record.type.toUpperCase()}] [${record.tag}]`;
+		(record.type === "fatal" || record.type === "error" || record.type === "fail" ? console.error : record.type === "warn" ? console.warn : console.log)(prefix, ...record.args);
+	} };
+	stateKey = Symbol.for("@ayu-sh-kr/dota-common-utils/logging");
+	globalState = globalThis;
+	state = globalState[stateKey] ??= {
+		settings: {},
+		entries: /* @__PURE__ */ new Set()
+	};
+	TTL = 6048e5;
+	RETRY_DELAY = 6e4;
+	PREFIX = "dota:icons:v1:";
+	memory = /* @__PURE__ */ new Map();
+	pending = /* @__PURE__ */ new Map();
+	retryAfter = /* @__PURE__ */ new Map();
 	IconStyle = {
 		container: "inline-flex shrink-0 items-center justify-center align-middle leading-none",
 		base: "box-border block overflow-hidden rounded-lg p-1 transition-colors duration-150 ease-out motion-reduce:transition-none fill-current stroke-current",
@@ -15320,10 +16137,12 @@ var init_dota_ui = __esmMin((() => {
 			"3xl": "size-12"
 		}
 	};
-	SVG_CACHE = /* @__PURE__ */ new Map();
-	SVG_INFLIGHT = /* @__PURE__ */ new Map();
 	ICON_NAME_PATTERN = /^[a-z0-9-]+:[a-z0-9-]+$/i;
+	logger$1$1 = createDotaLogger("dota-ui", "components/icon/icons.component.ts");
 	IconsComponent$1 = class IconsComponent extends BaseElement {
+		static #_ = _IconsComponent = this;
+		/** Asset directory used by every instance; defaults to Iconify. Set before app initialization. */
+		static baseUrl = "https://api.iconify.design";
 		name = "";
 		className = "";
 		size;
@@ -15367,7 +16186,7 @@ var init_dota_ui = __esmMin((() => {
 				if (container) container.replaceChildren();
 				return;
 			}
-			const svgText = await fetchSvg(name);
+			const svgText = await fetchSvg(name, _IconsComponent.baseUrl);
 			if (name !== this.name || !svgText) {
 				if (name === this.name) container.replaceChildren();
 				return;
@@ -15439,7 +16258,7 @@ var init_dota_ui = __esmMin((() => {
 	})], IconsComponent$1.prototype, "config", void 0);
 	__decorate$1([OnEventDecorator(LifecycleEventConstants.CONNECTED, true)], IconsComponent$1.prototype, "onConnected", null);
 	__decorate$1([OnEventDecorator(LifecycleEventConstants.ATTRIBUTE_CHANGED, true)], IconsComponent$1.prototype, "onAttributeChanged", null);
-	IconsComponent$1 = __decorate$1([ComponentDecorator({
+	IconsComponent$1 = _IconsComponent = __decorate$1([ComponentDecorator({
 		selector: "dota-icon",
 		shadow: false
 	})], IconsComponent$1);
@@ -16307,6 +17126,7 @@ var init_dota_ui = __esmMin((() => {
 	};
 	INTERACTIVE_SELECTOR = "a[href], button, input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex='-1'])";
 	CUSTOM_ELEMENT_NAME = /^[a-z][.0-9_a-z]*-[.0-9_a-z-]*$/;
+	logger$2 = createDotaLogger("dota-ui", "components/popover/popover.component.ts");
 	PLACEMENTS = /* @__PURE__ */ new Set([
 		"top",
 		"top-start",
@@ -16387,7 +17207,7 @@ var init_dota_ui = __esmMin((() => {
 				this.createdPanel = panel;
 				return panel;
 			} catch {
-				console.warn(`[dota-popover] Invalid anchored-selector: "${this.anchoredSelector}".`);
+				logger$2.warn(`Invalid anchored-selector: "${this.anchoredSelector}".`);
 				return null;
 			}
 		}
@@ -20435,266 +21255,723 @@ var init_dota_ui = __esmMin((() => {
 	})], DotaAlertComponent);
 }));
 //#endregion
-//#region ../../libs/dota-ssr/dist/index.mjs
-var init_dist$1 = __esmMin((() => {
-	init_application_capture_BSUuDzEw();
-	init_dist$4();
-	init_dist$6();
-}));
-//#endregion
-//#region ../../libs/dota-wrap/dist/index.mjs
-/**
-* Resolves eager or lazy module records into browser custom-element constructors.
-* Non-component exports are ignored so generated virtual modules may expose related
-* helpers without changing application registration.
-* @param modules Eager exports or lazy import functions supplied by the application.
-* @returns Constructors whose prototypes inherit from the active browser HTMLElement.
-*/
-async function extractComponent(modules) {
-	const entries = Object.values(modules);
-	const loadedModules = await Promise.all(entries.map(async (entry) => {
-		if (typeof entry === "function") return await entry() ?? {};
-		return entry ?? {};
-	}));
-	const components = [];
-	for (const mod of loadedModules) for (const exported of Object.values(mod)) if (typeof exported === "function" && exported.prototype instanceof HTMLElement) components.push(exported);
-	return components;
-}
-/**
-* Registers application and external component constructors with Dota Core.
-* Module loading finishes before one bootstrap call so custom-element upgrades occur
-* only after runtime plugins have configured the application sockets.
-* @param modules Generated module map or already resolved application constructors.
-* @param externalComponents Additional constructors supplied by UI libraries.
-* @returns Complete constructor list passed to bootstrap.
-*/
-/** Collects the application's components, external UI components included, without registering them. */
-async function resolveComponents(modules, externalComponents = []) {
-	const components = Array.isArray(modules) ? [...modules] : await extractComponent(modules);
-	components.push(...externalComponents);
-	return components;
-}
-async function registerComponents(modules, externalComponents = []) {
-	const components = await resolveComponents(modules, externalComponents);
-	bootstrap(components);
-	return components;
-}
-/**
-* Creates a router service from the registered components and optional explicit routes.
-* The renderer parameter is additive DI; omission preserves Dota Router's default
-* component-tag presentation behavior for existing callers.
-* @param components Constructors available to metadata-based route discovery.
-* @param errorRoute Fallback route for unresolved destinations.
-* @param defaultRoute Application default destination.
-* @param root Component whose host owns the route outlet.
-* @param routes Optional explicit flat route declarations.
-* @param globalHooks Application-wide navigation guards and observers.
-* @param renderer Optional presentation strategy supplied by runtime plugins.
-* @returns Deferred router service ready for initialization.
-*/
-async function registerRoutes(components, errorRoute, defaultRoute, root, routes = [], globalHooks, renderer) {
-	return DotaRouterService.fromComponents({
-		router: DomHistoryRouter,
-		components: [...components],
-		routes: routes.length > 0 ? [...routes] : void 0,
-		errorRoute,
-		defaultRoute,
-		root,
-		globalHooks,
-		renderer
-	});
-}
-/**
-* Composes runtime extensions, registers elements, and initializes application routing.
-* Plugin setup intentionally precedes custom-element definition so an existing static
-* document can hydrate during upgrade instead of taking the default client mount path.
-* When Dota SSR loads the entry on a server, the configuration is reported to it and the
-* returned promise never settles, so code chained on it only ever runs in the browser.
-* @param config Components, routes, root, hooks, and opt-in runtime plugins.
-* @returns Registered constructors and initialized router service.
-*/
-async function initializeApp(config) {
-	const captureHook = getApplicationCaptureHook();
-	if (captureHook) {
-		const components = await resolveComponents(config.modules, config.externalComponents);
-		captureHook({
-			components,
-			routes: config.routes?.length ? config.routes : RouterUtils.prepareConfig(components),
-			errorRoute: config.errorRoute,
-			defaultRoute: config.defaultRoute,
-			root: config.root
-		});
-		return new Promise(() => {});
-	}
-	let routeRenderer = createRouteRenderer(config.root);
-	let mountStrategyOwner = null;
-	let currentPlugin = "<unknown>";
-	const runtimeContext = {
-		setMountStrategy(strategy) {
-			if (mountStrategyOwner !== null) throw new Error(`dota-wrap: two hydration-capable plugins both claim the exclusive mount strategy slot: "${mountStrategyOwner}" (already registered) and "${currentPlugin}" (attempted). Remove one from the plugins array — they cannot coexist.`);
-			mountStrategyOwner = currentPlugin;
-			setMountStrategy(strategy);
+//#region src/configs/blogs.config.ts
+var BlogIcons, BlogTypeConfig, normalizeBlogPath, isSameBlog, getStableIndex, getSuggestedBlogPosts, blogPosts;
+var init_blogs_config = __esmMin((() => {
+	BlogIcons = {
+		Rant: "mdi:comment-outline",
+		Tutorial: "mdi:book-open-variant",
+		News: "mdi:newspaper-variant",
+		Tools: "mdi:wrench-outline",
+		Others: "mdi:dots-horizontal"
+	};
+	BlogTypeConfig = {
+		Rant: {
+			category: "Rant",
+			icon: BlogIcons.Rant,
+			color: "orange"
 		},
-		wrapRouteRenderer(wrapper) {
-			routeRenderer = wrapper(routeRenderer, config.root);
+		Tutorial: {
+			category: "Tutorial",
+			icon: BlogIcons.Tutorial,
+			color: "blue"
+		},
+		News: {
+			category: "News",
+			icon: BlogIcons.News,
+			color: "green"
+		},
+		Tools: {
+			category: "Tools",
+			icon: BlogIcons.Tools,
+			color: "purple"
+		},
+		Others: {
+			category: "Others",
+			icon: BlogIcons.Others,
+			color: "gray"
 		}
 	};
-	config.plugins?.forEach((plugin) => {
-		currentPlugin = plugin.name;
-		plugin.setup?.(runtimeContext);
-	});
-	const components = await registerComponents(config.modules, config.externalComponents);
-	console.info(`${components.length} Components registered.`);
-	const routerService = await registerRoutes(components, config.errorRoute, config.defaultRoute, config.root, config.routes ?? [], config.globalHooks, routeRenderer);
-	routerService.init();
-	console.info(`${routerService._routes.length} Routes registered.`);
-	console.info("Application initialized.");
-	return {
-		components,
-		routerService
+	normalizeBlogPath = (path) => {
+		return path.trim().replace(/^\/+/, "").replace(/\.md$/i, "").toLowerCase();
 	};
-}
-var init_dist = __esmMin((() => {
-	init_dist$4();
-	init_dist$3();
-	init_dist$1();
-	init_dist$4();
-	init_dist$3();
-	init_dist$5();
-	init_dist$2();
-}));
-//#endregion
-//#region src/components/chat/ai-form.component.ts
-var AiFormComponent;
-var init_ai_form_component = __esmMin((() => {
-	init_core$1();
-	init_OpenAIService();
-	init_local_storage_service();
-	init_decorate();
-	AiFormComponent = class AiFormComponent extends BaseElement {
-		openApiService;
-		isLoading;
-		messageEvent;
-		constructor() {
-			super();
-			this.openApiService = new OpenAIService("deepseek/deepseek-r1-distill-llama-8b");
+	isSameBlog = (left, right) => {
+		return normalizeBlogPath(left) === normalizeBlogPath(right);
+	};
+	getStableIndex = (value, size) => {
+		if (size <= 0) return 0;
+		let hash = 0;
+		for (let index = 0; index < value.length; index += 1) hash = hash * 31 + value.charCodeAt(index) | 0;
+		return Math.abs(hash) % size;
+	};
+	getSuggestedBlogPosts = (currentPath, limit = 3) => {
+		if (!blogPosts.length || limit <= 0) return [];
+		const normalizedCurrentPath = normalizeBlogPath(currentPath);
+		if (!normalizedCurrentPath) return [];
+		const currentIndex = blogPosts.findIndex((post) => isSameBlog(post.path, currentPath));
+		const availablePosts = blogPosts.filter((post) => !isSameBlog(post.path, currentPath));
+		if (availablePosts.length === 0) return [];
+		const suggestedPosts = [];
+		if (currentIndex !== -1) for (let offset = 1; offset < blogPosts.length && suggestedPosts.length < limit; offset += 1) {
+			const nextPost = blogPosts[(currentIndex + offset) % blogPosts.length];
+			if (isSameBlog(nextPost.path, currentPath)) continue;
+			suggestedPosts.push(nextPost);
 		}
-		async userInputEvent(event) {
-			this.isLoading = true;
-			try {
-				event.preventDefault();
-				const form = event.currentTarget;
-				const userMessage = new FormData(form).get("user-input")?.toString().trim() || "";
-				if (userMessage) {
-					const userMessageRecord = {
-						message: userMessage,
-						type: "USER"
-					};
-					this.messageEvent.emit(userMessageRecord);
-					const user = Promise.resolve(LocalStorageService.pushToList("message", userMessageRecord));
-					const chatMessageRecord = {
-						message: await this.openApiService.chatCompletion(userMessage),
-						type: "SERVER"
-					};
-					this.messageEvent.emit(chatMessageRecord);
-					const chat = Promise.resolve(LocalStorageService.pushToList("message", chatMessageRecord));
-					form.reset();
-					await Promise.all([chat, user]);
-				}
-			} finally {
-				this.isLoading = false;
+		else {
+			const startIndex = normalizedCurrentPath ? getStableIndex(normalizedCurrentPath, availablePosts.length) : 0;
+			for (let offset = 0; offset < availablePosts.length && suggestedPosts.length < limit; offset += 1) {
+				const nextPost = availablePosts[(startIndex + offset) % availablePosts.length];
+				suggestedPosts.push(nextPost);
 			}
 		}
+		return suggestedPosts.slice(0, limit);
+	};
+	blogPosts = [
+		{
+			date: "2026-08-12",
+			writer: "Ayush Jaiswal",
+			header: "Meet dota-alert Through an Interactive Lab",
+			description: "An interactive showcase of dota-alert covering confirmations, guarded prompts, async work, cancellation, and caller-owned custom content.",
+			category: "Tutorial",
+			path: "Dota-Alert.md"
+		},
+		{
+			date: "2026-08-12",
+			writer: "Ayush Jaiswal",
+			header: "Building a Useful Breadcrumb With dota-breadcrumb",
+			description: "A live tutorial for dota-breadcrumb covering semantic article trails, folded long paths, keyboard disclosure, native links, and complete per-instance visual overrides.",
+			category: "Tutorial",
+			path: "Dota-Breadcrumb.md"
+		},
+		{
+			date: "2026-07-17",
+			writer: "Ayush Jaiswal",
+			header: "LangChain Foundations: From Model Calls To Useful Agents",
+			description: "The first article in a connected AI application series, explaining LangChain prompts, tools, agents, middleware, state, and the path to RAG and LangGraph.",
+			category: "Tutorial",
+			path: "LangChain-Foundations.md"
+		},
+		{
+			date: "2026-07-17",
+			writer: "Ayush Jaiswal",
+			header: "RAG: Grounding AI Answers In Your Data",
+			description: "A practical guide to retrieval-augmented generation, covering ingestion, chunking, embeddings, authorized retrieval, grounded prompts, evaluation, and when to advance to graph workflows.",
+			category: "Tutorial",
+			path: "RAG-Grounded-Answers.md"
+		},
+		{
+			date: "2026-07-17",
+			writer: "Ayush Jaiswal",
+			header: "LangGraph: Reliable Stateful AI Workflows",
+			description: "The final article in the series, showing how LangGraph uses state, nodes, edges, bounded loops, approvals, persistence, and observability for reliable AI workflows.",
+			category: "Tutorial",
+			path: "LangGraph-Stateful-Workflows.md"
+		},
+		{
+			date: "2025-04-21",
+			writer: "Ayush Jaiswal",
+			header: "Head first Web Components",
+			description: "Lets explore the world of web components, a powerful technology that enables developers to create reusable and encapsulated custom elements. This article delves into the fundamentals of web components, including shadow DOM, custom elements, and HTML templates. By understanding these concepts, developers can build modular and maintainable applications that enhance user experience and streamline development processes.",
+			category: "Tutorial",
+			path: "Web-Component.md"
+		},
+		{
+			"date": "2025-04-21",
+			"writer": "Ayush Jaiswal",
+			"header": "What is needed to design a web component",
+			"description": "In this article, we will explore the essential components required to design a web component. We will discuss the key concepts and technologies involved in creating reusable and encapsulated custom elements. By understanding these components, developers can effectively leverage web components to enhance their web applications.",
+			"category": "Tutorial",
+			"path": "Component-Basic.md"
+		},
+		{
+			"date": "2025-04-22",
+			"writer": "Ayush Jaiswal",
+			"header": "What's next in Dota Core",
+			"description": "This article explores the upcoming release of dota core, a powerful framework for building scalable and efficient applications. It delves into the new features and enhancements that will be introduced, including improved performance, enhanced developer experience, and expanded capabilities. By understanding what's next in Dota Core, developers can stay ahead of the curve and leverage the latest advancements in their projects.",
+			"category": "News",
+			"path": "Next-in-Dota-Core.md"
+		},
+		{
+			date: "2025-04-22",
+			writer: "Ayush Jaiswal",
+			"header": "Window Port exlusion Issue",
+			"description": "This article addresses the window port exclusion issue, a common challenge faced by developers when working with web applications. It provides insights into the causes of this issue and offers practical solutions to mitigate its impact. By understanding the window port exclusion issue, developers can enhance the performance and reliability of their applications.",
+			category: "Rant",
+			"path": "Window-Port-Exclusion-Issue.md"
+		},
+		{
+			date: "2025-04-23",
+			writer: "Ayush Jaiswal",
+			header: "Scripting Languages",
+			description: "A practical overview of scripting languages, their strengths, and common use cases across automation, web development, data work, and embedded systems.",
+			category: "Tools",
+			path: "Scripting-Languages.md"
+		},
+		{
+			date: "2025-04-24",
+			writer: "Ayush Jaiswal",
+			header: "Kotlin For Scripting",
+			description: "An introduction to using Kotlin as a scripting language, with a focus on concise automation, JVM tooling, and practical use cases.",
+			category: "Tools",
+			path: "Kotlin-For-Scripting.md"
+		},
+		{
+			date: "2025-04-25",
+			writer: "Ayush Jaiswal",
+			header: "Data Encryption Standard",
+			description: "An introduction to DES, a symmetric encryption algorithm that encrypts data in 64-bit blocks using a 56-bit key via the Feistel Network across 16 rounds of substitution and permutation.",
+			category: "Tutorial",
+			path: "DES.md"
+		},
+		{
+			date: "2025-04-25",
+			writer: "Ayush Jaiswal",
+			header: "Advanced Encryption Standard",
+			description: "A short introduction to AES, a widely used symmetric-key encryption standard for securing data at rest and in transit.",
+			category: "Tutorial",
+			path: "AES.md"
+		},
+		{
+			date: "2025-04-25",
+			writer: "Ayush Jaiswal",
+			header: "Towards Cryptography",
+			description: "An introduction to cryptography, covering its purpose, the basic working model, and a simple example using the Caesar cipher.",
+			category: "Tutorial",
+			path: "Towards-Cryptography.md"
+		},
+		{
+			date: "2026-07-10",
+			writer: "Ayush Jaiswal",
+			header: "Chat Memory",
+			description: "A practical guide to chat memory, covering explicit and implicit memory, persistent information, the write-manage-read loop, and why these memory systems matter.",
+			category: "Tutorial",
+			path: "Chat-Memory.md"
+		},
+		{
+			date: "2026-07-11",
+			writer: "Ayush Jaiswal",
+			header: "Multi-Tenant Identity Architecture",
+			description: "A simple, ordered guide to multi-tenant identity architecture, covering AuthN, AuthZ, OAuth 2.0, OIDC, JWTs, opaque tokens, BFF login, IdP brokering, and multi-issuer resource servers.",
+			category: "Tutorial",
+			path: "Multi-Tenant-Identity-Architecture.md"
+		}
+	];
+}));
+//#endregion
+//#region src/components/blogs/blog-icon.component.ts
+var BlogIconComponent;
+var init_blog_icon_component = __esmMin((() => {
+	init_core$1();
+	init_blogs_config();
+	init_decorate();
+	BlogIconComponent = class BlogIconComponent extends BaseElement {
+		category;
+		constructor() {
+			super();
+		}
 		render() {
+			const iconDetail = BlogTypeConfig[this.category];
 			return `
-      <div class="relative group flex-1 w-full">
-        ${this.isLoading ? `<div class="absolute border -inset-1 bg-gradient-to-r dark:from-pink-400 dark:to-purple-400 from-pink-600 to-purple-600 
-                    rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"
-                >
-                </div>` : ""}
-        <form id="chat-form" class="relative flex items-center gap-2  w-full bg-white dark:bg-slate-900 rounded-lg p-2 shadow-sm  dark:shadow-[0px_0px_12px_rgba(147,51,234,0.8)]">
-
-          <div class="w-12 h-12 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center">
-            <img src="https://mir-s3-cdn-cf.behance.net/project_modules/fs/bcdeaf163021985.63df4524e42bb.jpg" alt="dota-bot"
-                 class="size-12 rounded-full "/>
-          </div>
-          <input name="user-input" type="text" autocomplete="off"   class="disabled:pointer-events-none disabled:opacity-70 w-full dark:text-gray-400  outline-none bg-transparent focus:border-purple-600 border-2  p-4 rounded-lg border-transparent "
-                 placeholder="Hello! How can I assist you today?"/>
-        </form>
-      </div>
+      <span>
+        <dota-icon name="${iconDetail.icon}" color="${iconDetail.color || "gray"}" variant="link" size="md"></dota-icon>
+      </span>
     `;
 		}
 	};
 	__decorate$2([PropertyDecorator({
-		type: BooleanType,
-		name: "is-loading"
-	})], AiFormComponent.prototype, "isLoading", void 0);
-	__decorate$2([EventDecorator()], AiFormComponent.prototype, "messageEvent", void 0);
-	__decorate$2([BindEventDecorator({
-		event: "submit",
-		id: "#chat-form"
-	})], AiFormComponent.prototype, "userInputEvent", null);
-	AiFormComponent = __decorate$2([ComponentDecorator({
-		selector: "ai-form",
+		name: "category",
+		type: StringType
+	})], BlogIconComponent.prototype, "category", void 0);
+	BlogIconComponent = __decorate$2([ComponentDecorator({
+		selector: "blog-icon",
 		shadow: false
-	})], AiFormComponent);
+	})], BlogIconComponent);
 }));
 //#endregion
-//#region src/components/chat/message-box.component.ts
-var MessageBoxComponent;
-var init_message_box_component = __esmMin((() => {
+//#region src/components/blogs/blog-pagination.component.ts
+var BLOG_PAGINATION_CHANGE_EVENT, BLOG_PAGINATION_STORAGE_KEY, BLOG_PAGE_SIZE_OPTIONS, DEFAULT_PAGINATION_STATE, clamp$1, toPositiveInteger, readStoredValue, readBlogPaginationState, persistBlogPaginationState, BlogPaginationComponent;
+var init_blog_pagination_component = __esmMin((() => {
 	init_core$1();
+	init_main();
 	init_local_storage_service();
 	init_decorate();
-	MessageBoxComponent = class MessageBoxComponent extends BaseElement {
-		messages = [];
-		cardSection;
+	BLOG_PAGINATION_CHANGE_EVENT = "blog:pagination:changed";
+	BLOG_PAGINATION_STORAGE_KEY = "dota-web:blogs:pagination";
+	BLOG_PAGE_SIZE_OPTIONS = [
+		3,
+		6,
+		9
+	];
+	DEFAULT_PAGINATION_STATE = {
+		currentPage: 1,
+		pageSize: 6
+	};
+	clamp$1 = (value, minimum, maximum) => {
+		return Math.min(Math.max(value, minimum), maximum);
+	};
+	toPositiveInteger = (value) => {
+		const parsed = Number(value);
+		return Number.isInteger(parsed) && parsed > 0 ? parsed : void 0;
+	};
+	readStoredValue = () => {
+		try {
+			const storedValue = LocalStorageService.get(BLOG_PAGINATION_STORAGE_KEY);
+			return storedValue ? JSON.parse(storedValue) : {};
+		} catch {
+			return {};
+		}
+	};
+	readBlogPaginationState = (totalItems) => {
+		const stored = readStoredValue();
+		const requestedPageSize = toPositiveInteger(stored.pageSize);
+		const pageSize = BLOG_PAGE_SIZE_OPTIONS.includes(requestedPageSize) ? requestedPageSize : DEFAULT_PAGINATION_STATE.pageSize;
+		const totalPages = Math.max(1, Math.ceil(Math.max(0, totalItems) / pageSize));
+		return {
+			currentPage: clamp$1(toPositiveInteger(stored.currentPage) ?? DEFAULT_PAGINATION_STATE.currentPage, 1, totalPages),
+			pageSize
+		};
+	};
+	persistBlogPaginationState = (state, totalItems) => {
+		const pageSize = BLOG_PAGE_SIZE_OPTIONS.includes(state.pageSize) ? state.pageSize : DEFAULT_PAGINATION_STATE.pageSize;
+		const totalPages = Math.max(1, Math.ceil(Math.max(0, totalItems) / pageSize));
+		const normalizedState = {
+			currentPage: clamp$1(state.currentPage, 1, totalPages),
+			pageSize
+		};
+		try {
+			LocalStorageService.add(BLOG_PAGINATION_STORAGE_KEY, JSON.stringify(normalizedState));
+		} catch {}
+		return normalizedState;
+	};
+	BlogPaginationComponent = class BlogPaginationComponent extends BaseElement {
+		total = "0";
+		constructor() {
+			super();
+		}
+		handleClick(event) {
+			const target = event.target;
+			if (!(target instanceof Element)) return;
+			const button = target.closest("[data-pagination-action]");
+			if (!button || button.disabled) return;
+			const totalPages = this.totalPages;
+			const currentState = this.state;
+			const action = button.dataset.paginationAction;
+			const requestedPage = action === "first" ? 1 : action === "previous" ? currentState.currentPage - 1 : action === "next" ? currentState.currentPage + 1 : action === "last" ? totalPages : toPositiveInteger(button.dataset.page) ?? currentState.currentPage;
+			this.setState({
+				...currentState,
+				currentPage: requestedPage
+			});
+		}
+		handlePageSizeChange(event) {
+			const target = event.target;
+			if (!(target instanceof HTMLSelectElement) || target.id !== "blog-page-size") return;
+			this.setState({
+				currentPage: 1,
+				pageSize: toPositiveInteger(target.value) ?? DEFAULT_PAGINATION_STATE.pageSize
+			});
+		}
+		get totalItems() {
+			return Math.max(0, toPositiveInteger(this.total) ?? 0);
+		}
+		get totalPages() {
+			return Math.max(1, Math.ceil(this.totalItems / this.state.pageSize));
+		}
+		get state() {
+			return readBlogPaginationState(this.totalItems);
+		}
+		setState(state) {
+			const persistedState = persistBlogPaginationState(state, this.totalItems);
+			applicationEventPublisher.publish({
+				name: BLOG_PAGINATION_CHANGE_EVENT,
+				data: persistedState
+			});
+			this.updateHTML();
+		}
+		getPageItems(totalPages, currentPage) {
+			if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1);
+			const items = [1];
+			const start = Math.max(2, currentPage - 1);
+			const end = Math.min(totalPages - 1, currentPage + 1);
+			if (start > 2) items.push("ellipsis");
+			for (let page = start; page <= end; page += 1) items.push(page);
+			if (end < totalPages - 1) items.push("ellipsis");
+			items.push(totalPages);
+			return items;
+		}
+		render() {
+			const state = this.state;
+			const totalPages = this.totalPages;
+			const startItem = this.totalItems === 0 ? 0 : (state.currentPage - 1) * state.pageSize + 1;
+			const endItem = Math.min(state.currentPage * state.pageSize, this.totalItems);
+			const pageItems = this.getPageItems(totalPages, state.currentPage);
+			return `
+      <nav aria-label="Blog pagination"
+           class="mt-10 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm
+                  dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+        <p class="text-sm text-slate-600 dark:text-slate-300" aria-live="polite">
+          Showing <span class="font-semibold text-slate-950 dark:text-white">${startItem}–${endItem}</span>
+          of <span class="font-semibold text-slate-950 dark:text-white">${this.totalItems}</span> posts
+        </p>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <label for="blog-page-size" class="sr-only">Posts per page</label>
+          <select id="blog-page-size"
+                  class="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-700
+                         outline-none transition focus-visible:ring-2 focus-visible:ring-purple-500
+                         dark:border-gray-700 dark:bg-gray-900 dark:text-slate-200"
+                  aria-label="Posts per page">
+            ${BLOG_PAGE_SIZE_OPTIONS.map((pageSize) => `
+              <option value="${pageSize}" ${state.pageSize === pageSize ? "selected" : ""}>${pageSize} per page</option>
+            `).join("")}
+          </select>
+
+          <div class="flex items-center gap-1" aria-label="Pagination controls">
+            ${this.renderActionButton("first", "First page", "«", state.currentPage === 1)}
+            ${this.renderActionButton("previous", "Previous page", "‹", state.currentPage === 1)}
+            ${pageItems.map((item) => item === "ellipsis" ? `<span aria-hidden="true" class="grid size-10 place-items-center text-slate-400 dark:text-slate-500">…</span>` : this.renderPageButton(item, state.currentPage)).join("")}
+            ${this.renderActionButton("next", "Next page", "›", state.currentPage === totalPages)}
+            ${this.renderActionButton("last", "Last page", "»", state.currentPage === totalPages)}
+          </div>
+        </div>
+      </nav>
+    `;
+		}
+		renderActionButton(action, label, icon, disabled) {
+			return `
+      <button type="button" data-pagination-action="${action}" aria-label="${label}" ${disabled ? "disabled" : ""}
+              class="grid size-10 place-items-center rounded-xl border border-transparent text-lg text-slate-600 transition
+                     hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950
+                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500
+                     disabled:pointer-events-none disabled:opacity-35
+                     dark:text-slate-300 dark:hover:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white">
+        <span aria-hidden="true">${icon}</span>
+      </button>
+    `;
+		}
+		renderPageButton(page, currentPage) {
+			const isCurrent = page === currentPage;
+			return `
+      <button type="button" data-pagination-action="page" data-page="${page}" ${isCurrent ? "aria-current=\"page\"" : ""}
+              aria-label="Page ${page}"
+              class="grid size-10 place-items-center rounded-xl text-sm font-semibold transition
+                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500
+                     ${isCurrent ? "bg-purple-600 text-white shadow-sm dark:bg-purple-500" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-gray-700 dark:hover:text-white"}">
+        ${page}
+      </button>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		name: "total",
+		type: StringType
+	})], BlogPaginationComponent.prototype, "total", void 0);
+	__decorate$2([HostListenerDecorator({ event: "click" })], BlogPaginationComponent.prototype, "handleClick", null);
+	__decorate$2([HostListenerDecorator({ event: "change" })], BlogPaginationComponent.prototype, "handlePageSizeChange", null);
+	BlogPaginationComponent = __decorate$2([ComponentDecorator({
+		selector: "blog-pagination",
+		shadow: false
+	})], BlogPaginationComponent);
+}));
+//#endregion
+//#region src/components/blogs/blog-preview.component.ts
+var categoryAccent, revealObserver, escapeHtml$1, estimateReadTime, BlogPreviewComponent;
+var init_blog_preview_component = __esmMin((() => {
+	init_core$1();
+	init_main();
+	init_decorate();
+	categoryAccent = {
+		Rant: "text-orange-600 dark:text-orange-300",
+		Tutorial: "text-blue-700 dark:text-blue-300",
+		News: "text-emerald-700 dark:text-emerald-300",
+		Tools: "text-purple-700 dark:text-purple-300",
+		Others: "text-slate-600 dark:text-slate-300"
+	};
+	escapeHtml$1 = (value) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;").replaceAll("'", "&#039;");
+	estimateReadTime = (header, description) => {
+		const wordCount = `${header} ${description}`.trim().split(/\s+/).filter(Boolean).length;
+		return Math.max(1, Math.ceil(wordCount / 200));
+	};
+	BlogPreviewComponent = class BlogPreviewComponent extends BaseElement {
+		date = "";
+		writer = "";
+		header = "";
+		description = "";
+		category = "Rant";
+		path = "";
 		constructor() {
 			super();
 		}
 		afterViewInit() {
-			requestAnimationFrame(() => {
-				this.messages = LocalStorageService.getList("message");
-				this.messages.forEach((message, index) => {
-					const messageCardEl = document.createElement("message-card");
-					messageCardEl.setAttribute("message-type", message.type);
-					messageCardEl.setAttribute("message", message.message);
-					messageCardEl.setAttribute("key", index.toString());
-					this.cardSection.appendChild(messageCardEl);
-					this.cardSection.scrollTop = this.cardSection.scrollHeight;
+			const card = this.querySelector("[data-blog-card]");
+			if (!card || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+				card?.classList.add("is-visible");
+				return;
+			}
+			const siblingCards = this.parentElement?.querySelectorAll("blog-preview") ?? [];
+			const index = Array.from(siblingCards).indexOf(this);
+			card.style.setProperty("--blog-preview-delay", `${Math.max(0, index) * 60}ms`);
+			if (!("IntersectionObserver" in window)) {
+				card.classList.add("is-visible");
+				return;
+			}
+			revealObserver ??= new IntersectionObserver((entries, observer) => {
+				entries.forEach((entry) => {
+					if (!entry.isIntersecting) return;
+					const target = entry.target;
+					target.classList.add("is-visible");
+					observer.unobserve(target);
 				});
+			}, {
+				threshold: .12,
+				rootMargin: "0px 0px -24px"
 			});
+			revealObserver.observe(card);
 		}
-		handleNewMessages(event) {
-			this.messages.push(event.detail);
-			requestAnimationFrame(() => {
-				const messageCardEl = document.createElement("message-card");
-				messageCardEl.setAttribute("message-type", event.detail.type);
-				messageCardEl.setAttribute("message", event.detail.message);
-				messageCardEl.setAttribute("key", this.messages.length.toString());
-				this.cardSection.appendChild(messageCardEl);
-				this.cardSection.scrollTop = this.cardSection.scrollHeight;
-			});
+		handleClick(event) {
+			if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+			event.preventDefault();
+			routerService.route(this.blogUrl);
+		}
+		get blogUrl() {
+			return `/blogs/content/${encodeURIComponent(this.category)}/${encodeURIComponent(this.path)}`;
 		}
 		render() {
+			const category = this.category in categoryAccent ? this.category : "Others";
+			const accentClass = categoryAccent[category];
+			const readTime = estimateReadTime(this.header, this.description);
 			return `
-      <section id="card-section" class="h-[55vh] w-full shadow-md dark:shadow-[0px_0px_12px_rgba(147,51,234,0.8)] overflow-y-auto custom-scrollbar p-4 bg-slate-100 dark:bg-slate-900 rounded-lg flex flex-col gap-4">
-        
+      <style>
+        .blog-preview-card {
+          transform: translateY(1.25rem);
+          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+          transition-delay: var(--blog-preview-delay, 0ms);
+        }
+
+        .blog-preview-card.is-visible {
+          transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .blog-preview-card,
+          .blog-preview-card.is-visible {
+            transform: none;
+            transition: none;
+          }
+        }
+      </style>
+
+      <a
+        data-blog-card
+        href="${this.blogUrl}"
+        aria-label="Read ${escapeHtml$1(this.header)}"
+        class="blog-preview-card group relative flex h-full min-h-[16rem] w-full flex-col overflow-hidden rounded-[20px]
+               border border-slate-200/90 bg-white p-[30px_28px_26px] text-left text-slate-950
+               shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[transform,box-shadow,background-color]
+               duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5
+               hover:bg-slate-50 hover:shadow-[0_18px_40px_-12px_rgba(15,23,42,0.16)]
+               focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-500
+               dark:border-slate-700/80 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700
+               dark:shadow-[0_1px_2px_rgba(0,0,0,0.28)]
+               dark:hover:shadow-[0_18px_40px_-12px_rgba(0,0,0,0.55)] font-dm"
+      >
+        <div>
+          <span class="${accentClass} text-[11px] font-medium uppercase tracking-[0.04em]">
+            ${escapeHtml$1(category)}
+          </span>
+        </div>
+
+        <h2 class="mt-6 text-2xl font-medium leading-[1.18] tracking-[-0.02em] text-slate-950 text-balance dark:text-white">
+          ${escapeHtml$1(this.header)}
+        </h2>
+
+        <p class="mt-2 line-clamp-3 text-[15px] leading-[1.55] text-slate-600 dark:text-slate-300">
+          ${escapeHtml$1(this.description)}
+        </p>
+
+        <div class="mt-auto flex items-center gap-2 pt-8 text-[13px] leading-5 text-slate-500 dark:text-slate-400">
+          <span class="truncate">${escapeHtml$1(this.writer)}</span>
+          <span aria-hidden="true" class="size-[3px] shrink-0 rounded-full bg-slate-400 dark:bg-slate-500"></span>
+          <span class="shrink-0">${readTime} min read</span>
+          <span aria-hidden="true" class="${accentClass} ml-auto text-lg leading-none opacity-80 transition-transform duration-[400ms]
+                       ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1">→</span>
+        </div>
+      </a>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		name: "date",
+		type: StringType
+	})], BlogPreviewComponent.prototype, "date", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "writer",
+		type: StringType
+	})], BlogPreviewComponent.prototype, "writer", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "header",
+		type: StringType
+	})], BlogPreviewComponent.prototype, "header", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "description",
+		type: StringType
+	})], BlogPreviewComponent.prototype, "description", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "category",
+		type: StringType
+	})], BlogPreviewComponent.prototype, "category", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "path",
+		type: StringType
+	})], BlogPreviewComponent.prototype, "path", void 0);
+	__decorate$2([AfterInitDecorator()], BlogPreviewComponent.prototype, "afterViewInit", null);
+	__decorate$2([HostListenerDecorator({ event: "click" })], BlogPreviewComponent.prototype, "handleClick", null);
+	BlogPreviewComponent = __decorate$2([ComponentDecorator({
+		selector: "blog-preview",
+		shadow: false
+	})], BlogPreviewComponent);
+}));
+//#endregion
+//#region src/components/blogs/blog-section.component.ts
+var BlogSectionComponent;
+var init_blog_section_component = __esmMin((() => {
+	init_core$1();
+	init_blogs_config();
+	init_blog_pagination_component();
+	init_event();
+	init_decorate();
+	BlogSectionComponent = class BlogSectionComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		handlePaginationChange() {
+			this.updateHTML();
+		}
+		render() {
+			const latestFirstPosts = [...blogPosts].sort((left, right) => right.date.localeCompare(left.date));
+			const paginationState = readBlogPaginationState(latestFirstPosts.length);
+			const startIndex = (paginationState.currentPage - 1) * paginationState.pageSize;
+			return `
+      <section class="relative isolate font-dm mx-auto max-w-7xl px-3 py-12 lg:pt-20">
+        <orb-background orbit-count="7"
+            orbit-spacing="10"
+            orbit-speed="10"
+            orbit-direction="clockwise"
+            orbit-particle-size="0.8"
+            orbit-particle-gap="11"
+            orbit-size="lg"
+        >
+        </orb-background>
+
+        <div class="relative z-10">
+          <section-header>
+            Blogs by the <span class="text-purple-600 dark:text-purple-500">Team Dota</span>
+          </section-header>
+          <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            ${latestFirstPosts.slice(startIndex, startIndex + paginationState.pageSize).map((post) => `
+              <blog-preview
+                date="${post.date}"
+                writer="${post.writer}"
+                header="${post.header}"
+                description="${post.description}"
+                category="${post.category}"
+                path="${post.path}"
+              ></blog-preview>
+            `).join("")}
+          </div>
+          <blog-pagination total="${latestFirstPosts.length}"></blog-pagination>
+        </div>
       </section>
     `;
 		}
 	};
-	__decorate$2([StateDecorator()], MessageBoxComponent.prototype, "messages", void 0);
-	__decorate$2([ElementDecorator({
-		selector: "card-section",
-		by: "id"
-	})], MessageBoxComponent.prototype, "cardSection", void 0);
-	__decorate$2([AfterInitDecorator()], MessageBoxComponent.prototype, "afterViewInit", null);
-	__decorate$2([WindowListenerDecorator({ event: "onMessageEvent" })], MessageBoxComponent.prototype, "handleNewMessages", null);
-	MessageBoxComponent = __decorate$2([ComponentDecorator({
-		selector: "message-box",
+	__decorate$2([OnEventDecorator$1(BLOG_PAGINATION_CHANGE_EVENT)], BlogSectionComponent.prototype, "handlePaginationChange", null);
+	BlogSectionComponent = __decorate$2([ComponentDecorator({
+		selector: "blog-section",
 		shadow: false
-	})], MessageBoxComponent);
+	})], BlogSectionComponent);
+}));
+//#endregion
+//#region src/components/blogs/blog-suggestion.component.ts
+var BlogSuggestionComponent;
+var init_blog_suggestion_component = __esmMin((() => {
+	init_core$1();
+	init_blogs_config();
+	init_decorate();
+	BlogSuggestionComponent = class BlogSuggestionComponent extends BaseElement {
+		currentBlog = "";
+		limit = "3";
+		render() {
+			const currentBlog = this.currentBlog?.trim() ?? "";
+			const suggestions = getSuggestedBlogPosts(currentBlog, Number(this.limit) || 3);
+			if (!suggestions.length) return "";
+			return `
+      <section class="font-dm mt-14 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/60 sm:p-6">
+        <div class="mb-5 flex items-end justify-between gap-4">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
+              Continue reading
+            </p>
+            <h2 class="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
+              Next blogs to open
+            </h2>
+          </div>
+          <p class="max-w-sm text-sm text-slate-600 dark:text-slate-400">
+            A quick path to the next few posts in this series.
+          </p>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          ${suggestions.map((post) => `
+            <blog-preview
+              date="${post.date}"
+              writer="${post.writer}"
+              header="${post.header}"
+              description="${post.description}"
+              category="${post.category}"
+              path="${post.path}">
+            </blog-preview>
+          `).join("")}
+        </div>
+      </section>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		name: "current-blog",
+		type: StringType
+	})], BlogSuggestionComponent.prototype, "currentBlog", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "limit",
+		type: StringType
+	})], BlogSuggestionComponent.prototype, "limit", void 0);
+	BlogSuggestionComponent = __decorate$2([ComponentDecorator({
+		selector: "blog-suggestion",
+		shadow: false
+	})], BlogSuggestionComponent);
+}));
+//#endregion
+//#region src/service/doc-loader.service.ts
+var DocLoaderService;
+var init_doc_loader_service = __esmMin((() => {
+	init_rest();
+	init_main();
+	DocLoaderService = class {
+		restClient;
+		constructor() {
+			this.restClient = RestClient.builder().timeout(1e4).handler((response) => {
+				if (!response.ok) routerService.route("/error");
+			}).build();
+		}
+		async loadDoc(slug) {
+			return (await this.restClient.get().uri(`/docs/${slug}.md`).retrieve().toResponse()).text();
+		}
+		async loadResource(path) {
+			return (await this.restClient.get().uri(`/materials/${path}`).retrieve().toResponse()).text();
+		}
+		async loadBlog(path) {
+			return (await this.restClient.get().uri(`/blogs/${path}`).retrieve().toResponse()).text();
+		}
+	};
 }));
 //#endregion
 //#region ../../ui/dota-md/dist/dota-md.mjs
@@ -21065,7 +22342,7 @@ function unescapeAll(str) {
 function replaceUnsafeChar(ch) {
 	return HTML_REPLACEMENTS[ch];
 }
-function escapeHtml$1(str) {
+function escapeHtml(str) {
 	if (HTML_ESCAPE_TEST_RE.test(str)) return str.replace(HTML_ESCAPE_REPLACE_RE, replaceUnsafeChar);
 	return str;
 }
@@ -23907,7 +25184,7 @@ var __defProp, __exportAll, flatMarkdownTheme, materialMarkdownTheme, appleMarkd
 var init_dota_md = __esmMin((() => {
 	init_dist$4();
 	init_dist$5();
-	init_dist$6();
+	init_dist$7();
 	__defProp = Object.defineProperty;
 	__exportAll = (all, no_symbols) => {
 		let target = {};
@@ -29662,7 +30939,7 @@ var init_dota_md = __esmMin((() => {
 		arrayReplaceAt: () => arrayReplaceAt,
 		asciiTrim: () => asciiTrim,
 		assign: () => assign$1,
-		escapeHtml: () => escapeHtml$1,
+		escapeHtml: () => escapeHtml,
 		escapeRE: () => escapeRE$1,
 		fromCodePoint: () => fromCodePoint,
 		has: () => has,
@@ -29703,11 +30980,11 @@ var init_dota_md = __esmMin((() => {
 	default_rules = {};
 	default_rules.code_inline = function(tokens, idx, options, env, slf) {
 		const token = tokens[idx];
-		return "<code" + slf.renderAttrs(token) + ">" + escapeHtml$1(token.content) + "</code>";
+		return "<code" + slf.renderAttrs(token) + ">" + escapeHtml(token.content) + "</code>";
 	};
 	default_rules.code_block = function(tokens, idx, options, env, slf) {
 		const token = tokens[idx];
-		return "<pre" + slf.renderAttrs(token) + "><code>" + escapeHtml$1(tokens[idx].content) + "</code></pre>\n";
+		return "<pre" + slf.renderAttrs(token) + "><code>" + escapeHtml(tokens[idx].content) + "</code></pre>\n";
 	};
 	default_rules.fence = function(tokens, idx, options, env, slf) {
 		const token = tokens[idx];
@@ -29720,8 +30997,8 @@ var init_dota_md = __esmMin((() => {
 			langAttrs = arr.slice(2).join("");
 		}
 		let highlighted;
-		if (options.highlight) highlighted = options.highlight(token.content, langName, langAttrs) || escapeHtml$1(token.content);
-		else highlighted = escapeHtml$1(token.content);
+		if (options.highlight) highlighted = options.highlight(token.content, langName, langAttrs) || escapeHtml(token.content);
+		else highlighted = escapeHtml(token.content);
 		if (highlighted.indexOf("<pre") === 0) return highlighted + "\n";
 		if (info) {
 			const i = token.attrIndex("class");
@@ -29748,7 +31025,7 @@ var init_dota_md = __esmMin((() => {
 		return options.breaks ? options.xhtmlOut ? "<br />\n" : "<br>\n" : "\n";
 	};
 	default_rules.text = function(tokens, idx) {
-		return escapeHtml$1(tokens[idx].content);
+		return escapeHtml(tokens[idx].content);
 	};
 	default_rules.html_block = function(tokens, idx) {
 		return tokens[idx].content;
@@ -29765,7 +31042,7 @@ var init_dota_md = __esmMin((() => {
 		let i, l, result;
 		if (!token.attrs) return "";
 		result = "";
-		for (i = 0, l = token.attrs.length; i < l; i++) result += " " + escapeHtml$1(token.attrs[i][0]) + "=\"" + escapeHtml$1(token.attrs[i][1]) + "\"";
+		for (i = 0, l = token.attrs.length; i < l; i++) result += " " + escapeHtml(token.attrs[i][0]) + "=\"" + escapeHtml(token.attrs[i][1]) + "\"";
 		return result;
 	};
 	/**
@@ -31851,6 +33128,239 @@ var init_dota_md = __esmMin((() => {
 	})], MdTocComponent);
 }));
 //#endregion
+//#region src/components/blogs/blog-view.component.ts
+var BlogViewComponent;
+var init_blog_view_component = __esmMin((() => {
+	init_core$1();
+	init_doc_loader_service();
+	init_dota_md();
+	init_event();
+	init_blog_route_utils();
+	init_rendering();
+	init_decorate();
+	BlogViewComponent = class BlogViewComponent extends BaseElement {
+		docLoader;
+		currentBlog = "";
+		/** Theme passed through to <md-view>. Default: 'apple'. */
+		theme = "apple";
+		/** Color passed through to <md-view>. Default: 'lime'. */
+		color = "lime";
+		/** max-width passed through to <md-view>. Default: 'max-w-3xl'. */
+		maxWidth = "max-w-3xl";
+		constructor() {
+			super();
+			this.docLoader = new DocLoaderService();
+		}
+		/** Loads the route's Markdown document and renders it after the component connects. */
+		async afterViewInit() {
+			if (this.querySelector("[data-md-content]")?.textContent?.trim()) return;
+			const { blog, category } = resolveBlogRouteParams(window.location.pathname, window.location.search);
+			if (blog && category) {
+				this.currentBlog = blog.trim();
+				this.updateHTML();
+				const raw = await this.docLoader.loadBlog(`${category.toLowerCase()}/${blog}`);
+				MDService.render(raw, { publish: true });
+			}
+		}
+		render() {
+			const routeBlog = resolveBlogRouteParams(window.location.pathname, window.location.search).blog;
+			const blogLabel = (this.currentBlog || routeBlog || "Blog").replace(/\.md$/i, "").replace(/-/g, " ");
+			return html`
+      <section class="mx-auto w-full max-w-screen-2xl px-3 py-12 sm:px-5 lg:px-8">
+        <dota-breadcrumb
+          path='${JSON.stringify([
+				{
+					id: "home",
+					label: "Home",
+					href: "/"
+				},
+				{
+					id: "blogs",
+					label: "Blogs",
+					href: "/blogs"
+				},
+				{
+					id: "current-blog",
+					label: blogLabel
+				}
+			])}'
+          label="Blog breadcrumb"
+          class="mb-8 block">
+        </dota-breadcrumb>
+        <div class="flex w-full flex-col xl:flex-row xl:items-start xl:gap-8">
+          <div class="min-w-0 flex-1 ${this.maxWidth}" style="overflow-anchor: none;">
+            <md-view theme="${this.theme}" color="${this.color}"></md-view>
+            <blog-suggestion current-blog="${this.currentBlog}" limit="3"></blog-suggestion>
+          </div>
+          <aside class="hidden xl:block shrink-0 self-start sticky top-16">
+            <md-toc
+              theme="${this.theme}"
+              color="${this.color}"
+              header-height="64"
+              mode="sticky">
+            </md-toc>
+          </aside>
+        </div>
+      </section>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		name: "current-blog",
+		type: StringType
+	})], BlogViewComponent.prototype, "currentBlog", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "theme",
+		type: StringType
+	})], BlogViewComponent.prototype, "theme", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "color",
+		type: StringType
+	})], BlogViewComponent.prototype, "color", void 0);
+	__decorate$2([PropertyDecorator({
+		name: "max-width",
+		type: StringType
+	})], BlogViewComponent.prototype, "maxWidth", void 0);
+	__decorate$2([OnEventDecorator$1("connected", true)], BlogViewComponent.prototype, "afterViewInit", null);
+	BlogViewComponent = __decorate$2([ComponentDecorator({
+		selector: "blog-view",
+		shadow: false
+	})], BlogViewComponent);
+}));
+//#endregion
+//#region src/components/chat/ai-form.component.ts
+var AiFormComponent;
+var init_ai_form_component = __esmMin((() => {
+	init_core$1();
+	init_OpenAIService();
+	init_local_storage_service();
+	init_decorate();
+	AiFormComponent = class AiFormComponent extends BaseElement {
+		openApiService;
+		isLoading;
+		messageEvent;
+		constructor() {
+			super();
+			this.openApiService = new OpenAIService("deepseek/deepseek-r1-distill-llama-8b");
+		}
+		async userInputEvent(event) {
+			this.isLoading = true;
+			try {
+				event.preventDefault();
+				const form = event.currentTarget;
+				const userMessage = new FormData(form).get("user-input")?.toString().trim() || "";
+				if (userMessage) {
+					const userMessageRecord = {
+						message: userMessage,
+						type: "USER"
+					};
+					this.messageEvent.emit(userMessageRecord);
+					const user = Promise.resolve(LocalStorageService.pushToList("message", userMessageRecord));
+					const chatMessageRecord = {
+						message: await this.openApiService.chatCompletion(userMessage),
+						type: "SERVER"
+					};
+					this.messageEvent.emit(chatMessageRecord);
+					const chat = Promise.resolve(LocalStorageService.pushToList("message", chatMessageRecord));
+					form.reset();
+					await Promise.all([chat, user]);
+				}
+			} finally {
+				this.isLoading = false;
+			}
+		}
+		render() {
+			return `
+      <div class="relative group flex-1 w-full">
+        ${this.isLoading ? `<div class="absolute border -inset-1 bg-gradient-to-r dark:from-pink-400 dark:to-purple-400 from-pink-600 to-purple-600 
+                    rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"
+                >
+                </div>` : ""}
+        <form id="chat-form" class="relative flex items-center gap-2  w-full bg-white dark:bg-slate-900 rounded-lg p-2 shadow-sm  dark:shadow-[0px_0px_12px_rgba(147,51,234,0.8)]">
+
+          <div class="w-12 h-12 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center">
+            <img src="https://mir-s3-cdn-cf.behance.net/project_modules/fs/bcdeaf163021985.63df4524e42bb.jpg" alt="dota-bot"
+                 class="size-12 rounded-full "/>
+          </div>
+          <input name="user-input" type="text" autocomplete="off"   class="disabled:pointer-events-none disabled:opacity-70 w-full dark:text-gray-400  outline-none bg-transparent focus:border-purple-600 border-2  p-4 rounded-lg border-transparent "
+                 placeholder="Hello! How can I assist you today?"/>
+        </form>
+      </div>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		type: BooleanType,
+		name: "is-loading"
+	})], AiFormComponent.prototype, "isLoading", void 0);
+	__decorate$2([EventDecorator()], AiFormComponent.prototype, "messageEvent", void 0);
+	__decorate$2([BindEventDecorator({
+		event: "submit",
+		id: "#chat-form"
+	})], AiFormComponent.prototype, "userInputEvent", null);
+	AiFormComponent = __decorate$2([ComponentDecorator({
+		selector: "ai-form",
+		shadow: false
+	})], AiFormComponent);
+}));
+//#endregion
+//#region src/components/chat/message-box.component.ts
+var MessageBoxComponent;
+var init_message_box_component = __esmMin((() => {
+	init_core$1();
+	init_local_storage_service();
+	init_decorate();
+	MessageBoxComponent = class MessageBoxComponent extends BaseElement {
+		messages = [];
+		cardSection;
+		constructor() {
+			super();
+		}
+		afterViewInit() {
+			requestAnimationFrame(() => {
+				this.messages = LocalStorageService.getList("message");
+				this.messages.forEach((message, index) => {
+					const messageCardEl = document.createElement("message-card");
+					messageCardEl.setAttribute("message-type", message.type);
+					messageCardEl.setAttribute("message", message.message);
+					messageCardEl.setAttribute("key", index.toString());
+					this.cardSection.appendChild(messageCardEl);
+					this.cardSection.scrollTop = this.cardSection.scrollHeight;
+				});
+			});
+		}
+		handleNewMessages(event) {
+			this.messages.push(event.detail);
+			requestAnimationFrame(() => {
+				const messageCardEl = document.createElement("message-card");
+				messageCardEl.setAttribute("message-type", event.detail.type);
+				messageCardEl.setAttribute("message", event.detail.message);
+				messageCardEl.setAttribute("key", this.messages.length.toString());
+				this.cardSection.appendChild(messageCardEl);
+				this.cardSection.scrollTop = this.cardSection.scrollHeight;
+			});
+		}
+		render() {
+			return `
+      <section id="card-section" class="h-[55vh] w-full shadow-md dark:shadow-[0px_0px_12px_rgba(147,51,234,0.8)] overflow-y-auto custom-scrollbar p-4 bg-slate-100 dark:bg-slate-900 rounded-lg flex flex-col gap-4">
+        
+      </section>
+    `;
+		}
+	};
+	__decorate$2([StateDecorator()], MessageBoxComponent.prototype, "messages", void 0);
+	__decorate$2([ElementDecorator({
+		selector: "card-section",
+		by: "id"
+	})], MessageBoxComponent.prototype, "cardSection", void 0);
+	__decorate$2([AfterInitDecorator()], MessageBoxComponent.prototype, "afterViewInit", null);
+	__decorate$2([WindowListenerDecorator({ event: "onMessageEvent" })], MessageBoxComponent.prototype, "handleNewMessages", null);
+	MessageBoxComponent = __decorate$2([ComponentDecorator({
+		selector: "message-box",
+		shadow: false
+	})], MessageBoxComponent);
+}));
+//#endregion
 //#region src/components/chat/message-card.component.ts
 var MessageCardComponent, messageStyleConfig;
 var init_message_card_component = __esmMin((() => {
@@ -32172,954 +33682,6 @@ var init_social_section_component = __esmMin((() => {
 	})], SocialSectionComponent);
 }));
 //#endregion
-//#region src/configs/blogs.config.ts
-var BlogIcons, BlogTypeConfig, normalizeBlogPath, isSameBlog, getStableIndex, getSuggestedBlogPosts, blogPosts;
-var init_blogs_config = __esmMin((() => {
-	BlogIcons = {
-		Rant: "mdi:comment-outline",
-		Tutorial: "mdi:book-open-variant",
-		News: "mdi:newspaper-variant",
-		Tools: "mdi:wrench-outline",
-		Others: "mdi:dots-horizontal"
-	};
-	BlogTypeConfig = {
-		Rant: {
-			category: "Rant",
-			icon: BlogIcons.Rant,
-			color: "orange"
-		},
-		Tutorial: {
-			category: "Tutorial",
-			icon: BlogIcons.Tutorial,
-			color: "blue"
-		},
-		News: {
-			category: "News",
-			icon: BlogIcons.News,
-			color: "green"
-		},
-		Tools: {
-			category: "Tools",
-			icon: BlogIcons.Tools,
-			color: "purple"
-		},
-		Others: {
-			category: "Others",
-			icon: BlogIcons.Others,
-			color: "gray"
-		}
-	};
-	normalizeBlogPath = (path) => {
-		return path.trim().replace(/^\/+/, "").replace(/\.md$/i, "").toLowerCase();
-	};
-	isSameBlog = (left, right) => {
-		return normalizeBlogPath(left) === normalizeBlogPath(right);
-	};
-	getStableIndex = (value, size) => {
-		if (size <= 0) return 0;
-		let hash = 0;
-		for (let index = 0; index < value.length; index += 1) hash = hash * 31 + value.charCodeAt(index) | 0;
-		return Math.abs(hash) % size;
-	};
-	getSuggestedBlogPosts = (currentPath, limit = 3) => {
-		if (!blogPosts.length || limit <= 0) return [];
-		const normalizedCurrentPath = normalizeBlogPath(currentPath);
-		if (!normalizedCurrentPath) return [];
-		const currentIndex = blogPosts.findIndex((post) => isSameBlog(post.path, currentPath));
-		const availablePosts = blogPosts.filter((post) => !isSameBlog(post.path, currentPath));
-		if (availablePosts.length === 0) return [];
-		const suggestedPosts = [];
-		if (currentIndex !== -1) for (let offset = 1; offset < blogPosts.length && suggestedPosts.length < limit; offset += 1) {
-			const nextPost = blogPosts[(currentIndex + offset) % blogPosts.length];
-			if (isSameBlog(nextPost.path, currentPath)) continue;
-			suggestedPosts.push(nextPost);
-		}
-		else {
-			const startIndex = normalizedCurrentPath ? getStableIndex(normalizedCurrentPath, availablePosts.length) : 0;
-			for (let offset = 0; offset < availablePosts.length && suggestedPosts.length < limit; offset += 1) {
-				const nextPost = availablePosts[(startIndex + offset) % availablePosts.length];
-				suggestedPosts.push(nextPost);
-			}
-		}
-		return suggestedPosts.slice(0, limit);
-	};
-	blogPosts = [
-		{
-			date: "2026-08-12",
-			writer: "Ayush Jaiswal",
-			header: "Meet dota-alert Through an Interactive Lab",
-			description: "An interactive showcase of dota-alert covering confirmations, guarded prompts, async work, cancellation, and caller-owned custom content.",
-			category: "Tutorial",
-			path: "Dota-Alert.md"
-		},
-		{
-			date: "2026-08-12",
-			writer: "Ayush Jaiswal",
-			header: "Building a Useful Breadcrumb With dota-breadcrumb",
-			description: "A live tutorial for dota-breadcrumb covering semantic article trails, folded long paths, keyboard disclosure, native links, and complete per-instance visual overrides.",
-			category: "Tutorial",
-			path: "Dota-Breadcrumb.md"
-		},
-		{
-			date: "2026-07-17",
-			writer: "Ayush Jaiswal",
-			header: "LangChain Foundations: From Model Calls To Useful Agents",
-			description: "The first article in a connected AI application series, explaining LangChain prompts, tools, agents, middleware, state, and the path to RAG and LangGraph.",
-			category: "Tutorial",
-			path: "LangChain-Foundations.md"
-		},
-		{
-			date: "2026-07-17",
-			writer: "Ayush Jaiswal",
-			header: "RAG: Grounding AI Answers In Your Data",
-			description: "A practical guide to retrieval-augmented generation, covering ingestion, chunking, embeddings, authorized retrieval, grounded prompts, evaluation, and when to advance to graph workflows.",
-			category: "Tutorial",
-			path: "RAG-Grounded-Answers.md"
-		},
-		{
-			date: "2026-07-17",
-			writer: "Ayush Jaiswal",
-			header: "LangGraph: Reliable Stateful AI Workflows",
-			description: "The final article in the series, showing how LangGraph uses state, nodes, edges, bounded loops, approvals, persistence, and observability for reliable AI workflows.",
-			category: "Tutorial",
-			path: "LangGraph-Stateful-Workflows.md"
-		},
-		{
-			date: "2025-04-21",
-			writer: "Ayush Jaiswal",
-			header: "Head first Web Components",
-			description: "Lets explore the world of web components, a powerful technology that enables developers to create reusable and encapsulated custom elements. This article delves into the fundamentals of web components, including shadow DOM, custom elements, and HTML templates. By understanding these concepts, developers can build modular and maintainable applications that enhance user experience and streamline development processes.",
-			category: "Tutorial",
-			path: "Web-Component.md"
-		},
-		{
-			"date": "2025-04-21",
-			"writer": "Ayush Jaiswal",
-			"header": "What is needed to design a web component",
-			"description": "In this article, we will explore the essential components required to design a web component. We will discuss the key concepts and technologies involved in creating reusable and encapsulated custom elements. By understanding these components, developers can effectively leverage web components to enhance their web applications.",
-			"category": "Tutorial",
-			"path": "Component-Basic.md"
-		},
-		{
-			"date": "2025-04-22",
-			"writer": "Ayush Jaiswal",
-			"header": "What's next in Dota Core",
-			"description": "This article explores the upcoming release of dota core, a powerful framework for building scalable and efficient applications. It delves into the new features and enhancements that will be introduced, including improved performance, enhanced developer experience, and expanded capabilities. By understanding what's next in Dota Core, developers can stay ahead of the curve and leverage the latest advancements in their projects.",
-			"category": "News",
-			"path": "Next-in-Dota-Core.md"
-		},
-		{
-			date: "2025-04-22",
-			writer: "Ayush Jaiswal",
-			"header": "Window Port exlusion Issue",
-			"description": "This article addresses the window port exclusion issue, a common challenge faced by developers when working with web applications. It provides insights into the causes of this issue and offers practical solutions to mitigate its impact. By understanding the window port exclusion issue, developers can enhance the performance and reliability of their applications.",
-			category: "Rant",
-			"path": "Window-Port-Exclusion-Issue.md"
-		},
-		{
-			date: "2025-04-23",
-			writer: "Ayush Jaiswal",
-			header: "Scripting Languages",
-			description: "A practical overview of scripting languages, their strengths, and common use cases across automation, web development, data work, and embedded systems.",
-			category: "Tools",
-			path: "Scripting-Languages.md"
-		},
-		{
-			date: "2025-04-24",
-			writer: "Ayush Jaiswal",
-			header: "Kotlin For Scripting",
-			description: "An introduction to using Kotlin as a scripting language, with a focus on concise automation, JVM tooling, and practical use cases.",
-			category: "Tools",
-			path: "Kotlin-For-Scripting.md"
-		},
-		{
-			date: "2025-04-25",
-			writer: "Ayush Jaiswal",
-			header: "Data Encryption Standard",
-			description: "An introduction to DES, a symmetric encryption algorithm that encrypts data in 64-bit blocks using a 56-bit key via the Feistel Network across 16 rounds of substitution and permutation.",
-			category: "Tutorial",
-			path: "DES.md"
-		},
-		{
-			date: "2025-04-25",
-			writer: "Ayush Jaiswal",
-			header: "Advanced Encryption Standard",
-			description: "A short introduction to AES, a widely used symmetric-key encryption standard for securing data at rest and in transit.",
-			category: "Tutorial",
-			path: "AES.md"
-		},
-		{
-			date: "2025-04-25",
-			writer: "Ayush Jaiswal",
-			header: "Towards Cryptography",
-			description: "An introduction to cryptography, covering its purpose, the basic working model, and a simple example using the Caesar cipher.",
-			category: "Tutorial",
-			path: "Towards-Cryptography.md"
-		},
-		{
-			date: "2026-07-10",
-			writer: "Ayush Jaiswal",
-			header: "Chat Memory",
-			description: "A practical guide to chat memory, covering explicit and implicit memory, persistent information, the write-manage-read loop, and why these memory systems matter.",
-			category: "Tutorial",
-			path: "Chat-Memory.md"
-		},
-		{
-			date: "2026-07-11",
-			writer: "Ayush Jaiswal",
-			header: "Multi-Tenant Identity Architecture",
-			description: "A simple, ordered guide to multi-tenant identity architecture, covering AuthN, AuthZ, OAuth 2.0, OIDC, JWTs, opaque tokens, BFF login, IdP brokering, and multi-issuer resource servers.",
-			category: "Tutorial",
-			path: "Multi-Tenant-Identity-Architecture.md"
-		}
-	];
-}));
-//#endregion
-//#region src/components/blogs/blog-icon.component.ts
-var BlogIconComponent;
-var init_blog_icon_component = __esmMin((() => {
-	init_core$1();
-	init_blogs_config();
-	init_decorate();
-	BlogIconComponent = class BlogIconComponent extends BaseElement {
-		category;
-		constructor() {
-			super();
-		}
-		render() {
-			const iconDetail = BlogTypeConfig[this.category];
-			return `
-      <span>
-        <dota-icon name="${iconDetail.icon}" color="${iconDetail.color || "gray"}" variant="link" size="md"></dota-icon>
-      </span>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "category",
-		type: StringType
-	})], BlogIconComponent.prototype, "category", void 0);
-	BlogIconComponent = __decorate$2([ComponentDecorator({
-		selector: "blog-icon",
-		shadow: false
-	})], BlogIconComponent);
-}));
-//#endregion
-//#region src/components/blogs/blog-pagination.component.ts
-var BLOG_PAGINATION_CHANGE_EVENT, BLOG_PAGINATION_STORAGE_KEY, BLOG_PAGE_SIZE_OPTIONS, DEFAULT_PAGINATION_STATE, clamp$1, toPositiveInteger, readStoredValue, readBlogPaginationState, persistBlogPaginationState, BlogPaginationComponent;
-var init_blog_pagination_component = __esmMin((() => {
-	init_core$1();
-	init_main();
-	init_local_storage_service();
-	init_decorate();
-	BLOG_PAGINATION_CHANGE_EVENT = "blog:pagination:changed";
-	BLOG_PAGINATION_STORAGE_KEY = "dota-web:blogs:pagination";
-	BLOG_PAGE_SIZE_OPTIONS = [
-		3,
-		6,
-		9
-	];
-	DEFAULT_PAGINATION_STATE = {
-		currentPage: 1,
-		pageSize: 6
-	};
-	clamp$1 = (value, minimum, maximum) => {
-		return Math.min(Math.max(value, minimum), maximum);
-	};
-	toPositiveInteger = (value) => {
-		const parsed = Number(value);
-		return Number.isInteger(parsed) && parsed > 0 ? parsed : void 0;
-	};
-	readStoredValue = () => {
-		try {
-			const storedValue = LocalStorageService.get(BLOG_PAGINATION_STORAGE_KEY);
-			return storedValue ? JSON.parse(storedValue) : {};
-		} catch {
-			return {};
-		}
-	};
-	readBlogPaginationState = (totalItems) => {
-		const stored = readStoredValue();
-		const requestedPageSize = toPositiveInteger(stored.pageSize);
-		const pageSize = BLOG_PAGE_SIZE_OPTIONS.includes(requestedPageSize) ? requestedPageSize : DEFAULT_PAGINATION_STATE.pageSize;
-		const totalPages = Math.max(1, Math.ceil(Math.max(0, totalItems) / pageSize));
-		return {
-			currentPage: clamp$1(toPositiveInteger(stored.currentPage) ?? DEFAULT_PAGINATION_STATE.currentPage, 1, totalPages),
-			pageSize
-		};
-	};
-	persistBlogPaginationState = (state, totalItems) => {
-		const pageSize = BLOG_PAGE_SIZE_OPTIONS.includes(state.pageSize) ? state.pageSize : DEFAULT_PAGINATION_STATE.pageSize;
-		const totalPages = Math.max(1, Math.ceil(Math.max(0, totalItems) / pageSize));
-		const normalizedState = {
-			currentPage: clamp$1(state.currentPage, 1, totalPages),
-			pageSize
-		};
-		try {
-			LocalStorageService.add(BLOG_PAGINATION_STORAGE_KEY, JSON.stringify(normalizedState));
-		} catch {}
-		return normalizedState;
-	};
-	BlogPaginationComponent = class BlogPaginationComponent extends BaseElement {
-		total = "0";
-		constructor() {
-			super();
-		}
-		handleClick(event) {
-			const target = event.target;
-			if (!(target instanceof Element)) return;
-			const button = target.closest("[data-pagination-action]");
-			if (!button || button.disabled) return;
-			const totalPages = this.totalPages;
-			const currentState = this.state;
-			const action = button.dataset.paginationAction;
-			const requestedPage = action === "first" ? 1 : action === "previous" ? currentState.currentPage - 1 : action === "next" ? currentState.currentPage + 1 : action === "last" ? totalPages : toPositiveInteger(button.dataset.page) ?? currentState.currentPage;
-			this.setState({
-				...currentState,
-				currentPage: requestedPage
-			});
-		}
-		handlePageSizeChange(event) {
-			const target = event.target;
-			if (!(target instanceof HTMLSelectElement) || target.id !== "blog-page-size") return;
-			this.setState({
-				currentPage: 1,
-				pageSize: toPositiveInteger(target.value) ?? DEFAULT_PAGINATION_STATE.pageSize
-			});
-		}
-		get totalItems() {
-			return Math.max(0, toPositiveInteger(this.total) ?? 0);
-		}
-		get totalPages() {
-			return Math.max(1, Math.ceil(this.totalItems / this.state.pageSize));
-		}
-		get state() {
-			return readBlogPaginationState(this.totalItems);
-		}
-		setState(state) {
-			const persistedState = persistBlogPaginationState(state, this.totalItems);
-			applicationEventPublisher.publish({
-				name: BLOG_PAGINATION_CHANGE_EVENT,
-				data: persistedState
-			});
-			this.updateHTML();
-		}
-		getPageItems(totalPages, currentPage) {
-			if (totalPages <= 7) return Array.from({ length: totalPages }, (_, index) => index + 1);
-			const items = [1];
-			const start = Math.max(2, currentPage - 1);
-			const end = Math.min(totalPages - 1, currentPage + 1);
-			if (start > 2) items.push("ellipsis");
-			for (let page = start; page <= end; page += 1) items.push(page);
-			if (end < totalPages - 1) items.push("ellipsis");
-			items.push(totalPages);
-			return items;
-		}
-		render() {
-			const state = this.state;
-			const totalPages = this.totalPages;
-			const startItem = this.totalItems === 0 ? 0 : (state.currentPage - 1) * state.pageSize + 1;
-			const endItem = Math.min(state.currentPage * state.pageSize, this.totalItems);
-			const pageItems = this.getPageItems(totalPages, state.currentPage);
-			return `
-      <nav aria-label="Blog pagination"
-           class="mt-10 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm
-                  dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-        <p class="text-sm text-slate-600 dark:text-slate-300" aria-live="polite">
-          Showing <span class="font-semibold text-slate-950 dark:text-white">${startItem}–${endItem}</span>
-          of <span class="font-semibold text-slate-950 dark:text-white">${this.totalItems}</span> posts
-        </p>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <label for="blog-page-size" class="sr-only">Posts per page</label>
-          <select id="blog-page-size"
-                  class="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-700
-                         outline-none transition focus-visible:ring-2 focus-visible:ring-purple-500
-                         dark:border-gray-700 dark:bg-gray-900 dark:text-slate-200"
-                  aria-label="Posts per page">
-            ${BLOG_PAGE_SIZE_OPTIONS.map((pageSize) => `
-              <option value="${pageSize}" ${state.pageSize === pageSize ? "selected" : ""}>${pageSize} per page</option>
-            `).join("")}
-          </select>
-
-          <div class="flex items-center gap-1" aria-label="Pagination controls">
-            ${this.renderActionButton("first", "First page", "«", state.currentPage === 1)}
-            ${this.renderActionButton("previous", "Previous page", "‹", state.currentPage === 1)}
-            ${pageItems.map((item) => item === "ellipsis" ? `<span aria-hidden="true" class="grid size-10 place-items-center text-slate-400 dark:text-slate-500">…</span>` : this.renderPageButton(item, state.currentPage)).join("")}
-            ${this.renderActionButton("next", "Next page", "›", state.currentPage === totalPages)}
-            ${this.renderActionButton("last", "Last page", "»", state.currentPage === totalPages)}
-          </div>
-        </div>
-      </nav>
-    `;
-		}
-		renderActionButton(action, label, icon, disabled) {
-			return `
-      <button type="button" data-pagination-action="${action}" aria-label="${label}" ${disabled ? "disabled" : ""}
-              class="grid size-10 place-items-center rounded-xl border border-transparent text-lg text-slate-600 transition
-                     hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950
-                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500
-                     disabled:pointer-events-none disabled:opacity-35
-                     dark:text-slate-300 dark:hover:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white">
-        <span aria-hidden="true">${icon}</span>
-      </button>
-    `;
-		}
-		renderPageButton(page, currentPage) {
-			const isCurrent = page === currentPage;
-			return `
-      <button type="button" data-pagination-action="page" data-page="${page}" ${isCurrent ? "aria-current=\"page\"" : ""}
-              aria-label="Page ${page}"
-              class="grid size-10 place-items-center rounded-xl text-sm font-semibold transition
-                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500
-                     ${isCurrent ? "bg-purple-600 text-white shadow-sm dark:bg-purple-500" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-gray-700 dark:hover:text-white"}">
-        ${page}
-      </button>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "total",
-		type: StringType
-	})], BlogPaginationComponent.prototype, "total", void 0);
-	__decorate$2([HostListenerDecorator({ event: "click" })], BlogPaginationComponent.prototype, "handleClick", null);
-	__decorate$2([HostListenerDecorator({ event: "change" })], BlogPaginationComponent.prototype, "handlePageSizeChange", null);
-	BlogPaginationComponent = __decorate$2([ComponentDecorator({
-		selector: "blog-pagination",
-		shadow: false
-	})], BlogPaginationComponent);
-}));
-//#endregion
-//#region src/components/blogs/blog-preview.component.ts
-var categoryAccent, revealObserver, escapeHtml, estimateReadTime, BlogPreviewComponent;
-var init_blog_preview_component = __esmMin((() => {
-	init_core$1();
-	init_main();
-	init_decorate();
-	categoryAccent = {
-		Rant: "text-orange-600 dark:text-orange-300",
-		Tutorial: "text-blue-700 dark:text-blue-300",
-		News: "text-emerald-700 dark:text-emerald-300",
-		Tools: "text-purple-700 dark:text-purple-300",
-		Others: "text-slate-600 dark:text-slate-300"
-	};
-	escapeHtml = (value) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;").replaceAll("'", "&#039;");
-	estimateReadTime = (header, description) => {
-		const wordCount = `${header} ${description}`.trim().split(/\s+/).filter(Boolean).length;
-		return Math.max(1, Math.ceil(wordCount / 200));
-	};
-	BlogPreviewComponent = class BlogPreviewComponent extends BaseElement {
-		date = "";
-		writer = "";
-		header = "";
-		description = "";
-		category = "Rant";
-		path = "";
-		constructor() {
-			super();
-		}
-		afterViewInit() {
-			const card = this.querySelector("[data-blog-card]");
-			if (!card || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-				card?.classList.add("is-visible");
-				return;
-			}
-			const siblingCards = this.parentElement?.querySelectorAll("blog-preview") ?? [];
-			const index = Array.from(siblingCards).indexOf(this);
-			card.style.setProperty("--blog-preview-delay", `${Math.max(0, index) * 60}ms`);
-			if (!("IntersectionObserver" in window)) {
-				card.classList.add("is-visible");
-				return;
-			}
-			revealObserver ??= new IntersectionObserver((entries, observer) => {
-				entries.forEach((entry) => {
-					if (!entry.isIntersecting) return;
-					const target = entry.target;
-					target.classList.add("is-visible");
-					observer.unobserve(target);
-				});
-			}, {
-				threshold: .12,
-				rootMargin: "0px 0px -24px"
-			});
-			revealObserver.observe(card);
-		}
-		handleClick(event) {
-			if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-			event.preventDefault();
-			routerService.route(this.blogUrl);
-		}
-		get blogUrl() {
-			return `/blogs/content/${encodeURIComponent(this.category)}/${encodeURIComponent(this.path)}`;
-		}
-		render() {
-			const category = this.category in categoryAccent ? this.category : "Others";
-			const accentClass = categoryAccent[category];
-			const readTime = estimateReadTime(this.header, this.description);
-			return `
-      <style>
-        .blog-preview-card {
-          transform: translateY(1.25rem);
-          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-          transition-delay: var(--blog-preview-delay, 0ms);
-        }
-
-        .blog-preview-card.is-visible {
-          transform: translateY(0);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .blog-preview-card,
-          .blog-preview-card.is-visible {
-            transform: none;
-            transition: none;
-          }
-        }
-      </style>
-
-      <a
-        data-blog-card
-        href="${this.blogUrl}"
-        aria-label="Read ${escapeHtml(this.header)}"
-        class="blog-preview-card group relative flex h-full min-h-[16rem] w-full flex-col overflow-hidden rounded-[20px]
-               border border-slate-200/90 bg-white p-[30px_28px_26px] text-left text-slate-950
-               shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[transform,box-shadow,background-color]
-               duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5
-               hover:bg-slate-50 hover:shadow-[0_18px_40px_-12px_rgba(15,23,42,0.16)]
-               focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-500
-               dark:border-slate-700/80 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700
-               dark:shadow-[0_1px_2px_rgba(0,0,0,0.28)]
-               dark:hover:shadow-[0_18px_40px_-12px_rgba(0,0,0,0.55)] font-dm"
-      >
-        <div>
-          <span class="${accentClass} text-[11px] font-medium uppercase tracking-[0.04em]">
-            ${escapeHtml(category)}
-          </span>
-        </div>
-
-        <h2 class="mt-6 text-2xl font-medium leading-[1.18] tracking-[-0.02em] text-slate-950 text-balance dark:text-white">
-          ${escapeHtml(this.header)}
-        </h2>
-
-        <p class="mt-2 line-clamp-3 text-[15px] leading-[1.55] text-slate-600 dark:text-slate-300">
-          ${escapeHtml(this.description)}
-        </p>
-
-        <div class="mt-auto flex items-center gap-2 pt-8 text-[13px] leading-5 text-slate-500 dark:text-slate-400">
-          <span class="truncate">${escapeHtml(this.writer)}</span>
-          <span aria-hidden="true" class="size-[3px] shrink-0 rounded-full bg-slate-400 dark:bg-slate-500"></span>
-          <span class="shrink-0">${readTime} min read</span>
-          <span aria-hidden="true" class="${accentClass} ml-auto text-lg leading-none opacity-80 transition-transform duration-[400ms]
-                       ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1">→</span>
-        </div>
-      </a>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "date",
-		type: StringType
-	})], BlogPreviewComponent.prototype, "date", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "writer",
-		type: StringType
-	})], BlogPreviewComponent.prototype, "writer", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "header",
-		type: StringType
-	})], BlogPreviewComponent.prototype, "header", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "description",
-		type: StringType
-	})], BlogPreviewComponent.prototype, "description", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "category",
-		type: StringType
-	})], BlogPreviewComponent.prototype, "category", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "path",
-		type: StringType
-	})], BlogPreviewComponent.prototype, "path", void 0);
-	__decorate$2([AfterInitDecorator()], BlogPreviewComponent.prototype, "afterViewInit", null);
-	__decorate$2([HostListenerDecorator({ event: "click" })], BlogPreviewComponent.prototype, "handleClick", null);
-	BlogPreviewComponent = __decorate$2([ComponentDecorator({
-		selector: "blog-preview",
-		shadow: false
-	})], BlogPreviewComponent);
-}));
-//#endregion
-//#region src/components/blogs/blog-section.component.ts
-var BlogSectionComponent;
-var init_blog_section_component = __esmMin((() => {
-	init_core$1();
-	init_blogs_config();
-	init_blog_pagination_component();
-	init_event();
-	init_decorate();
-	BlogSectionComponent = class BlogSectionComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		handlePaginationChange() {
-			this.updateHTML();
-		}
-		render() {
-			const latestFirstPosts = [...blogPosts].sort((left, right) => right.date.localeCompare(left.date));
-			const paginationState = readBlogPaginationState(latestFirstPosts.length);
-			const startIndex = (paginationState.currentPage - 1) * paginationState.pageSize;
-			return `
-      <section class="relative isolate font-dm mx-auto max-w-7xl px-3 py-12 lg:pt-20">
-        <orb-background orbit-count="7"
-            orbit-spacing="10"
-            orbit-speed="10"
-            orbit-direction="clockwise"
-            orbit-particle-size="0.8"
-            orbit-particle-gap="11"
-            orbit-size="lg"
-        >
-        </orb-background>
-
-        <div class="relative z-10">
-          <section-header>
-            Blogs by the <span class="text-purple-600 dark:text-purple-500">Team Dota</span>
-          </section-header>
-          <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            ${latestFirstPosts.slice(startIndex, startIndex + paginationState.pageSize).map((post) => `
-              <blog-preview
-                date="${post.date}"
-                writer="${post.writer}"
-                header="${post.header}"
-                description="${post.description}"
-                category="${post.category}"
-                path="${post.path}"
-              ></blog-preview>
-            `).join("")}
-          </div>
-          <blog-pagination total="${latestFirstPosts.length}"></blog-pagination>
-        </div>
-      </section>
-    `;
-		}
-	};
-	__decorate$2([OnEventDecorator$1(BLOG_PAGINATION_CHANGE_EVENT)], BlogSectionComponent.prototype, "handlePaginationChange", null);
-	BlogSectionComponent = __decorate$2([ComponentDecorator({
-		selector: "blog-section",
-		shadow: false
-	})], BlogSectionComponent);
-}));
-//#endregion
-//#region src/components/blogs/blog-suggestion.component.ts
-var BlogSuggestionComponent;
-var init_blog_suggestion_component = __esmMin((() => {
-	init_core$1();
-	init_blogs_config();
-	init_decorate();
-	BlogSuggestionComponent = class BlogSuggestionComponent extends BaseElement {
-		currentBlog = "";
-		limit = "3";
-		render() {
-			const currentBlog = this.currentBlog?.trim() ?? "";
-			const suggestions = getSuggestedBlogPosts(currentBlog, Number(this.limit) || 3);
-			if (!suggestions.length) return "";
-			return `
-      <section class="font-dm mt-14 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/60 sm:p-6">
-        <div class="mb-5 flex items-end justify-between gap-4">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
-              Continue reading
-            </p>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
-              Next blogs to open
-            </h2>
-          </div>
-          <p class="max-w-sm text-sm text-slate-600 dark:text-slate-400">
-            A quick path to the next few posts in this series.
-          </p>
-        </div>
-
-        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          ${suggestions.map((post) => `
-            <blog-preview
-              date="${post.date}"
-              writer="${post.writer}"
-              header="${post.header}"
-              description="${post.description}"
-              category="${post.category}"
-              path="${post.path}">
-            </blog-preview>
-          `).join("")}
-        </div>
-      </section>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "current-blog",
-		type: StringType
-	})], BlogSuggestionComponent.prototype, "currentBlog", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "limit",
-		type: StringType
-	})], BlogSuggestionComponent.prototype, "limit", void 0);
-	BlogSuggestionComponent = __decorate$2([ComponentDecorator({
-		selector: "blog-suggestion",
-		shadow: false
-	})], BlogSuggestionComponent);
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssg-ssr-csr.md?raw
-var ssg_ssr_csr_default;
-var init_ssg_ssr_csr = __esmMin((() => {
-	ssg_ssr_csr_default = "# Server rendering, one small piece at a time\n\nYou do not need to know SSR to start here. Follow one page, `/tasks/42`, from a URL to visible HTML, then to an interactive component. Each lesson answers one question and introduces the terms it needs.\n\n**The central idea:** the same Dota component can produce HTML before the browser runs your app. *When* that happens distinguishes SSR from SSG. The browser still has work to do afterward.\n\n**New to SSR? [Begin with lesson 1: From URL to HTML →](/docs/ssr-html-first)**\n\n## Choose a short read\n\n| Read in order | You will be able to explain |\n| --- | --- |\n| [1. From URL to HTML](/docs/ssr-html-first) · about 4 min | What the browser receives; CSR, SSR, SSG, and hydration without framework jargon. |\n| [2. A server-ready component](/docs/ssr-component) · about 5 min | A complete example, decorators, properties, data loading, and the symbols in the code. |\n| [3. Inside one SSR request](/docs/ssr-request) · about 5 min | Application capture, route matching, request state, recursive components, SEO, and the response. |\n| [4. Templates become HTML](/docs/ssr-templates) · about 4 min | What is reused, what was added, escaping, template plans, and hydration markers. |\n| [5. SSG: render at build time](/docs/ssr-static-build) · about 5 min | Why SSG takes a different execution path, readiness, fetches, workers, and output files. |\n| [6. Make HTML interactive](/docs/ssr-hydration) · about 5 min | Adoption versus mounting, the initial route, client-only placeholders, events, and updates. |\n| [7. Build and serve a mixed app](/docs/ssr-hosting) · about 4 min | Wrap configuration, standalone SSR, static-file precedence, and hosting targets. |\n| [8. Packages and server limits](/docs/ssr-package-map) · about 6 min | Who owns each part, the minimal server DOM, request isolation, and debugging checkpoints. |\n\nThese are focused explanations, not a tour of Dota Web's content pages. Dota Web appears only where it provides a real integration example.\n\n## See the three timelines\n\n![Three timelines: CSR builds content in the browser, SSR builds content for a request, and SSG builds content before requests.](./rendering-modes.svg)\n\n## Keep these distinctions beside you\n\n| Question | Answer |\n| --- | --- |\n| Who creates the **initial page content**? | CSR: the browser. SSR: a server handling the request. SSG: a build process. |\n| Does SSR mean a different template language? | No. Dota reuses `html` templates; a server serializer writes them as HTML. |\n| Is hydration another rendering mode? | No. It is browser-side work that reconnects compatible existing HTML to component updates and events. |\n| Does `mode: 'ssr'` make every navigation contact a server? | No. Later in-app navigation uses the normal browser router. |\n| Does SSG call the SSR data hook? | No. This implementation runs normal app startup in Happy DOM rather than the request-time string adapter. |\n\n> **Reading the pictures:** arrows show the order of work. Boxes name operations or results. A branch labels an actual choice. HTML examples that omit Dota's bookkeeping attributes are explicitly marked “simplified”; do not copy marker examples as configuration.\n\n## When you need the exact file\n\nUse the [complete file and function reference](/docs/ssr-file-reference) after a lesson, or while changing the implementation. It preserves the detailed branch walkthrough, source links, per-file descriptions, function tables, tests, and packaging notes. It is a lookup document, not the prerequisite for understanding SSR.\n\n**Start with [1. From URL to HTML →](/docs/ssr-html-first).**\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-component.md?raw
-var ssr_component_default;
-var init_ssr_component = __esmMin((() => {
-	ssr_component_default = "# 2. A server-ready component\n\n**Question:** what must a component provide so the server and browser can both use it?\n\n**You will learn:** a small working page, serializable properties, server and browser data hooks, and the syntax used throughout this collection.\n\n## Keep one example in mind\n\nThis complete page displays the ID in `/tasks/42`. It deliberately does not fetch an API yet. Save it with your page components and let the preloader discover it, or register it explicitly in `initializeApp`.\n\n```ts\nimport {\n  AfterInit, Component, DotaPageElement, Property, String, type SEO,\n} from '@ayu-sh-kr/dota-wrap/core';\nimport {Route} from '@ayu-sh-kr/dota-wrap/router';\nimport {html} from '@ayu-sh-kr/dota-wrap/rendering';\nimport type {RenderContext} from '@ayu-sh-kr/dota-ssr/server';\n\n@Route({path: '/tasks/:id', mode: 'ssr'})\n@Component({selector: 'task-page', shadow: false})\nexport class TaskPage extends DotaPageElement {\n  @Property({name: 'task-id', type: String})\n  taskId = '';\n\n  constructor() { super(); }\n\n  get seo(): SEO {\n    return {title: `Task ${this.taskId}`, description: 'Task details'};\n  }\n\n  serverLoad(context: RenderContext) {\n    this.taskId = context.params.id;\n  }\n\n  @AfterInit()\n  initializeFromBrowserUrl() {\n    if (!this.taskId) {\n      this.taskId = location.pathname.split('/').at(-1) ?? '';\n      this.updateHTML();\n    }\n    this.updateSEO();\n  }\n\n  render() {\n    return html`<h1>Task ${this.taskId}</h1>`;\n  }\n}\n```\n\nThe `RenderContext` import is **type-only**: TypeScript removes it from emitted browser JavaScript. It does not load the server runtime into the browser. Wrap remains the consumer-facing runtime API; the explicit server contract lives in `dota-ssr/server`. With pnpm's strict dependency layout, declare `@ayu-sh-kr/dota-ssr` as a direct dev dependency to use this type import: a transitive dependency through Wrap is not automatically importable. The current Wrap SSR entry does not re-export this server type.\n\n## Read the code in four pieces\n\n**1. Declare identity.** `@Component` associates a class with `<task-page>`. `shadow: false` puts rendered children directly inside that element. `@Route` associates a URL pattern with the page. A decorator is metadata attached to a declaration; it does not itself answer an HTTP request.\n\n**2. Prepare state.** `taskId` is an instance field. `@Property` connects the JavaScript field `taskId` with the HTML attribute `task-id`. SSR seeds incoming attributes, awaits `serverLoad`, then reflects supported property values back into attributes.\n\n```html\n<!-- Simplified SSR output; bookkeeping markers omitted. -->\n<task-page task-id=\"42\" path=\"/tasks/42\">\n  <h1>Task 42</h1>\n</task-page>\n```\n\n**3. Describe output.** `render()` reads prepared state and returns an `html` template. Keep it **pure**: describing the same state should produce the same output without starting fetches or changing external state. The same description can be serialized on the server or rendered in the browser; it should not depend on layout measurements.\n\n**4. Handle the other startup path.** `serverLoad` runs in request-time string SSR, not in the browser or the current SSG pipeline. `@AfterInit` handles ordinary browser/SSG startup. The guard avoids overwriting a value already transferred in the host's attribute. `updateHTML()` applies changed state; `updateSEO()` refreshes the browser title after the ID is available.\n\n> **Host** means the outer component element, here `<task-page>`. **Instance** means one object constructed from `TaskPage`. HTML transfers attributes and content, not that JavaScript object. A plain field or `context.state` is not automatically serialized for the browser. Reflected property values are public HTML; never use them to transfer secrets.\n\n## Understand the symbols\n\n| Syntax in the example | Meaning |\n| --- | --- |\n| `@Component(...)`, `@Property(...)` | Decorators: record framework metadata. |\n| `extends DotaPageElement` / `super()` | Inherit page behavior; initialize the parent class. |\n| `get seo()` | A getter: compute metadata when code reads `instance.seo`. |\n| ``html`...${this.taskId}...` `` | A tagged template; `${...}` is a dynamic value, not string concatenation performed by the server alone. |\n| `context: RenderContext` | A TypeScript type annotation; `:` here is not a route parameter. |\n| `!this.taskId` | True when this string is empty. |\n| `?? ''` | Use an empty-string fallback only for `null` or `undefined`. |\n| `type SEO` / `import type` | Compile-time contracts, removed from runtime code. |\n\n## Add a server fetch when needed\n\nReplace the simple `serverLoad` with an asynchronous version when the initial page needs API data:\n\n```ts\n// Method replacement inside a page with a decorated `title` property.\nasync serverLoad(context: RenderContext) {\n  const response = await context.fetch(`/api/tasks/${context.params.id}`);\n  if (!response.ok) throw new Error(`Task request failed: ${response.status}`);\n  const task = await response.json();\n  this.title = task.title;\n}\n```\n\n`async` returns a promise; `await` waits for its result before proceeding. The adapter awaits this hook before `render()`. `context.fetch` resolves a relative string URL against the page request's origin. It does not create an API endpoint; your host must actually serve `/api/tasks/...`.\n\nFor SSG or browser navigation, put the corresponding load in the normal application initialization path and make it observable to SSG's readiness/settling mechanism. Do not assume adding `serverLoad` alone makes all three modes load data identically.\n\n**In the code:** [string-adapter.ts](../../../../../../packages/libs/dota-ssr/src/ssr/string-adapter.ts) implements `renderHost` and property reflection; [BaseElement](../../../../../../packages/libs/dota-core/src/core/elements/base-elements.ts) owns browser connection and updates. The [standalone playground components](../../../../../../packages/libs/dota-ssr/playground/light-dom/src/components.ts) show API loading, nested components, and a counter.\n\n**Next: [3. Inside one SSR request →](/docs/ssr-request)** · [Collection](/docs/ssg-ssr-csr)\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-hosting.md?raw
-var ssr_hosting_default;
-var init_ssr_hosting = __esmMin((() => {
-	ssr_hosting_default = "# 7. Build and serve a mixed app\n\n**Question:** how do Wrap, standalone SSR, SSG files, and the hosting server fit together?\n\n**You will learn:** the two integration levels, a mixed-app build, file-first serving, and the limits of each deployment target.\n\n## Wrap composes the pieces; it does not replace the engine\n\nFor an application using `initializeApp`, use the wrapper's Vite composition and hydration plugin. Wrap is a **facade**: a coordinated public entry point over collaborating libraries, not a second rendering engine. The server captures the existing application declarations; you do not duplicate the component registry or SSR route list.\n\n```ts\n// vite.config.ts — wrapper-based build configuration.\nimport {defineConfig} from 'vite';\nimport {dotaVitePlugins} from '@ayu-sh-kr/dota-wrap/vite';\n\nexport default defineConfig({\n  plugins: dotaVitePlugins({\n    deployment: 'node',\n    ssg: {\n      autoDetectRoutes: true,\n      routes: ['/tasks/42'],\n    },\n  }),\n});\n```\n\nThis config assumes the project's TypeScript/decorator setup and page discovery are already configured. Keep the `dotaHydration` startup from [lesson 6](/docs/ssr-hydration). Declare SSR routes with explicit `mode: 'ssr'`.\n\nThe composition includes the SSR plugin by default; applications with no detected SSR routes do not get a request server. `ssr: false` disables it. SSG remains opt-in through its options and the `--ssg` build flag. `deployment` selects generated hosting files; it does not upload or deploy them. Nested `ssg.deployment` or `ssr.deployment` can override the shared target.\n\n```sh\n# From the app directory, using a build:ssg script equivalent to this:\npnpm exec vite build -- --ssg\n\n# For the generated Node target, from the app directory:\nnode dist-server/server.mjs\n```\n\nThe SSR build preserves the original client shell before SSG can overwrite `dist/index.html`. Otherwise a later CSR fallback might accidentally receive the home page's prerendered state.\n\n## Standalone SSR: wire the lower-level contract\n\nYou do not need Wrap or `initializeApp` to use the request-time engine. Register constructors and page paths directly, then adapt its standard `Request`/`Response` contract to your host.\n\n```ts\n// server.ts — ESM server entry. Load the server environment before components.\nimport {\n  createRequestHandler, createStringAdapter,\n} from '@ayu-sh-kr/dota-ssr/server';\n\nconst {COMPONENTS} = await import('./components.js');\n\nexport const handler = createRequestHandler({\n  adapter: createStringAdapter({components: COMPONENTS}),\n  routes: [{path: '/tasks/:id', page: 'task-page'}],\n  template: `<!doctype html><html>\n    <head><!--dota-head--></head>\n    <body><!--dota-body-->\n      <script type=\"module\" src=\"/assets/client.js\"><\/script>\n    </body></html>`,\n});\n\nconst response = await handler(new Request('https://example.com/tasks/42'));\nconsole.log(await response?.text());\n```\n\n`COMPONENTS` must contain the decorated `task-page` class and registered descendants. The script URL is an illustrative built browser asset; your build/host must provide it. `response?.text()` means “read the response if one exists”; unknown paths return `undefined`. A browser entry must register components and install the hydration strategy if it should reuse this output.\n\nThe `/server` entry installs minimal server globals before Core's element classes are evaluated. The dynamic component import makes that order explicit. A prebuilt browser module already evaluated against a different DOM realm is not an interchangeable server component module.\n\nFor an existing Node middleware stack, `toNodeListener(handler)` bridges Node requests/responses and lets declined requests reach `next`. The separate `dota-ssr/node` entry provides a ready-made static-plus-SSR host. Keeping Node hosting separate avoids forcing `node:http` into every server bundle.\n\n> **Working example:** the [light-DOM playground server](../../../../../../packages/libs/dota-ssr/playground/light-dom/server.mjs) combines Vite assets, a small API, `createStringAdapter`, and `toNodeListener`. Its [browser entry](../../../../../../packages/libs/dota-ssr/playground/light-dom/src/client.ts) installs the mount strategy before `bootstrap`, without a router.\n\n## Follow the Node host's decision\n\n![Node host checks a real static file, then SSR, then a CSR fallback shell.](./hosting-flow.svg)\n\nFor a normal page GET, `createNodeServer` first looks for an existing static file safely inside the client directory. It can resolve directory `index.html` and clean-URL `.html` candidates. If none exists, it asks the SSR handler. If the handler declines, the host serves the clean CSR fallback shell.\n\n| Request | Available output | Result |\n| --- | --- | --- |\n| `/tasks/42` | `dist/tasks/42/index.html` exists | Serve the SSG snapshot; do not call `serverLoad`. |\n| `/tasks/99` | No static file; `/tasks/:id` is SSR | Render a fresh page for this request. |\n| `/editor` | No static file or SSR match | Send the CSR shell; browser routing creates the page. |\n\nThis is the **static-first** pattern. Prerendering an SSR URL changes which path wins for that URL on this host. Do not expect live request data to override an existing static snapshot.\n\nThe chart covers successful page selection. Malformed paths are rejected, unsupported methods return 405, and rendering failures are 500 errors rather than silently returning a CSR page. HEAD follows selection without sending a body. SSR does not provide API endpoints, authentication, or a universal cache policy for your application.\n\n## Deployment is platform-specific\n\n| Target | Generated integration / important boundary |\n| --- | --- |\n| Node | Server bundle, startup, and preserved fallback shell; filesystem/static-first serving as above. |\n| Vercel | Function integration and SSR rewrites. Root static-index precedence is a platform caveat; review generated configuration. |\n| Netlify | Function plus routing rules for SSR paths. |\n| Cloudflare Pages | Advanced worker with asset fallback and Node-compatibility configuration. |\n| GitHub Pages | Static files only; no request-time SSR. The build warns and relies on client rendering where applicable. |\n\nDo not assume every platform uses Node's exact file lookup/rewriting policy. Inspect the output for your target. Secondary Vite builds filter out recursive SSR/SSG and artifact writers so building the server does not trigger another full application build loop.\n\n**In the code:** [Wrap Vite composition](../../../../../../packages/libs/dota-wrap/src/vite/index.ts), [SSR Vite plugin](../../../../../../packages/libs/dota-ssr/src/vite/ssr/plugin.ts), [node-server.ts](../../../../../../packages/libs/dota-ssr/src/ssr/node-server.ts), and [deployment/server.ts](../../../../../../packages/libs/dota-ssr/src/vite/deployment/server.ts).\n\n**Next: [8. Packages and server limits →](/docs/ssr-package-map)** · [Collection](/docs/ssg-ssr-csr)\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-html-first.md?raw
-var ssr_html_first_default;
-var init_ssr_html_first = __esmMin((() => {
-	ssr_html_first_default = "# 1. From URL to HTML\n\n**Question:** when someone opens `/tasks/42`, where does the page come from?\n\n**You will learn:** the request/response cycle, the browser's role, and the difference between CSR, SSR, SSG, and hydration. No server-rendering experience needed.\n\n## Start with a document, not a component\n\nA browser asks a server for a URL. The server replies with a document, usually HTML. The browser parses that text into a **DOM**: an in-memory tree of elements. CSS styles the tree; JavaScript can change it and respond to clicks.\n\n```text\nGET /tasks/42 HTTP/1.1\nHost: example.com\n```\n\n```html\n<!-- A simplified HTML response, not a complete Dota document. -->\n<!doctype html>\n<html>\n  <head><title>Task 42</title></head>\n  <body><h1>Task 42</h1></body>\n</html>\n```\n\n`GET` means “retrieve this resource.” `/tasks/42` is the path. The server can choose the response from a file or create it by running code. That choice is the foundation of this collection.\n\n> **Server** means the process answering the request, not necessarily a physical machine. A Node process or a platform function can fill that role. A **build** is the earlier process that turns source code into deployable files.\n\n## Three ways to produce the first page\n\n![CSR, SSR, and SSG timelines with the point at which page content is produced.](./rendering-modes.svg)\n\nWith **client-side rendering (CSR)**, the response contains an application shell and JavaScript references. The browser downloads the app, constructs components, and produces the page content. The shell itself can contain authored HTML; “CSR” does not mean the response has literally zero markup.\n\nWith **server-side rendering (SSR)**, a request triggers component execution on the server. The response already contains that page's content. It can depend on this request's URL or freshly fetched data. CSS, images, and JavaScript may still need to load.\n\nWith **static site generation (SSG)**, a build visits selected URLs beforehand and saves their HTML. The host later serves those files. No component needs to run per request for a static-file hit. Data baked into those files remains a build-time snapshot until rebuilt, unless browser code updates it.\n\n| For `/tasks/42` | CSR | SSR | SSG |\n| --- | --- | --- | --- |\n| When is page HTML produced? | In the visitor's browser | While answering the request | Before deployment, during the build |\n| Must this URL be known at build time? | No | No; `/tasks/:id` can match it | Yes; select a concrete URL |\n| Does a static-only host suffice? | Yes, with URL fallback | No, not for request-time execution | Yes |\n| Can browser JavaScript run afterward? | Yes | Yes | Yes |\n\n## Tell Dota your initial-delivery policy\n\n```ts\n// Route-decorator examples; each belongs on its own page class.\n@Route({path: '/tasks/:id', mode: 'ssr'})\n@Route({path: '/about', mode: 'ssg'})\n@Route({path: '/editor', mode: 'csr'})\n```\n\nThe `:id` segment is a **parameter**: `/tasks/42` captures `id = '42'`. It is a pattern, not a folder named `:id`.\n\nDota's explicit `mode` wins over the older `ssr` boolean. Without an explicit mode, legacy `ssr: true` means **SSG**, not request-time SSR. Otherwise the default is CSR. Prefer explicit modes so intent is unambiguous.\n\n> **Important boundary:** route mode chooses how the initial document is delivered. Clicking a link handled by the already-running browser router does not automatically request a new server-rendered document. The browser must initialize data for that navigation too.\n\n## HTML is not an interactive app yet\n\nAn SSR response might already show a button:\n\n```html\n<button>Save task</button>\n```\n\nThe text is visible before your application's event handler is attached. **Hydration** is the browser-side integration that reuses compatible HTML and connects it to the app's rendering and event machinery. **Mounting** instead creates a fresh rendered tree in a host element.\n\nDota distinguishes these operations; some initial root/page content is preserved with a deferred renderer rather than immediately adopting every dynamic part. [Lesson 6](/docs/ssr-hydration) explains that distinction with before/after examples.\n\n## Check your understanding\n\nIf `/tasks/42/index.html` was generated yesterday and served unchanged today, that request used **SSG output**, even though the build executed on a server. If a request today runs `serverLoad` and creates fresh HTML, that is **SSR**. The deciding factor is *when the page HTML is produced*, not the machine's location.\n\n**In the code:** [render-mode.ts](../../../../../../packages/libs/dota-core/src/core/render/render-mode.ts) owns the mode types and `resolveRouteRenderMode`. [route-renderer.ts](../../../../../../packages/libs/dota-router/src/coordinator/route-renderer.ts) owns ordinary browser route presentation.\n\n**Next: [2. Write a server-ready component →](/docs/ssr-component)** · [Collection](/docs/ssg-ssr-csr)\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-hydration.md?raw
-var ssr_hydration_default;
-var init_ssr_hydration = __esmMin((() => {
-	ssr_hydration_default = "# 6. Make HTML interactive\n\n**Question:** what happens between seeing server-produced HTML and clicking a working button?\n\n**You will learn:** browser registration order, mounting versus adoption, initial-route preservation, client-only hosts, and mismatch recovery.\n\n## The server does not send component objects\n\nThe response contains text: HTML elements, attributes, comments, and script references. The browser parses elements before it knows your component classes. JavaScript then registers those classes; `customElements.define` can **upgrade** matching elements that are already present.\n\nUpgrading connects a real component instance to an existing custom element. Without hydration integration, ordinary mounting can replace its children and discard useful SSR/SSG output.\n\n```ts\n// main.ts: install the plugin through app startup, before element registration.\nimport {initializeApp} from '@ayu-sh-kr/dota-wrap';\nimport {dotaHydration} from '@ayu-sh-kr/dota-wrap/ssr';\n\nexport const applicationReady = initializeApp({\n  modules: components,\n  routes: routeConfig,\n  root: AppComponent,\n  plugins: [dotaHydration({mismatch: 'warn'})],\n});\n```\n\n`components`, `routeConfig`, and `AppComponent` refer to your application declarations. Wrap runs plugin setup before bootstrap defines the custom elements. Installing the strategy after registration is too late to protect their initial mount.\n\n![Browser flow separates the initial route boundary, compatible marked components, unmarked components, and client-only mounts.](./browser-flow.svg)\n\n## Three words that are not interchangeable\n\n| Operation | What happens to the existing children? |\n| --- | --- |\n| **Mount** | Create the output as a fresh rendered tree. Existing server children are not adopted. |\n| **Hydrate / adopt parts** | Use compatible markers to attach a render session to existing dynamic regions. Reuse eligible nodes. |\n| **Defer rendering** | Leave the current tree alone now; create a normal mounted session on the first later update. |\n\nA **render session** remembers how future outputs relate to nodes/parts. It is how `updateHTML()` can update an existing component rather than treating every render as unrelated text.\n\nFor ordinary eligible hosts, the hydration mount strategy checks the structured template's identity, marker version, and scope before calling Rendering's `hydrate`. Missing markers take the ordinary mount path. Marked but incompatible output follows the mismatch policy.\n\nThis is a **strategy pattern**: Core asks the installed strategy how to create the first render session instead of hard-coding “always mount.” The plugin chooses whether to mount, adopt, or defer; Core's ordinary lifecycle still performs binding and subsequent updates.\n\n## Why the root and initial page need special handling\n\nAt startup the router also wants to display its first page. If it replaced a server-produced page host, even correctly marked descendants could disappear.\n\nThe plugin captures the direct marked page inside the root before bootstrap. While that initial route is pending, root/page rendering can use `deferRender` to preserve the tree. The route wrapper then checks the path, page selector, placement, and route-marker compatibility. A matching initial transition keeps the page instead of painting it again.\n\n> **“Handoff” simply means transferring responsibility.** The server produced the initial markup; browser components and the router now take responsibility for it. It is not a separate API or an empty document.\n\nThis implementation does **not** mean every root/page dynamic part is immediately adopted. Their deferred session mounts normally on the first later update. Ordinary eligible descendant hosts can hydrate their parts. A later navigation uses normal routing; a custom route `render` callback remains authoritative.\n\n## What an “empty client-only host” actually is\n\nFor a browser-only widget, declare a component-level opt-out:\n\n```ts\n@Component({selector: 'map-widget', shadow: false, mode: 'csr'})\nexport class MapWidget extends BaseElement {\n  render() {\n    return html`<p>Map tools</p>`;\n  }\n}\n```\n\nThe enclosing page can still be SSR or SSG. On the server, the widget leaves only a placeholder element:\n\n```html\n<!-- Delivered HTML: the host exists, but contains no rendered widget. -->\n<map-widget data-dota-csr=\"\"></map-widget>\n```\n\nAfter browser registration and ordinary mounting:\n\n```html\n<!-- Simplified browser DOM: the widget now has content. -->\n<map-widget><p>Map tools</p></map-widget>\n```\n\nThat is all “empty browser handoff” was trying to describe: **keep a place for the component, let the browser create its contents**. It is not hydration of nonexistent child nodes. Required server content should not live inside a client-only widget. Keep browser-only work out of its constructor too: string SSR constructs the class before deciding to skip its render.\n\n## Events and updates return to normal Dota behavior\n\n```ts\n// Methods/field inside a browser component.\ncount = 0;\n\n@BindEvent({event: 'click', id: '#increment'})\nincrement() {\n  this.count += 1;\n  this.updateHTML();\n}\n\nrender() {\n  return html`<button id=\"increment\">Count: ${this.count}</button>`;\n}\n```\n\nCore's connection lifecycle handles properties, params, binding, events, and after-init work. It retains the chosen render session for updates. No browser click handler runs on the request-time server. `updateHTML()` does not call `serverLoad` again.\n\nFor initial consistency, the browser must recover the same state from supported attributes or another explicit application mechanism. Random values, different time-dependent output, or server-only fields can create mismatches even when the template's static shape is unchanged.\n\n## Recognize fallback, not just success\n\n`mismatch: 'warn'` reports incompatibility and permits recovery by remounting the affected host; route mismatch permits normal route presentation. `mismatch: 'throw'` surfaces it as an error, useful for catching server/client deployment skew. Neither policy creates missing data or makes incompatible templates equivalent.\n\nCheck the console, retained nodes, and rendered result rather than treating one hydration flag as proof that every nested part was adopted. Deploy HTML and its matching JavaScript together.\n\n**In the code:** [dotaHydration and its mount/route strategies](../../../../../../packages/libs/dota-ssr/src/index.ts), [render-strategy.ts](../../../../../../packages/libs/dota-core/src/core/elements/render-strategy.ts), [renderer.ts](../../../../../../packages/libs/dota-rendering/src/renderer.ts), and the [standalone browser setup](../../../../../../packages/libs/dota-ssr/playground/light-dom/src/client.ts).\n\n**Next: [7. Build and serve a mixed app →](/docs/ssr-hosting)** · [Collection](/docs/ssg-ssr-csr)\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-package-map.md?raw
-var ssr_package_map_default;
-var init_ssr_package_map = __esmMin((() => {
-	ssr_package_map_default = "# 8. Packages and server limits\n\n**Question:** now that the flow makes sense, which package owns each piece, and what is safe to run on the server?\n\n**You will learn:** the responsibility boundaries, the difference between a minimal server DOM and Happy DOM, request isolation, and a practical debugging sequence.\n\n## Read the stack from the application downward\n\n```text\nYour application\n  dota-wrap          consumer imports, initializeApp, Vite composition\n    dota-ssr         SSR requests, SSG builds, hydration integration, hosting\n      dota-core      components, properties, lifecycle, render-mode policy, SEO\n      dota-router    browser navigation and route presentation\n      dota-rendering shared html contract, DOM rendering, server serializer\n      dota-server-dom minimal server element/document and request scopes\n    dota-runtime     type contracts for runtime plugin integration\n```\n\nThis is a responsibility map, not a complete npm dependency graph. In particular, browser code and server-only entry points must stay separate.\n\n| Part | Why it belongs there | Main functions or contracts |\n| --- | --- | --- |\n| Wrap | Applications configure one facade rather than coordinating internals themselves. | `initializeApp`, `dotaVitePlugins`, wrapped `dotaSsg`. |\n| SSR | Coordinates when rendering happens and connects the result to requests, files, and browser startup. | `captureApplication`, `createApplicationHandler`, `createRequestHandler`, `createStringAdapter`, `prerenderRoute`, `dotaHydration`. |\n| Rendering | Server and browser must agree on template shape and marker meaning. | `html`, `serializeOutput`, `templateId`, `render`, `hydrate`, `deferRender`. |\n| Core | Property and SEO semantics should not diverge between browser and server. | `PropertyUtils.seedInitialValues`, `seoHeadTags`, `BaseElement`, render-mode resolvers. |\n| Server DOM | Components need a minimal element base and request environment without a full browser per request. | `ServerElement`, `ServerDocument`, `installServerGlobals`, `runInBrowserScope`. |\n| Runtime | Defines plugin sockets without owning a renderer or starting an app. | `DotaRuntimePlugin`, `DotaRuntimeContext`, `RouteRendererWrapper`. |\n\nSSR remains in the same `dota-ssr` package. The server template writer is grouped with the already-existing Rendering package. The new server-DOM package groups the related element/document/attribute/reflection/scope implementation instead of making each helper its own package. Hydration integration and hosting do not need separate packages merely because they run at different moments; explicit entry points isolate those responsibilities.\n\n> **Source status is not release status.** This collection documents the current branch. A package directory, version field, or export declaration does not prove that code has been published to npm. `dota-server-dom` is a new workspace package in this branch; do not assume it is already available from a released registry version. See the [file reference's packaging and changeset section](/docs/ssr-file-reference#appendix-c-packaging-release-notes-and-supporting-documents) for the branch changes.\n\n## String SSR uses a deliberately small environment\n\nCore component classes extend `HTMLElement`. Node does not supply that browser class, so the server entry installs minimal stand-ins before component modules load. The implementation supports the construction and reflection needed to render strings; it does not try to be a complete browser.\n\n| You can use for request rendering | You must not assume |\n| --- | --- |\n| Attributes, class/style/dataset reflection, small element trees | Real selector queries, layout, painting, focus behavior, or connected elements |\n| A document/location representing the request | That writing `document.head` produces response SEO |\n| Request-local storage and event-target surfaces | Real navigation, bubbling, animation frames, or observer notifications |\n| Explicit `serverLoad` and pure `render` | Browser `connected`/`AfterInit` handlers executing in string SSR |\n\nSelector queries return empty results in this minimal environment; measurements are zero, navigation/history are inert, and animation/observer APIs do not behave like a running browser. A library that calls these APIs may import successfully and still not produce meaningful server content.\n\nThe server registry records definitions and `whenDefined` promises; it does not upgrade existing elements like the browser registry. The string adapter creates registered components explicitly. Shadow components can emit declarative shadow-root markup rather than relying on a live browser to attach a shadow tree.\n\n## Why requests do not all see the same URL\n\n`runInBrowserScope` uses Node's **AsyncLocalStorage**, which keeps a value associated with one asynchronous execution chain, including work resumed after `await`.\n\n```text\nRequest A → /tasks/42 → scope A document/location/storage\nRequest B → /tasks/99 → scope B document/location/storage\n\nAwaiting A's data must not make A observe B's location.\n```\n\nThe package exposes scope-aware getters for globals it owns. Existing globals supplied by the host are preserved; that preservation is not a guarantee that those foreign globals become request-isolated. Keep real server state in the explicit context when possible, and do not install a shared third-party browser realm and assume it has become per-request.\n\nSSG takes a different isolation approach: install a fresh Happy DOM realm, run one route within it, then restore globals. Parallel routes use workers rather than sharing one mutable global window concurrently.\n\n`Symbol.for(...)` in shared flags/hooks means “find the same symbol by this registry key,” allowing cooperating module copies to agree on that slot. It is not itself request isolation. A `WeakMap` cache keyed by template strings likewise caches reusable template analysis, not visitor state.\n\n## Debug in execution order\n\n| Symptom | Check this boundary first |\n| --- | --- |\n| Expected SSR but received only a shell | Explicit route mode, selected host, SSR plugin output, and whether the handler matched the URL. |\n| Old data after a fresh request | A static SSG file may be winning before SSR; distinguish build caches from deployed content. |\n| SSR has data, SSG does not | Only `serverLoad` may be implemented; inspect normal startup, API base, readiness, and settling warnings. |\n| Content disappears on browser startup | Hydration setup order, initial route path/placement, matching HTML/JS deployment, and mismatch warnings. |\n| Widget is empty in initial HTML | Check for component `mode: 'csr'`; an empty marked host is intentional. |\n| Text is visible but a click does nothing | Verify browser registration, loaded assets, binding selectors, and connection errors—not just server HTML. |\n| Browser and server titles differ | Compare loaded properties, page/route SEO, and when browser SEO is refreshed. |\n\n## Put the whole story together\n\nFor `/tasks/42`, a build may have saved a static page. If so, the host serves it. Otherwise an SSR route captures declarations as needed, matches the URL, constructs fresh components, awaits server data, serializes the shared templates, and fills the document shell. A CSR-only path instead receives the shell and renders in the browser.\n\nWhichever path produced the document, browser startup registers components. Hydration integration preserves the eligible initial page and adopts compatible ordinary hosts; unmarked or client-only hosts mount normally. Events and later updates belong to the running browser app. Later navigation follows the normal router rather than replaying the server pipeline automatically.\n\nThat is the complete execution model. For the individual implementation units, keep the [file and function reference](/docs/ssr-file-reference) beside the relevant lesson rather than reading it as one uninterrupted tutorial.\n\n**Source map:** [Wrap entry](../../../../../../packages/libs/dota-wrap/src/index.ts), [SSR source](../../../../../../packages/libs/dota-ssr/src), [Rendering server entry](../../../../../../packages/libs/dota-rendering/src/server/index.ts), [server-DOM source](../../../../../../packages/libs/dota-server-dom/src), and [runtime contracts](../../../../../../packages/libs/dota-runtime/src/index.ts).\n\n**Continue: [Implementation reference →](/docs/ssr-file-reference)** · [Back to the collection](/docs/ssg-ssr-csr)\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-request.md?raw
-var ssr_request_default;
-var init_ssr_request = __esmMin((() => {
-	ssr_request_default = "# 3. Inside one SSR request\n\n**Question:** which functions turn `GET /tasks/42` into a complete HTML response?\n\n**You will learn:** the two setup/render phases, application capture, request context, component recursion, and document composition.\n\n## Separate declarations from a visitor's page\n\nThe server needs to know *which classes and routes exist* before it can render a request. That setup can be reused. A visitor's component instances and request state must not be reused.\n\n![Two stages: capture and cache application declarations; then match and render each request with fresh state.](./request-flow.svg)\n\n**Capture once, render many times** is the pattern. It avoids rediscovering declarations for every visitor while keeping each render's mutable component state separate.\n\n## First use: capture the application\n\n`createApplicationHandler(loadEntry, options)` lazily prepares the application. “Lazy” means the work begins on first use, not just because the module was imported.\n\n1. `captureApplication` installs a temporary capture hook and loads the app entry inside a server browser scope.\n2. `initializeApp` notices that hook. It reports the components, routes, root, and fallbacks instead of starting the browser router or registering a live application.\n3. `resolveServerRoutes` flattens nested paths and selects routes whose resolved mode is `ssr`. Routes with a custom `render` callback are skipped.\n4. The handler creates a string adapter and prepares the document shell. These declarations and the handler are cached for later requests.\n\n> **Capture hook:** a temporary callback that receives the application's declarations. It is not a network request, a rendered page, or a browser lifecycle event. Captures are queued because the hook occupies one global slot. Module-level side effects still execute while importing the entry; browser startup chained after the intercepted `initializeApp` does not.\n\nThis is why the same `initializeApp` declarations can support Wrap-driven SSR without a second manually maintained route list. A failed capture clears the cached promise so a later attempt can retry.\n\n## Every request: match and create context\n\n`createRequestHandler` accepts a standard `Request`. It declines methods other than GET/HEAD and paths it does not own by returning `undefined`. That means “let the host try another handler,” not “send an empty successful HTML page.”\n\n```ts\n// Values created for GET https://example.com/tasks/42?tab=details:\ncontext.url.pathname;  // '/tasks/42'\ncontext.params.id;     // '42', captured by /tasks/:id\ncontext.state;         // new Map() for this request only\nawait context.fetch('/api/tasks/42'); // resolves against https://example.com\n```\n\nThe matcher checks routes in order; first match wins. It supports literal and `:name` path segments and ignores trailing slashes. It is not the complete browser router or an API/authentication layer. `context.state` is a request-local `Map` shared with descendants; `Map` is a key/value store, not a client-state transfer mechanism.\n\n`context.fetch` resolves URLs; it does not automatically forward the visitor's cookies or authorization headers. An application that needs authenticated server fetches must explicitly supply that behavior without putting visitor-specific credentials into shared global state.\n\n## Every host: construct, load, render\n\nThe **adapter pattern** separates request orchestration from the HTML engine. The handler calls `adapter.render(selector, context)` and receives `{html, head?}`; `head?` means metadata is optional. The default string adapter supplies that contract. Another engine could implement it without rewriting route matching and response composition.\n\nFor the matching page, `createStringAdapter` performs this sequence:\n\n```text\nnew TaskPage()\n  → apply input attributes\n  → seed @Property fields\n  → await serverLoad(context)\n  → reflect supported properties into host attributes\n  → call render() once\n  → serialize the template\n  → render registered descendant component hosts\n```\n\nThe adapter finds custom-element hosts in the output and repeats the process. Siblings may load concurrently; the assembled result stays in document order. Scope IDs are normalized afterward so concurrent completion does not change their final numbering. The default nesting limit of 32 stops endlessly self-including components.\n\n```html\n<!-- Simplified nested result; markers omitted. -->\n<task-page task-id=\"42\">\n  <h1>Task 42</h1>\n  <task-summary label=\"Open\">\n    <p>Status: Open</p>\n  </task-summary>\n</task-page>\n```\n\nOnly registered component tags are instantiated. Ordinary HTML remains HTML. The tokenizer avoids treating text inside scripts, comments, or inert templates as live component hosts. A client-only component instead leaves a marked, empty host; [lesson 6](/docs/ssr-hydration) shows exactly what that means.\n\n> **Not a browser simulation:** request-time string SSR does not call `connectedCallback`, bind browser events, run `@AfterInit`, or calculate layout. Use `serverLoad` for required server data and keep `render()` a description of prepared state.\n\n## Finish the document and response\n\nThe **shell** is the surrounding HTML document: doctype, head, root element, styles, and script references. **Outlets** are placeholder comments that identify where generated content belongs.\n\n```html\n<!doctype html>\n<html>\n  <head><!--dota-head--></head>\n  <body>\n    <app-root><!--dota-body--></app-root>\n    <script type=\"module\" src=\"/assets/app.js\"><\/script>\n  </body>\n</html>\n```\n\n`prepareDocumentShell` can add the outlets to an existing shell. `renderDocument` replaces the head outlet with SEO tags and the body outlet with the rendered page. It preserves the shell's assets. This does **not** run the root component's browser lifecycle to render an application chrome.\n\nThe adapter reads a page's `seo` after loading/rendering. If the result has no head metadata, the handler uses route SEO as a whole-object fallback, not a per-field merge. Shared Core code describes managed head tags, including JSON-LD. Appending to the server shim's `document.head` is not how response SEO is collected.\n\nFinally the handler returns `Response` with `text/html; charset=utf-8`. Output is buffered: the complete string is assembled before returning, not streamed in fragments. Render errors propagate to the host. The Node host sends no body for HEAD, although rendering still occurs.\n\n**Follow the functions:** [application.ts](../../../../../../packages/libs/dota-ssr/src/ssr/application.ts) → [request-handler.ts](../../../../../../packages/libs/dota-ssr/src/ssr/request-handler.ts) → [string-adapter.ts](../../../../../../packages/libs/dota-ssr/src/ssr/string-adapter.ts) → [document.ts](../../../../../../packages/libs/dota-ssr/src/ssr/document.ts). Their full function tables remain in the [file reference](/docs/ssr-file-reference).\n\n**Next: [4. Templates become HTML →](/docs/ssr-templates)** · [Collection](/docs/ssg-ssr-csr)\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-static-build.md?raw
-var ssr_static_build_default;
-var init_ssr_static_build = __esmMin((() => {
-	ssr_static_build_default = "# 5. SSG: render at build time\n\n**Question:** if SSR already creates HTML, why is SSG a different path here?\n\n**You will learn:** concrete route selection, Happy DOM startup, readiness and settling, asset/API fetches, isolation, and generated files.\n\n## Same goal, different execution engine\n\nRequest-time SSR constructs a component and calls its server hook. Dota's current SSG runs the **ordinary application** in Happy DOM, a DOM implementation that runs in Node. It waits for that application to finish meaningful work, then saves the document.\n\n![Static generation: select URLs, open an isolated Happy DOM window, start the app, wait, serialize, and write files.](./ssg-flow.svg)\n\nThis is not a request-time `serverLoad` loop, a screenshot, or a full browser with layout and painting. Browser-style lifecycle code runs, but graphics, measurements, and browser-only APIs still require care.\n\n## Select real URLs, not an infinite pattern\n\n```ts\n// vite.config.ts: SSG options inside dotaVitePlugins(...).\nssg: {\n  autoDetectRoutes: true,\n  routes: ['/tasks/42', '/tasks/99'],\n  concurrency: 1,\n  deployment: false,\n}\n```\n\nAuto-detection reads preloader metadata and selects routes resolving to SSG. A pattern like `/tasks/:id` does not enumerate every possible ID. A discovered dynamic SSG route is rejected rather than producing a literal `:id` file—even if concrete paths were also supplied. Keep a parameterized route SSR/CSR and list the concrete URLs explicitly instead.\n\nExplicit paths can prerender selected URLs even when their page normally has `mode: 'ssr'` or `mode: 'csr'`. That enables a mixed policy: prebuild popular task IDs, render other IDs per request. Explicit mappings override discovered output mappings for the same path.\n\n```text\nURL /             → dist/index.html\nURL /about        → dist/about/index.html\nURL /tasks/42     → dist/tasks/42/index.html\n```\n\nThe normalizer validates paths and outputs before writing: duplicate output collisions, escaping the output directory, and query/hash-based paths are not valid output mappings.\n\n## Export a startup promise\n\n```ts\n// main.ts: actual app startup, not SSR capture.\nexport const applicationReady = initializeApp({\n  modules: components,\n  routes: routeConfig,\n  root: AppComponent,\n  plugins: [dotaHydration({mismatch: 'warn'})],\n}).then(async () => {\n  await initializeApplicationData();\n});\n```\n\nHere `components`, `routeConfig`, `AppComponent`, and `initializeApplicationData` are application-owned values. The important contract is the exported promise. SSG awaits `applicationReady` by default; `readyExport` can select another export. Export a real promise, not a boolean saying “started.” A promise represents work whose completion can be awaited.\n\nIn `.then(async () => { ... })`, `() =>` declares an **arrow function**, a callback to run after startup resolves. Returning/awaiting its asynchronous work extends the exported promise. Starting a detached operation without returning or awaiting it does not make that operation part of this readiness contract.\n\nThe pre-render runner enables server-render/hydration emission, loads the entry, and runs normal `initializeApp`. The request-time application-capture hook is **not** active. Custom elements connect, the router starts, and after-init work can run.\n\n> **For the task example:** SSG reaches `initializeFromBrowserUrl`, not `serverLoad`. If the initial static HTML needs API data, the normal startup/data-loading path must request it. Putting it only in `serverLoad` will not populate SSG output.\n\n## “Ready” and “settled” are different\n\n**Ready** means the app's exported promise resolved. **Settled** means the runner has also waited through supported pending DOM work and tracked fetches, checking again for work they trigger. A fetch might finish and then schedule another DOM update; waiting for just one promise would miss that.\n\nThe loop has limits: a default 30-second settling budget and at most 25 passes. If work keeps polling, SSG warns and writes the page as rendered so far. Successful file creation is not proof that every asynchronous feature completed.\n\nAn optional `settle(window, route)` callback is an application-specific barrier; afterward the runner checks pending work again. That callback cannot be transferred to parallel workers, so use it with sequential generation.\n\n## Fetches need a build-time destination\n\n```ts\n// For relative API fetches that are not built public files:\nssg: {\n  routes: ['/tasks/42'],\n  fetchBaseUrl: 'https://api.example.com',\n}\n```\n\nSame-origin GET/HEAD fetches first try built assets safely inside the output directory. Missing local assets can fall back to `fetchBaseUrl`. Cross-origin URLs use the network. Without a configured API base, a relative `/api/tasks/42` is not magically handled by your production API.\n\nGenerated page outputs are excluded from the asset cache so one route does not accidentally consume another route's newly generated document. Build caches reuse eligible asset bytes and simple GET responses, not live DOM nodes or component instances. They are not a deployment CDN cache or an SSR page cache.\n\n## Each route gets its own window\n\n`prerenderRoute` creates a fresh Happy DOM window at a synthetic URL for each path. It installs that window's globals/fetch bridge, writes the shell, reevaluates application modules for the route, waits, marks the route, and serializes the whole document.\n\nFinally it closes pending work, tears down the window, and restores the previous global descriptors. With `concurrency > 1`, a bounded worker pool gives workers separate runners and caches; each route still gets a fresh window. Workers await successful output writes before receiving more work. More workers can cost more startup time and memory, so they are not automatically faster.\n\nRun the existing site pilot from the workspace root:\n\n```sh\n# Uses the app's configured SSG paths and Node hosting target.\nDOTA_DEPLOYMENT=node pnpm --filter dota-web run build:ssg\n```\n\nThe `--ssg` build flag activates the static-generation plugin. An ordinary build does not implicitly generate every selected static page.\n\n**Follow the functions:** [generateStaticPages](../../../../../../packages/libs/dota-ssr/src/ssg/generate.ts), [prerenderRoute](../../../../../../packages/libs/dota-ssr/src/ssg/prerender-runtime.ts), [route-output.ts](../../../../../../packages/libs/dota-ssr/src/ssg/route-output.ts), [prerender-fetch.ts](../../../../../../packages/libs/dota-ssr/src/ssg/prerender-fetch.ts), and [render-workers.ts](../../../../../../packages/libs/dota-ssr/src/ssg/render-workers.ts).\n\n**Next: [6. Make HTML interactive →](/docs/ssr-hydration)** · [Collection](/docs/ssg-ssr-csr)\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-templates.md?raw
-var ssr_templates_default;
-var init_ssr_templates = __esmMin((() => {
-	ssr_templates_default = "# 4. Templates become HTML\n\n**Question:** did SSR reuse Dota's templating, modify hydration, or invent a separate renderer?\n\n**Short answer:** it reuses the existing structured template language, adds a server HTML writer, and extends the browser integration to recognize and reuse the server's output. These are different responsibilities.\n\n## One template, two consumers\n\n```ts\nimport {html} from '@ayu-sh-kr/dota-wrap/rendering';\n\nconst title = 'Fix <button>';\nconst output = html`<h1>${title}</h1>`;\n```\n\nThe `html` tag returns a **TemplateResult**: static string segments plus dynamic values. Think of it as a description, not a DOM tree or a completed HTML string.\n\n```text\nStatic segments: ['<h1>', '</h1>']\nDynamic values:  ['Fix <button>']\n\nBrowser consumer → DOM elements and updateable parts\nServer consumer  → escaped HTML text and optional hydration markers\n```\n\nThe existing browser renderer owns DOM creation, parts, updates, keyed lists, and adoption. The server consumer in `dota-rendering/server` owns serialization. `dota-ssr` decides *when and which components* to render, then delegates template writing to Rendering.\n\n| Concern | What the branch does |\n| --- | --- |\n| `html`, structured results, existing directives | Reuses the existing contract rather than adding a server template language. |\n| Server serializer, tokenizer, template plan | Adds a server implementation under Rendering's `/server` entry. The serializer was moved out of SSR as part of this separation. |\n| Marker format and template identity | Shares durable metadata so the browser can identify what it is receiving. |\n| Browser hydration and initial-route handling | Extends integration; it is not a wholesale rewrite of all rendering. |\n\n## Serialization must preserve meaning\n\n**Serialize** means encode a value into a form that can be stored or transmitted. Here the result is HTML text.\n\n```html\n<!-- Without hydration markers, the template above produces: -->\n<h1>Fix &lt;button&gt;</h1>\n```\n\nEscaping turns `<` into `&lt;`, so the title remains text rather than creating another element. Dynamic text and quoted attribute values are escaped. Quote dynamic attributes explicitly:\n\n```ts\nhtml`<a href=\"${url}\">${label}</a>`;  // supported shape\n```\n\nThis does not validate that a URL is safe for your application's use. Escaping syntax and validating untrusted content are different jobs. Dynamic tag names and dynamic attribute names are not supported by the server template planner.\n\n`unsafeHTML` and `trustedHTML` opt into raw HTML behavior; neither sanitizes input. `unsafeHTML` participates in structural template composition, while `trustedHTML` supplies a dynamic child. Do not use either for arbitrary user content. `nothing` means no rendered content. Existing `when` and `keyed` directives are handled recursively; duplicate keyed entries are an error.\n\n## Why a tokenizer and a plan exist\n\nA **tokenizer** reads HTML-like source into meaningful pieces: start tags, end tags, attributes, comments, and text. It prevents a fake `<task-page>` inside a script from being treated as a component.\n\nA **template plan** records how a particular static template is written: where dynamic children and attributes belong, and where markers are valid. It is cached by the template's static strings so repeated renders do not repeat all that analysis. This lexical machinery is not a full browser HTML parser or layout engine.\n\nThe planner accounts for some browser normalization, such as implied table bodies. Raw-text/RCDATA and inert-template positions cannot always carry adoptable dynamic parts. Unsupported adoption can warn and remount, or fail under strict mismatch handling. “It is HTML” does not guarantee every unusual template position can be hydrated.\n\n## Markers are a map, not visible content\n\n```html\n<!-- Illustrative bookkeeping for one structured host. Hash abbreviated. -->\n<task-page data-dh-c=\"task-page\" data-dh-t=\"HASH\" data-dh-v=\"2\" data-dh-s=\"h0\">\n  <h1><!--dh:h0:p0-->Task 42<!--/dh:h0:p0--></h1>\n</task-page>\n```\n\n| Symbol | What it tells the browser |\n| --- | --- |\n| `data-dh-c` | The component selector this identity belongs to. |\n| `data-dh-t` | A hash identifying the template's static shape, not its current text values. |\n| `data-dh-v` | The template identity format version; currently `2`. |\n| `data-dh-s=\"h0\"` | This host's scope, so nested components' parts do not collide. |\n| `p0` | A dynamic part's index within the scope. |\n| `<!--dh:...-->` / `<!--/dh:...-->` | Start/end HTML comments delimiting a child part; comments are not painted as text. |\n\nDynamic attributes have their own `data-dh-a` tokens. Keyed ranges have additional markers so entries can retain identity when reordered. The initial route marker is a separate protocol with its own version; do not confuse it with `data-dh-v`.\n\nYou never author these attributes manually. The server emits them and the browser validates them. A mismatch means the server's map may not describe the browser template; mounting fresh is safer than silently attaching updates to the wrong nodes.\n\n> **Two independent responsibilities:** markers locate dynamic regions; property reflection transfers supported values. A marker does not contain all application state. The browser still needs matching state for its first render.\n\n**In the code:** [template-serializer.ts](../../../../../../packages/libs/dota-rendering/src/server/template-serializer.ts), [template-plan.ts](../../../../../../packages/libs/dota-rendering/src/server/template-plan.ts), [html-tokenizer.ts](../../../../../../packages/libs/dota-rendering/src/server/html-tokenizer.ts), [hydration-markers.ts](../../../../../../packages/libs/dota-rendering/src/hydration-markers.ts), and [renderer.ts](../../../../../../packages/libs/dota-rendering/src/renderer.ts).\n\n**Next: [5. SSG: render at build time →](/docs/ssr-static-build)** · [Collection](/docs/ssg-ssr-csr)\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/browser-flow.svg?raw
-var browser_flow_default;
-var init_browser_flow = __esmMin((() => {
-	browser_flow_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"ssr-learning-diagram\" style=\"display:block;width:100%;max-width:480px;height:auto;margin:1.5rem auto;font-family:DM Sans,Helvetica,Arial,sans-serif;text-rendering:geometricPrecision\" viewBox=\"0 0 520 925\" role=\"img\" aria-labelledby=\"title desc\">\n<title id=\"title\">Browser startup has distinct outcomes</title><desc id=\"desc\">Install hydration before registering custom elements. The initial root/page boundary may defer rendering. Compatible ordinary marked hosts adopt parts. Unmarked and client-only hosts mount fresh. Invalid markers warn and recover or throw. These are branches, not consecutive stages.</desc>\n<defs><marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"10\" refY=\"5\" markerWidth=\"8\" markerHeight=\"8\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10Z\" fill=\"var(--primary-color, #7352cc)\"/></marker></defs><rect class=\"canvas\" fill=\"var(--background-color, #fafaff)\" width=\"520\" height=\"925\" rx=\"16\"/>\n<text class=\"title\" fill=\"var(--foreground-color, #252436)\" font-size=\"24\" font-weight=\"700\" x=\"24\" y=\"38\">Do not repaint everything.</text>\n<rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"100\" y=\"76\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"298\" y=\"106\" text-anchor=\"middle\">Install before registration</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"298\" y=\"133\" text-anchor=\"middle\">Then upgrade existing hosts</text>\n<path class=\"rail\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" d=\"M298 152V182H40V750\"/>\n<rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"100\" y=\"230\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"298\" y=\"260\" text-anchor=\"middle\">Initial root / page</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"298\" y=\"287\" text-anchor=\"middle\">Preserve now; defer its renderer</text>\n<rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"100\" y=\"390\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"298\" y=\"420\" text-anchor=\"middle\">Compatible marked host</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"298\" y=\"447\" text-anchor=\"middle\">Adopt existing dynamic parts</text>\n<rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"100\" y=\"550\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"298\" y=\"580\" text-anchor=\"middle\">Unmarked / client-only</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"298\" y=\"607\" text-anchor=\"middle\">Mount fresh content</text>\n<rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"100\" y=\"710\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"298\" y=\"740\" text-anchor=\"middle\">Invalid marked host</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"298\" y=\"767\" text-anchor=\"middle\">Warn + recover, or throw</text>\n<path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M40 268H100\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M40 428H100\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M40 588H100\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M40 748H100\"/>\n<text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"840\">Branches, not four consecutive steps.</text>\n<path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M28 884H82\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"100\" y=\"890\">Order of work / selected path</text>\n</svg>\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/hosting-flow.svg?raw
-var hosting_flow_default;
-var init_hosting_flow = __esmMin((() => {
-	hosting_flow_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"ssr-learning-diagram\" style=\"display:block;width:100%;max-width:480px;height:auto;margin:1.5rem auto;font-family:DM Sans,Helvetica,Arial,sans-serif;text-rendering:geometricPrecision\" viewBox=\"0 0 520 690\" role=\"img\" aria-labelledby=\"title desc\">\n<title id=\"title\">The Node host selects a page producer</title><desc id=\"desc\">For a valid page GET or HEAD, an existing static file is served first. Otherwise a matching SSR handler renders the page. If it declines, the CSR shell is served. Malformed paths, unsupported methods, and rendering errors are covered separately in the lesson.</desc>\n<defs><marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"10\" refY=\"5\" markerWidth=\"8\" markerHeight=\"8\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10Z\" fill=\"var(--primary-color, #7352cc)\"/></marker></defs><rect class=\"canvas\" fill=\"var(--background-color, #fafaff)\" width=\"520\" height=\"690\" rx=\"16\"/>\n<text class=\"title\" fill=\"var(--foreground-color, #252436)\" font-size=\"24\" font-weight=\"700\" x=\"24\" y=\"38\">Which HTML wins?</text>\n<text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"72\">Valid page GET / HEAD on Node</text>\n<rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"24\" y=\"112\" width=\"200\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"124\" y=\"142\" text-anchor=\"middle\">Static file?</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"124\" y=\"169\" text-anchor=\"middle\">Inside client output</text>\n<rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"334\" y=\"112\" width=\"162\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"415\" y=\"142\" text-anchor=\"middle\">Serve file</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"415\" y=\"169\" text-anchor=\"middle\">SSG / asset</text>\n<rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"24\" y=\"298\" width=\"200\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"124\" y=\"328\" text-anchor=\"middle\">SSR match?</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"124\" y=\"355\" text-anchor=\"middle\">Ask page handler</text>\n<rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"334\" y=\"298\" width=\"162\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"415\" y=\"328\" text-anchor=\"middle\">Render SSR</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"415\" y=\"355\" text-anchor=\"middle\">Fresh HTML</text>\n<rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"24\" y=\"484\" width=\"200\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"124\" y=\"514\" text-anchor=\"middle\">CSR shell</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"124\" y=\"541\" text-anchor=\"middle\">Browser renders</text>\n<path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M224 150H334\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"258\" y=\"136\">yes</text>\n<path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M124 188V298\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"138\" y=\"246\">no</text>\n<path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M224 336H334\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"258\" y=\"322\">yes</text>\n<path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M124 374V484\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"138\" y=\"432\">no</text>\n<text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"611\">A static task page bypasses serverLoad.</text>\n<path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M28 650H82\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"100\" y=\"656\">Order of work / selected path</text>\n</svg>\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/rendering-modes.svg?raw
-var rendering_modes_default;
-var init_rendering_modes = __esmMin((() => {
-	rendering_modes_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"ssr-learning-diagram\" style=\"display:block;width:100%;max-width:480px;height:auto;margin:1.5rem auto;font-family:DM Sans,Helvetica,Arial,sans-serif;text-rendering:geometricPrecision\" viewBox=\"0 0 480 680\" role=\"img\" aria-labelledby=\"title desc\">\n<title id=\"title\">When is the page content produced?</title><desc id=\"desc\">CSR builds content in the browser after JavaScript loads. SSR builds content while answering a request. SSG builds HTML before deployment and later requests receive a saved file.</desc>\n<defs><marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"10\" refY=\"5\" markerWidth=\"8\" markerHeight=\"8\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10Z\" fill=\"var(--primary-color, #7352cc)\"/></marker></defs><rect class=\"canvas\" fill=\"var(--background-color, #fafaff)\" width=\"480\" height=\"680\" rx=\"16\"/>\n<text class=\"title\" fill=\"var(--foreground-color, #252436)\" font-size=\"24\" font-weight=\"700\" x=\"24\" y=\"38\">Same page. Three timelines.</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"95\">CSR · in the visitor’s browser</text><rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"24\" y=\"117\" width=\"160\" height=\"72\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"104\" y=\"159\" text-anchor=\"middle\">Request</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"280\" y=\"117\" width=\"176\" height=\"72\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"368\" y=\"159\" text-anchor=\"middle\">Browser builds</text><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M184 153H280\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"223\">after app JS loads</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"285\">SSR · while answering a request</text><rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"24\" y=\"307\" width=\"160\" height=\"72\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"104\" y=\"349\" text-anchor=\"middle\">Request</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"280\" y=\"307\" width=\"176\" height=\"72\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"368\" y=\"349\" text-anchor=\"middle\">Server builds</text><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M184 343H280\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"413\">HTML in response</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"475\">SSG · before visitors arrive</text><rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"24\" y=\"497\" width=\"160\" height=\"72\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"104\" y=\"539\" text-anchor=\"middle\">Build</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"280\" y=\"497\" width=\"176\" height=\"72\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"368\" y=\"539\" text-anchor=\"middle\">Saved HTML</text><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M184 533H280\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"24\" y=\"603\">serve on later requests</text><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M28 645H82\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"100\" y=\"651\">Order of work / selected path</text>\n</svg>\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/request-flow.svg?raw
-var request_flow_default;
-var init_request_flow = __esmMin((() => {
-	request_flow_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"ssr-learning-diagram\" style=\"display:block;width:100%;max-width:480px;height:auto;margin:1.5rem auto;font-family:DM Sans,Helvetica,Arial,sans-serif;text-rendering:geometricPrecision\" viewBox=\"0 0 480 884\" role=\"img\" aria-labelledby=\"title desc\">\n<title id=\"title\">One matched SSR request</title><desc id=\"desc\">On first use capture and cache application declarations. For each matched request create context, load and render fresh hosts, serialize and compose the document, and return buffered HTML. Unmatched requests and errors are described in the lesson.</desc>\n<defs><marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"10\" refY=\"5\" markerWidth=\"8\" markerHeight=\"8\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10Z\" fill=\"var(--primary-color, #7352cc)\"/></marker></defs><rect class=\"canvas\" fill=\"var(--background-color, #fafaff)\" width=\"480\" height=\"884\" rx=\"16\"/>\n<text class=\"title\" fill=\"var(--foreground-color, #252436)\" font-size=\"24\" font-weight=\"700\" x=\"24\" y=\"38\">One matched SSR request</text><rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"42\" y=\"84\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"114\" text-anchor=\"middle\">Capture declarations</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"141\" text-anchor=\"middle\">First use only; reuse the setup</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"42\" y=\"240\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"270\" text-anchor=\"middle\">Match + fresh context</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"297\" text-anchor=\"middle\">URL, params, fetch, request state</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"42\" y=\"396\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"426\" text-anchor=\"middle\">Load + render fresh hosts</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"453\" text-anchor=\"middle\">Properties → serverLoad → render</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"42\" y=\"552\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"582\" text-anchor=\"middle\">Serialize + compose</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"609\" text-anchor=\"middle\">Nested hosts + shell + page SEO</text><rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"42\" y=\"708\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"738\" text-anchor=\"middle\">HTML response</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"765\" text-anchor=\"middle\">Browser receives content + markers</text><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M240 160V240\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M240 316V396\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M240 472V552\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M240 628V708\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M28 846H82\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"100\" y=\"852\">Order of work / selected path</text>\n</svg>\n";
-}));
-//#endregion
-//#region ../../../documentation/packages/libs/dota-ssr/architecture/learning/ssg-flow.svg?raw
-var ssg_flow_default;
-var init_ssg_flow = __esmMin((() => {
-	ssg_flow_default = "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"ssr-learning-diagram\" style=\"display:block;width:100%;max-width:480px;height:auto;margin:1.5rem auto;font-family:DM Sans,Helvetica,Arial,sans-serif;text-rendering:geometricPrecision\" viewBox=\"0 0 480 884\" role=\"img\" aria-labelledby=\"title desc\">\n<title id=\"title\">One URL in an SSG build</title><desc id=\"desc\">After the client build, choose concrete URLs. For each URL create a fresh Happy DOM window, run normal application startup, await readiness and pending work, serialize the document and write HTML. Limits and error behavior are explained in the lesson.</desc>\n<defs><marker id=\"arrow\" viewBox=\"0 0 10 10\" refX=\"10\" refY=\"5\" markerWidth=\"8\" markerHeight=\"8\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10Z\" fill=\"var(--primary-color, #7352cc)\"/></marker></defs><rect class=\"canvas\" fill=\"var(--background-color, #fafaff)\" width=\"480\" height=\"884\" rx=\"16\"/>\n<text class=\"title\" fill=\"var(--foreground-color, #252436)\" font-size=\"24\" font-weight=\"700\" x=\"24\" y=\"38\">One URL in an SSG build</text><rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"42\" y=\"84\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"114\" text-anchor=\"middle\">Select concrete URLs</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"141\" text-anchor=\"middle\">After the client bundle is written</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"42\" y=\"240\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"270\" text-anchor=\"middle\">Fresh Happy DOM window</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"297\" text-anchor=\"middle\">One route; isolated document</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"42\" y=\"396\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"426\" text-anchor=\"middle\">Start the ordinary app</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"453\" text-anchor=\"middle\">No request-time capture hook</text><rect class=\"card\" fill=\"var(--surface-raised-color, #fff)\" stroke=\"var(--primary-color-border, #8174ad)\" stroke-width=\"1.6\" x=\"42\" y=\"552\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"582\" text-anchor=\"middle\">Wait for ready + settled</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"609\" text-anchor=\"middle\">Startup, DOM tasks, tracked fetches</text><rect class=\"card accent\" fill=\"var(--primary-color-subtle, #f1edfc)\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"1.6\" x=\"42\" y=\"708\" width=\"396\" height=\"76\" rx=\"11\"/><text class=\"label\" fill=\"var(--foreground-color, #252436)\" font-size=\"22\" font-weight=\"600\" x=\"240\" y=\"738\" text-anchor=\"middle\">Serialize + write HTML</text><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"240\" y=\"765\" text-anchor=\"middle\">Later requests can serve this file</text><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M240 160V240\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M240 316V396\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M240 472V552\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M240 628V708\"/><path class=\"arrow\" fill=\"none\" stroke=\"var(--primary-color, #7352cc)\" stroke-width=\"2\" marker-end=\"url(#arrow)\" d=\"M28 846H82\"/><text class=\"note\" fill=\"var(--muted-color, #5d5a73)\" font-size=\"19\" x=\"100\" y=\"852\">Order of work / selected path</text>\n</svg>\n";
-}));
-var init_branch_changes_guide = __esmMin((() => {}));
-//#endregion
-//#region src/service/doc-loader.service.ts
-var renderingLessons, renderingDiagrams, DocLoaderService;
-var init_doc_loader_service = __esmMin((() => {
-	init_ssg_ssr_csr();
-	init_ssr_component();
-	init_ssr_hosting();
-	init_ssr_html_first();
-	init_ssr_hydration();
-	init_ssr_package_map();
-	init_ssr_request();
-	init_ssr_static_build();
-	init_ssr_templates();
-	init_browser_flow();
-	init_hosting_flow();
-	init_rendering_modes();
-	init_request_flow();
-	init_ssg_flow();
-	init_rest();
-	init_branch_changes_guide();
-	init_main();
-	renderingLessons = /* #__PURE__ */ Object.assign({
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssg-ssr-csr.md": ssg_ssr_csr_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-component.md": ssr_component_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-hosting.md": ssr_hosting_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-html-first.md": ssr_html_first_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-hydration.md": ssr_hydration_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-package-map.md": ssr_package_map_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-request.md": ssr_request_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-static-build.md": ssr_static_build_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-templates.md": ssr_templates_default
-	});
-	renderingDiagrams = /* #__PURE__ */ Object.assign({
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/browser-flow.svg": browser_flow_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/hosting-flow.svg": hosting_flow_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/rendering-modes.svg": rendering_modes_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/request-flow.svg": request_flow_default,
-		"../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssg-flow.svg": ssg_flow_default
-	});
-	DocLoaderService = class {
-		restClient;
-		constructor() {
-			this.restClient = RestClient.builder().timeout(1e4).handler((response) => {
-				if (!response.ok) routerService.route("/error");
-			}).build();
-		}
-		/**
-		* Loads the SSR collection and file reference from their canonical package documentation.
-		* Embeds trusted repository SVGs so static pages do not retain Vite dev asset URLs.
-		* Resolves repository links for the website; other docs use public Markdown.
-		* @param slug Documentation URL segment used to select its content source.
-		*/
-		async loadDoc(slug) {
-			const lesson = Object.entries(renderingLessons).find(([path]) => path.endsWith(`/${slug}.md`))?.[1];
-			if (lesson || slug === "ssr-file-reference") return (lesson ?? "# Dota SSR and SSG: from application declaration to HTML and browser updates\n\n> **Implementation reference, not the starting lesson.** New to SSR? Start with the [short server-rendering collection](/docs/ssg-ssr-csr): eight ordered lessons with flow diagrams, annotated code, and definitions. This page retains the detailed branch-wide file descriptions and function inventories for lookup.\n\nThis guide explains the framework implementation: how Dota renders a request,\nhow it generates static pages, which functions run in each path, and how the\nbrowser takes ownership afterward. The main chapters follow library execution.\nDota Web is only a consumer example in the appendix.\n\nEach runtime file has its own heading and a function/method map explaining its\ninputs, results, decisions, and callers. Public APIs and private orchestration\nhelpers are both covered. Type-only and export-only files are identified as such.\nExamples marked as simplified show the relevant contract; the existing playground\nand consumer fixture provide runnable projects.\n\n## First separate the two server lifecycles\n\n| Question | Request SSR | Build-time SSG | Browser CSR |\n| --- | --- | --- | --- |\n| When does it produce the first HTML? | For each matched HTTP request | Once per selected concrete URL during the build | After the app shell reaches the browser |\n| Which engine runs? | String adapter plus Rendering's server serializer | Normal app and DOM renderer in Happy DOM | Normal app and DOM renderer in the browser |\n| Does `serverLoad(context)` run? | Yes, once per rendered component instance | No, not through the current SSG pipeline | No |\n| Do connected / after-init hooks run? | Not as the adapter's rendering lifecycle | Yes, through ordinary app execution | Yes |\n| How is URL/data supplied? | Request context, scoped globals, seeded properties | Window URL, normal routing/bindings, app readiness and tracked fetches | Browser URL, routing/bindings, normal client data work |\n| What persists across pages? | Cached declarations/handler, not rendered component instances | Build caches and transformed code; route windows/module state are fresh | The active browser application |\n| What leaves the producer? | Buffered HTML Response | HTML files plus optional hosting mappings | Live DOM |\n| What happens next? | Browser route preservation / eligible hydration, then client updates | Browser route preservation / eligible hydration, then client updates | Ordinary client mount and updates |\n\nThe same component `render()` can serve all three environments, but the lifecycle\nthat prepares its state is different. **Moving data loading into `serverLoad`\ndoes not automatically make SSG call it.** Keeping data only in a connected hook\ndoes not automatically include it in string-rendered SSR.\n\n```text\nRequest SSR\n  app declaration → capture once → match each request → fresh context/instances\n  → seed properties → await serverLoad → reflect → render → serialize/expand\n  → shell + SEO → Response\n\nBuild-time SSG\n  concrete URLs → fresh Happy DOM window → run the ordinary app\n  → await applicationReady → wait for DOM/fetch settling\n  → route markers → serialize whole document → write HTML file\n\nBoth outputs\n  browser registration → preserve eligible initial route\n  → adopt compatible component parts or mount normally → events and updates\n```\n\nSSR orchestration, SSG orchestration, browser integration, and build/deployment\nremain in `dota-ssr`. `dota-rendering` owns the template contract, the DOM\nrenderer, and the new server serializer. `dota-server-dom` supplies the minimal\nrequest environment. There is no separate SSR template language.\n\n## A small example to keep in mind\n\nConsider a request for `/tasks/42`. This component gives SSR an explicit data\nhook and gives normal SSG/browser startup a separate URL-derived initialization.\nThe property is serialized so the first browser render can recover the same ID.\n\n```ts\nimport {\n  AfterInit, Component, DotaPageElement, Property, String, type SEO\n} from '@ayu-sh-kr/dota-core';\nimport {html} from '@ayu-sh-kr/dota-rendering';\nimport {Route} from '@ayu-sh-kr/dota-router';\nimport type {RenderContext} from '@ayu-sh-kr/dota-ssr/server';\n\n@Route({path: '/tasks/:id', mode: 'ssr'})\n@Component({selector: 'task-page', shadow: false})\nexport class TaskPage extends DotaPageElement {\n  @Property({name: 'task-id', type: String}) taskId = '';\n\n  constructor() { super(); }\n\n  get seo(): SEO {\n    return {title: `Task ${this.taskId}`, description: 'Task details'};\n  }\n\n  serverLoad(context: RenderContext) {\n    this.taskId = context.params.id;\n  }\n\n  @AfterInit()\n  initializeFromBrowserUrl() {\n    if (!this.taskId) { // SSR may already have transferred this value.\n      this.taskId = location.pathname.split('/').at(-1) ?? '';\n      this.updateHTML();\n    }\n    this.updateSEO();\n  }\n\n  render() {\n    return html`<h1>Task ${this.taskId}</h1>`;\n  }\n}\n```\n\nThis is an illustrative component, not a change to the application. For real API\ndata, use `context.fetch` in an async serverLoad; the existing standalone playground\ndemonstrates that pattern. SSG API loading must instead be reached through its\nnormal startup/readiness path, with a configured API base when necessary.\n\n| Stage for this example | SSR | SSG for an explicitly selected `/tasks/42` |\n| --- | --- | --- |\n| Initial instance | taskId is empty | taskId is empty |\n| State preparation | serverLoad receives params.id = 42 | Normal connection renders initially, then AfterInit derives 42 and updates |\n| HTML production | Reflect task-id, serialize render output | Wait for updates, then serialize the document |\n| Browser startup after delivery | Seed taskId from the host attribute; no second serverLoad | Seed the serialized property; normal browser behavior continues |\n\nExplicit SSG URLs can override the usual producer for particular URLs. On the\nNode host, a generated `tasks/42/index.html` is served first; `/tasks/99` can\nstill use the `/tasks/:id` request handler. This is one useful way SSG and SSR\nwork together in the same application.\n\nRoute mode is an initial-delivery decision. Later in-app navigation still uses\nnormal browser routing; it does not automatically fetch fresh SSR HTML.\n\n## Reading order\n\n- [1. Start from Dota's server entry and application declaration](#1-start-from-dotas-server-entry-and-application-declaration)\n- [2. Follow one SSR request into HTML](#2-follow-one-ssr-request-into-html)\n- [3. Follow the SSG build into static files](#3-follow-the-ssg-build-into-static-files)\n- [4. Understand the shared template and the separate server writer](#4-understand-the-shared-template-and-the-separate-server-writer)\n- [5. Connect builds and hosts to both paths](#5-connect-builds-and-hosts-to-both-paths)\n- [6. Finish in the browser: CSR, route preservation, hydration](#6-finish-in-the-browser-csr-route-preservation-hydration)\n- [7. Reach the server-environment units](#7-reach-the-server-environment-units)\n- [Appendix A. Runnable examples and correctness checks](#appendix-a-runnable-examples-and-correctness-checks)\n- [Appendix B. Brief consumer and generated-output references](#appendix-b-brief-consumer-and-generated-output-references)\n- [Appendix C. Packaging, release notes, and supporting documents](#appendix-c-packaging-release-notes-and-supporting-documents)\n\n\n## 1. Start from Dota's server entry and application declaration\n\nFirst understand the contract: route mode chooses initial HTML production, Wrap supplies declarations, and the SSR server entry exposes the request engine. Existing supporting files are included only when they explain framework behavior.\n\n### [packages/libs/dota-core/src/core/render/render-mode.ts](../../../../../packages/libs/dota-core/src/core/render/render-mode.ts)\n\nThis shared policy distinguishes a **route's initial delivery mode** from a **component's server opt-out**. Types are `RouteRenderMode = 'ssr' | 'ssg' | 'csr'` and `ComponentRenderMode = 'inherit' | 'csr'`.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `resolveRouteRenderMode(route)` | Returns explicit mode, otherwise ssg for legacy ssr: true, otherwise csr. Explicit mode wins even when the legacy field disagrees. |\n| `resolveComponentRenderMode(component)` | Reads __dotaMode from a class/instance constructor, defaulting to inherit. |\n| `setServerRender(enabled), isServerRender()` | Write/read the global-symbol server flag shared by module copies. BaseElement and the string adapter use it to omit client-only hosts during server work. |\n\nThe legacy name is easy to misread: `ssr: true` predates request rendering and still means build-time SSG. `CLIENT_ONLY_ATTRIBUTE` is `data-dota-csr`; the browser uses it as the empty server-host handoff.\n\n### [packages/libs/dota-core/src/core/types/core.types.ts](../../../../../packages/libs/dota-core/src/core/types/core.types.ts)\n\nContains Core's component, property, binding, lifecycle, and SEO types. For this feature, `ComponentConfig.mode` describes whether a component inherits its page's environment or is client-only; that existing contract is consumed by both server paths.\n\n### [packages/libs/dota-runtime/src/index.ts](../../../../../packages/libs/dota-runtime/src/index.ts)\n\nExisting supporting file. It contains only the shared TypeScript contracts `DotaRuntimePlugin`, `DotaRuntimeContext`, and `RouteRendererWrapper`. A plugin's `setup` can select an initial mount strategy and wrap route presentation.\n\n### [packages/libs/dota-wrap/src/runtime-plugin.ts](../../../../../packages/libs/dota-wrap/src/runtime-plugin.ts)\n\nExisting supporting file. It re-exports the runtime contracts through Wrap. Application code can type runtime extensions while continuing to consume the wrapper as its public package surface.\n\n### [packages/libs/dota-wrap/src/index.ts](../../../../../packages/libs/dota-wrap/src/index.ts)\n\nThis composition root makes the same app entry usable in the browser, SSG, and captured SSR. Its `AppConfig` contains modules, external components, explicit/decorated routes, root, fallback routes, navigation hooks, and runtime plugins.\n\n**Normal browser/SSG path:** set up plugin sockets → register components → create router → initialize router → resolve readiness. **SSR capture path:** resolve declarations → report them to the hook → leave the returned promise pending. The capture branch runs first, so it does not accidentally start the browser router.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `extractComponent(modules)` | Awaits eager/lazy module records and collects exports whose prototypes inherit from the active HTMLElement. This resolves imports but does not register elements. |\n| `resolveComponents(modules, externalComponents)` | Copies a supplied constructor array or resolves module records, then appends external UI components. Both capture and normal registration need the complete list. |\n| `registerComponents(modules, externalComponents)` | Resolves the list, calls Core bootstrap once, and returns constructors. In the browser, define() can immediately upgrade existing server hosts. |\n| `registerRoutes(components, errorRoute, defaultRoute, root, routes, globalHooks, renderer)` | Constructs the Router service using explicit routes when supplied or metadata discovery otherwise. Accepts the renderer already decorated by plugins. |\n| `initializeApp(config)` | Chooses capture or normal startup. Capture reports configuration and never resolves its promise; normal startup configures plugins before bootstrap, initializes routing, and returns components/router service. |\n| `runtimeContext.setMountStrategy(strategy)` | Claims the exclusive initial-mount socket. A second plugin claim throws with both plugin names rather than allowing order-dependent hydration. |\n| `runtimeContext.wrapRouteRenderer(wrapper)` | Replaces the current renderer with the wrapper's result, passing the application root. Hydration uses this to protect only the first marked route. |\n\nThis ordering is necessary: if custom elements upgrade before the hydration strategy is installed, Core mounts fresh HTML and can erase the server DOM.\n\n```ts\nimport {initializeApp} from '@ayu-sh-kr/dota-wrap';\nimport {dotaHydration} from '@ayu-sh-kr/dota-wrap/ssr';\nimport {AppRoot, TaskPage, HomePage, ErrorPage} from './pages';\n\nexport const applicationReady = initializeApp({\n  modules: [AppRoot, TaskPage, HomePage, ErrorPage],\n  root: AppRoot,\n  defaultRoute: {path: '/', component: HomePage},\n  errorRoute: {path: '/error', component: ErrorPage},\n  plugins: [dotaHydration()]\n}).then(() => {\n  // Browser startup continuation; SSR capture never reaches it.\n  window.scrollTo(0, 0);\n});\n```\n\nThis follows the existing [consumer fixture](../../../../../packages/libs/dota-wrap/test/fixtures/ssr-app/src/main.ts); page classes are supplied by its sibling module. SSG needs this promise to resolve, so SSG does not activate the capture hook.\n\n### [packages/libs/dota-ssr/src/ssr/index.ts](../../../../../packages/libs/dota-ssr/src/ssr/index.ts)\n\nThis is the root of the request-time API: import `@ayu-sh-kr/dota-ssr/server` to obtain the component adapter, explicit request handler, application-capture handler, document writers, and shared types.\n\nIt contains exports rather than an additional rendering algorithm. The first import is local `server-globals`, which must run before Core defines its HTMLElement subclass. Constructors/scoping are forwarded from `dota-server-dom`; escaping/serialization are forwarded from `dota-rendering/server`. Existing SSR consumers can retain their imports after those implementations move.\n\n**Call direction:** application host → this entry → application or request handler → string adapter → Rendering/server. Import the server entry before evaluating server-side component modules.\n\n### [packages/libs/dota-ssr/src/ssr/server-globals.ts](../../../../../packages/libs/dota-ssr/src/ssr/server-globals.ts)\n\nThis module calls `installServerGlobals()` before Core is evaluated. It is kept as a separate local entry in SSR's library build because external imports may otherwise be hoisted before an inline installer statement.\n\nThere are no functions declared here: the module's work is the installer call. It establishes only `HTMLElement` and `customElements` for class evaluation. A request document/location is created later by `runInBrowserScope`; installing the class base does not create a page.\n\n### [packages/libs/dota-ssr/src/application-capture.ts](../../../../../packages/libs/dota-ssr/src/application-capture.ts)\n\nThis file is the narrow bridge between Wrap startup and the SSR runtime. `CapturedApplication` carries the component list, route tree, root, and default/error routes. `ApplicationCaptureHook` is a callback receiving that object.\n\nThe bridge lives at `Symbol.for('dota.ssr.application-capture')`, not in a module-local variable, so differently loaded copies can find the same slot. It transfers application declarations, not rendered HTML or per-request state.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `setApplicationCaptureHook(hook)` | Stores the callback on the shared global symbol, or clears it with undefined. The server capture operation owns setting and clearing this slot. |\n| `getApplicationCaptureHook()` | Returns the installed callback, if any. initializeApp checks this before its normal component registration and router startup. |\n\nA capture import is configuration discovery. Component constructors may be resolved during discovery, but components are not being connected as a browser page. Application module-level statements still execute; only startup chained on the deliberately pending readiness promise is suppressed.\n\n### [packages/libs/dota-ssr/src/ssr/application.ts](../../../../../packages/libs/dota-ssr/src/ssr/application.ts)\n\nThis file turns a captured Wrap application into a reusable handler. It separates **one-time declaration loading** from **per-request component construction**. Capturing once does not mean rendered page instances are shared across requests.\n\nThe shell's root selector is resolved from component metadata. It identifies where to insert the page; the request engine does not execute the root's normal connected lifecycle to render the whole app.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `captureApplication(loadEntry, timeout)` | Queues a capture, installs the shared hook inside a browser scope, invokes the import callback, and resolves with CapturedApplication. Import failure or missing report rejects; default timeout is 10 seconds. finally clears the hook so it cannot affect later startup. |\n| `resolveServerRoutes(application)` | Flattens nested paths, keeps routes whose resolved mode is ssr, skips custom render callbacks, and converts component classes to selector-based PageRoute records. Carries optional route SEO. |\n| `createApplicationHandler(loadEntry, options)` | Returns an async RequestHandler with an application() accessor. Caches application capture and handler creation lazily; prepares root/head outlets and builds a string adapter from captured constructors. |\n| `loadApplication() — closure` | Shares the first capture promise across callers. Clears a rejected promise so a later call can retry rather than keeping startup permanently broken. |\n| `handle(request) — closure` | Waits for the cached handler, then forwards the actual request. Handler setup failure clears that cache too; successful requests still get fresh RenderContext and instances. |\n| `flattenRoutes(routes, parent)` | Returns each route paired with its full parent/child pathname. Collapses duplicate slashes and removes non-root trailing slashes so server lookup agrees with configured paths. |\n| `selectorOf(component)` | Reads own Component metadata, falling back to __dotaSelector. Non-functions or classes without selectors are not renderable page hosts. |\n\nA nested declaration `/tasks` + child `:id` becomes `/tasks/:id`. A route with a custom browser `render` callback is skipped: this server engine cannot infer HTML from that callback.\n\n```ts\nimport {createApplicationHandler} from '@ayu-sh-kr/dota-ssr/server';\n\n// shell is the built index.html; appEntry is a server-loadable entry module.\nconst handler = createApplicationHandler(() => import(appEntry), {\n  template: shell,\n  hydration: true\n});\nconst response = await handler(new Request('http://localhost/tasks/42'));\n```\n\nThis higher-level API requires capture-aware `initializeApp`. For a custom host without Wrap, use the explicit handler below.\n\n## 2. Follow one SSR request into HTML\n\nA captured application gives the request handler constructors and page patterns. Every request then gets a fresh context and instances; the following files explain that execution rather than application page design.\n\n### [packages/libs/dota-ssr/src/ssr/types.ts](../../../../../packages/libs/dota-ssr/src/ssr/types.ts)\n\nThese interfaces define the boundary between HTTP orchestration and an output engine. They contain no executable functions.\n\n| Contract | Meaning in a request |\n| --- | --- |\n| `RenderContext` | URL, decoded path params, relative-aware fetch, and a fresh state Map shared by components in this render. |\n| `ServerLoadable` | Optional awaited `serverLoad(context)` method on a component. |\n| `RenderAdapter` | Named engine with `render(selector, context)` returning HTML and optional page SEO. |\n| `PageRoute` | Concrete/pattern path mapped to a page selector, optionally with fallback route SEO. |\n| `RequestHandler` | Async Request → Response or undefined for host fallthrough. |\n| `StringAdapterOptions` | Registered constructors, depth limit, and marker emission; hydration defaults on. |\n| `DocumentTemplate` | Shell string or URL-dependent sync/async shell loader. |\n| `ApplicationHandler` | Request handler plus application() for lazy captured declarations. |\n\nThe context `state` Map is server coordination, not automatic client state transfer. For first-client-render parity, assign needed data to serializable `@Property` fields; the adapter reflects those onto the host.\n\n### [packages/libs/dota-ssr/src/ssr/request-handler.ts](../../../../../packages/libs/dota-ssr/src/ssr/request-handler.ts)\n\nThis file is the HTTP-to-render orchestration layer. It does not instantiate components itself. It matches a route, builds the context, asks an adapter to render the selector, fills the shell, and returns a buffered HTML response.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `matchRoute(routes, pathname)` | Checks routes in priority order. Splits by slash, ignores trailing slashes, compares literal segments, decodes :name values, and returns route plus params or undefined. This is deliberately smaller than the browser Router's full navigation system. |\n| `createRequestHandler(options)` | Captures the fetch delegate once and returns the request function. Declines methods other than GET/HEAD and unknown paths. Creates fresh state, resolves relative string fetch inputs against the request URL, renders and loads the shell concurrently, then returns text/html. |\n| `toNodeListener — forwarding export` | Exposes the Node HTTP bridge implemented in node-listener.ts; it is not another request-matching implementation. |\n\nFor `GET /tasks/42?tab=history`, the matcher uses pathname `/tasks/42`, while the full query remains on `context.url`. A component's own SEO wins over route SEO via `result.head ?? route.seo`; the objects are not field-by-field merged.\n\n```js\nimport {\n  createRequestHandler, createStringAdapter\n} from '@ayu-sh-kr/dota-ssr/server';\n\n// Evaluate decorated classes only after importing the server entry.\nconst {COMPONENTS} = await import('./components.js');\nconst handler = createRequestHandler({\n  adapter: createStringAdapter({components: COMPONENTS}),\n  routes: [{path: '/tasks/:id', page: 'task-page'}],\n  template: '<html><head><!--dota-head--></head>' +\n    '<body><!--dota-body--></body></html>'\n});\nconst response = await handler(new Request('http://localhost/tasks/42'));\n```\n\n`undefined` means “this layer did not answer”; the host can serve an asset, API, or CSR shell. A thrown render error is different and propagates. HEAD still renders; Node suppresses the body when sending it.\n\n### [packages/libs/dota-ssr/src/ssr/string-adapter.ts](../../../../../packages/libs/dota-ssr/src/ssr/string-adapter.ts)\n\nThis is the SSR component engine. It executes the same component `render()` methods used by the browser, but it explicitly performs a smaller server lifecycle. Normal connection hooks, DOM bindings, and browser event registration are not run.\n\nThe inputs are registered constructors plus the request's selector/context. The result contains the fully expanded page host, its reflected attributes, descendant HTML, optional markers, and the page's `seo`.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `createStringAdapter(options)` | Indexes constructors by __dotaSelector and rejects missing selectors. Captures maxDepth (default 32) and hydration (default true), then returns the string adapter. |\n| `render(selector, context) — adapter method` | Creates the marked route host and render pass, enters a request browser scope, sets the shared server-render flag, renders the tree, renumbers scopes, and returns HTML plus page SEO. An active-render count keeps the flag true until overlapping renders finish. |\n| `renderHost(host, pass, depth)` | Creates an instance, applies input attributes, clears stale identity, and checks client-only mode. Otherwise seeds typed properties, awaits serverLoad once, reflects properties, calls render, stamps structured identity, serializes, and expands descendants. It wraps shadow output in a declarative shadow-root template. |\n| `expandHosts(markup, pass, depth)` | Finds registered non-overlapping hosts, renders siblings concurrently with Promise.all, and substitutes results into source-order slices. Each registered child owns expansion of its own rendered subtree. |\n| `reflectProperties(instance)` | Reads Core property metadata and writes non-null values to attributes using each type's serializer. This is the transfer point between loaded server state and browser property seeding. |\n| `renumberScopesInDocumentOrder(html)` | Maps provisional scope tokens to h0, h1, … by first appearance in finished markup. Concurrent sibling completion must not randomize document marker IDs. |\n| `findHosts(markup, registry)` | Tokenizes markup to find registered top-level host spans and authored children. Ignores tag-like text inside comments/raw text/attributes/inert templates; traverses declarative shadow content and unregistered wrappers. |\n\nThe actual per-instance order is:\n\n```text\nconstruct → apply attributes → client-only check\n  inherited: seed properties → await serverLoad → reflect properties\n    → render → stamp identity → serialize → recursively expand children\n  client-only: empty host + data-dota-csr\n```\n\nFor shadow components, authored light children are expanded separately from shadow output. For a plain string result, HTML is still emitted, but it has no structured template identity to adopt. The route marker is independent.\n\nWhy not just call `connectedCallback()`? It would invoke DOM binding and browser lifecycle work that this minimal environment does not implement. Code needed for SSR HTML belongs in `serverLoad` or pure `render`; `@AfterInit` and connected listeners are not server data hooks.\n\nProperty serialization may be large: an object property can become a JSON attribute. Only transfer the data the first browser render actually needs. Fields without Property metadata and the context Map are not serialized automatically.\n\n### [packages/libs/dota-core/src/core/elements/document-head.ts](../../../../../packages/libs/dota-core/src/core/elements/document-head.ts)\n\nThis is the shared SEO policy used by the browser updater and SSR serializer. `SeoHeadTag` describes title, meta, link, and managed JSON-LD tags without needing a DOM.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `seoHeadTags(seo)` | Returns the complete stable list in write order, including undefined values that mean a previously managed tag must be removed. |\n| `seoHeadTagSelector(tag)` | Returns the browser selector identifying the managed title/meta/link/marked JSON-LD tag. The server uses equivalent identities when removing shell defaults. |\n| `normalizeKeywords(keywords)` | Trims string/array keywords, removes blanks, and joins arrays into the meta content value. |\n| `meta / link — local factories` | Build typed tag descriptions while keeping the policy list compact; they do not write elements. |\n\nFor example, removing `seo.canonical` on the next route must remove the previous route's canonical link, not leave stale metadata. `SEO_JSON_LD_ATTRIBUTE` marks the one framework-managed script so author-written scripts are not overwritten.\n\n### [packages/libs/dota-core/src/core/elements/dota-page-element.ts](../../../../../packages/libs/dota-core/src/core/elements/dota-page-element.ts)\n\nThis is the browser/page lifecycle side of SEO. The string engine reads the same page `seo` getter and serializes it through its document writer.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `updateDocumentSEO(seo)` | Iterates the shared Core tag list and applies it to document.head. |\n| `applyHeadTag(tag)` | Sets document.title, upserts/removes meta/link tags, and writes managed JSON-LD through textContent. Undefined values remove stale managed tags. |\n| `DotaPageElement.handleBeforeInit() / updateSEO()` | Integrate SEO synchronization with normal page startup and expose explicit page metadata refresh. Request SSR does not need to invoke the full connection lifecycle to read seo. |\n\nA page may derive SEO from values assigned by `serverLoad`; the adapter reads it after the load/render pass. When no page metadata exists, the request handler can use route-level SEO.\n\n### [packages/libs/dota-ssr/src/ssr/document.ts](../../../../../packages/libs/dota-ssr/src/ssr/document.ts)\n\nAfter the adapter has produced page HTML, this module inserts it into the actual document. It retains the shell's asset scripts/styles and unrelated hosts. The server shim's `document.head` is not the response document.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `prepareDocumentShell(template, rootSelector)` | Returns a shell with a head outlet before </head> and a body outlet inside the root component. Keeps already-authored outlets; tokenizes root spans; throws when the required head/root structure is absent. |\n| `renderDocument(template, result)` | Removes matching framework-managed shell head tags when page metadata exists, then replaces head/body outlet comments using function replacers. Returns the full response string. |\n| `renderHead(seo)` | Gets Core's ordered head-tag descriptions and serializes each one. The shared policy keeps browser and server SEO identities consistent. |\n| `serializeHeadTag(tag)` | Writes escaped title/meta/link content. JSON-LD is JSON-stringified, escapes characters that could end the script or disrupt parsing, and receives the browser-managed marker. |\n| `withoutManagedHeadTags(template, tags)` | Removes the shell defaults owned by the page tag list, avoiding duplicate descriptions, social tags, canonical URLs, or structured data. |\n| `managedTagPattern(tag)` | Builds the correct search for title, meta name/property, link rel, or marked JSON-LD. Attribute quoting/order is accounted for. |\n| `escape(value) — local regex helper` | Escapes metadata identity text before embedding it in a regular expression; this is not HTML escaping. |\n\nWith automatic app capture, a normal root shell is sufficient:\n\n```html\n<html>\n  <head><title>Default title</title></head>\n  <body>\n    <app-root id=\"app-root\"></app-root>\n    <script type=\"module\" src=\"/client.js\"><\/script>\n  </body>\n</html>\n```\n\n`prepareDocumentShell(shell, 'app-root')` creates insertion points without executing the root's render method. The explicit request-handler example instead supplies `<!--dota-head-->` and `<!--dota-body-->` directly.\n\n## 3. Follow the SSG build into static files\n\nSSG is a second server execution path: normal application lifecycle inside Happy DOM. It shares template contracts and browser handoff with SSR, but does not call the string adapter. The functions below explain URL discovery, data readiness, isolation, and final disk writes.\n\n### [packages/libs/dota-ssr/src/vite/index.ts](../../../../../packages/libs/dota-ssr/src/vite/index.ts)\n\nThis entry exposes both the SSG factory and the new SSR factory. The default export `dotaSsg(options)` is a build plugin; `dotaSsr` is a named export. They can run in one Vite application without sharing the same rendering algorithm.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `dotaSsg(options)` | Validates positive integer concurrency/timeouts and the worker-transfer restriction on settle callbacks. Returns the post-build SSG plugin with normalized concurrency/renderTimeout. |\n| `apply(config, environment)` | Activates SSG only for build commands whose process arguments include --ssg. An options object by itself does not generate static pages. |\n| `configResolved(resolvedConfig)` | Stores final root/output/config paths for the generation pass. |\n| `closeBundle()` | Calls generateStaticPages once client assets and the client shell have been written. Errors fail the build instead of producing a misleading complete static output. |\n\nThe repository's `build:ssg` script is `tsc && vite build -- --ssg`. Plain `vite build` can still produce SSR output because the SSR plugin has different activation rules.\n\n```ts\nimport {defineConfig} from 'vite';\nimport {dotaVitePlugins} from '@ayu-sh-kr/dota-wrap/vite';\n\nexport default defineConfig({\n  oxc: {decorator: {legacy: true}},\n  plugins: dotaVitePlugins({\n    deployment: 'node',\n    ssg: {\n      autoDetectRoutes: true,\n      routes: ['/tasks/42'],\n      concurrency: 1\n    }\n  })\n});\n```\n\nAn explicit URL can be prerendered even when its declared route mode is SSR. On Node, that concrete static file then wins before the broader `/tasks/:id` SSR handler. This supports prebuilding a few stable URLs while rendering the remaining IDs per request.\n\n### [packages/libs/dota-ssr/src/ssg/types.ts](../../../../../packages/libs/dota-ssr/src/ssg/types.ts)\n\nThis is the SSG data contract file; it contains interfaces/types rather than runtime functions.\n\n- `DotaSsgRoute`/`DotaSsgRouteInput`: concrete pathname plus optional output, or a pathname shorthand.\n- `ResolvedDotaSsgRoute`: validated pathname/output used for writing files.\n- `DotaDecoratedRoute`: metadata-only path/mode/legacy-flag records from the preloader.\n- `DotaSsgOptions`: discovery, explicit URLs, application entry, readiness export, settle barrier, timeouts, worker count, fetch base, and deployment options.\n- `DotaSsgDeploymentOptions`/`DotaSsgVercelOptions`: static hosting-file configuration.\n\nThe optional `settle(window, route)` callback is another explicit readiness barrier. It is rejected with parallel workers because functions cannot be transferred as worker data. Await needed work in the application's readiness promise or use sequential mode.\n\n### [packages/libs/dota-ssr/src/ssg/route-output.ts](../../../../../packages/libs/dota-ssr/src/ssg/route-output.ts)\n\nStatic generation needs a finite list of URLs and an unambiguous destination for each. This module validates those mappings before any page is written; it does not render components.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `resolveSsgRoutes(routes)` | Accepts pathname strings or {path, output} objects, normalizes/sorts paths, chooses directory-index outputs by default, and rejects duplicate paths/outputs, query/hash input, escaping paths, or non-HTML outputs. |\n| `resolveDecoratedSsgRoutes(decoratedRoutes, routes)` | Selects discovered routes whose resolved mode is ssg, validates that discovered paths are concrete, and merges explicit entries. Explicit paths override the discovered output mapping for that same path. |\n\nA dynamic declaration cannot tell the build which IDs exist. A discovered `mode: 'ssg'` route containing `:id` is rejected; pass concrete URLs explicitly instead.\n\n```ts\nresolveSsgRoutes([\n  '/tasks/42',\n  {path: '/about', output: 'pages/about.html'}\n]);\n// [\n//   {path: '/about', output: 'pages/about.html'},\n//   {path: '/tasks/42', output: 'tasks/42/index.html'}\n// ]\n```\n\nThe example is a call to the implementation function shown above; applications normally configure these values through the SSG options.\n\n### [packages/libs/dota-ssr/src/ssg/generate.ts](../../../../../packages/libs/dota-ssr/src/ssg/generate.ts)\n\nThis is SSG's root coordinator, analogous to the request handler's orchestration role but running once during the build. It reads the completed client shell, resolves URLs, selects sequential/parallel execution, persists every result, and prepares static platform routing.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `generateStaticPages(config, options)` | Resolves root/output/template, creates a prerender server when discovery or sequential work needs it, chooses the route list, and bounds worker count by concurrency, CPU availability, and route count. Always closes any retained server in finally. |\n| `writeRoute(route, html, timings, settled) — closure` | Creates destination directories once, awaits the actual HTML write, records stage/write timings, and warns when settling reached its limit. A failed write is not recorded as a completed route. |\n\nSequential mode shares the transformed-code, immutable-asset, and network caches across route renders. Each route still gets fresh evaluated modules and a new Happy DOM window. Parallel mode closes the discovery server and delegates to isolated workers, each with its own server/caches.\n\nOnce all writes complete, `prepareDeployment` writes static hosting rules. That order ensures a rewrite never points to an output the coordinator has not finished writing. No output URL selection means only optional deployment preparation is needed, not a fake rendering pass.\n\n### [packages/libs/dota-ssr/src/vite/prerender-server.ts](../../../../../packages/libs/dota-ssr/src/vite/prerender-server.ts)\n\nThis creates the Vite environment used to execute a normal application for SSG. Vite's term “SSR module runner” here means server-side module evaluation; it does not mean this function calls the new string SSR engine.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `createPrerenderServer(config, root, entry, renderingModule, logType)` | Reloads the app transforms, creates a middleware-mode Vite server, resolves the shared Rendering entry, and installs a virtual SSG preamble. Closes the server if Rendering resolution fails. |\n| `resolveId(id) — virtual-entry plugin` | Maps virtual:dota-ssg-entry to the plugin's internal resolved ID, leaving unrelated imports alone. |\n| `load(id) — virtual-entry plugin` | Generates the preamble for that ID: configure logging, enable durable markers and the shared server-render flag, dynamically import the application, and export finishPrerender plus the application namespace. |\n| `resolveDecoratedRoutes(server, routes)` | Loads virtual:dota-route-metadata, validates its array shape, and delegates discovery/explicit URL merging to resolveDecoratedSsgRoutes. |\n\nThe preamble intentionally **runs** `initializeApp` and exports its namespace. Unlike request SSR, it does not install the application capture hook. The normal app readiness promise must complete so page routing, component connection, and data-loading hooks can produce DOM.\n\nThe shared application-config loader removes SSG/SSR writers from this secondary Vite instance, preventing it from recursively generating another build.\n\n### [packages/libs/dota-ssr/src/ssg/window-globals.ts](../../../../../packages/libs/dota-ssr/src/ssg/window-globals.ts)\n\nSSG application modules expect browser globals during evaluation. This bridge temporarily redirects those names to a particular Happy DOM window rather than inventing another DOM implementation.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `installWindowGlobals(window)` | Snapshots existing property descriptors, skips non-configurable names, installs route-window APIs, and returns a restoration callback. Bound functions keep the correct window receiver. |\n| `returned restore callback` | Replays captured descriptors in reverse order or deletes names that were originally absent. Restores getter/writability/configurability as well as values. |\n\nThis differs from request `runInBrowserScope`: it redirects configurable globals to an actual Happy DOM realm. Sequential route execution and worker isolation are important because these SSG globals are process-visible, not AsyncLocalStorage getters.\n\n### [packages/libs/dota-ssr/src/ssg/prerender-runtime.ts](../../../../../packages/libs/dota-ssr/src/ssg/prerender-runtime.ts)\n\nThis file answers: “How does one selected URL become one static HTML document?” It owns the per-URL browser realm, application evaluation, readiness barrier, settle loop, route marking, serialization, and cleanup.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `prerenderRoute(server, template, route, outputDirectory, options, readAsset, networkCache)` | Creates a route window and fetch/global bridges, writes the shell, clears evaluated-module state, imports the SSG preamble, and awaits the configured readiness export. Settles DOM/fetch work, marks the page, serializes the full document, and returns HTML, timings, and settled status. |\n| `createPrerenderWindow(path)` | Creates Happy DOM at a synthetic origin with that pathname. Disables automatic JavaScript/CSS/iframe resource loading and prevents runaway timer loops; controlled app evaluation supplies the code. |\n| `resolveSsrRunner(server)` | Returns one cached module runner per Vite SSR environment. Requires a runnable environment, disables HMR/source-map interception, and supplies the compiled evaluator. |\n| `CompiledModuleEvaluator.runInlinedModule(context, code)` | Caches a compiled async wrapper for transformed source, then invokes it against each route's fresh module context and seals exports. Code compilation is reused; route module state is not. |\n| `settlePrerenderWindow(window, waitForFetches, timeout)` | Yields microtasks, waits for Happy DOM work, then waits for tracked fetch delivery. Repeats until no fetch work remains, or until the Node-clock deadline/25-pass cap is reached. Returns false when bounded waiting expires. |\n| `markPrerenderedRoute(window, pathname)` | Finds the routed child host whose path matches the generated URL and stamps shared route markers. This allows initial browser routing to preserve even a page with legacy string output. |\n| `closePrerenderWindow(window)` | Removes body children one at a time before closing Happy DOM. Disconnection hooks can remove sibling/portalled nodes, so teardown must not rely on a stale child-list length. |\n\nThe ordering is:\n\n```text\nfresh window → install globals/fetch → write shell\n  → clear evaluated modules → import ordinary app\n  → await applicationReady → settle DOM and tracked fetches\n  → mark route → serialize document\n  → stop fetch delivery → clear flags → close window → restore globals\n```\n\nThe default readiness export is `applicationReady`; a missing/non-promise export is an error. Default settling is 30 seconds with at most 25 passes. A page that never becomes quiet can still be written with a warning; “build succeeded” alone is not proof every asynchronous article finished loading.\n\nCleanup is in nested `finally` blocks so failed rendering does not leave global objects or emission flags set for the next route.\n\n### [packages/libs/dota-ssr/src/ssg/prerender-fetch.ts](../../../../../packages/libs/dota-ssr/src/ssg/prerender-fetch.ts)\n\nThis module makes build-time content loading predictable. A component fetching `/docs/topic.md` should read the built public asset, and SSG must wait until the resulting page handlers have had a chance to update DOM.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `installPrerenderFetch(window, staticRoot, fetchBaseUrl, readAsset, networkCache)` | Saves the window's fetch delegate, installs the tracked adapter, and returns a waiter with close(). A configured fetchBaseUrl is parsed as the API fallback URL. |\n| `waitForFetches(deadline) — closure` | Waits for current delivery promises and any newly chained requests until the set is empty or the deadline is reached. Reports whether it waited so the outer settle loop knows more DOM work may exist. |\n| `waiter.close()` | Marks the context closed. New/late requests are left unsettled rather than delivering callbacks against a disposed window or another route's globals. |\n| `settlesBefore(promise, deadline)` | Races work against a timer based on Node performance.now(), clears the timer, and returns whether work finished before the deadline. The Node clock remains meaningful when window globals are installed. |\n| `createPrerenderFetch(context)` | Returns a Happy DOM-compatible fetch wrapper. Tracks both success and failure delivery and preserves the original rejection for callers. |\n| `deliver(settle) — inner closure` | Uses setImmediate to resolve/reject in a later task, removes its delivery from tracking, and releases the waiter after page handlers can be queued. This avoids an all-microtask fetch loop starving deadline timers. |\n| `performPrerenderFetch(context, input, init)` | Passes cross-origin requests to the network delegate. For same-origin GET/HEAD, validates/decodes the path and reads built files; missing files can fall back to the API base. Returns 400 for malformed encoding, 404 for missing/escaping paths, or 405 for unsupported local methods without an API fallback. |\n\nFor a build window at `http://dota.ssg/tasks/42`:\n\n```text\nfetch('/docs/topic.md') → read <build output>/docs/topic.md\nfetch('/api/tasks')    → missing asset → configured fetchBaseUrl, else 404\nfetch('https://api.example.test/tasks') → network delegate\n```\n\nReadiness and fetch waiting are separate: component connection can start a request after initial registration. Once a response arrives, its handler can start another request. The delivery set and repeated settle loop cover this chain; arbitrary detached promises not attached to either barrier are not automatically awaited.\n\n### [packages/libs/dota-ssr/src/ssg/asset-reader.ts](../../../../../packages/libs/dota-ssr/src/ssg/asset-reader.ts)\n\nThis owns a build-local byte cache, not a page/HTTP response cache. Reusing immutable public bytes avoids rereading the same Markdown/icons for every isolated route.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `createPrerenderAssetReader(outputs, maxBytes)` | Returns an async absolute-file reader. Shares in-flight reads, excludes generated route destinations, removes failed entries, caps entries at 256 and retained bytes at 32 MiB by default. A zero byte limit disables retention. |\n| `returned reader(file, head)` | Returns {content, size}. Uncached HEAD uses stat and no body; cached bytes can provide length without a second read. Non-file paths fail as EISDIR so fetch policy can handle them. |\n\nGenerated HTML is excluded because it is being written during the same build and cannot be assumed immutable. Sharing bytes instead of window-specific Response objects prevents old route realms from being retained.\n\n### [packages/libs/dota-ssr/src/ssg/network-cache.ts](../../../../../packages/libs/dota-ssr/src/ssg/network-cache.ts)\n\nThis shares eligible remote responses inside one SSG execution context. It is not the proposed deployment edge cache and does not cache request-time SSR page responses.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `createPrerenderNetworkCache(maxBytes)` | Returns a network wrapper with URL-keyed in-flight/result caching, at most 512 retained entries and 16 MiB of bodies by default. |\n| `returned wrapper(window, networkFetch, input, init)` | Caches only plain GET calls without body/headers and without a Request object; other calls delegate directly. Saves response bytes/status/headers and reconstructs a fresh Response from the active route's constructor. |\n\nHTTP error statuses can be cached just like successful responses, so routes in one build see the same answer. Rejections without a Response are removed. A fresh body copy and realm-specific Response avoid sharing consumed streams or objects tied to a disposed window. Parallel workers own separate caches.\n\n### [packages/libs/dota-ssr/src/ssg/render-workers.ts](../../../../../packages/libs/dota-ssr/src/ssg/render-workers.ts)\n\nThis is the pool coordinator for parallel static pages. It transfers cloneable configuration and route jobs; it does not share a window or application instances across workers.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `renderRoutesInWorkers(routes, data, concurrency, timeout, write, workerFile)` | Starts a bounded pool, waits for ready/rendered/closed messages, assigns the next URL only after its output is written, and terminates all workers in finally. |\n| `fail(error) — per-worker closure` | Rejects with route/startup/shutdown context and marks the pool failed so no more work is assigned. |\n| `armTimeout() — per-worker closure` | Replaces the current startup/job/shutdown deadline and records the timer for cleanup. |\n| `message handler` | Processes worker errors, awaits write(route, html, timings, settled), then sends another render job or close. A worker is not reused while its result is still being persisted. |\n\nThe coordinator's `write` callback is `generateStaticPages`'s writeRoute. Waiting for it bounds HTML buffering to roughly the worker count. Worker count is also limited by available CPUs; more workers are not free because each creates a Vite server and compiles/evaluates its own graph.\n\n### [packages/libs/dota-ssr/src/ssg/render-worker.ts](../../../../../packages/libs/dota-ssr/src/ssg/render-worker.ts)\n\nThis is the executable `dota-ssr/worker` implementation. It is meant to run in a worker thread, not as a general application import.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `startWorker()` | Requires parentPort, reads RenderWorkerData, creates one asset/network cache and one prerender server, registers render/close message handling, and posts ready. Startup errors are reported to the parent and close the port. |\n| `render message handler` | Runs prerenderRoute for the supplied URL and returns HTML, timings, and settled status. Errors are serialized as messages. |\n| `close message handler` | Closes the worker's Vite server, posts closed, and closes the message port. |\n\nOne message is rendered at a time because the parent assigns work serially per worker. The worker reuses its server/caches, but prerenderRoute still creates a fresh window for every URL.\n\n## 4. Understand the shared template and the separate server writer\n\nThe component's render method returns the same data structure in each environment. Here is how the new string writer plans that structure and emits markup compatible with the existing DOM renderer.\n\n### [packages/libs/dota-rendering/src/template.ts](../../../../../packages/libs/dota-rendering/src/template.ts)\n\nExisting supporting file. It defines the shared `html` template constructor, nested-template flattening, directive constructors/type guards, marker helpers for ordinary interpolation, and value-to-text conversion.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `html(strings, ...values)` | Returns shared TemplateResult data; flattens nested structural values and reuses a call-site plan when structure matches. |\n| `appendFlattenedValue(value, flattened)` | Recursively merges nested static strings and dynamic leaves, recording the shape of each input. |\n| `collectFlattenedValues(value, shape, values)` | Validates a cached shape and gathers current values; structural differences require rebuilding the plan. |\n| `requiresStructuralFlattening(value), isUnsafeHtmlValue(value)` | Recognize nested templates, structural markup, and arrays that affect static structure. |\n| `unsafeHTML(value), trustedHTML(value)` | Mark caller-trusted markup for structural composition or a dynamic child range respectively. Neither sanitizes untrusted input. |\n| `keyed(items, getKey, renderItem)` | Creates key/template entries that the server serializes and the browser reconciles as bounded ranges. |\n| `when(condition, truthy, falsy)` | Creates a conditional child directive; the default false branch is nothing. |\n| `valueText(value)` | Makes null/undefined/nothing empty while preserving other values including 0 and false. |\n| `isTemplateResult, isTrustedHtmlValue, isKeyedValue, isConditionalValue` | Discriminator guards shared by both output engines. |\n| `isAttributePosition(source), valueMarkerFor(index), valueMarkerPattern` | Support template inspection and temporary parser tokens, distinct from the durable hydration addresses. |\n\n### [packages/libs/dota-rendering/src/template-id.ts](../../../../../packages/libs/dota-rendering/src/template-id.ts)\n\nExisting supporting file. It defines durable marker version 2, the host identity attribute names, `data-dh-a`, and `templateId`. Template identity hashes length-prefixed static segments so the same structure has the same ID across server and browser realms.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `templateId(strings)` | Caches a realm-independent FNV-style hash of length-prefixed static segments. Values do not affect structural identity, but segment lengths preserve interpolation boundaries. |\n\n### [packages/libs/dota-rendering/src/main.ts](../../../../../packages/libs/dota-rendering/src/main.ts)\n\nThis is Rendering's existing root export surface for templates, types, diffing, renderer operations, template identity, and logging. The branch adds the shared hydration-marker exports.\n\n### [packages/libs/dota-rendering/src/hydration-markers.ts](../../../../../packages/libs/dota-rendering/src/hydration-markers.ts)\n\nSSR's string writer and SSG's DOM renderer must emit the same durable addresses for browser adoption. This module centralizes those addresses and the element/component/dynamic attribute names.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `hydrationScope(index)` | Returns h0, h1, … for a document host. The string adapter allocates provisional IDs before final document-order numbering. |\n| `isHydrationScope(value)` | Accepts only h followed by digits; the browser rejects missing/malformed scope values. |\n| `childPartMarkers(scope, index)` | Returns opening/closing comment data for one child interpolation, such as dh:h0:p1 and /dh:h0:p1. |\n| `keyedEntryMarkers(scope, partIndex, position)` | Returns a keyed entry's paired range address within its parent child part. |\n| `attributePartToken(scope, index)` | Returns the token stored in a dynamic element's data-dh-a list, for example h0:p0. |\n| `hydrationIdentity(tagName, strings, scope)` | Returns host attributes for component tag, templateId, marker version, and scope. Both emitters use this rather than independently assembling identity. |\n\nA simplified response fragment makes the ownership visible:\n\n```html\n<task-page data-dh-c=\"task-page\" data-dh-t=\"template-hash\"\n           data-dh-v=\"2\" data-dh-s=\"h0\">\n  <h1 data-dota-index=\"0\" data-dota-dynamic=\"\">\n    Task <!--dh:h0:p0-->42<!--/dh:h0:p0-->\n  </h1>\n</task-page>\n```\n\nThe template hash shown is illustrative. Nested components own separate scopes; the parent's adoption must not consume a child's part markers.\n\n### [packages/libs/dota-rendering/src/server/index.ts](../../../../../packages/libs/dota-rendering/src/server/index.ts)\n\nThis is the public DOM-free Rendering output entry, exporting `serializeOutput`, `escapeHtml`, HTML tokenization/entity decoding, token types, and template/shadow-root element names.\n\nIt declares no rendering functions itself. It groups the serializer and its lexical dependencies with the package that already owns `TemplateResult`, directives, and hydration. The SSR adapter imports this supported surface; the browser continues to use the root Rendering entry.\n\n### [packages/libs/dota-rendering/src/server/template-serializer.ts](../../../../../packages/libs/dota-rendering/src/server/template-serializer.ts)\n\nThis is a template-value interpreter, not a component runner. It receives an existing `RenderOutput` and writes HTML according to a cached plan. It neither chooses a route nor calls a component constructor or data hook.\n\nStructured templates use the same directive guards and value-text policy as the browser. Plain strings keep the legacy raw-HTML contract; `nothing`/other non-string output becomes empty.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `serializeOutput(output, scope?)` | Dispatches a TemplateResult to serializeTemplate, passes a legacy string through, otherwise returns an empty string. Omitted scope produces plain HTML; a scope enables durable markers. |\n| `escapeHtml(value)` | Escapes ampersand, angle brackets, and both quotes for text or quoted attribute contexts. Static authored HTML and explicitly trusted child markup are not passed through this dynamic-value escape. |\n| `serializeTemplate(template, scope)` | Walks planTemplate(template.strings). Appends static/hydration-only operations, fills child/text slots, serializes quoted attributes, and writes attribute-part tokens. |\n| `serializeChild(value, index, scope)` | Serializes the value and, when scoped, wraps it in paired child-part comments owned by that host. |\n| `serializeChildContent(value, index, scope)` | Dispatches trusted markup, conditional templates, keyed lists, or ordinary escaped valueText. The conditional nothing sentinel produces no content. |\n| `serializeKeyed(value, index, scope)` | Rejects duplicate keys, serializes entries in order, and wraps entries in position-based keyed ranges. The browser later associates those ranges with the client keys. |\n| `serializeAttribute(value)` | Rejects trusted-HTML directives in attribute position and escapes ordinary valueText. This is distinct from writing raw child markup. |\n| `serializeUnboundText(value, inRawText)` | Writes a text-only value. Raw-text content neutralizes closing-tag sequences; ordinary text contexts are escaped. These slots cannot carry adoptable comment ranges. |\n| `wrapInMarkers(pair, content)` | Surrounds child/keyed content with start/end HTML comments; this makes the range discoverable after the browser parses the response. |\n\nFor a component whose render method returns:\n\n```ts\nimport {html} from '@ayu-sh-kr/dota-rendering';\nimport {serializeOutput} from '@ayu-sh-kr/dota-rendering/server';\n\nconst view = (name: string) => html`<p title=\"${name}\">Hello ${name}</p>`;\nserializeOutput(view('<Ada>'));\n// <p title=\"&lt;Ada&gt;\">Hello &lt;Ada&gt;</p>\nserializeOutput(view('<Ada>'), 'h0');\n// Same visible content, plus element indexes, attribute tokens, and child ranges.\n```\n\nThe adapter separately stamps the host identity. A template alone does not know which component tag owns it, so `serializeOutput` does not invent the host wrapper.\n\n### [packages/libs/dota-rendering/src/server/template-plan.ts](../../../../../packages/libs/dota-rendering/src/server/template-plan.ts)\n\nA template separates static strings from dynamic values. Before writing values, this module determines what each interpolation means in HTML. It caches the resulting operations by the static-string array so repeated renders avoid reparsing the same template shape.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `planTemplate(strings)` | Joins static segments with private placeholders, tokenizes once, dispatches tokens to TemplatePlanner, caches the finished operation list, and returns it. |\n| `TemplatePlanner.constructor(source)` | Starts component boundary output and initializes open-element, inert-template, foreign-content, and element-index state. |\n| `TemplatePlanner.startTag(token)` | Copies static attributes, turns quoted dynamic attributes into operations, adds indexes/part tokens, updates open-element state, and rejects dynamic names/unquoted values. |\n| `TemplatePlanner.endTag(token)` | Closes matching open elements, adjusts inert/foreign depth, and explicitly closes any implied table body owned by the planner. |\n| `TemplatePlanner.text(token)` | Splits placeholder positions. Ordinary content creates child operations and a dynamic-parent flag; raw text, RCDATA, and inert templates create unbound-text operations. |\n| `TemplatePlanner.comment(token)` | Keeps comments as markup but writes interpolated comment content as unbound text, not adoptable child comments. |\n| `TemplatePlanner.finish()` | Appends the component end boundary and returns the plan accumulated so far. |\n| `TemplatePlanner.elementMarkers(name, dynamic)` | Allocates a document-order element index and optional component/dynamic attributes. Their indexes must match the browser's detached template parse. |\n| `TemplatePlanner.openImpliedTbody()` | Writes/indexes a tbody when a tr is authored directly under table. The browser would insert that element, so omitting it would shift later indexes. |\n| `TemplatePlanner.markDynamic(element)` | Adds the dynamic-parent flag once to a tracked element when it owns child interpolation. |\n| `TemplatePlanner.pushStatic(html)` | Appends markup, merging adjacent static operations instead of creating many tiny steps. |\n| `hasPlaceholder(value)` | Recognizes private planning placeholders in names/attributes so unsupported syntax can be rejected. |\n| `splitPlaceholders(value)` | Returns alternating literal strings and numeric interpolation indexes for a source fragment. |\n\nFor `<p title=\"…\">…</p>`, the planner must distinguish the first value as an attribute and the second as child content. Escaping and marker writing depend on that distinction. For `<textarea>…</textarea>`, a comment would become visible text, so durable child markers are not valid there.\n\nThis implements selected parser corrections, not the whole HTML tree-building standard. Write valid HTML and use the parity tests as evidence for supported constructs rather than assuming any browser-normalized malformed markup will adopt.\n\n### [packages/libs/dota-rendering/src/server/html-tokenizer.ts](../../../../../packages/libs/dota-rendering/src/server/html-tokenizer.ts)\n\nBoth SSR host discovery and template planning need to read markup without treating every `<` as a tag. The tokenizer yields source-spanned start tags, end tags, text, and comments; attribute records include raw and decoded values.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `tokenizeHtml(source)` | Yields tokens covering the input. Tracks foreign-content context and keeps raw-text/RCDATA bodies together until the appropriate closing tag. |\n| `decodeHtmlEntities(value)` | Decodes numeric references and the supported small named table; leaves unknown names unchanged. |\n| `readMarkup(source, open)` | Classifies markup at a candidate opening angle bracket, including comments/declarations/end/start tags, or lets the caller treat it as text. |\n| `readStartTag(source, open)` | Reads a start-tag name, ordered attributes, end position, and self-closing flag. Tokenizing preserves the source offsets needed for substitution. |\n| `readAttribute(source, start)` | Reads one name and optional quoted/unquoted value, returning quote/rawValue/decoded value and source spans. |\n| `scanName(source, from)` | Advances over a tag-name region using lexical terminators. |\n| `skipWhitespace(source, from)` | Advances over HTML whitespace before the next name/value/delimiter. |\n| `findRawTextEnd(source, name, from)` | Locates the correct raw-text closing tag using a cached tag-specific pattern; content inside is not rescanned as ordinary tags. |\n| `isWhitespace(code), isAsciiLetter(code)` | Classify the ASCII syntax characters used by the scanner. |\n| `isTagNameEnd(code), isAttributeNameEnd(code), isUnquotedValueEnd(code)` | Define context-specific terminators. Using one delimiter rule for all three contexts would misread valid attributes. |\n\nFor `<script>\"<task-item>\"<\/script>`, host discovery must not create a task-item component. Likewise, an angle bracket inside a quoted label must remain attribute data.\n\n```ts\nimport {tokenizeHtml} from '@ayu-sh-kr/dota-rendering/server';\n\nconst tokens = [...tokenizeHtml('<task-item label=\"A &amp; B\"></task-item>')];\n// start tag: task-item, decoded label \"A & B\"; then matching end tag.\n```\n\nThe output is tokens, not a browser-normalized DOM tree.\n\n### [packages/libs/dota-rendering/src/server/html-elements.ts](../../../../../packages/libs/dota-rendering/src/server/html-elements.ts)\n\nThis file contains shared constants/sets rather than functions: void elements, raw-text/RCDATA elements, SVG/MathML roots, template/declarative-shadow names, and table/body/row names.\n\nThe sets tell the tokenizer when tag-like text is inert and tell the planner whether an element stays open, receives indexes, or needs a parser-inserted body. These syntax categories are Rendering concerns; request orchestration should not carry its own conflicting copy.\n\n## 5. Connect builds and hosts to both paths\n\nBuild plugins produce the app/server artifacts; hosting policy chooses static files, SSR, or the client shell. Static redirect writers and server function writers have different responsibilities.\n\n### [packages/libs/dota-wrap/src/vite/index.ts](../../../../../packages/libs/dota-wrap/src/vite/index.ts)\n\nThis factory composes the application build plugins. It does not select a page at request time. SSG is opt-in through an options object plus the SSG build flag; SSR integration is included unless explicitly disabled.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `dotaVitePlugins(options)` | Returns preloader, event-map, Web Types, optional SSG, default-enabled SSR, and extension plugins in that order. Propagates shared roots/logging and deployment settings while allowing nested overrides. |\n| `ssgDeploymentTarget(ssg)` | Reads a string/object/legacy Vercel SSG deployment setting so SSR can use the same target when no common/SSR override was supplied. |\n\nThe SSR plugin defaults to Node when no target is selected. `{ssg: false, ssr: false}` removes both integrations, leaving ordinary client startup. These options enable infrastructure; actual route declarations determine which initial producer handles a page.\n\n### [packages/libs/dota-wrap/src/ssg/index.ts](../../../../../packages/libs/dota-wrap/src/ssg/index.ts)\n\nThis is Wrapper forwarding and one small SSG adapter. It keeps consumers on `dota-wrap` imports while implementation remains in `dota-ssr`.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `dotaSsg(options)` | Calls the SSR package's SSG factory with renderingModule set to dota-wrap/rendering, then applies caller overrides. Returns the original Vite plugin. |\n\nIt also forwards `dotaSsr`, route utilities, and configuration/target types. There is no second SSR or SSG rendering algorithm here.\n\n### [packages/libs/dota-ssr/src/vite/application-config.ts](../../../../../packages/libs/dota-ssr/src/vite/application-config.ts)\n\nBoth secondary build environments need the application's transforms without re-running the primary artifact writers.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `loadApplicationConfig(config, root, command)` | Re-reads the app Vite configuration, flattens nested/async plugin arrays, removes SSG/SSR plus event-map/Web Types writers, and returns remaining plugins separately from config settings. |\n\nThe excluded plugins would recursively trigger another server/prerender build or rewrite artifacts already generated by the client build. Keeping decorator transforms, aliases, and the component preloader is necessary so server and client evaluate compatible classes/templates.\n\n### [packages/libs/dota-ssr/src/vite/ssr/types.ts](../../../../../packages/libs/dota-ssr/src/vite/ssr/types.ts)\n\nContains `DotaServerTarget`, `DotaSsrOptions`, and `ServerDeployment`. The options select the app entry, document template, hydration, output directory, logging, and Node/Vercel/Netlify/Cloudflare/GitHub target.\n\n### [packages/libs/dota-ssr/src/vite/ssr/plugin.ts](../../../../../packages/libs/dota-ssr/src/vite/ssr/plugin.ts)\n\nThis file integrates the request engine into Vite development and production. The application declares `mode: 'ssr'`; the plugin supplies middleware or a deployable server rather than requiring a hand-maintained server entry.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `dotaSsr(options)` | Creates the plugin and its cached config, SSR-declaration signal, and original-shell state. |\n| `configResolved(config)` | Stores final application build settings. |\n| `transform(code, id)` | Checks application source for a literal mode: 'ssr' signal, excluding node_modules/dist. Returns null because it detects rather than rewriting source. |\n| `writeBundle(options, bundle)` | Saves the original built index asset before SSG may overwrite index.html with a static home page. |\n| `configureServer(server)` | Installs the development middleware below. |\n| `closeBundle.handler()` | In a client production build with a detected signal and deployment enabled, builds the server bundle, reads its real SSR routes, and writes platform output. Skips recursive SSR builds and applications with no actual server routes. |\n| `installDevMiddleware(server, options, logger)` | Accepts HTML GET/HEAD requests, lazily creates an application handler through Vite's module graph, and delegates with toNodeListener. Unmatched/static/non-HTML requests continue through Vite. |\n| `invalidate(file) — watcher closure` | Clears the cached handler on source activity; after finding no SSR routes, only a change containing the mode signal triggers recapture. |\n| `createHandler() — closure` | Loads the server API and app entry through Vite, captures the app, resolves real routes, and supplies a URL-specific transformIndexHtml shell. No routes means middleware can stay inactive. |\n| `declaresServerRoutes() — closure` | Consults metadata for warning severity when capture fails. Incomplete metadata cannot safely prove all SSR absent. |\n\nThe production detector is a regular expression, not execution of arbitrary route expressions. A computed mode without a visible literal is not guaranteed to trigger server output. In development a failed capture disables SSR until the next change and is logged according to metadata; it is not a successful render with missing content.\n\nA clean shell matters in mixed builds: returning an already-prerendered home document as every CSR fallback would show the wrong page before startup.\n\n### [packages/libs/dota-ssr/src/vite/ssr/server-build.ts](../../../../../packages/libs/dota-ssr/src/vite/ssr/server-build.ts)\n\nThis generates an application server bundle, distinct from building the published SSR library. The library leaves workspace dependencies external; the deployable application bundle inlines them so it can be copied to a function directory.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `ownModule(entry)` | Resolves the SSR package's own server/Node ESM path internally. A Wrap-only app should not need a direct SSR dependency just to resolve generated imports. |\n| `serverEntrySource(entryFile, target, hydration)` | Generates source exporting a lazy application handler, a serverRoutes reader, and the Node host export only for the Node target. |\n| `buildServerBundle(config, root, options, target, template)` | Reuses filtered app configuration, defines entry/template virtual modules, embeds the clean shell, and builds one ESM server file. Node built-ins remain external; Cloudflare uses webworker targeting but still needs Node compatibility for scoping. |\n| `virtual plugin resolveId / load` | Resolve the generated entry/template IDs and return server source or a JSON-escaped shell export. These modules belong to this build, not files the app maintains. |\n| `readServerRoutes(bundleFile)` | Imports/evaluates the built application in a temporary worker and returns captured SSR path patterns. Isolates module globals from the build process and has a 30-second deadline. |\n| `finish(error?, routes?) — closure` | Clears the route-read timer, terminates the worker, and resolves/rejects the route discovery promise. |\n\nA simplified generated entry is:\n\n```ts\nimport {createApplicationHandler, resolveServerRoutes}\n  from '@ayu-sh-kr/dota-ssr/server';\n// shell is supplied by the generated template virtual module.\nexport const handler = createApplicationHandler(\n  () => import('/absolute/app/src/main.ts'),\n  {template: shell, hydration: true}\n);\nexport const serverRoutes = async () =>\n  resolveServerRoutes(await handler.application()).map(route => route.path);\n```\n\nReading routes loads declarations, not every page's `serverLoad`. Request-time data is loaded later when a matching request reaches the adapter.\n\n### [packages/libs/dota-ssr/src/ssr/node.ts](../../../../../packages/libs/dota-ssr/src/ssr/node.ts)\n\nProvides `dota-ssr/node`, exporting `createNodeServer` and `NodeServerOptions`. Consumers wanting a complete Node HTTP host use this entry; a custom Fetch-compatible host can call the lower-level request handler instead.\n\n### [packages/libs/dota-ssr/src/ssr/node-listener.ts](../../../../../packages/libs/dota-ssr/src/ssr/node-listener.ts)\n\nThis bridges web-standard request handling to Node/Connect HTTP. It avoids importing Core so Vite configuration can load the bridge before server element setup.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `toNodeListener(handler)` | Returns an async listener that constructs Request from Node method/headers/URL, forwards it, sends response status/headers/buffered body, and suppresses the HEAD body. Undefined calls next or sends 404; exceptions call next(error) or send 500. |\n\nThe listener alone does not serve files or choose a SPA fallback; `createNodeServer` wraps it with that policy. A custom host can instead use the Request/Response handler directly.\n\n### [packages/libs/dota-ssr/src/ssr/node-server.ts](../../../../../packages/libs/dota-ssr/src/ssr/node-server.ts)\n\nThis is where SSG, SSR, and CSR meet in an actual Node request. The host first looks for existing built files, then calls the request renderer, then serves the clean client shell when neither answered.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `createNodeServer(options)` | Resolves the client/fallback paths, creates a Node listener and http.Server, and returns it unstarted. Handles GET/HEAD file responses, SSR errors as 500, unmatched unsupported methods as 405, and malformed request processing as 400. |\n| `isShell(file) — closure` | Identifies an unrendered root index identical to a separately preserved fallback shell. Skipping that file lets an SSR route at / run instead of being shadowed by an empty client index. |\n| `findFile(root, pathname)` | Tries exact file, directory index, and .html form after validating the resolved path remains inside the client directory. |\n| `sendFile(file, headOnly, response)` | Writes MIME type and streams file bytes, or sends headers only for HEAD. A read-stream failure destroys the response. |\n\nFor a hybrid task application:\n\n```text\n/tasks/42 → dist/tasks/42/index.html exists → static SSG response\n/tasks/99 → no static file → /tasks/:id matches → request SSR response\n/chat     → no static file, no SSR match → clean shell → CSR\n```\n\nAn SSR exception is not the same as “no match”: it becomes an error response, not a successful shell fallback.\n\n```js\nimport {createNodeServer} from '@ayu-sh-kr/dota-ssr/node';\n\n// handler is a createRequestHandler/createApplicationHandler result.\ncreateNodeServer({\n  handler,\n  clientDirectory: './dist',\n  fallback: '../dist-server/shell.html'\n}).listen(3000);\n```\n\nThe generated startup supplies absolute paths. Static files winning first also means an explicitly prerendered SSR URL will not execute serverLoad again until its file is removed/rebuilt.\n\n### [packages/libs/dota-ssr/src/vite/deployment/server.ts](../../../../../packages/libs/dota-ssr/src/vite/deployment/server.ts)\n\nThe server bundle is platform-neutral application output only within the current runtime requirements. This file writes the entry wrappers and routing files needed to invoke it on each target; it does not deploy the result.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `prepareServerDeployment(target, deployment, logger)` | Dispatches to Node/Vercel/Netlify/Cloudflare writers. GitHub Pages logs a static-only warning because it cannot execute request SSR. |\n| `prepareNode(deployment, logger)` | Writes index.mjs, server.mjs, and clean shell.html. Startup calls createNodeServer using clientDirectory and fallback, reading PORT with a default of 3000. |\n| `prepareVercel(deployment, logger)` | Copies a private server bundle, writes GET/HEAD API handlers, and prepends owned SSR rewrites ahead of authored SPA fallbacks. Carries the original pathname in __dota_path and restores it before rendering. |\n| `prepareNetlify(deployment, logger)` | Writes a Functions API entry whose path configuration claims only SSR route patterns, leaving other content to static/client hosting. |\n| `prepareCloudflarePages(deployment, logger)` | Writes an advanced worker falling back to env.ASSETS, routes configuration, and a missing Wrangler config with nodejs_compat. Warns if an existing config lacks required compatibility. |\n| `basePrefix(base)` | Extracts the public deployment pathname without its trailing slash so generated patterns respect the Vite base. |\n| `projectName(root)` | Reads package name or directory fallback and normalizes it into a worker-safe project name. |\n\nNode and platform functions are different wrappers over the same handler. SSG artifacts are already files, not code that these wrappers must regenerate. Vercel's root index can take priority over an SSR `/` rewrite, and the writer warns about that limitation.\n\nThe Cloudflare bundle still uses Node-compatible async context; targeting `webworker` does not erase that dependency. Generated directories/files are overwritten on builds, so maintain the writer/configuration rather than manually editing emitted code.\n\n### [packages/libs/dota-ssr/src/vite/deployment/index.ts](../../../../../packages/libs/dota-ssr/src/vite/deployment/index.ts)\n\nThis is the **static** hosting dispatcher invoked after SSG has finished writing documents. It is separate from server deployment because mapping a URL to HTML is different from invoking a function.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `prepareDeployment(root, outputDirectory, routes, options, base)` | Resolves explicit deployment or the legacy Vercel option, does nothing when disabled, and delegates to the appropriate static writer. Rejects unsupported targets. |\n\nNo target/legacy option means no static hosting preparation; it does not silently publish anything. The supplied route outputs have already been validated and written.\n\n### [packages/libs/dota-ssr/src/vite/deployment/redirects.ts](../../../../../packages/libs/dota-ssr/src/vite/deployment/redirects.ts)\n\nNetlify and Cloudflare static output use a generated ownership block in `_redirects` so future builds can update only Dota's rules.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `writeRedirects(outputDirectory, routes, base)` | Reads existing rules, removes complete owned blocks, rejects unmatched markers, validates concrete URLs, prepends status-200 mappings, and writes only when changed. Keeps all authored text outside the owned block. |\n\nA status-200 rule serves a document without changing the visible page URL. It is not a server-rendering endpoint. Wildcard/parameter paths are rejected because this writer receives concrete SSG pages.\n\n### [packages/libs/dota-ssr/src/vite/deployment/netlify.ts](../../../../../packages/libs/dota-ssr/src/vite/deployment/netlify.ts)\n\nThis is the thin Netlify static adapter.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `prepareNetlify(outputDirectory, routes, base)` | Calls writeRedirects for completed static page mappings. Request-time Netlify function generation is implemented separately in deployment/server.ts. |\n\n### [packages/libs/dota-ssr/src/vite/deployment/cloudflare-pages.ts](../../../../../packages/libs/dota-ssr/src/vite/deployment/cloudflare-pages.ts)\n\nThis is the thin Cloudflare Pages static adapter.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `prepareCloudflarePages(outputDirectory, routes, base)` | Calls writeRedirects for completed static pages. It does not create the advanced worker; that belongs to the SSR deployment writer. |\n\n### [packages/libs/dota-ssr/src/vite/deployment/github-pages.ts](../../../../../packages/libs/dota-ssr/src/vite/deployment/github-pages.ts)\n\nGitHub Pages does not offer the rewrite/function capability expected by the other target writers.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `prepareGithubPages(outputDirectory, routes)` | Maps custom outputs to default directory-index aliases, checks conflicts before copying completed HTML, and writes .nojekyll. Does not remove stale files or add a SPA fallback. |\n\nThis makes SSG content reachable through static paths. It does not add request-time SSR to GitHub Pages.\n\n### [packages/libs/dota-ssr/src/vite/vercel-config.ts](../../../../../packages/libs/dota-ssr/src/vite/vercel-config.ts)\n\nSSG and SSR both need to preserve a project's authored Vercel configuration. This shared reader/parser plus the static redirect updater keep their ownership distinct.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `updateVercelConfig(root, routes, options)` | Reads/parses configuration, replaces generated static redirect sources with current mappings, preserves unrelated settings, and writes only when the serialized result changes. |\n| `createVercelRedirects(routes)` | Returns redirect records for completed static outputs, avoiding self-mappings and handling route URL variants. |\n| `readVercelConfigSource(root, configuredFile)` | Reads an explicitly selected config or searches ancestors for vercel.json; returns the filename and existing text for diagnostics/unchanged-write checks. |\n| `parseVercelConfig(text, configFile)` | Parses JSON and requires an object, reporting the source filename on invalid input. |\n| `hasVercelRedirectSource(value)` | Type-checks a redirect entry before reading its source while merging old/generated entries. |\n| `outputUrl(output)` | Converts the relative HTML output mapping to the URL form used by generated redirects. |\n\nThe SSR writer uses the exported reader/parser, but writes `rewrites` to invoke the function. SSG's `redirects` and SSR's `rewrites` are different records and should not be described as the same serving operation.\n\n## 6. Finish in the browser: CSR, route preservation, hydration\n\nThe document has now reached a browser. Route preservation prevents the initial page from being erased; structured hydration establishes part ownership; CSR mounts normally. Later updates and navigation use the ordinary client framework.\n\n### [packages/libs/dota-ssr/src/route-marker.ts](../../../../../packages/libs/dota-ssr/src/route-marker.ts)\n\nThis owns the route-boundary contract: `data-dh-route`, `data-dh-route-version`, and route version 1. It is independent of template marker version 2.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `routeMarkerAttributes()` | Returns the route attribute record used by SSG's markPrerenderedRoute and SSR's top-level page host. The browser route wrapper reads it to decide whether its first page host can remain. |\n\nA page can have a valid route marker even when its render output is a legacy string without structured template parts. That permits preserving the initial routed page; it does not grant part-by-part template adoption.\n\n### [packages/libs/dota-ssr/src/index.ts](../../../../../packages/libs/dota-ssr/src/index.ts)\n\nThis is the browser hydration integration, used with either SSG or SSR output. It connects Core's initial-mount socket and Router's initial-presentation socket to Rendering's existing `hydrate`/`deferRender` operations.\n\n**Important distinction:** ordinary marked component parts can be adopted immediately; the captured root/page boundary is initially deferred so the router does not erase server output. Its first later update can mount normally. “Kept server page” and “hydrated every page part” are not the same claim.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `dotaHydration(options)` | Creates a runtime plugin with warn/throw mismatch policy. It does not itself register custom elements; initializeApp runs setup before registration. |\n| `setup(context)` | Installs the mount strategy, wraps route presentation, and captures the marked initial page while it still exists before upgrades. |\n| `installMountStrategy(context, mismatch, getHandoff)` | Defers eligible captured root/page mounts. Otherwise mounts unmarked output normally, or validates template ID/version/scope before hydrate. Invalid host identity follows the selected mismatch policy. |\n| `createHydrationRouteRenderer(next, root, mismatch, handoff)` | Retains the initial captured page only when selected component/path/markers agree. Other routes and later navigations delegate to next; a custom renderer remains authoritative. |\n| `captureInitialRoute(root)` | Finds the root and its direct marked page child before registration, recording root/page/pathname and a captured lifecycle state. |\n| `rootHasMarkedPage(root, match, context, handoff)` | Checks host identity/placement, route markers or the pinned legacy template version, normalized paths, and absence of a custom renderer. |\n| `reportRouteMismatch(handoff, mismatch)` | Warns or throws when a captured route could not be adopted; custom render presentation is an intentional bypass rather than this error. |\n| `normalizePath(path)` | Normalizes trailing slashes while preserving root /, so equivalent startup URLs do not manufacture a mismatch. |\n| `hydrationMismatch(host, cause?)` | Creates a component-specific diagnostic and preserves the underlying marker/adoption failure as cause. |\n\nThe initial handoff state moves from captured to adopted, released, or invalid; it is not a reusable server-route cache for future navigations.\n\n```ts\nimport {dotaHydration} from '@ayu-sh-kr/dota-wrap/ssr';\nconst plugins = [dotaHydration({mismatch: 'throw'})];\n// Pass to initializeApp before registration; use warn for local remount recovery.\n```\n\nMissing markers preserve ordinary client mounting. Malformed/old identity is different from missing identity: it is reported. Rendering's warn-policy hydration can also recover from malformed part markers by remounting locally.\n\n### [packages/libs/dota-core/src/core/helper/bootstrap.ts](../../../../../packages/libs/dota-core/src/core/helper/bootstrap.ts)\n\nExisting supporting file. `bootstrap` registers component constructors by `__dotaSelector` with `customElements.define`, avoiding duplicate definitions. In a browser, registration can immediately upgrade existing server hosts.\n\n### [packages/libs/dota-core/src/core/elements/render-strategy.ts](../../../../../packages/libs/dota-core/src/core/elements/render-strategy.ts)\n\nExisting supporting file. It defines `MountStrategy`, the default browser mount, `setMountStrategy`, and `resolveMountStrategy`. Core owns the initial-mount extension point; SSR supplies an implementation through its runtime plugin.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `defaultMountStrategy(host, root, output)` | Delegates to ordinary Rendering.render; the default does not use host identity. |\n| `setMountStrategy(strategy)` | Installs one application-wide initial-mount policy. A second claim throws instead of replacing hydration ownership. |\n| `resolveMountStrategy()` | Returns the installed strategy or the default. BaseElement calls it for inherited components' initial mount. |\n\n### [packages/libs/dota-core/src/core/elements/base-elements.ts](../../../../../packages/libs/dota-core/src/core/elements/base-elements.ts)\n\nExisting supporting file. `BaseElement` implements component construction, connection/disconnection, property/event binding, initial rendering, and reactive updates. It connects the low-level renderer to Dota decorators and lifecycle events.\n\n### [packages/libs/dota-router/src/coordinator/route-renderer.ts](../../../../../packages/libs/dota-router/src/coordinator/route-renderer.ts)\n\nExisting supporting file. `createRouteRenderer`/`renderRoute` select the root outlet, apply route SEO, respect a custom renderer, and normally write the selected page tag with its path into the root.\n\n### [packages/libs/dota-rendering/src/renderer.ts](../../../../../packages/libs/dota-rendering/src/renderer.ts)\n\nThis is the existing DOM engine used directly in CSR, in Happy DOM during SSG, and for browser adoption after SSR/SSG. The branch shares marker construction; it does not rewrite the renderer.\n\nThe public session object stays stable while its internal strategy changes between legacy strings and structured templates. The following map includes the internal functions that matter to producing and adopting the shared representation.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `render(root, output)` | Creates a new RenderSession and mounts output into the owned Element/ShadowRoot. This is Core's default client mount and SSG's marked DOM-writing path. |\n| `hydrate(root, output, options)` | Creates a hydration-mode RenderSession over existing marked DOM. Strict failures throw; warn mode logs and mounts a fresh session. The integration must validate host template identity/version before calling it. |\n| `deferRender(initialOutput, createSession)` | Returns a session doing no initial DOM work. Its output getter exposes the baseline; update creates a normal session on first mutation; dispose prevents further work and releases a created session. |\n| `patch(instance, output), update(instance, output)` | Forward the next output to the retained session and return its mutation summary. They do not rerun serverLoad. |\n| `setHydrationEmit(enabled)` | Controls durable marker emission for new mounts, enabled around the SSG pass and restored afterward. |\n| `setHydrationMismatchPolicy(policy), warnHydrationMismatch(error)` | Provide default direct-call recovery policy and the diagnostic. An explicit per-call option wins. |\n| `RenderSession.constructor / output / update / dispose` | Chooses string/template and mount/hydrate strategy, exposes current output, delegates compatible changes, switches strategies when output kind changes, and disposes owned nested resources. |\n| `StringStrategy.constructor / update / dispose` | Handles legacy strings via HTML writes; it has no structured interpolation parts to adopt or patch. |\n| `TemplateStrategy.constructor / update / dispose` | Mounts or adopts a structured template. Diffs later output, patches changed values for compatible structure, or disposes parts and remounts changed structure. |\n| `TemplateStrategy.mount(output)` | Parses detached template DOM, finds parts, applies values, stamps/clears identity, and replaces the root's children. |\n| `TemplateStrategy.adopt(output)` | Plans expected parts using a detached parse, then attaches them to live indexed elements and paired scope-owned comments. Fails if expected interpolation indexes are missing. |\n| `TemplateStrategy.parseTemplate(output)` | Builds a detached template with unique interpolation placeholders and neutral attribute names so binding setup does not leak temporary values into custom elements. Rejects unquoted dynamic attributes. |\n| `TemplateStrategy.findParts / findChildParts / indexElementsAndFindAttributeParts` | Discover placeholder text and attributes, index elements, allocate child boundaries, and record which values drive which live parts. |\n| `TemplateStrategy.applyIndexes / applyAttribute / applyChild` | Apply only affected value indexes. Attribute writes follow planned quote/value semantics; children choose scalar text, trusted markup, conditional branches, or keyed lists. |\n| `TemplateStrategy.applyKeyed` | Reuses/moves existing keyed entry ranges, mounts new keys, and removes absent keys while rejecting duplicates. |\n| `TemplateStrategy.adoptChildRepresentation` | Reconstructs scalar text ownership or nested conditional/keyed sessions inside a marked child range, preserving nodes for subsequent compatible patches. |\n| `TemplateStrategy.clearTrustedMarkup / clearBranch / clearKeyed / disposeParts` | Release the old child representation and nested sessions when value kind or structure changes. Avoid keeping sessions alive for nodes no longer owned. |\n| `NativeRoot constructor / ownerDocument / replaceChildren / findDynamicElement / writeHTML / hydrationNodes` | Adapt an Element/ShadowRoot to renderer operations and traverse its owned representation. |\n| `NativeRoot.stampHydrationIdentity / clearHydrationIdentity` | Stamp the component boundary with shared identity or remove stale identity when ordinary client output replaces it. |\n| `RangeRoot constructor / ownerDocument / replaceChildren / findDynamicElement / writeHTML / clear / hydrationNodes` | Perform equivalent operations between two boundary nodes for conditional/keyed subtemplates. Its stampHydrationIdentity/clearHydrationIdentity are no-ops because it owns no component host. |\n| `recordRenderPart / appendMarkerTokens` | Index a value's mutation targets and merge durable attribute tokens without dropping existing tokens. |\n| `createHydrationScope / readHydrationScope` | Allocate scopes for marked DOM mounts or validate the server scope before adoption. |\n| `parseHydrationChildStart / parseHydrationChildEnd / parseHydrationKeyedStart / parseHydrationKeyedEnd` | Recognize only the active scope's comment grammar; nested component markers are not adopted by the parent. |\n| `collectDescendants / collectTopLevelHydrationElements` | Traverse eligible element/comment nodes and isolate the active template's top-level candidates. |\n| `collectHydrationChildParts / collectHydrationKeyedRanges` | Pair durable boundaries, reject malformed/unclosed ranges, and preserve nesting needed for child sessions. |\n| `nodesBetween / removeInclusiveRange / moveInclusiveRange` | Read or mutate bounded sibling ranges, enabling keyed movement without replacing the rest of the component. |\n\nA same-call-site update can preserve server nodes:\n\n```ts\nimport {html, hydrate, patch} from '@ayu-sh-kr/dota-rendering';\n\nconst view = (label: string) => html`<p>${label}</p>`;\n// host already contains valid matching server markup; identity was checked.\nconst session = hydrate(host, view('Before'), {mismatch: 'throw'});\nconst original = host.querySelector('p');\npatch(session, view('After'));\nconsole.assert(host.querySelector('p') === original);\n```\n\nA changed template shape is allowed to replace DOM. The purpose of hydration is establishing correct part ownership, not promising every future change can preserve every node.\n\n## 7. Reach the server-environment units\n\nThese are the low-level stand-ins used by request SSR. SSG uses Happy DOM instead. The APIs below are intentionally bounded, and those limits explain why the two server lifecycles are different.\n\n### [packages/libs/dota-server-dom/src/index.ts](../../../../../packages/libs/dota-server-dom/src/index.ts)\n\nContains the extracted package's pure exports: node/element/document constructors, registry, attribute reflection, browser-object stand-ins, and the callable global installer.\n\n### [packages/libs/dota-server-dom/src/install.ts](../../../../../packages/libs/dota-server-dom/src/install.ts)\n\nThe side-effect entry imports and immediately calls `installServerGlobals`. It lets an external consumer request module-time setup explicitly:\n\n### [packages/libs/dota-server-dom/src/module-globals.ts](../../../../../packages/libs/dota-server-dom/src/module-globals.ts)\n\nComponent classes extend HTMLElement at module evaluation time. This installer supplies only that class base and a custom-element registry before any request begins.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `installMissingGlobal(name, value)` | Defines a configurable/writable global only when its current value is undefined. Preserves a real browser, Happy DOM, or host object. |\n| `installServerGlobals()` | Calls the helper for HTMLElement and customElements. Repeated calls keep the first registry rather than resetting definitions. |\n\nThese objects remain process-wide. They are distinct from request document/location/storage, which belong to the Node scope below. The `/install` module calls this function explicitly; importing pure constructors does not.\n\n### [packages/libs/dota-server-dom/src/node/index.ts](../../../../../packages/libs/dota-server-dom/src/node/index.ts)\n\nExports `runInBrowserScope` from the Node-specific entry. It is the supported API for code that needs request-backed browser globals across asynchronous work.\n\n### [packages/libs/dota-server-dom/src/node/browser-scope.ts](../../../../../packages/libs/dota-server-dom/src/node/browser-scope.ts)\n\nA server can render overlapping URLs. A single mutable global `location` would let one request read another's URL after an await. This module supplies request-selected getters backed by AsyncLocalStorage.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `runInBrowserScope(url, task)` | Creates a fresh scope, installs missing getters while any render is active, runs/awaits task inside the scope, and removes owned globals when the final overlapping render finishes. Returns the task result. |\n| `createBrowserScope(url)` | Allocates linked location/document plus independent history, local/session storage, and window-event target for this request. |\n| `installBrowserGlobals()` | Installs accessors for request objects and plain values for inert process APIs; records names it owns. Skips names already present on globalThis. |\n| `removeBrowserGlobals()` | Deletes only recorded names and releases the out-of-render fallback scope. Does not delete host-provided globals. |\n\nThe scope's isolation guarantee applies to objects **it supplies**. A pre-existing runtime `localStorage` is preserved, even if that object is shared. This is observable and covered by preservation/isolation tests.\n\n```ts\nimport {runInBrowserScope} from '@ayu-sh-kr/dota-server-dom/node';\n\nconst renderPath = (path: string) =>\n  runInBrowserScope(new URL(path, 'http://localhost'), async () => {\n    await Promise.resolve();\n    return location.pathname;\n  });\n\nconst paths = await Promise.all([renderPath('/slow'), renderPath('/fast')]);\n// ['/slow', '/fast'] when the scope supplies location.\n```\n\n`window` refers to globalThis; document/location/history accessors resolve the active scope. Media queries do not match, viewport dimensions are placeholders, animation callbacks do not execute, and observers are inert. This supports pure/template/data work, not browser layout.\n\n### [packages/libs/dota-server-dom/src/browser/browser-objects.ts](../../../../../packages/libs/dota-server-dom/src/browser/browser-objects.ts)\n\nThis file contains non-layout browser-shaped services created by the request scope. They allow shared component getters/data code to read familiar APIs without starting browser navigation, persistence, or observers.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `ServerLocation constructor / href / origin / protocol / host / hostname / port / pathname / search / hash` | Wrap a URL and expose its request-specific fields. ancestorOrigins is an empty stand-in; toString returns the URL representation. |\n| `ServerLocation.assign / replace / reload` | Do not navigate or restart the server render. |\n| `ServerHistory.pushState / replaceState / back / forward / go` | No-op navigation methods with placeholder history state; server code cannot drive a real browser transition. |\n| `ServerStorage.length / key / getItem / setItem / removeItem / clear` | Implement an in-memory string store and key enumeration. The request scope allocates separate stores unless a host global is preserved. |\n| `createUnmatchedMediaQuery(media)` | Returns a media-query-shaped object whose query text is retained and matches is false; its listener operations are inert. |\n| `InertObserver constructor / observe / unobserve / disconnect / takeRecords` | Accept observer-style calls without scheduling callbacks; takeRecords returns no observations. |\n\nA component using layout/media queries to decide essential HTML may render a different initial tree in a real browser. Keep essential SSR output based on request data and explicit properties, then use browser lifecycle work for visual effects.\n\n### [packages/libs/dota-server-dom/src/dom/custom-element-registry.ts](../../../../../packages/libs/dota-server-dom/src/dom/custom-element-registry.ts)\n\nComponent modules can register themselves during evaluation, and element identity may need a constructor-to-tag lookup. This small registry supports those operations without browser tree upgrading.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `ServerCustomElementRegistry.define(name, constructor)` | Validates/stores the name and reverse constructor mapping; resolves pending whenDefined promises. Duplicate/invalid definitions throw. |\n| `get(name) / getName(constructor)` | Return a registered constructor or its element name. |\n| `whenDefined(name)` | Returns an already-resolved promise or a shared pending promise for that name. define resolves it when registration happens. |\n| `upgrade(root)` | Intentionally does nothing. The string adapter constructs components explicitly; it does not ask a DOM parser to upgrade a document. |\n\n### [packages/libs/dota-server-dom/src/dom/server-document.ts](../../../../../packages/libs/dota-server-dom/src/dom/server-document.ts)\n\nThis provides a document-shaped request object with html/head/body nodes and a linked Location. It is not the actual response shell parsed into a live DOM; the string document writer owns response assembly.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `ServerDocument.constructor(location)` | Creates documentElement/head/body links and retains the request location. |\n| `nodeType / nodeName / ownerDocument` | Expose document identity; ownerDocument is null because a document has no owning document. |\n| `title getter/setter / URL / documentURI / defaultView` | Keep simple title state and derive URL/view information from request/global objects. |\n| `readyState / visibilityState / hidden / activeElement / hasFocus` | Provide stable server placeholders, not a browser lifecycle, focus, or visibility simulation. |\n| `createElement(name) / createElementNS(namespace, name)` | Create stand-in elements; namespace creation does not implement a complete browser namespaced DOM. |\n| `createTextNode(data) / createComment(data) / createDocumentFragment()` | Allocate server nodes used by shared code. |\n| `querySelector / querySelectorAll / getElementById / getElementsByTagName / getElementsByClassName` | Return null/empty results instead of querying an HTML response tree. |\n\nAppending SEO nodes here does not add them to the response. Assign page/route `seo` so `renderHead` writes them into the real shell.\n\n### [packages/libs/dota-server-dom/src/dom/server-element.ts](../../../../../packages/libs/dota-server-dom/src/dom/server-element.ts)\n\nThis is the HTMLElement-like base that decorated component classes extend in a Node render. It supplies attributes and familiar reflection APIs without executing a browser component lifecycle.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `ServerElement.create(localName)` | Creates an ordinary stand-in element with an explicit tag name; used by document.createElement. |\n| `nodeType / nodeName / localName / tagName` | Expose element identity. The name comes from the explicit name, registry lookup, or constructor __dotaSelector; tagName/nodeName use element casing conventions. |\n| `id / className / classList / dataset / style` | Reflect convenience properties onto the underlying attribute store using the token/style/dataset adapters. |\n| `attributes / getAttributeNames()` | Expose attribute records/names that the string adapter serializes after data loading. |\n| `hasAttribute(name) / hasAttributes() / getAttribute(name)` | Read the stored attributes, including the normal null result for an absent name. |\n| `setAttribute(name, value) / removeAttribute(name) / toggleAttribute(name, force)` | Maintain attribute strings and presence. These are data operations, not browser upgrade/connection processing. |\n| `children / firstElementChild / shadowRoot` | Read the small node tree and optional attached shadow root. |\n| `attachShadow(init)` | Creates one server shadow root; a second attachment throws. The SSR adapter later emits declarative shadow markup from component output. |\n| `querySelector / querySelectorAll / getElementsByTagName / getElementsByClassName / closest / matches` | Return empty/null/false results: there is no parsed rendered-page tree to search. |\n| `getBoundingClientRect / focus / blur / scrollIntoView` | Return zero layout information or do nothing; rendering must not depend on actual viewport/layout work here. |\n| `ServerShadowRoot constructor / nodeType / nodeName` | Hold host/mode with fragment-like root identity. |\n| `ServerShadowRoot.querySelector / querySelectorAll / getElementById` | Return empty results for the same reason as element queries. |\n\nExample: setting `this.dataset.taskId = '42'` can affect the serialized host; searching `this.querySelector('h1')` cannot inspect the HTML returned by `render()`. Those are deliberately different capabilities.\n\n### [packages/libs/dota-server-dom/src/dom/element-reflection.ts](../../../../../packages/libs/dota-server-dom/src/dom/element-reflection.ts)\n\nThese adapters make convenience APIs update the attributes the SSR adapter eventually emits. This is useful compatibility, independent of a full browser tree.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `ServerTokenList constructor / length / value / item / contains` | Wrap one attribute as a whitespace-token list. Reads parse the current stored value so direct attribute changes stay visible. |\n| `ServerTokenList.add / remove / toggle / replace` | Mutate tokens and write one normalized attribute value. toggle supports the optional forced-presence argument. |\n| `ServerTokenList.forEach / [Symbol.iterator] / toString` | Expose iteration/string behavior over the current token list. |\n| `ServerTokenList.tokens / write` | Internal parsing/serialization boundary; write deduplicates/normalizes the underlying attribute. |\n| `createDataset(host)` | Returns a proxy translating dataset property reads/writes/deletes/enumeration to data-* attributes. |\n| `attributeOf / keyOf — dataset closures` | Convert camelCase property names to data-kebab-case names and back for proxy operations. |\n| `ServerStyleDeclaration.constructor / create(host)` | Wrap an element's style attribute; create returns a proxy that also supports familiar style.propertyName access. |\n| `cssText / length / item / getPropertyValue / getPropertyPriority` | Read serialized declarations, enumeration order, values, and important priority. |\n| `setProperty(name, value, priority) / removeProperty(name)` | Update/remove CSS declarations, preserve requested priority, and rewrite the style attribute. removeProperty returns the removed value. |\n| `declarations() / write(declarations)` | Parse the current style text into a declaration map and serialize updates back. |\n| `cssPropertyName(key)` | Converts JS camelCase property access to CSS kebab-case while preserving custom-property names. |\n\nFor example, `element.style.backgroundColor = 'red'` becomes `style=\"background-color: red;\"`, and `element.dataset.userId = '42'` becomes `data-user-id=\"42\"`. The adapter reads the attributes, not proxy implementation details.\n\n### [packages/libs/dota-server-dom/src/dom/server-node.ts](../../../../../packages/libs/dota-server-dom/src/dom/server-node.ts)\n\nThis is the minimal tree behind server elements/documents. It inherits the platform EventTarget, but there is no browser event propagation or layout. The tree supports shared component code; rendered HTML still comes from `render()`, not automatic tree serialization.\n\n| Function or method | Inputs, result, and behaviour |\n| --- | --- |\n| `ServerNode nodeType / nodeName / isConnected / ownerDocument` | Base type/name are placeholders; subclasses override them. isConnected is always false. ownerDocument reads the current scoped document rather than retaining one from a previous request. |\n| `parentNode / parentElement / childNodes / firstChild / lastChild / nextSibling / previousSibling` | Expose tree relationships; childNodes returns a copy so callers cannot mutate the tree by editing the returned array. |\n| `textContent getter/setter` | Reads descendant text while excluding comments; assignment replaces children with text. |\n| `hasChildNodes() / appendChild(node) / insertBefore(node, reference)` | Query children and implement insertion. insertBefore is the central mutation: fragments contribute their children, moves detach old parents, and cycles/invalid reference children throw. |\n| `removeChild(node) / remove()` | Detach a particular child or the node itself and keep parent links consistent. |\n| `append(...nodes) / prepend(...nodes) / replaceChildren(...nodes)` | Perform convenience mutations, converting string inputs into text nodes. |\n| `contains(node) / getRootNode()` | Walk parent links for ancestry/root queries. |\n| `ServerCharacterData constructor / nodeType / nodeName / textContent / length` | Represent text or comment nodes with data and the corresponding node type/name. Updating textContent updates their data. |\n| `ServerDocumentFragment nodeType / nodeName` | Provide fragment identity used by the insertion logic. |\n| `toServerNode(node)` | Returns an existing server node or converts a string into ServerCharacterData of text kind. |\n\n## Appendix A. Runnable examples and correctness checks\n\nUse the existing standalone playground or deployment fixture to run the concepts. Test descriptions identify the invariant being checked; they are not a claim that the whole workspace suite was freshly run for this document.\n\n### [packages/libs/dota-core/test/core/elements/dota-page-element.test.ts](../../../../../packages/libs/dota-core/test/core/elements/dota-page-element.test.ts)\n\nAdds checks for creating, updating, and removing the managed JSON-LD script. It verifies that unrelated application-authored JSON-LD remains in the document.\n\n### [packages/libs/dota-rendering/test/server/html-tokenizer.test.ts](../../../../../packages/libs/dota-rendering/test/server/html-tokenizer.test.ts)\n\nChecks how HTML is split into tokens and how attributes/entities are read. Cases include raw text, SVG/MathML, incomplete markup, and self-closing tags.\n\n### [packages/libs/dota-rendering/test/server/template-parity.test.ts](../../../../../packages/libs/dota-rendering/test/server/template-parity.test.ts)\n\nContains markup normalization, a helper that mounts through the browser renderer with marker emission, and comparisons against `serializeOutput`. It uses Happy DOM as the browser parser side.\n\n### [packages/libs/dota-rendering/test/server/template-serializer.test.ts](../../../../../packages/libs/dota-rendering/test/server/template-serializer.test.ts)\n\nChecks escaping, directives, unsupported interpolation positions, duplicate keys, legacy strings, and durable marker output. These tests describe what the server serializer accepts and produces.\n\n### [packages/libs/dota-server-dom/test/dom/server-element.test.ts](../../../../../packages/libs/dota-server-dom/test/dom/server-element.test.ts)\n\nChecks the minimal element's attribute and property behavior, including class/style/dataset reflection and supported tree operations. It verifies the extracted stand-ins independently of SSR.\n\n### [packages/libs/dota-server-dom/test/module-globals.test.ts](../../../../../packages/libs/dota-server-dom/test/module-globals.test.ts)\n\nContains isolated installer tests that remove test-created globals afterward. It verifies missing globals are supplied, repeated calls keep the same registry, and a host-provided `HTMLElement` is preserved.\n\n### [packages/libs/dota-server-dom/test/node/browser-scope.test.ts](../../../../../packages/libs/dota-server-dom/test/node/browser-scope.test.ts)\n\nChecks scoped globals, overlapping requests, cleanup, preservation of pre-existing globals, and registry behavior. It describes where request isolation applies and what the host continues to own.\n\n### [packages/libs/dota-ssr/playground/light-dom/index.html](../../../../../packages/libs/dota-ssr/playground/light-dom/index.html)\n\nProvides the small demo's HTML shell, with head/body insertion points, a little styling, and the browser entry script. The server inserts the rendered task page into it.\n\n### [packages/libs/dota-ssr/playground/light-dom/server.mjs](../../../../../packages/libs/dota-ssr/playground/light-dom/server.mjs)\n\nContains a Node/Vite middleware demonstration, a small in-memory tasks API, explicit SSR page routes, and a shell loader. It imports the server API before loading decorated components and externalizes shared framework packages to avoid duplicate metadata stores.\n\n### [packages/libs/dota-ssr/playground/light-dom/src/client.ts](../../../../../packages/libs/dota-ssr/playground/light-dom/src/client.ts)\n\nContains the standalone browser bootstrap. It installs `dotaHydration` through a context exposing Core's mount-strategy setter, then registers the same components used on the server.\n\n### [packages/libs/dota-ssr/playground/light-dom/src/components.ts](../../../../../packages/libs/dota-ssr/playground/light-dom/src/components.ts)\n\nContains the standalone example's `Task` type, `TaskItemComponent`, `ClickCounterComponent`, `TasksPage`, and shared `COMPONENTS` list. The page fetches data in `serverLoad`; rows get typed attributes; conditional/keyed templates render lists; the counter binds a click handler.\n\n### [packages/libs/dota-ssr/playground/light-dom/tsconfig.json](../../../../../packages/libs/dota-ssr/playground/light-dom/tsconfig.json)\n\nGives the playground its TypeScript settings, including legacy decorators and browser/Node types. It checks the demo components without emitting JavaScript.\n\n### [packages/libs/dota-ssr/test/ssr/application.test.ts](../../../../../packages/libs/dota-ssr/test/ssr/application.test.ts)\n\nChecks application capture, timeout/error handling, flattened SSR route selection, and handler reuse. It verifies that captured applications produce pages through the normal SSR pipeline.\n\n### [packages/libs/dota-ssr/test/ssr/document.test.ts](../../../../../packages/libs/dota-ssr/test/ssr/document.test.ts)\n\nChecks the document shell and head writer. It covers automatic insertion points, replacement of shell metadata, and JSON-LD output that cannot accidentally close its script element.\n\n### [packages/libs/dota-ssr/test/ssr/head-parity.test.ts](../../../../../packages/libs/dota-ssr/test/ssr/head-parity.test.ts)\n\nContains head normalization and comparisons between SSR `renderHead` and Core's browser `updateDocumentSEO`. It checks the same SEO contract through both writers.\n\n### [packages/libs/dota-ssr/test/ssr/hydration-parity.test.ts](../../../../../packages/libs/dota-ssr/test/ssr/hydration-parity.test.ts)\n\nContains server-context construction, inert HTML parsing, a direct `hydrateHost` helper, and adoption/update assertions using Rendering's real `hydrate` and `patch`.\n\n### [packages/libs/dota-ssr/test/ssr/node-server.test.ts](../../../../../packages/libs/dota-ssr/test/ssr/node-server.test.ts)\n\nChecks the complete Node host: static-file precedence, SSR routes, client fallback, rendering at `/`, file-path restrictions, and error/method responses.\n\n### [packages/libs/dota-ssr/test/ssr/request-handler.test.ts](../../../../../packages/libs/dota-ssr/test/ssr/request-handler.test.ts)\n\nChecks route matching, dynamic parameters, HTML response assembly, per-request state, relative fetches, and declined requests. It also exercises the Node listener through an actual HTTP server.\n\n### [packages/libs/dota-ssr/test/ssr/string-adapter-fixtures.ts](../../../../../packages/libs/dota-ssr/test/ssr/string-adapter-fixtures.ts)\n\nContains example components used by the SSR tests: nested tasks, conditional/keyed content, shadow output, browser API probes, and client-only/render-mode cases. These fixtures make expected rendering behavior concrete.\n\n### [packages/libs/dota-ssr/test/ssr/string-adapter.test.ts](../../../../../packages/libs/dota-ssr/test/ssr/string-adapter.test.ts)\n\nChecks component construction, server data loading, property reflection, nested rendering, shadow output, and hydration markers. It also tests client-only behavior and request-specific browser globals.\n\n### [packages/libs/dota-wrap/test/fixtures/ssr-app/.gitignore](../../../../../packages/libs/dota-wrap/test/fixtures/ssr-app/.gitignore)\n\nExcludes output generated when deployment tests build the fixture, including server bundles, platform files, and local dependencies.\n\n### [packages/libs/dota-wrap/test/fixtures/ssr-app/index.html](../../../../../packages/libs/dota-wrap/test/fixtures/ssr-app/index.html)\n\nProvides the deployment fixture's document shell and application entry script. The server build uses this shell to test page insertion inside the root host.\n\n### [packages/libs/dota-wrap/test/fixtures/ssr-app/src/main.ts](../../../../../packages/libs/dota-wrap/test/fixtures/ssr-app/src/main.ts)\n\nContains the complete fixture call to Wrap's `initializeApp`, including all components, root, fallbacks, and hydration plugin. It exports `applicationReady` with a chained `window.scrollTo`.\n\n### [packages/libs/dota-wrap/test/fixtures/ssr-app/src/pages.ts](../../../../../packages/libs/dota-wrap/test/fixtures/ssr-app/src/pages.ts)\n\nContains the fixture root, SSR task page, CSR about page, home page, and error page. The task page uses `serverLoad(context)` to copy the route ID and scoped pathname into serializable properties; its title derives from that data.\n\n### [packages/libs/dota-wrap/test/fixtures/ssr-app/vite.config.ts](../../../../../packages/libs/dota-wrap/test/fixtures/ssr-app/vite.config.ts)\n\nContains the fixture build configuration, decorator transform, deployment target from `DOTA_FIXTURE_TARGET`, and an alias to Wrap's built entries. It disables unrelated metadata writers.\n\n### [packages/libs/dota-wrap/test/ssr-deployment.test.ts](../../../../../packages/libs/dota-wrap/test/ssr-deployment.test.ts)\n\nContains real fixture builds for Node, Vercel, Netlify, and Cloudflare Pages, with setup/cleanup for their generated files. It starts the Node output and checks SSR parameters, static assets, and CSR shell behavior; other cases inspect generated route/function/worker configuration.\n\n### [packages/libs/dota-wrap/test/vite-composition.test.ts](../../../../../packages/libs/dota-wrap/test/vite-composition.test.ts)\n\nUpdates the expected plugin list to include SSR and checks that SSR can be disabled. It also keeps explicit extension-only composition covered.\n\n## Appendix B. Brief consumer and generated-output references\n\nThese files consume or expose the framework. Their application UI is outside the implementation walkthrough, so each is summarized briefly while retaining the requested file-level inventory.\n\n### [api/_dota-ssr/index.mjs](../../../../../api/_dota-ssr/index.mjs)\n\nGenerated application server bundle copied into Vercel's API directory. The function wrapper imports it to render requests; it is build output rather than source to maintain by hand.\n\n### [api/dota-ssr.mjs](../../../../../api/dota-ssr.mjs)\n\nGenerated Vercel function wrapper for GET and HEAD. It restores the original page path from the rewrite query parameter and forwards the request to the bundled handler.\n\n### [packages/apps/dota-web/CHANGELOG.md](../../../../../packages/apps/dota-web/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/apps/dota-web/dist-server/index.mjs](../../../../../packages/apps/dota-web/dist-server/index.mjs)\n\nGenerated application server bundle for local Node hosting. It contains the bundled request handler and application code; rebuild it from source rather than editing it directly.\n\n### [packages/apps/dota-web/dist-server/server.mjs](../../../../../packages/apps/dota-web/dist-server/server.mjs)\n\nGenerated Node startup file. It loads the bundled handler, locates client assets and the fallback shell, and starts the HTTP host on the configured port.\n\n### [packages/apps/dota-web/dist-server/shell.html](../../../../../packages/apps/dota-web/dist-server/shell.html)\n\nGenerated copy of the clean client document used as the SPA fallback. Keeping it separate prevents a prerendered home page from accidentally becoming every client route's shell.\n\n### [packages/apps/dota-web/package.json](../../../../../packages/apps/dota-web/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [packages/apps/dota-web/src/configs/docs.config.ts](../../../../../packages/apps/dota-web/src/configs/docs.config.ts)\n\nContains `DOCS`, `docUrl`, and `findDoc`, feeding docs navigation, titles, paging, and concrete SSG URLs. The Server Rendering group starts at `/docs/ssg-ssr-csr`, follows eight short lessons, and finishes with this reference at `/docs/ssr-file-reference`. The registry stays metadata-only because Vite config imports it.\n\n### [packages/apps/dota-web/src/pages/blog-content.page.ts](../../../../../packages/apps/dota-web/src/pages/blog-content.page.ts)\n\nMarks article URLs as SSR. Its `seo` getter and `render` produce request-aware metadata and a legacy string layout; `afterViewInit` is browser/Happy DOM lifecycle work. The nested article loader is not called by the string adapter, so the route mode alone does not guarantee Markdown content is in request HTML.\n\n### [packages/apps/dota-web/src/pages/blog.page.ts](../../../../../packages/apps/dota-web/src/pages/blog.page.ts)\n\nChanges the listing from legacy static-generation opt-in to request SSR. Contains `BlogPage.seo`, the scrolling `afterViewInit` hook, and the layout `render` method; no SSR engine functions are implemented here.\n\n### [packages/apps/dota-web/src/pages/chat.page.ts](../../../../../packages/apps/dota-web/src/pages/chat.page.ts)\n\nMarks the route CSR. Its constructor initializes service/state, `afterViewInit` restores browser-stored messages, and `render` composes the chat interface. Those page-specific details are independent of SSR orchestration.\n\n### [packages/apps/dota-web/src/pages/community.page.ts](../../../../../packages/apps/dota-web/src/pages/community.page.ts)\n\nMarks the route SSR. Contains a connected scroll handler and a string layout composing community sections; it illustrates registered child expansion, not browser animation execution on the server.\n\n### [packages/apps/dota-web/src/pages/docs.page.ts](../../../../../packages/apps/dota-web/src/pages/docs.page.ts)\n\nContains `DocsRoutePage.seo`/`render` and concrete docs route classes. `/docs` opts into SSG; concrete `/docs/:slug` URLs are supplied by configuration. This demonstrates explicit static URL selection rather than automatic parameter expansion.\n\n### [packages/apps/dota-web/src/pages/error.page.ts](../../../../../packages/apps/dota-web/src/pages/error.page.ts)\n\nKeeps error rendering on the CSR route path. Contains path/message/status properties, `seo`, a connected scroll handler, and the error layout. Node SSR exceptions still return HTTP 500 rather than automatically invoking this page.\n\n### [packages/apps/dota-web/src/pages/home/home.page.ts](../../../../../packages/apps/dota-web/src/pages/home/home.page.ts)\n\nUses `mode: 'ssg'` for the home route. `HomePage.seo`, `onConnected`, and `render` supply metadata, a scroll hook, and a composed landing-page template. It is a consumer of the engine, not where static generation is implemented.\n\n### [packages/apps/dota-web/src/pages/resource.page.ts](../../../../../packages/apps/dota-web/src/pages/resource.page.ts)\n\nMarks resources CSR. Contains the scroll `afterViewInit` and page-composition `render`; it adds no new server rendering logic.\n\n### [packages/apps/dota-web/src/service/doc-loader.service.ts](../../../../../packages/apps/dota-web/src/service/doc-loader.service.ts)\n\nContains `loadDoc`, `loadResource`, and `loadBlog` over the shared REST client. `loadDoc` uses eager raw imports for the learning collection and this canonical reference, embeds trusted repository SVGs, and rewrites repository links for the website. Eager text avoids an unobserved asynchronous module import during SSG; inline vector geometry avoids development-only asset URLs. Diagram presentation uses attributes rather than SVG style elements, preserving the rest of the article through Happy DOM parsing. Other docs, resources, and blogs use public-file fetches.\n\n### [packages/apps/dota-web/vite.config.ts](../../../../../packages/apps/dota-web/vite.config.ts)\n\nConfigures the consumer's shared target, SSG concrete URL list, and plugin composition. Benchmark switches alter the explicit prerender list; the SSR/SSG engines themselves remain in library packages.\n\n### [packages/apps/dota-web/web-types.json](../../../../../packages/apps/dota-web/web-types.json)\n\nGenerated editor metadata. The branch updates source offsets after annotations moved; this file does not affect HTML production.\n\n### [vercel.json](../../../../../vercel.json)\n\nAdds SSR rewrites for the blog listing, blog articles, and community page before the SPA catch-all. Existing static redirects and asset-cache headers remain part of the hosting configuration.\n\n## Appendix C. Packaging, release notes, and supporting documents\n\nThese remaining branch files explain publication/build setup, release-history differences, investigations, and illustrations. They are retained for completeness without placing release metadata in the main runtime explanation.\n\n### [.changeset/automatic-ssr-deployment.md](../../../../../.changeset/automatic-ssr-deployment.md)\n\nRelease note for automatic development and production SSR in `dota-ssr`. It describes application capture, platform output, Node hosting, and document/SEO handling.\n\n### [.changeset/automatic-ssr-wrap.md](../../../../../.changeset/automatic-ssr-wrap.md)\n\nRelease note for automatic SSR wiring through Wrap. It documents default Vite composition, deployment selection, opt-out, and server application capture.\n\n### [.changeset/light-dom-string-ssr.md](../../../../../.changeset/light-dom-string-ssr.md)\n\nRelease note for the explicit string-rendering server API and standalone playground. It also explains render-mode handling in the adapter.\n\n### [.changeset/render-mode-core.md](../../../../../.changeset/render-mode-core.md)\n\nRelease note describing Core's route/component render modes and server-render flag. Its presence relative to local `master` reflects release history as well as feature development; it does not mean all that Core behavior was newly written in this branch.\n\n### [.changeset/render-mode-preloader.md](../../../../../.changeset/render-mode-preloader.md)\n\nRelease note describing render-mode extraction by the route scanner. The actual preloader source has no corresponding new change in this comparison.\n\n### [.changeset/render-mode-router.md](../../../../../.changeset/render-mode-router.md)\n\nRelease note describing explicit route modes and compatibility with the old `ssr` flag. Router source is unchanged in this comparison; the note is part of the release-history differences.\n\n### [.changeset/render-mode-ssr.md](../../../../../.changeset/render-mode-ssr.md)\n\nRelease note describing SSG route selection by resolved render mode. It distinguishes static generation from routes explicitly assigned SSR or CSR.\n\n### [.changeset/rendering-server-entry.md](../../../../../.changeset/rendering-server-entry.md)\n\nContains the Rendering release entry for the new `/server` API. It documents template-to-string output, escaping, optional hydration markers, and exported lexical HTML support, plus the requirement that server and root share runtime values/types.\n\n### [.changeset/seo-json-ld-core.md](../../../../../.changeset/seo-json-ld-core.md)\n\nRelease note for structured data in page SEO and the shared head-tag description. It explains browser updates and the common contract used by server output.\n\n### [.changeset/server-dom-package.md](../../../../../.changeset/server-dom-package.md)\n\nContains the first release entry for `dota-server-dom`. It lists pure constructors, explicit installation, request scoping, preservation of existing globals, and the Node-compatible runtime requirement.\n\n### [.changeset/shared-hydration-markers.md](../../../../../.changeset/shared-hydration-markers.md)\n\nRelease note for Rendering's public marker helpers and constants. These let other writers produce markup compatible with the existing hydration engine.\n\n### [.changeset/ssr-shared-server-packages.md](../../../../../.changeset/ssr-shared-server-packages.md)\n\nContains the SSR compatibility release entry for consuming the extracted packages. It explains that existing server constructor, scoping, escaping, and serialization exports remain available as forwarding exports even though their implementation owners changed.\n\n### [documentation/packages/libs/dota-ssr/architecture/branch-changes-guide.md](../../../../../documentation/packages/libs/dota-ssr/architecture/branch-changes-guide.md)\n\nThis canonical guide documents the runtime functions and execution paths, followed by a complete branch-file appendix. The docs loader renders this same file at /docs/ssg-ssr-csr, so there is one Markdown source to maintain.\n\n### [documentation/packages/libs/dota-ssr/architecture/light-dom-string-rendering.md](../../../../../documentation/packages/libs/dota-ssr/architecture/light-dom-string-rendering.md)\n\nExplains the string renderer's design, data-loading phase, component nesting, render modes, and limitations. It is the detailed implementation narrative for the SSR work.\n\n### [documentation/packages/libs/dota-ssr/architecture/package-boundaries-and-execution.md](../../../../../documentation/packages/libs/dota-ssr/architecture/package-boundaries-and-execution.md)\n\nRecords the packaging assessment, published-package snapshot, template/hydration findings, and standalone/Wrap execution examples. Its recommendations were written before the subsequent extraction visible in this working tree, so read them as a dated review.\n\n### [documentation/packages/libs/dota-ssr/architecture/source-layout.md](../../../../../documentation/packages/libs/dota-ssr/architecture/source-layout.md)\n\nMaps the package's source folders and public entries. It explains the division between browser hydration, build tooling, SSG, and request-time rendering; folder references need to track package extractions.\n\n### [documentation/packages/libs/dota-ssr/architecture/ssr-execution-flow.excalidraw](../../../../../documentation/packages/libs/dota-ssr/architecture/ssr-execution-flow.excalidraw)\n\nEditable scene for the request execution illustration. It contains the boxes, labels, and connectors used to explain the two entry paths.\n\n### [documentation/packages/libs/dota-ssr/architecture/ssr-execution-flow.svg](../../../../../documentation/packages/libs/dota-ssr/architecture/ssr-execution-flow.svg)\n\nViewable illustration showing explicit standalone inputs and Wrap capture converging on the same request/render/document pipeline.\n\n### [documentation/packages/libs/dota-ssr/architecture/template-hydration-flow.excalidraw](../../../../../documentation/packages/libs/dota-ssr/architecture/template-hydration-flow.excalidraw)\n\nEditable scene for the template/hydration illustration. Use it to adjust the diagram's layout or wording; its SVG companion must be updated separately.\n\n### [documentation/packages/libs/dota-ssr/architecture/template-hydration-flow.svg](../../../../../documentation/packages/libs/dota-ssr/architecture/template-hydration-flow.svg)\n\nViewable illustration connecting shared templates to server serialization and the existing browser hydration/update engine.\n\n### [documentation/packages/libs/dota-ssr/performance/render-mode-benchmark-2026-10-17.md](../../../../../documentation/packages/libs/dota-ssr/performance/render-mode-benchmark-2026-10-17.md)\n\nRecords measurements comparing mixed rendering, SSG, SSR, and CSR across three applications. It describes the benchmark setup, build costs, request performance, and browser loading observations.\n\n### [documentation/packages/libs/dota-ssr/performance/ssr-request-render-benchmark-2026-10-15.md](../../../../../documentation/packages/libs/dota-ssr/performance/ssr-request-render-benchmark-2026-10-15.md)\n\nRecords earlier experiments with request-time rendering and bundling. Its statements about features not yet implemented describe the state at the time of that experiment.\n\n### [documentation/packages/libs/dota-ssr/planning/buffered-ssr-and-edge-cache.md](../../../../../documentation/packages/libs/dota-ssr/planning/buffered-ssr-and-edge-cache.md)\n\nKeeps the longer-term plan for buffered SSR and caching, with a link to the string-rendering implementation. Planned cache/lifecycle work should not be read as already shipped.\n\n### [documentation/packages/libs/dota-ssr/planning/dom-free-component-rendering-analysis.md](../../../../../documentation/packages/libs/dota-ssr/planning/dom-free-component-rendering-analysis.md)\n\nContains the original investigation into rendering components without Happy DOM. It explains reusable framework pieces and missing capabilities before the later implementation existed.\n\n### [packages/libs/dota-core/CHANGELOG.md](../../../../../packages/libs/dota-core/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/libs/dota-core/package.json](../../../../../packages/libs/dota-core/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [packages/libs/dota-rendering/package.json](../../../../../packages/libs/dota-rendering/package.json)\n\nContains Rendering's package identity, dependencies, scripts, output files, and export map. The added `./server` map points ESM/CommonJS and TypeScript consumers to the new serialization entry.\n\n### [packages/libs/dota-rendering/tsconfig.json](../../../../../packages/libs/dota-rendering/tsconfig.json)\n\nConfigures Rendering's source/test TypeScript checks. The addition maps the package's own root name to `src/main.ts`, so server source importing `@ayu-sh-kr/dota-rendering` checks against the current source contract rather than stale built declarations.\n\n### [packages/libs/dota-rendering/vite.config.ts](../../../../../packages/libs/dota-rendering/vite.config.ts)\n\nBuilds root and server runtime entries in ESM and CommonJS. The server entry's package-name import of the root is externalized so it reuses the root runtime and identity values rather than bundling a second copy.\n\n### [packages/libs/dota-rendering/vitest.config.ts](../../../../../packages/libs/dota-rendering/vitest.config.ts)\n\nRuns Rendering tests in Happy DOM and sets source/test aliases. The added exact-match alias for the package root makes server and browser code use the same current root module in tests, including identity values and template types.\n\n### [packages/libs/dota-router/CHANGELOG.md](../../../../../packages/libs/dota-router/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/libs/dota-router/package.json](../../../../../packages/libs/dota-router/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [packages/libs/dota-runtime/CHANGELOG.md](../../../../../packages/libs/dota-runtime/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/libs/dota-runtime/package.json](../../../../../packages/libs/dota-runtime/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [packages/libs/dota-server-dom/README.md](../../../../../packages/libs/dota-server-dom/README.md)\n\nContains the public explanation, installation command, entry-point table, and usage example for the extracted server DOM package. It explains how to install module-time globals before importing component classes and how to run work inside a request scope.\n\n### [packages/libs/dota-server-dom/package.json](../../../../../packages/libs/dota-server-dom/package.json)\n\nDefines the new `@ayu-sh-kr/dota-server-dom` workspace package, its initial version, publication files, commands, Node engine requirement, and three public entries.\n\n### [packages/libs/dota-server-dom/tsconfig.json](../../../../../packages/libs/dota-server-dom/tsconfig.json)\n\nConfigures strict TypeScript checks for source, tests, and package configuration. DOM types describe browser-shaped APIs while Node types cover request scoping.\n\n### [packages/libs/dota-server-dom/vite.config.ts](../../../../../packages/libs/dota-server-dom/vite.config.ts)\n\nBuilds the pure, install, and Node entries separately and emits their type declarations. Keeping installation as an explicit entry preserves its required evaluation order.\n\n### [packages/libs/dota-server-dom/vitest.config.ts](../../../../../packages/libs/dota-server-dom/vitest.config.ts)\n\nRuns the package's tests in a Node environment and defines local source/test aliases and coverage settings.\n\n### [packages/libs/dota-ssr/CHANGELOG.md](../../../../../packages/libs/dota-ssr/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/libs/dota-ssr/README.md](../../../../../packages/libs/dota-ssr/README.md)\n\nContains SSR's public introduction and usage documentation. The branch adds request-time string-rendering examples, the explicit server entry, `serverLoad` guidance, render-mode behavior, and the playground command.\n\n### [packages/libs/dota-ssr/package.json](../../../../../packages/libs/dota-ssr/package.json)\n\nContains SSR's dependencies, build/test/playground scripts, and public root/Vite/worker/server/Node entries. The branch adds the `/server` and `/node` output maps, playground command, and workspace dependency on `dota-server-dom`.\n\n### `packages/libs/dota-ssr/src/ssr/.gitkeep` (deleted)\n\nDeleted placeholder. The SSR directory now contains implementation files, so it no longer needs an empty file to keep the directory in Git.\n\n### [packages/libs/dota-ssr/tsconfig.json](../../../../../packages/libs/dota-ssr/tsconfig.json)\n\nEnables legacy TypeScript decorators so the package can type-check the decorated components used in its SSR fixtures.\n\n### [packages/libs/dota-ssr/vite.config.ts](../../../../../packages/libs/dota-ssr/vite.config.ts)\n\nBuilds the browser root, Vite entry, SSG worker, SSR server entry, Node host entry, and local server-global setup chunk. It emits ESM/CommonJS plus declarations.\n\n### [packages/libs/dota-wrap/CHANGELOG.md](../../../../../packages/libs/dota-wrap/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/libs/dota-wrap/package.json](../../../../../packages/libs/dota-wrap/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [packages/libs/dota-wrap/vitest.config.ts](../../../../../packages/libs/dota-wrap/vitest.config.ts)\n\nExcludes fixture source files from direct test discovery. The fixture is built by the deployment test instead of being treated as a collection of test modules.\n\n### [packages/plugins/dota-vite-preloader/CHANGELOG.md](../../../../../packages/plugins/dota-vite-preloader/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/plugins/dota-vite-preloader/package.json](../../../../../packages/plugins/dota-vite-preloader/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [packages/plugins/web-type-json/CHANGELOG.md](../../../../../packages/plugins/web-type-json/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/plugins/web-type-json/package.json](../../../../../packages/plugins/web-type-json/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [packages/ui/dota-md/CHANGELOG.md](../../../../../packages/ui/dota-md/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/ui/dota-md/package.json](../../../../../packages/ui/dota-md/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [packages/ui/dota-ui/CHANGELOG.md](../../../../../packages/ui/dota-ui/CHANGELOG.md)\n\nContains the package's released-change history. Relative to local `master`, this checkout lacks a newer release entry; this is a release-history difference, not an SSR implementation change in this file.\n\n### [packages/ui/dota-ui/package.json](../../../../../packages/ui/dota-ui/package.json)\n\nContains package identity, version, dependencies, scripts, and public entry configuration. In this comparison its change is the version value relative to local `master`; it does not add runtime behavior or a new public entry.\n\n### [pnpm-lock.yaml](../../../../../pnpm-lock.yaml)\n\nRecords workspace dependency resolution, including the new server DOM package's tooling. It keeps installations reproducible as package boundaries change.\n\n\n## Appendix D. Learning collection and docs integration\n\nThese files provide the beginner reading path and its presentation. They do not add another SSR engine. The SVGs are canonical package documentation assets, embedded by the docs loader without duplicating them into public content. Their title/description, responsive viewBox, semantic-color fallbacks, and arrow legend keep them accessible and usable both standalone and in Dota Web.\n\n### [packages/apps/dota-web/src/components/docs/docs-view.component.ts](../../../../../packages/apps/dota-web/src/components/docs/docs-view.component.ts)\n\nComposes the docs shell, grouped navigation, Markdown view, loading state, TOC, and previous/next links. `loadDoc()` skips an already prerendered article; `doc` selects metadata; `renderNav()`, `renderSkeleton()`, `renderNotFound()`, `renderPager()`, and `render()` build their named regions. Both navigation scroll areas opt into the hidden-scrollbar utility without disabling overflow; the left navigation remains keyboard-focusable.\n\n### [packages/apps/dota-web/src/style.css](../../../../../packages/apps/dota-web/src/style.css)\n\nImports the shared theme and component styles, then defines app utilities. The `no-scrollbar` utility now also covers descendant `overflow-y-auto` containers, because the Markdown TOC has both an outer aside and an inner scroll container. It hides the scrollbar chrome with Firefox/Chromium-compatible rules while preserving scrolling.\n\n### [packages/apps/dota-web/test/components/docs/docs-view.component.test.ts](../../../../../packages/apps/dota-web/test/components/docs/docs-view.component.test.ts)\n\nExercises active navigation, neighboring pages, loading/publishing Markdown, reuse of prerendered content, unknown slugs, and the hidden-scrollbar hooks. Its `mount()` helper connects a real docs component and waits for asynchronous initialization.\n\n### [packages/apps/dota-web/test/service/doc-loader.service.test.ts](../../../../../packages/apps/dota-web/test/service/doc-loader.service.test.ts)\n\nTests local collection loading, the full reference, repository-link rewriting, registered lesson links, accessible SVG embedding, and preservation of the content after a diagram in the SSG DOM. Also verifies the ordered registry and public document/resource/blog requests, including fetch failure propagation.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssg-ssr-csr.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssg-ssr-csr.md)\n\nThe collection entry point at `/docs/ssg-ssr-csr`. Contains the reading order, estimated reading times, the three producer timelines, key distinctions, and the link to this implementation reference.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssr-html-first.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-html-first.md)\n\nLesson 1 builds the request/response model from scratch. Contains HTTP/HTML examples, CSR/SSR/SSG comparisons, route-mode syntax, a comprehension check, and the distinction between HTML delivery and interactivity.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssr-component.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-component.md)\n\nLesson 2 presents the complete task page used throughout the course. Explains decorators, typed properties, server versus browser initialization, transfer through attributes, syntax symbols, and an optional API-loading method.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssr-request.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-request.md)\n\nLesson 3 follows a matched request through capture, matching, fresh context, fresh instances, recursive rendering, SEO, document outlets, and a buffered response. Links the orchestrating functions in execution order.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssr-templates.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-templates.md)\n\nLesson 4 separates the shared template contract from the server writer and browser renderer. Contains escaping examples, tokenizer/plan explanations, a marker legend, version boundaries, and raw-HTML safety notes.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssr-static-build.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-static-build.md)\n\nLesson 5 follows concrete URLs through build-time Happy DOM execution. Contains route configuration, readiness/settling examples, API-base guidance, output mappings, worker/cache boundaries, cleanup behavior, and the existing build command.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssr-hydration.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-hydration.md)\n\nLesson 6 explains registration order, mounting, adoption, and deferred root/page rendering separately. Contains plugin setup, a client-only before/after HTML example, browser event/update code, and mismatch recovery. It replaces ambiguous “empty handoff” language with an explicit empty host and its later contents.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssr-hosting.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-hosting.md)\n\nLesson 7 compares Wrap composition with direct standalone request-handler setup. Contains build/start commands, Node static-first selection, mixed SSG/SSR/CSR examples, response failure boundaries, and platform-specific deployment notes.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssr-package-map.md](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssr-package-map.md)\n\nLesson 8 maps responsibilities across Wrap, SSR, Rendering, Core, Router, Runtime, and Server DOM. Contains the minimal-environment contract, asynchronous request isolation, release-status cautions, debugging checkpoints, and the complete end-to-end recap.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/rendering-modes.svg](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/rendering-modes.svg)\n\nThe three-timeline illustration reused by the overview and first lesson. Shows when CSR, SSR, and SSG produce page content; its arrows show ordered work rather than elapsed durations.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/request-flow.svg](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/request-flow.svg)\n\nThe matched-request spine. Separates cached declaration capture from per-request matching, fresh hosts, document composition, and the final HTML response.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/ssg-flow.svg](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/ssg-flow.svg)\n\nThe static-build spine. Shows concrete route selection, a fresh Happy DOM window, ordinary app startup, readiness/settling, and file output.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/browser-flow.svg](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/browser-flow.svg)\n\nThe browser-startup branch illustration. Distinguishes deferred initial root/page output, compatible host adoption, normal/client-only mounting, and invalid-marker recovery. The caption explicitly says these are branches, not sequential steps.\n\n### [documentation/packages/libs/dota-ssr/architecture/learning/hosting-flow.svg](../../../../../documentation/packages/libs/dota-ssr/architecture/learning/hosting-flow.svg)\n\nThe successful Node page-selection flow. Shows static-file precedence, then SSR, then the CSR shell, with labeled yes/no branches. Failure statuses remain explained in the accompanying lesson.\n").replace(/!\[[^\]]*\]\(\.\/([a-z-]+\.svg)\)/g, (image, name) => {
-				const diagram = Object.entries(renderingDiagrams).find(([path]) => path.endsWith(`/${name}`))?.[1];
-				return diagram ? `<figure>${diagram.replaceAll("\n", "")}</figure>` : image;
-			}).replaceAll("](../../../../../../", "](https://github.com/ayu-sh-kr/dota-workspace/blob/feat/light-dom-ssr/").replaceAll("](../../../../../", "](https://github.com/ayu-sh-kr/dota-workspace/blob/feat/light-dom-ssr/");
-			return (await this.restClient.get().uri(`/docs/${slug}.md`).retrieve().toResponse()).text();
-		}
-		async loadResource(path) {
-			return (await this.restClient.get().uri(`/materials/${path}`).retrieve().toResponse()).text();
-		}
-		async loadBlog(path) {
-			return (await this.restClient.get().uri(`/blogs/${path}`).retrieve().toResponse()).text();
-		}
-	};
-}));
-//#endregion
-//#region src/components/blogs/blog-view.component.ts
-var BlogViewComponent;
-var init_blog_view_component = __esmMin((() => {
-	init_core$1();
-	init_doc_loader_service();
-	init_dota_md();
-	init_event();
-	init_blog_route_utils();
-	init_rendering();
-	init_decorate();
-	BlogViewComponent = class BlogViewComponent extends BaseElement {
-		docLoader;
-		currentBlog = "";
-		/** Theme passed through to <md-view>. Default: 'apple'. */
-		theme = "apple";
-		/** Color passed through to <md-view>. Default: 'lime'. */
-		color = "lime";
-		/** max-width passed through to <md-view>. Default: 'max-w-3xl'. */
-		maxWidth = "max-w-3xl";
-		constructor() {
-			super();
-			this.docLoader = new DocLoaderService();
-		}
-		/** Loads the route's Markdown document and renders it after the component connects. */
-		async afterViewInit() {
-			if (this.querySelector("[data-md-content]")?.textContent?.trim()) return;
-			const { blog, category } = resolveBlogRouteParams(window.location.pathname, window.location.search);
-			if (blog && category) {
-				this.currentBlog = blog.trim();
-				this.updateHTML();
-				const raw = await this.docLoader.loadBlog(`${category.toLowerCase()}/${blog}`);
-				MDService.render(raw, { publish: true });
-			}
-		}
-		render() {
-			const routeBlog = resolveBlogRouteParams(window.location.pathname, window.location.search).blog;
-			const blogLabel = (this.currentBlog || routeBlog || "Blog").replace(/\.md$/i, "").replace(/-/g, " ");
-			return html`
-      <section class="mx-auto w-full max-w-screen-2xl px-3 py-12 sm:px-5 lg:px-8">
-        <dota-breadcrumb
-          path='${JSON.stringify([
-				{
-					id: "home",
-					label: "Home",
-					href: "/"
-				},
-				{
-					id: "blogs",
-					label: "Blogs",
-					href: "/blogs"
-				},
-				{
-					id: "current-blog",
-					label: blogLabel
-				}
-			])}'
-          label="Blog breadcrumb"
-          class="mb-8 block">
-        </dota-breadcrumb>
-        <div class="flex w-full flex-col xl:flex-row xl:items-start xl:gap-8">
-          <div class="min-w-0 flex-1 ${this.maxWidth}" style="overflow-anchor: none;">
-            <md-view theme="${this.theme}" color="${this.color}"></md-view>
-            <blog-suggestion current-blog="${this.currentBlog}" limit="3"></blog-suggestion>
-          </div>
-          <aside class="hidden xl:block shrink-0 self-start sticky top-16">
-            <md-toc
-              theme="${this.theme}"
-              color="${this.color}"
-              header-height="64"
-              mode="sticky">
-            </md-toc>
-          </aside>
-        </div>
-      </section>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "current-blog",
-		type: StringType
-	})], BlogViewComponent.prototype, "currentBlog", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "theme",
-		type: StringType
-	})], BlogViewComponent.prototype, "theme", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "color",
-		type: StringType
-	})], BlogViewComponent.prototype, "color", void 0);
-	__decorate$2([PropertyDecorator({
-		name: "max-width",
-		type: StringType
-	})], BlogViewComponent.prototype, "maxWidth", void 0);
-	__decorate$2([OnEventDecorator$1("connected", true)], BlogViewComponent.prototype, "afterViewInit", null);
-	BlogViewComponent = __decorate$2([ComponentDecorator({
-		selector: "blog-view",
-		shadow: false
-	})], BlogViewComponent);
-}));
-//#endregion
 //#region src/components/docs/appearance-menu.ts
 /**
 * Closes the menu rendered by `host` when a click lands outside it. Because every menu does
@@ -33158,9 +33720,9 @@ function selectMenuOption(host, value) {
 var MENU_TRIGGER, MENU_PANEL, menuChevron;
 var init_appearance_menu = __esmMin((() => {
 	init_rendering();
-	MENU_TRIGGER = "flex h-8 cursor-pointer list-none items-center gap-2 rounded-md border border-gray-200 px-2.5 text-xs font-medium text-gray-700 select-none hover:bg-gray-50 group-open:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 dark:group-open:bg-gray-800 [&::-webkit-details-marker]:hidden";
-	MENU_PANEL = "absolute right-0 top-full z-50 mt-2 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg dark:border-gray-700 dark:bg-gray-900";
-	menuChevron = () => html`<svg class="h-3 w-3 text-gray-400 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z"/></svg>`;
+	MENU_TRIGGER = "button-secondary button-compact list-none select-none group-open:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden";
+	MENU_PANEL = "absolute right-0 top-full z-50 mt-2 rounded-card border border-default bg-surface p-1.5 shadow-lg";
+	menuChevron = () => html`<svg class="h-4 w-4 text-muted transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z"/></svg>`;
 }));
 //#endregion
 //#region src/components/docs/docs-accent-picker.component.ts
@@ -33231,7 +33793,7 @@ var init_docs_accent_picker_component = __esmMin((() => {
 			return html`
       <details class="group relative">
         <summary class="${MENU_TRIGGER}" aria-label="Accent color">
-          <span data-current class="${DOT} ${ACCENTS[DEFAULT_ACCENT]}"></span>Accent${menuChevron()}
+          <span data-current class="${DOT} ${ACCENTS[DEFAULT_ACCENT]}"></span><span class="hidden sm:inline">Accent</span>${menuChevron()}
         </summary>
         <div class="${MENU_PANEL} grid w-max grid-cols-4 gap-3 p-3">
           ${Object.entries(ACCENTS).map(([color, swatch]) => html`
@@ -33396,6 +33958,24 @@ var init_docs_view_component = __esmMin((() => {
 			if (!doc || this.querySelector("[data-md-content] > *")) return;
 			MDService.render(await this.loader.loadDoc(doc.slug), { publish: true });
 		}
+		/**
+		* Closes the floating document list when the reader clicks elsewhere.
+		* @param event Document click used to identify clicks outside the menu.
+		*/
+		closeMobileNavOnOutsideClick(event) {
+			const menu = this.querySelector("[data-mobile-doc-nav]");
+			if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+		}
+		/**
+		* Closes the document list on Escape and returns focus to its trigger.
+		* @param event Document key press while the menu may be open.
+		*/
+		closeMobileNavOnEscape(event) {
+			const menu = this.querySelector("[data-mobile-doc-nav]");
+			if (event.key !== "Escape" || !menu?.open) return;
+			menu.open = false;
+			menu.querySelector("summary")?.focus();
+		}
 		get doc() {
 			return DOCS.find((doc) => doc.slug === this.slug);
 		}
@@ -33482,8 +34062,8 @@ var init_docs_view_component = __esmMin((() => {
           <div class="mx-auto flex h-14 max-w-screen-2xl items-center justify-between gap-3 px-4 lg:px-6">
             <div class="flex min-w-0 items-center gap-2 text-sm">
               <a href="/" class="text-lg font-extrabold">Dota</a>
-              <span class="text-gray-300 dark:text-gray-600">/</span>
-              <a href="${docUrl(DOCS[0].slug)}" class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">Docs</a>
+              <span class="hidden text-gray-300 sm:inline dark:text-gray-600">/</span>
+              <a href="${docUrl(DOCS[0].slug)}" class="hidden text-gray-500 hover:text-gray-900 sm:inline dark:text-gray-400 dark:hover:text-gray-100">Docs</a>
             </div>
             <div class="flex shrink-0 items-center gap-1.5">
               <docs-theme-picker></docs-theme-picker>
@@ -33500,10 +34080,23 @@ var init_docs_view_component = __esmMin((() => {
           </aside>
 
           <main class="min-w-0 px-4 py-8 sm:px-8 lg:px-12">
-            <details class="mb-6 rounded-lg border border-gray-200 lg:hidden dark:border-gray-800">
-              <summary class="cursor-pointer px-4 py-2.5 text-sm font-medium">${doc?.section ?? "Docs"} · ${doc?.title ?? "Menu"}</summary>
-              <div class="border-t border-gray-200 px-2 py-4 dark:border-gray-800">${this.renderNav()}</div>
-            </details>
+            <div class="mx-auto mb-6 max-w-3xl lg:hidden">
+              <details data-mobile-doc-nav class="group relative w-fit max-w-full">
+                <summary class="button-secondary button-compact list-none select-none group-open:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden"
+                         aria-label="Browse documentation pages">
+                  <svg class="size-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M4 5h12M4 10h12M4 15h8"/>
+                  </svg>
+                  Browse docs
+                  <svg class="size-4 text-muted transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.3 7.3a1 1 0 011.4 0L10 10.6l3.3-3.3a1 1 0 111.4 1.4l-4 4a1 1 0 01-1.4 0l-4-4a1 1 0 010-1.4z"/>
+                  </svg>
+                </summary>
+                <div class="absolute left-0 top-full z-30 mt-2 max-h-[70dvh] w-[calc(100vw-2rem)] max-w-sm overflow-y-auto overscroll-contain rounded-card border border-default bg-surface p-4 shadow-lift sm:w-96">
+                  ${this.renderNav()}
+                </div>
+              </details>
+            </div>
 
             <article class="group/article mx-auto max-w-3xl">
               ${doc ? html`
@@ -33526,6 +34119,8 @@ var init_docs_view_component = __esmMin((() => {
 		type: StringType
 	})], DocsViewComponent.prototype, "slug", void 0);
 	__decorate$2([OnEventDecorator$1("connected", true)], DocsViewComponent.prototype, "loadDoc", null);
+	__decorate$2([DocumentListenerDecorator({ event: "click" })], DocsViewComponent.prototype, "closeMobileNavOnOutsideClick", null);
+	__decorate$2([DocumentListenerDecorator({ event: "keydown" })], DocsViewComponent.prototype, "closeMobileNavOnEscape", null);
 	DocsViewComponent = __decorate$2([ComponentDecorator({
 		selector: "docs-view",
 		shadow: false
@@ -34552,10 +35147,12 @@ var init_navigation_sidebar_component = __esmMin((() => {
 }));
 //#endregion
 //#region src/components/utils/icons.component.ts
-var IconsComponent;
+var logger$1, IconsComponent;
 var init_icons_component = __esmMin((() => {
 	init_core$1();
+	init_dist();
 	init_decorate();
+	logger$1 = createDotaLogger$1("dota-web", "components/utils/icons.component.ts");
 	IconsComponent = class IconsComponent extends BaseElement {
 		name;
 		color;
@@ -34583,7 +35180,7 @@ var init_icons_component = __esmMin((() => {
 					if (svgPath) svgPath.setAttribute("fill", "currentColor");
 				}
 			} else {
-				console.warn("Invalid Icon Name");
+				logger$1.warn(`Could not load icon "${this.name}" (HTTP ${response.status})`);
 				this.innerHTML = "";
 			}
 		}
@@ -38486,163 +39083,6 @@ var init_tool_list_item_component = __esmMin((() => {
 	})], ToolListItemComponent);
 }));
 //#endregion
-//#region src/components/utils/buttons/ai-button.component.ts
-var AiButtonComponent;
-var init_ai_button_component = __esmMin((() => {
-	init_core$1();
-	init_main();
-	init_decorate();
-	AiButtonComponent = class AiButtonComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		hostClickListener() {
-			routerService.route("/chat");
-		}
-		render() {
-			return `
-      <span id="github-button" class="active:scale-95 cursor-pointer">
-        <a target="_blank">
-            <dota-icon name="healthicons:artificial-intelligence" color="pink" variant="ghost" size="md"/>
-        </a>
-      </span>
-    `;
-		}
-	};
-	__decorate$2([HostListenerDecorator({ event: "click" })], AiButtonComponent.prototype, "hostClickListener", null);
-	AiButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "ai-button",
-		shadow: false
-	})], AiButtonComponent);
-}));
-//#endregion
-//#region src/components/utils/buttons/dark-mode-button.component.ts
-var DarkModeButtonComponent;
-var init_dark_mode_button_component = __esmMin((() => {
-	init_core$1();
-	init_GeneralUtils();
-	init_decorate();
-	DarkModeButtonComponent = class DarkModeButtonComponent extends BaseElement {
-		color = "purple";
-		constructor() {
-			super();
-		}
-		handleDark() {
-			GeneralUtils.toggleDarkMode();
-		}
-		handleThemeChange() {
-			this.updateHTML();
-		}
-		render() {
-			const isDarkTheme = GeneralUtils.isDarkMode();
-			return `
-      <button id="dark-button" type="button"
-              class="inline-flex size-9 items-center justify-center rounded-full text-primary hover:bg-raised
-                      active:scale-95 cursor-pointer"
-              aria-label="Switch to ${isDarkTheme ? "light" : "dark"} mode">
-        <dota-icon name="${isDarkTheme ? "material-symbols:dark-mode" : "material-symbols:sunny-rounded"}" color="${this.color}" variant="ghost" size="md"></dota-icon>
-      </button>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "color",
-		type: StringType
-	})], DarkModeButtonComponent.prototype, "color", void 0);
-	__decorate$2([BindEventDecorator({
-		event: "click",
-		id: "#dark-button"
-	})], DarkModeButtonComponent.prototype, "handleDark", null);
-	__decorate$2([WindowListenerDecorator({ event: "themeChange" })], DarkModeButtonComponent.prototype, "handleThemeChange", null);
-	DarkModeButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "dark-mode-button",
-		shadow: false
-	})], DarkModeButtonComponent);
-}));
-//#endregion
-//#region src/components/utils/buttons/github-button.component.ts
-var GithubButtonComponent;
-var init_github_button_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	GithubButtonComponent = class GithubButtonComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		render() {
-			return `
-      <span id="github-button" class="active:scale-95 cursor-pointer">
-        <a href="https://github.com/ayu-sh-kr" target="_blank">
-            <dota-icon name="mdi:github" color="none" variant="ghost" size="md"/>
-        </a>
-      </span>
-    `;
-		}
-	};
-	GithubButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "github-button",
-		shadow: false
-	})], GithubButtonComponent);
-}));
-//#endregion
-//#region src/components/utils/buttons/ham-burger-button.component.ts
-var HamBurgerButtonComponent;
-var init_ham_burger_button_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	HamBurgerButtonComponent = class HamBurgerButtonComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		handleToggle() {
-			const sidebar = document.querySelector("navigation-sidebar");
-			if (sidebar) sidebar.visible = !sidebar.visible;
-		}
-		render() {
-			return `
-      <button id="ham-button" class="md:hidden flex items-center justify-center active:scale-95">
-        <dota-icon name="solar:hamburger-menu-linear" color="gray" variant="ghost" size="md"></dota-icon>
-      </button>
-    `;
-		}
-	};
-	__decorate$2([HostListenerDecorator({ event: "click" })], HamBurgerButtonComponent.prototype, "handleToggle", null);
-	HamBurgerButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "ham-burger-button",
-		shadow: false
-	})], HamBurgerButtonComponent);
-}));
-//#endregion
-//#region src/components/utils/buttons/scroll-bottom-button.component.ts
-var ScrollBottomButtonComponent;
-var init_scroll_bottom_button_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	ScrollBottomButtonComponent = class ScrollBottomButtonComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		handleScroll() {
-			window.scrollTo({
-				top: document.body.scrollHeight,
-				behavior: "smooth"
-			});
-		}
-		render() {
-			return `
-      <div id="scroll-bottom-button" class="fixed bottom-4 right-4 cursor-pointer">
-        <dota-icon name="material-symbols:arrow-circle-down" color="purple" variant="ghost" size="xl"/>
-      </div>
-    `;
-		}
-	};
-	__decorate$2([HostListenerDecorator({ event: "click" })], ScrollBottomButtonComponent.prototype, "handleScroll", null);
-	ScrollBottomButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "scroll-bottom-button",
-		shadow: false
-	})], ScrollBottomButtonComponent);
-}));
-//#endregion
 //#region src/components/utils/footer/footer.component.ts
 var FooterComponent;
 var init_footer_component = __esmMin((() => {
@@ -38659,7 +39099,10 @@ var init_footer_component = __esmMin((() => {
           <div class="layout-card-grid">
             <!-- Logo and Copyright -->
             <div>
-              <h1 class="text-3xl font-semibold text-foreground text-start">Dota</h1>
+              <a href="/" class="inline-flex items-center gap-1 text-3xl font-semibold text-foreground hover:text-primary transition-colors">
+                <span class="app-footer-symbol" aria-hidden="true"></span>
+                Dota
+              </a>
             </div>
 
             <!-- Overview -->
@@ -38734,6 +39177,165 @@ var init_footer_component = __esmMin((() => {
 	})], FooterComponent);
 }));
 //#endregion
+//#region src/components/utils/buttons/ai-button.component.ts
+var AiButtonComponent;
+var init_ai_button_component = __esmMin((() => {
+	init_core$1();
+	init_main();
+	init_decorate();
+	AiButtonComponent = class AiButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		hostClickListener() {
+			routerService.route("/chat");
+		}
+		render() {
+			return `
+      <span id="github-button" class="active:scale-95 cursor-pointer">
+        <a target="_blank">
+            <dota-icon name="healthicons:artificial-intelligence" color="pink" variant="ghost" size="md"></dota-icon>
+        </a>
+      </span>
+    `;
+		}
+	};
+	__decorate$2([HostListenerDecorator({ event: "click" })], AiButtonComponent.prototype, "hostClickListener", null);
+	AiButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "ai-button",
+		shadow: false
+	})], AiButtonComponent);
+}));
+//#endregion
+//#region src/components/utils/buttons/dark-mode-button.component.ts
+var DarkModeButtonComponent;
+var init_dark_mode_button_component = __esmMin((() => {
+	init_core$1();
+	init_GeneralUtils();
+	init_decorate();
+	DarkModeButtonComponent = class DarkModeButtonComponent extends BaseElement {
+		color = "purple";
+		constructor() {
+			super();
+		}
+		handleDark() {
+			GeneralUtils.toggleDarkMode();
+		}
+		handleThemeChange() {
+			this.updateHTML();
+		}
+		render() {
+			const isDarkTheme = GeneralUtils.isDarkMode();
+			return `
+      <button id="dark-button" type="button"
+              class="inline-flex size-9 items-center justify-center rounded-full text-primary hover:bg-raised
+                      active:scale-95 cursor-pointer"
+              aria-label="Switch to ${isDarkTheme ? "light" : "dark"} mode">
+        <dota-icon name="${isDarkTheme ? "material-symbols:dark-mode" : "material-symbols:sunny-rounded"}" color="${this.color}" variant="ghost" size="lg"></dota-icon>
+      </button>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		name: "color",
+		type: StringType
+	})], DarkModeButtonComponent.prototype, "color", void 0);
+	__decorate$2([BindEventDecorator({
+		event: "click",
+		id: "#dark-button"
+	})], DarkModeButtonComponent.prototype, "handleDark", null);
+	__decorate$2([WindowListenerDecorator({ event: "themeChange" })], DarkModeButtonComponent.prototype, "handleThemeChange", null);
+	DarkModeButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "dark-mode-button",
+		shadow: false
+	})], DarkModeButtonComponent);
+}));
+//#endregion
+//#region src/components/utils/buttons/github-button.component.ts
+var GithubButtonComponent;
+var init_github_button_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	GithubButtonComponent = class GithubButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		render() {
+			return `
+      <span id="github-button" class="active:scale-95 cursor-pointer">
+        <a href="https://github.com/ayu-sh-kr" target="_blank"
+           class="inline-flex size-9 items-center justify-center rounded-full text-foreground hover:bg-raised"
+           aria-label="GitHub">
+            <dota-icon name="mdi:github" color="none" variant="ghost" size="lg"></dota-icon>
+        </a>
+      </span>
+    `;
+		}
+	};
+	GithubButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "github-button",
+		shadow: false
+	})], GithubButtonComponent);
+}));
+//#endregion
+//#region src/components/utils/buttons/ham-burger-button.component.ts
+var HamBurgerButtonComponent;
+var init_ham_burger_button_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	HamBurgerButtonComponent = class HamBurgerButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		handleToggle() {
+			const sidebar = document.querySelector("navigation-sidebar");
+			if (sidebar) sidebar.visible = !sidebar.visible;
+		}
+		render() {
+			return `
+      <button id="ham-button" class="md:hidden flex items-center justify-center active:scale-95">
+        <dota-icon name="solar:hamburger-menu-linear" color="gray" variant="ghost" size="md"></dota-icon>
+      </button>
+    `;
+		}
+	};
+	__decorate$2([HostListenerDecorator({ event: "click" })], HamBurgerButtonComponent.prototype, "handleToggle", null);
+	HamBurgerButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "ham-burger-button",
+		shadow: false
+	})], HamBurgerButtonComponent);
+}));
+//#endregion
+//#region src/components/utils/buttons/scroll-bottom-button.component.ts
+var ScrollBottomButtonComponent;
+var init_scroll_bottom_button_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	ScrollBottomButtonComponent = class ScrollBottomButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		handleScroll() {
+			window.scrollTo({
+				top: document.body.scrollHeight,
+				behavior: "smooth"
+			});
+		}
+		render() {
+			return `
+      <div id="scroll-bottom-button" class="fixed bottom-4 right-4 cursor-pointer">
+        <dota-icon name="material-symbols:arrow-circle-down" color="purple" variant="ghost" size="xl"/>
+      </div>
+    `;
+		}
+	};
+	__decorate$2([HostListenerDecorator({ event: "click" })], ScrollBottomButtonComponent.prototype, "handleScroll", null);
+	ScrollBottomButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "scroll-bottom-button",
+		shadow: false
+	})], ScrollBottomButtonComponent);
+}));
+//#endregion
 //#region src/components/utils/header/header.component.ts
 var HeaderComponent;
 var init_header_component = __esmMin((() => {
@@ -38767,8 +39369,9 @@ var init_header_component = __esmMin((() => {
                 <nav class="app-header-nav">
                      <div class="flex min-w-0 items-center px-2 sm:px-3">
                         <a href="/"
-                           class="inline-flex items-center rounded-full px-2 text-xl sm:text-2xl font-extrabold tracking-tight
+                           class="inline-flex items-center gap-1 rounded-full px-2 text-xl sm:text-2xl font-extrabold tracking-tight
                                    text-foreground transition-colors duration-200 hover:text-primary">
+                            <span class="app-header-symbol" aria-hidden="true"></span>
                             Dota
                         </a>
                      </div>
@@ -38787,7 +39390,7 @@ var init_header_component = __esmMin((() => {
 			}).join("")}
                          </ul>
                       </div>
-                      <div class="flex items-center gap-x-1 justify-end rounded-full bg-surface p-1
+                      <div class="app-header-actions flex items-center gap-x-1 justify-end rounded-full bg-surface p-1
                               backdrop-blur-xl">
                         <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <github-button></github-button>
@@ -38798,7 +39401,7 @@ var init_header_component = __esmMin((() => {
                         <span class="inline-flex size-9 items-center justify-center rounded-full">
                           <ai-button></ai-button>
                         </span>
-                        <span class="inline-flex size-9 items-center justify-center rounded-full">
+                        <span class="inline-flex size-9 items-center justify-center rounded-full md:hidden">
                           <ham-burger-button></ham-burger-button>
                         </span>
                       </div>
@@ -38837,6 +39440,86 @@ var init_section_header_component = __esmMin((() => {
 		selector: "section-header",
 		shadow: false
 	})], SectionHeaderComponent);
+}));
+//#endregion
+//#region src/components/utils/section/no-content.component.ts
+var NoContentComponent;
+var init_no_content_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	NoContentComponent = class NoContentComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		render() {
+			return `
+        <div class="grid sm:grid-cols-1 md:grid-cols-2 place-items-center overflow-hidden">
+            <div class="text-center py-10 font-semibold text-gray-700 dark:text-gray-300">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl">Oops!</h1>
+                <h3 class="text-purple-500 dark:text-purple-400">No Content At The Moment</h3>
+            </div>
+            <div class="">
+                <img src="/svgs/no-content.svg" alt="no-content.svg" class="bg-transparent">
+            </div>
+        </div>
+    `;
+		}
+	};
+	NoContentComponent = __decorate$2([ComponentDecorator({
+		selector: "no-content",
+		shadow: false
+	})], NoContentComponent);
+}));
+//#endregion
+//#region src/components/utils/wrapper/page-wrapper.component.ts
+var PageWrapperComponent;
+var init_page_wrapper_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	PageWrapperComponent = class PageWrapperComponent extends BaseElement {
+		content;
+		constructor() {
+			super();
+			this.content = this.innerHTML;
+		}
+		render() {
+			return `
+      <section class="font-dm mx-auto max-w-7xl px-3 py-2 mt-10">
+        ${this.content}
+      </section>
+    `;
+		}
+	};
+	PageWrapperComponent = __decorate$2([ComponentDecorator({
+		selector: "page-wrapper",
+		shadow: false
+	})], PageWrapperComponent);
+}));
+//#endregion
+//#region src/components/utils/wrapper/section-wrapper.component.ts
+var SectionWrapperComponent;
+var init_section_wrapper_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	SectionWrapperComponent = class SectionWrapperComponent extends BaseElement {
+		content;
+		constructor() {
+			super();
+			this.content = this.innerHTML;
+		}
+		render() {
+			return `
+      <section class="mt-10 font-dm">
+        ${this.content}
+      </section>
+    `;
+		}
+	};
+	__decorate$2([StateDecorator()], SectionWrapperComponent.prototype, "content", void 0);
+	SectionWrapperComponent = __decorate$2([ComponentDecorator({
+		selector: "section-wrapper",
+		shadow: false
+	})], SectionWrapperComponent);
 }));
 //#endregion
 //#region src/components/utils/notification/notification.component.ts
@@ -39017,86 +39700,6 @@ var init_notification_holder_component = __esmMin((() => {
 		selector: "notification-holder",
 		shadow: false
 	})], NotificationHolderComponent);
-}));
-//#endregion
-//#region src/components/utils/section/no-content.component.ts
-var NoContentComponent;
-var init_no_content_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	NoContentComponent = class NoContentComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		render() {
-			return `
-        <div class="grid sm:grid-cols-1 md:grid-cols-2 place-items-center overflow-hidden">
-            <div class="text-center py-10 font-semibold text-gray-700 dark:text-gray-300">
-                <h1 class="text-5xl md:text-6xl lg:text-7xl">Oops!</h1>
-                <h3 class="text-purple-500 dark:text-purple-400">No Content At The Moment</h3>
-            </div>
-            <div class="">
-                <img src="/svgs/no-content.svg" alt="no-content.svg" class="bg-transparent">
-            </div>
-        </div>
-    `;
-		}
-	};
-	NoContentComponent = __decorate$2([ComponentDecorator({
-		selector: "no-content",
-		shadow: false
-	})], NoContentComponent);
-}));
-//#endregion
-//#region src/components/utils/wrapper/page-wrapper.component.ts
-var PageWrapperComponent;
-var init_page_wrapper_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	PageWrapperComponent = class PageWrapperComponent extends BaseElement {
-		content;
-		constructor() {
-			super();
-			this.content = this.innerHTML;
-		}
-		render() {
-			return `
-      <section class="font-dm mx-auto max-w-7xl px-3 py-2 mt-10">
-        ${this.content}
-      </section>
-    `;
-		}
-	};
-	PageWrapperComponent = __decorate$2([ComponentDecorator({
-		selector: "page-wrapper",
-		shadow: false
-	})], PageWrapperComponent);
-}));
-//#endregion
-//#region src/components/utils/wrapper/section-wrapper.component.ts
-var SectionWrapperComponent;
-var init_section_wrapper_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	SectionWrapperComponent = class SectionWrapperComponent extends BaseElement {
-		content;
-		constructor() {
-			super();
-			this.content = this.innerHTML;
-		}
-		render() {
-			return `
-      <section class="mt-10 font-dm">
-        ${this.content}
-      </section>
-    `;
-		}
-	};
-	__decorate$2([StateDecorator()], SectionWrapperComponent.prototype, "content", void 0);
-	SectionWrapperComponent = __decorate$2([ComponentDecorator({
-		selector: "section-wrapper",
-		shadow: false
-	})], SectionWrapperComponent);
 }));
 //#endregion
 //#region src/components/home/utils/code-snippet/code-snippet.component.ts
@@ -39294,6 +39897,12 @@ var init_tab_holder_component = __esmMin((() => {
 var _virtual_dota_components_default;
 var init__virtual_dota_components = __esmMin((() => {
 	init_app_component();
+	init_blog_icon_component();
+	init_blog_pagination_component();
+	init_blog_preview_component();
+	init_blog_section_component();
+	init_blog_suggestion_component();
+	init_blog_view_component();
 	init_ai_form_component();
 	init_message_box_component();
 	init_message_card_component();
@@ -39301,12 +39910,6 @@ var init__virtual_dota_components = __esmMin((() => {
 	init_community_component();
 	init_social_button_component();
 	init_social_section_component();
-	init_blog_icon_component();
-	init_blog_pagination_component();
-	init_blog_preview_component();
-	init_blog_section_component();
-	init_blog_suggestion_component();
-	init_blog_view_component();
 	init_docs_accent_picker_component();
 	init_docs_theme_picker_component();
 	init_docs_view_component();
@@ -39336,19 +39939,19 @@ var init__virtual_dota_components = __esmMin((() => {
 	init_our_tools_component();
 	init_tool_detail_component();
 	init_tool_list_item_component();
+	init_footer_component();
 	init_ai_button_component();
 	init_dark_mode_button_component();
 	init_github_button_component();
 	init_ham_burger_button_component();
 	init_scroll_bottom_button_component();
-	init_footer_component();
 	init_header_component();
 	init_section_header_component();
-	init_notification_holder_component();
-	init_notification_component();
 	init_no_content_component();
 	init_page_wrapper_component();
 	init_section_wrapper_component();
+	init_notification_holder_component();
+	init_notification_component();
 	init_code_snippet_component();
 	init_device_preview_component();
 	init_get_started_button_component();
@@ -39363,6 +39966,12 @@ var init__virtual_dota_components = __esmMin((() => {
 	init_home_page();
 	_virtual_dota_components_default = [
 		AppComponent,
+		BlogIconComponent,
+		BlogPaginationComponent,
+		BlogPreviewComponent,
+		BlogSectionComponent,
+		BlogSuggestionComponent,
+		BlogViewComponent,
 		AiFormComponent,
 		MessageBoxComponent,
 		MessageCardComponent,
@@ -39370,12 +39979,6 @@ var init__virtual_dota_components = __esmMin((() => {
 		CommunityComponent,
 		SocialButtonComponent,
 		SocialSectionComponent,
-		BlogIconComponent,
-		BlogPaginationComponent,
-		BlogPreviewComponent,
-		BlogSectionComponent,
-		BlogSuggestionComponent,
-		BlogViewComponent,
 		DocsAccentPickerComponent,
 		DocsThemePickerComponent,
 		DocsViewComponent,
@@ -39406,19 +40009,19 @@ var init__virtual_dota_components = __esmMin((() => {
 		OurToolsComponent,
 		ToolDetailComponent,
 		ToolListItemComponent,
+		FooterComponent,
 		AiButtonComponent,
 		DarkModeButtonComponent,
 		GithubButtonComponent,
 		HamBurgerButtonComponent,
 		ScrollBottomButtonComponent,
-		FooterComponent,
 		HeaderComponent,
 		SectionHeaderComponent,
-		NotificationHolderComponent,
-		NotificationComponent,
 		NoContentComponent,
 		PageWrapperComponent,
 		SectionWrapperComponent,
+		NotificationHolderComponent,
+		NotificationComponent,
 		CodeSnippetComponent,
 		DevicePreviewComponent,
 		GetStartedButtonComponent,
@@ -39593,13 +40196,12 @@ var init__virtual_dota_routes = __esmMin((() => {
 	routeConfig = [
 		{
 			path: "/blogs/content/:category/:blog",
-			component: BlogContentPage,
-			mode: "ssr"
+			component: BlogContentPage
 		},
 		{
 			path: "/blogs",
 			component: BlogPage,
-			mode: "ssr"
+			mode: "ssg"
 		},
 		{
 			path: "/chat",
@@ -39613,12 +40215,13 @@ var init__virtual_dota_routes = __esmMin((() => {
 		},
 		{
 			path: "/docs/:slug",
-			component: DocsPage
+			component: DocsPage,
+			mode: "ssr"
 		},
 		{
 			path: "/docs",
 			component: DocsIndexPage,
-			mode: "ssg"
+			mode: "ssr"
 		},
 		{
 			path: "/error",
@@ -39798,7 +40401,7 @@ function hydrationMismatch(host, cause) {
 var LEGACY_ROUTE_TEMPLATE_VERSION;
 var init_ssr = __esmMin((() => {
 	init_dist$4();
-	init_dist$6();
+	init_dist$7();
 	LEGACY_ROUTE_TEMPLATE_VERSION = 2;
 }));
 //#endregion
@@ -45165,7 +45768,7 @@ var main_exports = /* @__PURE__ */ __exportAll$1({
 	notificationService: () => notificationService,
 	routerService: () => routerService
 });
-var applicationEventService, applicationEventPublisher, applicationEventListener, routerService, notificationService, applicationReady;
+var logger, applicationEventService, applicationEventPublisher, applicationEventListener, routerService, notificationService, applicationReady;
 var init_main = __esmMin((() => {
 	init_style();
 	init_github_dark();
@@ -45182,6 +45785,8 @@ var init_main = __esmMin((() => {
 	init_ssr();
 	init_markdown_config();
 	MDService.configure(markdownSetup);
+	IconsComponent$1.baseUrl = `/assets/icons`;
+	logger = createDotaLogger$1("dota-web", "main.ts");
 	applicationEventService = ApplicationEventService.getInstance();
 	applicationEventPublisher = applicationEventService.getPublisher();
 	applicationEventListener = applicationEventService.getListener();
@@ -45233,7 +45838,7 @@ var init_main = __esmMin((() => {
 			data: null
 		});
 	});
-	applicationReady.catch((error) => console.error(error));
+	applicationReady.catch((error) => logger.error("Application initialization failed", error));
 }));
 //#endregion
 //#region \0virtual:dota-ssr-server
