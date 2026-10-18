@@ -1,21 +1,16 @@
-import {createConsola, LogLevels, type ConsolaInstance, type LogType} from 'consola';
+import {createDotaLogger, resolveDotaLogType} from '@ayu-sh-kr/dota-common-utils';
+import type {ConsolaInstance, LogType} from 'consola';
 
-let logger = createConsola({
-  level: LogLevels.silent,
-  formatOptions: {date: true, colors: true}
-});
+let logger = createDotaLogger('dota-rendering', 'renderer.ts');
 
 /**
  * Configures diagnostics for rendering work initiated by a host integration.
- * Rendering remains silent until an integration, such as the SSG Vite plugin,
- * explicitly supplies its preferred Consola level.
- * @param logType Minimum verbosity for renderer diagnostics.
+ * An integration such as SSG supplies its own level as the rendering default;
+ * `DOTA_RENDERING_LOG_TYPE` and package-specific settings still take precedence.
+ * @param logType Default verbosity for renderer diagnostics.
  */
 export function configureDotaRenderingLogger(logType: LogType): void {
-  logger = createConsola({
-    level: LogLevels[logType],
-    formatOptions: {date: true, colors: true}
-  });
+  logger = createDotaLogger('dota-rendering', 'renderer.ts', resolveDotaLogType('dota-rendering', undefined, logType));
 }
 
 /** Returns the renderer-scoped logger used by rendering internals. */
