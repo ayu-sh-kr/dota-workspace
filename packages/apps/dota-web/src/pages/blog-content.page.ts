@@ -5,7 +5,7 @@ import { GeneralUtils } from "@dota/utils/GeneralUtils.ts";
 import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 
-@Route({path: '/blogs/content/:category/:blog'})
+@Route({path: '/blogs/content/:category/:blog', mode: 'ssr'})
 @Component({
   selector: "blog-content",
   shadow: false

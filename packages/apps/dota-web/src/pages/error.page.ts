@@ -3,7 +3,7 @@ import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
-@Route({path: '/error'})
+@Route({path: '/error', mode: 'csr'})
 @Component({
   selector: 'app-error',
   shadow: false
