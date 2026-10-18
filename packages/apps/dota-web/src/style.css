@@ -45,9 +45,11 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--muted-color); }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar::-webkit-scrollbar,
+    .no-scrollbar .overflow-y-auto::-webkit-scrollbar { display: none; }
 
-    .no-scrollbar {
+    .no-scrollbar,
+    .no-scrollbar .overflow-y-auto {
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
