@@ -17,6 +17,7 @@ export class HomePage extends DotaPageElement {
 
   get seo(): SEO {
     return {
+      favicon: '/favicon.svg',
       title: 'Dota Web - A Cutting-Edge Web Application',
       description: 'Dota Web is a cutting-edge web application built with the Dota framework, designed to provide an exceptional user experience. It features a sleek and modern design, seamless navigation, and lightning-fast performance. With Dota Web, you can explore a wide range of features and functionalities that cater to your needs, whether you\'re looking for a powerful tool for work or a fun platform for entertainment.',
       keywords: ['Dota Web', 'Dota Framework', 'Web Application', 'Modern Design', 'Seamless Navigation', 'Fast Performance'],
