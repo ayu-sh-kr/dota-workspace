@@ -9658,7 +9658,7 @@ function selectorOf(component) {
 }
 //#endregion
 //#region \0virtual:dota-ssr-template
-var _virtual_dota_ssr_template_default = "<!doctype html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\"/>\n    <link rel=\"icon\" type=\"image/svg+xml\" sizes=\"any\" href=\"/favicon.svg\"/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n    <title>Dota Web</title>\n    <style>html.dark { background-color: #020617; color-scheme: dark; }</style>\n    <script>\n        // Apply the saved theme before first paint; mirrors GeneralUtils.getBrowserTheme().\n        (function () {\n            var theme = localStorage.getItem('theme');\n            var dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;\n            if (dark) document.documentElement.classList.add('dark', 'bg-slate-950');\n        })();\n    <\/script>\n  <script type=\"module\" crossorigin src=\"/assets/index-BorV35nN.js\"><\/script>\n  <link rel=\"stylesheet\" crossorigin href=\"/assets/index-B1dlKzRy.css\">\n</head>\n<body>\n<div id=\"app\">\n    <app-root id=\"app-root\"></app-root>\n    <notification-holder id=\"dota-notification\" position=\"bottom-right\"></notification-holder>\n    <dota-alert></dota-alert>\n</div>\n</body>\n</html>\n";
+var _virtual_dota_ssr_template_default = "<!doctype html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\"/>\n    <link rel=\"icon\" type=\"image/svg+xml\" sizes=\"any\" href=\"/favicon.svg\"/>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n    <title>Dota Web</title>\n    <style>html.dark { background-color: #020617; color-scheme: dark; }</style>\n    <script>\n        // Apply the saved theme before first paint; mirrors GeneralUtils.getBrowserTheme().\n        (function () {\n            var theme = localStorage.getItem('theme');\n            var dark = theme ? theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;\n            if (dark) document.documentElement.classList.add('dark', 'bg-slate-950');\n        })();\n    <\/script>\n  <script type=\"module\" crossorigin src=\"/assets/index-7IXPftaD.js\"><\/script>\n  <link rel=\"stylesheet\" crossorigin href=\"/assets/index-B1dlKzRy.css\">\n</head>\n<body>\n<div id=\"app\">\n    <app-root id=\"app-root\"></app-root>\n    <notification-holder id=\"dota-notification\" position=\"bottom-right\"></notification-holder>\n    <dota-alert></dota-alert>\n</div>\n</body>\n</html>\n";
 //#endregion
 //#region src/style.css
 var init_style = __esmMin((() => {}));
@@ -34892,6 +34892,112 @@ var init_reactive_section_component = __esmMin((() => {
 	})], ReactiveSectionComponent);
 }));
 //#endregion
+//#region src/components/sidebar/navigation-sidebar.component.ts
+var NavigationSidebarComponent;
+var init_navigation_sidebar_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	NavigationSidebarComponent = class NavigationSidebarComponent extends BaseElement {
+		items = [
+			{
+				name: "Documents",
+				url: "/docs/getting-started"
+			},
+			{
+				name: "Resources",
+				url: "/resources"
+			},
+			{
+				name: "Community",
+				url: "/community"
+			},
+			{
+				name: "Blogs",
+				url: "/blogs"
+			}
+		];
+		visible = false;
+		constructor() {
+			super();
+		}
+		afterViewInit() {}
+		handleScreenSize() {
+			if (window.innerWidth >= 768) {
+				this.visible = false;
+				document.body.classList.remove("overflow-hidden");
+			}
+		}
+		handleVisibility() {
+			if (this.visible) document.body.classList.add("overflow-hidden");
+			else document.body.classList.remove("overflow-hidden");
+		}
+		handleCloseClick() {
+			this.visible = false;
+		}
+		render() {
+			return `
+      <div
+        class="fixed ${this.visible ? "block" : "hidden"} md:hidden bg-surface text-foreground top-0 left-0 h-screen w-full z-50">
+        <div class="relative h-full">
+          <header class="p-4 border-b flex items-center justify-between">
+            <div class="font-extrabold text-2xl w-1/6 px-5 text-foreground">
+              <a href="/">Dota</a>
+            </div>
+            <button id="close-button" class="">
+              <dota-icon name="gridicons:cross-small" size="md" color="gray" variant="soft"></dota-icon>
+            </button>
+          </header>
+          <div class="flex mt-12 justify-center h-full">
+            <ul class="flex flex-col w-[300px]">
+              ${this.items.map((item) => {
+				return `
+                  <li class="font-medium hover:text-primary text-foreground text-left w-full">
+                    <a href="${item.url}" class="inline-block py-4 border-b w-full">${item.name}</a>
+                     </li>
+                   `;
+			}).join("")}
+              <div class="bg-raised rounded-control p-3 mt-6 flex items-center justify-between">
+                <p class="text-[13px] text-muted font-medium">Appearance</p>
+                <dark-mode-button></dark-mode-button>
+              </div>
+              <ul class="mt-4 flex gap-2 items-center justify-center">
+                <a href="#" class="text-muted hover:underline" title="discord">
+                  <dota-icon name="mdi:discord" color="slate" variant="ghost" size="lg"/>
+                </a>
+                <a href="#" class="text-muted hover:underline" title="twitter">
+                  <dota-icon name="mdi:twitter" color="slate" variant="ghost" size="lg"/>
+                </a>
+                <a href="#" class="text-muted hover:underline" title="github">
+                  <dota-icon name="mdi:github" color="slate" variant="ghost" size="lg"/>
+                  <a href="#" class="text-muted hover:underline inline-flex pt-1.5"
+                     title="blog">
+                    <dota-icon name="mdi:blogger" color="slate" variant="ghost" size="lg"/>
+                  </a>
+              </ul>
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		name: "visible",
+		type: BooleanType
+	})], NavigationSidebarComponent.prototype, "visible", void 0);
+	__decorate$2([AfterInitDecorator()], NavigationSidebarComponent.prototype, "afterViewInit", null);
+	__decorate$2([WindowListenerDecorator({ event: "resize" })], NavigationSidebarComponent.prototype, "handleScreenSize", null);
+	__decorate$2([WatcherDecorator("visible")], NavigationSidebarComponent.prototype, "handleVisibility", null);
+	__decorate$2([BindEventDecorator({
+		event: "click",
+		id: "#close-button"
+	})], NavigationSidebarComponent.prototype, "handleCloseClick", null);
+	NavigationSidebarComponent = __decorate$2([ComponentDecorator({
+		selector: "navigation-sidebar",
+		shadow: false
+	})], NavigationSidebarComponent);
+}));
+//#endregion
 //#region src/components/resource/resource-content.component.ts
 var ResourceContentComponent;
 var init_resource_content_component = __esmMin((() => {
@@ -35038,112 +35144,6 @@ var init_resource_section_component = __esmMin((() => {
 		selector: "resource-section",
 		shadow: false
 	})], ResourceSectionComponent);
-}));
-//#endregion
-//#region src/components/sidebar/navigation-sidebar.component.ts
-var NavigationSidebarComponent;
-var init_navigation_sidebar_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	NavigationSidebarComponent = class NavigationSidebarComponent extends BaseElement {
-		items = [
-			{
-				name: "Documents",
-				url: "/docs/getting-started"
-			},
-			{
-				name: "Resources",
-				url: "/resources"
-			},
-			{
-				name: "Community",
-				url: "/community"
-			},
-			{
-				name: "Blogs",
-				url: "/blogs"
-			}
-		];
-		visible = false;
-		constructor() {
-			super();
-		}
-		afterViewInit() {}
-		handleScreenSize() {
-			if (window.innerWidth >= 768) {
-				this.visible = false;
-				document.body.classList.remove("overflow-hidden");
-			}
-		}
-		handleVisibility() {
-			if (this.visible) document.body.classList.add("overflow-hidden");
-			else document.body.classList.remove("overflow-hidden");
-		}
-		handleCloseClick() {
-			this.visible = false;
-		}
-		render() {
-			return `
-      <div
-        class="fixed ${this.visible ? "block" : "hidden"} md:hidden bg-surface text-foreground top-0 left-0 h-screen w-full z-50">
-        <div class="relative h-full">
-          <header class="p-4 border-b flex items-center justify-between">
-            <div class="font-extrabold text-2xl w-1/6 px-5 text-foreground">
-              <a href="/">Dota</a>
-            </div>
-            <button id="close-button" class="">
-              <dota-icon name="gridicons:cross-small" size="md" color="gray" variant="soft"></dota-icon>
-            </button>
-          </header>
-          <div class="flex mt-12 justify-center h-full">
-            <ul class="flex flex-col w-[300px]">
-              ${this.items.map((item) => {
-				return `
-                  <li class="font-medium hover:text-primary text-foreground text-left w-full">
-                    <a href="${item.url}" class="inline-block py-4 border-b w-full">${item.name}</a>
-                     </li>
-                   `;
-			}).join("")}
-              <div class="bg-raised rounded-control p-3 mt-6 flex items-center justify-between">
-                <p class="text-[13px] text-muted font-medium">Appearance</p>
-                <dark-mode-button></dark-mode-button>
-              </div>
-              <ul class="mt-4 flex gap-2 items-center justify-center">
-                <a href="#" class="text-muted hover:underline" title="discord">
-                  <dota-icon name="mdi:discord" color="slate" variant="ghost" size="lg"/>
-                </a>
-                <a href="#" class="text-muted hover:underline" title="twitter">
-                  <dota-icon name="mdi:twitter" color="slate" variant="ghost" size="lg"/>
-                </a>
-                <a href="#" class="text-muted hover:underline" title="github">
-                  <dota-icon name="mdi:github" color="slate" variant="ghost" size="lg"/>
-                  <a href="#" class="text-muted hover:underline inline-flex pt-1.5"
-                     title="blog">
-                    <dota-icon name="mdi:blogger" color="slate" variant="ghost" size="lg"/>
-                  </a>
-              </ul>
-            </ul>
-          </div>
-        </div>
-      </div>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "visible",
-		type: BooleanType
-	})], NavigationSidebarComponent.prototype, "visible", void 0);
-	__decorate$2([AfterInitDecorator()], NavigationSidebarComponent.prototype, "afterViewInit", null);
-	__decorate$2([WindowListenerDecorator({ event: "resize" })], NavigationSidebarComponent.prototype, "handleScreenSize", null);
-	__decorate$2([WatcherDecorator("visible")], NavigationSidebarComponent.prototype, "handleVisibility", null);
-	__decorate$2([BindEventDecorator({
-		event: "click",
-		id: "#close-button"
-	})], NavigationSidebarComponent.prototype, "handleCloseClick", null);
-	NavigationSidebarComponent = __decorate$2([ComponentDecorator({
-		selector: "navigation-sidebar",
-		shadow: false
-	})], NavigationSidebarComponent);
 }));
 //#endregion
 //#region src/components/utils/icons.component.ts
@@ -38910,6 +38910,165 @@ var init_our_tools_component = __esmMin((() => {
 	})], OurToolsComponent);
 }));
 //#endregion
+//#region src/components/utils/buttons/ai-button.component.ts
+var AiButtonComponent;
+var init_ai_button_component = __esmMin((() => {
+	init_core$1();
+	init_main();
+	init_decorate();
+	AiButtonComponent = class AiButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		hostClickListener() {
+			routerService.route("/chat");
+		}
+		render() {
+			return `
+      <span id="github-button" class="active:scale-95 cursor-pointer">
+        <a target="_blank">
+            <dota-icon name="healthicons:artificial-intelligence" color="pink" variant="ghost" size="md"></dota-icon>
+        </a>
+      </span>
+    `;
+		}
+	};
+	__decorate$2([HostListenerDecorator({ event: "click" })], AiButtonComponent.prototype, "hostClickListener", null);
+	AiButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "ai-button",
+		shadow: false
+	})], AiButtonComponent);
+}));
+//#endregion
+//#region src/components/utils/buttons/dark-mode-button.component.ts
+var DarkModeButtonComponent;
+var init_dark_mode_button_component = __esmMin((() => {
+	init_core$1();
+	init_GeneralUtils();
+	init_decorate();
+	DarkModeButtonComponent = class DarkModeButtonComponent extends BaseElement {
+		color = "purple";
+		constructor() {
+			super();
+		}
+		handleDark() {
+			GeneralUtils.toggleDarkMode();
+		}
+		handleThemeChange() {
+			this.updateHTML();
+		}
+		render() {
+			const isDarkTheme = GeneralUtils.isDarkMode();
+			return `
+      <button id="dark-button" type="button"
+              class="inline-flex size-9 items-center justify-center rounded-full text-primary hover:bg-raised
+                      active:scale-95 cursor-pointer"
+              aria-label="Switch to ${isDarkTheme ? "light" : "dark"} mode">
+        <dota-icon name="${isDarkTheme ? "material-symbols:dark-mode" : "material-symbols:sunny-rounded"}" color="${this.color}" variant="ghost" size="lg"></dota-icon>
+      </button>
+    `;
+		}
+	};
+	__decorate$2([PropertyDecorator({
+		name: "color",
+		type: StringType
+	})], DarkModeButtonComponent.prototype, "color", void 0);
+	__decorate$2([BindEventDecorator({
+		event: "click",
+		id: "#dark-button"
+	})], DarkModeButtonComponent.prototype, "handleDark", null);
+	__decorate$2([WindowListenerDecorator({ event: "themeChange" })], DarkModeButtonComponent.prototype, "handleThemeChange", null);
+	DarkModeButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "dark-mode-button",
+		shadow: false
+	})], DarkModeButtonComponent);
+}));
+//#endregion
+//#region src/components/utils/buttons/github-button.component.ts
+var GithubButtonComponent;
+var init_github_button_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	GithubButtonComponent = class GithubButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		render() {
+			return `
+      <span id="github-button" class="active:scale-95 cursor-pointer">
+        <a href="https://github.com/ayu-sh-kr" target="_blank"
+           class="inline-flex size-9 items-center justify-center rounded-full text-foreground hover:bg-raised"
+           aria-label="GitHub">
+            <dota-icon name="mdi:github" color="none" variant="ghost" size="lg"></dota-icon>
+        </a>
+      </span>
+    `;
+		}
+	};
+	GithubButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "github-button",
+		shadow: false
+	})], GithubButtonComponent);
+}));
+//#endregion
+//#region src/components/utils/buttons/ham-burger-button.component.ts
+var HamBurgerButtonComponent;
+var init_ham_burger_button_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	HamBurgerButtonComponent = class HamBurgerButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		handleToggle() {
+			const sidebar = document.querySelector("navigation-sidebar");
+			if (sidebar) sidebar.visible = !sidebar.visible;
+		}
+		render() {
+			return `
+      <button id="ham-button" class="md:hidden flex items-center justify-center active:scale-95">
+        <dota-icon name="solar:hamburger-menu-linear" color="gray" variant="ghost" size="md"></dota-icon>
+      </button>
+    `;
+		}
+	};
+	__decorate$2([HostListenerDecorator({ event: "click" })], HamBurgerButtonComponent.prototype, "handleToggle", null);
+	HamBurgerButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "ham-burger-button",
+		shadow: false
+	})], HamBurgerButtonComponent);
+}));
+//#endregion
+//#region src/components/utils/buttons/scroll-bottom-button.component.ts
+var ScrollBottomButtonComponent;
+var init_scroll_bottom_button_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	ScrollBottomButtonComponent = class ScrollBottomButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		handleScroll() {
+			window.scrollTo({
+				top: document.body.scrollHeight,
+				behavior: "smooth"
+			});
+		}
+		render() {
+			return `
+      <div id="scroll-bottom-button" class="fixed bottom-4 right-4 cursor-pointer">
+        <dota-icon name="material-symbols:arrow-circle-down" color="purple" variant="ghost" size="xl"/>
+      </div>
+    `;
+		}
+	};
+	__decorate$2([HostListenerDecorator({ event: "click" })], ScrollBottomButtonComponent.prototype, "handleScroll", null);
+	ScrollBottomButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "scroll-bottom-button",
+		shadow: false
+	})], ScrollBottomButtonComponent);
+}));
+//#endregion
 //#region src/components/home/utils/tool-detail.component.ts
 var ToolDetailComponent;
 var init_tool_detail_component = __esmMin((() => {
@@ -39177,165 +39336,6 @@ var init_footer_component = __esmMin((() => {
 	})], FooterComponent);
 }));
 //#endregion
-//#region src/components/utils/buttons/ai-button.component.ts
-var AiButtonComponent;
-var init_ai_button_component = __esmMin((() => {
-	init_core$1();
-	init_main();
-	init_decorate();
-	AiButtonComponent = class AiButtonComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		hostClickListener() {
-			routerService.route("/chat");
-		}
-		render() {
-			return `
-      <span id="github-button" class="active:scale-95 cursor-pointer">
-        <a target="_blank">
-            <dota-icon name="healthicons:artificial-intelligence" color="pink" variant="ghost" size="md"></dota-icon>
-        </a>
-      </span>
-    `;
-		}
-	};
-	__decorate$2([HostListenerDecorator({ event: "click" })], AiButtonComponent.prototype, "hostClickListener", null);
-	AiButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "ai-button",
-		shadow: false
-	})], AiButtonComponent);
-}));
-//#endregion
-//#region src/components/utils/buttons/dark-mode-button.component.ts
-var DarkModeButtonComponent;
-var init_dark_mode_button_component = __esmMin((() => {
-	init_core$1();
-	init_GeneralUtils();
-	init_decorate();
-	DarkModeButtonComponent = class DarkModeButtonComponent extends BaseElement {
-		color = "purple";
-		constructor() {
-			super();
-		}
-		handleDark() {
-			GeneralUtils.toggleDarkMode();
-		}
-		handleThemeChange() {
-			this.updateHTML();
-		}
-		render() {
-			const isDarkTheme = GeneralUtils.isDarkMode();
-			return `
-      <button id="dark-button" type="button"
-              class="inline-flex size-9 items-center justify-center rounded-full text-primary hover:bg-raised
-                      active:scale-95 cursor-pointer"
-              aria-label="Switch to ${isDarkTheme ? "light" : "dark"} mode">
-        <dota-icon name="${isDarkTheme ? "material-symbols:dark-mode" : "material-symbols:sunny-rounded"}" color="${this.color}" variant="ghost" size="lg"></dota-icon>
-      </button>
-    `;
-		}
-	};
-	__decorate$2([PropertyDecorator({
-		name: "color",
-		type: StringType
-	})], DarkModeButtonComponent.prototype, "color", void 0);
-	__decorate$2([BindEventDecorator({
-		event: "click",
-		id: "#dark-button"
-	})], DarkModeButtonComponent.prototype, "handleDark", null);
-	__decorate$2([WindowListenerDecorator({ event: "themeChange" })], DarkModeButtonComponent.prototype, "handleThemeChange", null);
-	DarkModeButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "dark-mode-button",
-		shadow: false
-	})], DarkModeButtonComponent);
-}));
-//#endregion
-//#region src/components/utils/buttons/github-button.component.ts
-var GithubButtonComponent;
-var init_github_button_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	GithubButtonComponent = class GithubButtonComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		render() {
-			return `
-      <span id="github-button" class="active:scale-95 cursor-pointer">
-        <a href="https://github.com/ayu-sh-kr" target="_blank"
-           class="inline-flex size-9 items-center justify-center rounded-full text-foreground hover:bg-raised"
-           aria-label="GitHub">
-            <dota-icon name="mdi:github" color="none" variant="ghost" size="lg"></dota-icon>
-        </a>
-      </span>
-    `;
-		}
-	};
-	GithubButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "github-button",
-		shadow: false
-	})], GithubButtonComponent);
-}));
-//#endregion
-//#region src/components/utils/buttons/ham-burger-button.component.ts
-var HamBurgerButtonComponent;
-var init_ham_burger_button_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	HamBurgerButtonComponent = class HamBurgerButtonComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		handleToggle() {
-			const sidebar = document.querySelector("navigation-sidebar");
-			if (sidebar) sidebar.visible = !sidebar.visible;
-		}
-		render() {
-			return `
-      <button id="ham-button" class="md:hidden flex items-center justify-center active:scale-95">
-        <dota-icon name="solar:hamburger-menu-linear" color="gray" variant="ghost" size="md"></dota-icon>
-      </button>
-    `;
-		}
-	};
-	__decorate$2([HostListenerDecorator({ event: "click" })], HamBurgerButtonComponent.prototype, "handleToggle", null);
-	HamBurgerButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "ham-burger-button",
-		shadow: false
-	})], HamBurgerButtonComponent);
-}));
-//#endregion
-//#region src/components/utils/buttons/scroll-bottom-button.component.ts
-var ScrollBottomButtonComponent;
-var init_scroll_bottom_button_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	ScrollBottomButtonComponent = class ScrollBottomButtonComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		handleScroll() {
-			window.scrollTo({
-				top: document.body.scrollHeight,
-				behavior: "smooth"
-			});
-		}
-		render() {
-			return `
-      <div id="scroll-bottom-button" class="fixed bottom-4 right-4 cursor-pointer">
-        <dota-icon name="material-symbols:arrow-circle-down" color="purple" variant="ghost" size="xl"/>
-      </div>
-    `;
-		}
-	};
-	__decorate$2([HostListenerDecorator({ event: "click" })], ScrollBottomButtonComponent.prototype, "handleScroll", null);
-	ScrollBottomButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "scroll-bottom-button",
-		shadow: false
-	})], ScrollBottomButtonComponent);
-}));
-//#endregion
 //#region src/components/utils/header/header.component.ts
 var HeaderComponent;
 var init_header_component = __esmMin((() => {
@@ -39440,86 +39440,6 @@ var init_section_header_component = __esmMin((() => {
 		selector: "section-header",
 		shadow: false
 	})], SectionHeaderComponent);
-}));
-//#endregion
-//#region src/components/utils/section/no-content.component.ts
-var NoContentComponent;
-var init_no_content_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	NoContentComponent = class NoContentComponent extends BaseElement {
-		constructor() {
-			super();
-		}
-		render() {
-			return `
-        <div class="grid sm:grid-cols-1 md:grid-cols-2 place-items-center overflow-hidden">
-            <div class="text-center py-10 font-semibold text-gray-700 dark:text-gray-300">
-                <h1 class="text-5xl md:text-6xl lg:text-7xl">Oops!</h1>
-                <h3 class="text-purple-500 dark:text-purple-400">No Content At The Moment</h3>
-            </div>
-            <div class="">
-                <img src="/svgs/no-content.svg" alt="no-content.svg" class="bg-transparent">
-            </div>
-        </div>
-    `;
-		}
-	};
-	NoContentComponent = __decorate$2([ComponentDecorator({
-		selector: "no-content",
-		shadow: false
-	})], NoContentComponent);
-}));
-//#endregion
-//#region src/components/utils/wrapper/page-wrapper.component.ts
-var PageWrapperComponent;
-var init_page_wrapper_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	PageWrapperComponent = class PageWrapperComponent extends BaseElement {
-		content;
-		constructor() {
-			super();
-			this.content = this.innerHTML;
-		}
-		render() {
-			return `
-      <section class="font-dm mx-auto max-w-7xl px-3 py-2 mt-10">
-        ${this.content}
-      </section>
-    `;
-		}
-	};
-	PageWrapperComponent = __decorate$2([ComponentDecorator({
-		selector: "page-wrapper",
-		shadow: false
-	})], PageWrapperComponent);
-}));
-//#endregion
-//#region src/components/utils/wrapper/section-wrapper.component.ts
-var SectionWrapperComponent;
-var init_section_wrapper_component = __esmMin((() => {
-	init_core$1();
-	init_decorate();
-	SectionWrapperComponent = class SectionWrapperComponent extends BaseElement {
-		content;
-		constructor() {
-			super();
-			this.content = this.innerHTML;
-		}
-		render() {
-			return `
-      <section class="mt-10 font-dm">
-        ${this.content}
-      </section>
-    `;
-		}
-	};
-	__decorate$2([StateDecorator()], SectionWrapperComponent.prototype, "content", void 0);
-	SectionWrapperComponent = __decorate$2([ComponentDecorator({
-		selector: "section-wrapper",
-		shadow: false
-	})], SectionWrapperComponent);
 }));
 //#endregion
 //#region src/components/utils/notification/notification.component.ts
@@ -39702,6 +39622,35 @@ var init_notification_holder_component = __esmMin((() => {
 	})], NotificationHolderComponent);
 }));
 //#endregion
+//#region src/components/utils/section/no-content.component.ts
+var NoContentComponent;
+var init_no_content_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	NoContentComponent = class NoContentComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		render() {
+			return `
+        <div class="grid sm:grid-cols-1 md:grid-cols-2 place-items-center overflow-hidden">
+            <div class="text-center py-10 font-semibold text-gray-700 dark:text-gray-300">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl">Oops!</h1>
+                <h3 class="text-purple-500 dark:text-purple-400">No Content At The Moment</h3>
+            </div>
+            <div class="">
+                <img src="/svgs/no-content.svg" alt="no-content.svg" class="bg-transparent">
+            </div>
+        </div>
+    `;
+		}
+	};
+	NoContentComponent = __decorate$2([ComponentDecorator({
+		selector: "no-content",
+		shadow: false
+	})], NoContentComponent);
+}));
+//#endregion
 //#region src/components/home/utils/code-snippet/code-snippet.component.ts
 var _CodeSnippetComponent, CodeSnippetComponent;
 var init_code_snippet_component = __esmMin((() => {
@@ -39802,31 +39751,55 @@ var init_code_snippet_component = __esmMin((() => {
 	})], CodeSnippetComponent);
 }));
 //#endregion
-//#region src/components/home/utils/get-started-button/get-started-button.component.ts
-var GetStartedButtonComponent;
-var init_get_started_button_component = __esmMin((() => {
+//#region src/components/utils/wrapper/page-wrapper.component.ts
+var PageWrapperComponent;
+var init_page_wrapper_component = __esmMin((() => {
 	init_core$1();
-	init_rendering();
-	init_main();
 	init_decorate();
-	GetStartedButtonComponent = class GetStartedButtonComponent extends BaseElement {
+	PageWrapperComponent = class PageWrapperComponent extends BaseElement {
+		content;
 		constructor() {
 			super();
-		}
-		onClickListener() {
-			routerService.route("/docs/getting-started");
+			this.content = this.innerHTML;
 		}
 		render() {
-			return html`
-      <button type="button" class="button-primary">Getting Started</button>
+			return `
+      <section class="font-dm mx-auto max-w-7xl px-3 py-2 mt-10">
+        ${this.content}
+      </section>
     `;
 		}
 	};
-	__decorate$2([HostListenerDecorator({ event: "click" })], GetStartedButtonComponent.prototype, "onClickListener", null);
-	GetStartedButtonComponent = __decorate$2([ComponentDecorator({
-		selector: "get-started-button",
+	PageWrapperComponent = __decorate$2([ComponentDecorator({
+		selector: "page-wrapper",
 		shadow: false
-	})], GetStartedButtonComponent);
+	})], PageWrapperComponent);
+}));
+//#endregion
+//#region src/components/utils/wrapper/section-wrapper.component.ts
+var SectionWrapperComponent;
+var init_section_wrapper_component = __esmMin((() => {
+	init_core$1();
+	init_decorate();
+	SectionWrapperComponent = class SectionWrapperComponent extends BaseElement {
+		content;
+		constructor() {
+			super();
+			this.content = this.innerHTML;
+		}
+		render() {
+			return `
+      <section class="mt-10 font-dm">
+        ${this.content}
+      </section>
+    `;
+		}
+	};
+	__decorate$2([StateDecorator()], SectionWrapperComponent.prototype, "content", void 0);
+	SectionWrapperComponent = __decorate$2([ComponentDecorator({
+		selector: "section-wrapper",
+		shadow: false
+	})], SectionWrapperComponent);
 }));
 //#endregion
 //#region src/components/home/utils/tab-holder/tab-holder.component.ts
@@ -39893,6 +39866,33 @@ var init_tab_holder_component = __esmMin((() => {
 	})], TabHolderComponent);
 }));
 //#endregion
+//#region src/components/home/utils/get-started-button/get-started-button.component.ts
+var GetStartedButtonComponent;
+var init_get_started_button_component = __esmMin((() => {
+	init_core$1();
+	init_rendering();
+	init_main();
+	init_decorate();
+	GetStartedButtonComponent = class GetStartedButtonComponent extends BaseElement {
+		constructor() {
+			super();
+		}
+		onClickListener() {
+			routerService.route("/docs/getting-started");
+		}
+		render() {
+			return html`
+      <button type="button" class="button-primary">Getting Started</button>
+    `;
+		}
+	};
+	__decorate$2([HostListenerDecorator({ event: "click" })], GetStartedButtonComponent.prototype, "onClickListener", null);
+	GetStartedButtonComponent = __decorate$2([ComponentDecorator({
+		selector: "get-started-button",
+		shadow: false
+	})], GetStartedButtonComponent);
+}));
+//#endregion
 //#region \0virtual:dota-components
 var _virtual_dota_components_default;
 var init__virtual_dota_components = __esmMin((() => {
@@ -39920,10 +39920,10 @@ var init__virtual_dota_components = __esmMin((() => {
 	init_emitter_section_component();
 	init_offer_component();
 	init_reactive_section_component();
+	init_navigation_sidebar_component();
 	init_resource_content_component();
 	init_resource_path_component();
 	init_resource_section_component();
-	init_navigation_sidebar_component();
 	init_icons_component();
 	init_self_end_component();
 	init_aes_flow_component();
@@ -39937,25 +39937,25 @@ var init__virtual_dota_components = __esmMin((() => {
 	init_feature_component();
 	init_hero_section_component();
 	init_our_tools_component();
-	init_tool_detail_component();
-	init_tool_list_item_component();
-	init_footer_component();
 	init_ai_button_component();
 	init_dark_mode_button_component();
 	init_github_button_component();
 	init_ham_burger_button_component();
 	init_scroll_bottom_button_component();
+	init_tool_detail_component();
+	init_tool_list_item_component();
+	init_footer_component();
 	init_header_component();
 	init_section_header_component();
-	init_no_content_component();
-	init_page_wrapper_component();
-	init_section_wrapper_component();
 	init_notification_holder_component();
 	init_notification_component();
+	init_no_content_component();
 	init_code_snippet_component();
 	init_device_preview_component();
-	init_get_started_button_component();
+	init_page_wrapper_component();
+	init_section_wrapper_component();
 	init_tab_holder_component();
+	init_get_started_button_component();
 	init_blog_content_page();
 	init_blog_page();
 	init_chat_page();
@@ -39989,10 +39989,10 @@ var init__virtual_dota_components = __esmMin((() => {
 		EmitterSectionComponent,
 		OfferComponent,
 		ReactiveSectionComponent,
+		NavigationSidebarComponent,
 		ResourceContentComponent,
 		ResourcePathComponent,
 		ResourceSectionComponent,
-		NavigationSidebarComponent,
 		IconsComponent,
 		SelfEndComponent,
 		AesFlowComponent,
@@ -40007,25 +40007,25 @@ var init__virtual_dota_components = __esmMin((() => {
 		FeatureComponent,
 		HeroSectionComponent,
 		OurToolsComponent,
-		ToolDetailComponent,
-		ToolListItemComponent,
-		FooterComponent,
 		AiButtonComponent,
 		DarkModeButtonComponent,
 		GithubButtonComponent,
 		HamBurgerButtonComponent,
 		ScrollBottomButtonComponent,
+		ToolDetailComponent,
+		ToolListItemComponent,
+		FooterComponent,
 		HeaderComponent,
 		SectionHeaderComponent,
-		NoContentComponent,
-		PageWrapperComponent,
-		SectionWrapperComponent,
 		NotificationHolderComponent,
 		NotificationComponent,
+		NoContentComponent,
 		CodeSnippetComponent,
 		DevicePreviewComponent,
-		GetStartedButtonComponent,
+		PageWrapperComponent,
+		SectionWrapperComponent,
 		TabHolderComponent,
+		GetStartedButtonComponent,
 		BlogContentPage,
 		BlogPage,
 		ChatPage,
