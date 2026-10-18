@@ -3,7 +3,7 @@ import type {Plugin} from 'vite';
 import dotaVitePreloader from '../preloader-plugin';
 import eventMapGenerator, {type EventMapGeneratorPluginConfig} from '../event-map-generator';
 import dotaWebTypeJson, {type WebTypeJsonPluginConfig} from '../web-type-json';
-import dotaSsg, {type DotaSsgOptions} from '../ssg';
+import dotaSsg, {dotaSsr, type DotaServerTarget, type DotaSsgOptions, type DotaSsrOptions} from '../ssg';
 
 /** Options forwarded to the wrapped Dota preloader plugin. */
 export type DotaVitePreloaderOptions = Record<string, never>;
@@ -33,6 +33,16 @@ export type DotaVitePluginsOptions = {
   webTypes?: DotaWebTypesOptions | false;
   /** SSG options, or `false`/omission to keep the build client-only. */
   ssg?: DotaSsgOptions | false;
+  /**
+   * Request-time rendering for `@Route({mode: 'ssr'})` routes; on by default and a no-op
+   * for applications without such routes. `false` removes it.
+   */
+  ssr?: DotaSsrOptions | false;
+  /**
+   * Hosting platform for both SSG and SSR output, unless `ssg.deployment` or
+   * `ssr.deployment` says otherwise. SSR defaults to `node` when no target is set.
+   */
+  deployment?: DotaServerTarget;
   /** Explicitly supplied third-party or application-specific Vite plugins. */
   extensions?: Plugin[];
 };
@@ -43,7 +53,7 @@ export type DotaVitePluginsOptions = {
  * the original plugin objects so Vite controls their native hooks and ordering.
  * Nitro and other server-owning integrations remain explicit extensions.
  * @param options Shared defaults and per-plugin configuration.
- * @returns Vite plugins in preloader, event-map, Web Types, SSG, and extension order.
+ * @returns Vite plugins in preloader, event-map, Web Types, SSG, SSR, and extension order.
  */
 export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] {
   const root = options.root ?? process.cwd();
@@ -82,10 +92,28 @@ export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] 
     plugins.push(dotaSsg({
       root,
       logType,
+      ...(options.deployment && options.deployment !== 'node' ? {deployment: options.deployment} : {}),
       ...options.ssg,
+    }));
+  }
+
+  if (options.ssr !== false) {
+    plugins.push(dotaSsr({
+      root,
+      logType,
+      deployment: options.deployment ?? ssgDeploymentTarget(options.ssg),
+      ...options.ssr,
     }));
   }
 
   plugins.push(...(options.extensions ?? []));
   return plugins;
+}
+
+/** The SSG deployment target, so SSR deploys to the same platform without repeating it. */
+function ssgDeploymentTarget(ssg: DotaSsgOptions | false | undefined): DotaServerTarget | undefined {
+  if (!ssg) return undefined;
+  const deployment = ssg.deployment ?? (ssg.vercel ? 'vercel' : undefined);
+  if (!deployment) return undefined;
+  return typeof deployment === 'string' ? deployment : deployment.target;
 }
