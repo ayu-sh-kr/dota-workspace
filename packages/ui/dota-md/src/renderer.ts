@@ -84,10 +84,15 @@ export function applyMarkdownThemeToElement(root: ParentNode, theme: Theme, colo
     const priorClasses = prior ? resolveClasses(prior.theme, prior.color, tag).split(/\s+/).filter(Boolean) : [];
     root.querySelectorAll(tag).forEach((element) => {
       const previous = APPLIED_THEME_CLASSES.get(element) ?? priorClasses;
-      if (previous?.length) element.classList.remove(...previous);
-      const next = isHighlightedCode(tag, element.className) ? [] : classes;
+      const ownClasses = [...element.classList].filter((name) => !previous.includes(name)).join(' ');
+      const next = isHighlightedCode(tag, ownClasses) ? [] : classes;
+      // Only the difference is written: re-applying the theme a prerendered page already
+      // carries must not touch every element's `class` and restyle the whole document.
+      const stale = previous.filter((name) => !next.includes(name));
+      const missing = next.filter((name) => !element.classList.contains(name));
+      if (stale.length) element.classList.remove(...stale);
       // Guarded so unthemed tags do not gain an empty `class` attribute.
-      if (next.length) element.classList.add(...next);
+      if (missing.length) element.classList.add(...missing);
       APPLIED_THEME_CLASSES.set(element, next);
     });
   }
