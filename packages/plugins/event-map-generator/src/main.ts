@@ -1,4 +1,4 @@
-import { createConsola, LogLevels, type LogType } from 'consola';
+import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
 import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, resolve } from 'node:path';
@@ -15,7 +15,7 @@ import type {
   EventMapScanCandidate,
 } from '@dota/Types.ts';
 
-let log = createConsola();
+let log = createDotaLogger('dota-event-map-generator', 'main.ts');
 
 /**
  * Writes the declaration and optional source-navigation artifacts from one scan.
@@ -63,9 +63,10 @@ async function writeGeneratedArtifacts(
   }
 
   await Promise.all(writes);
-  log.info(`Generated ${artifact.names.length} application event entries at ${outFile}`);
+  log.info(`Generated ${artifact.names.length} application event entries`);
+  log.debug(`Event declarations written to ${outFile}`);
   if (locationOutput != null) {
-    log.info(`Generated event source locations at ${locationOutput}`);
+    log.debug(`Event source locations written to ${locationOutput}`);
   }
 }
 
@@ -217,17 +218,11 @@ export function isEventMapSourceFile(file: string, root: string, scanRoots: stri
  * @returns A Vite plugin with build-time and source-change generation hooks.
  */
 export default function eventMapGenerator(options: EventMapGeneratorPluginConfig = {}): Plugin {
-  const { logType = 'info' } = options;
+  const { logType } = options;
   let root = options.root ?? process.cwd();
   let resolverOptions = normalizeResolverOptions(root, options.resolver);
 
-  log = createConsola({
-    level: LogLevels[logType],
-    formatOptions: {
-      date: true,
-      colors: true
-    }
-  });
+  log = createDotaLogger('dota-event-map-generator', 'main.ts', logType);
 
   /** Runs the shared scan and writes every artifact enabled by the plugin options. */
   const regenerate = async (): Promise<void> => {
