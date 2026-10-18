@@ -196,4 +196,49 @@ describe('durable rendering and hydration', () => {
     expect(parentParagraph?.textContent).toBe('parent client');
     expect(childArticle?.textContent).toBe('child client');
   });
+  it('patches an adopted attribute after a nested light-DOM renderer replaces its element', () => {
+    const view = (href: string) => html`<nav><div class="panel"><a href="${href}">link</a></div></nav>`;
+    const serverRoot = document.createElement('section');
+    setHydrationEmit(true);
+    render(serverRoot, view('/server'));
+    setHydrationEmit(false);
+
+    const container = document.createElement('div');
+    container.innerHTML = serverRoot.outerHTML;
+    document.body.append(container);
+    const clientRoot = container.firstElementChild as HTMLElement;
+    const instance = hydrate(clientRoot, view('/server'), {mismatch: 'throw'});
+    const panel = clientRoot.querySelector('.panel') as HTMLElement;
+    panel.innerHTML = panel.innerHTML;
+
+    update(instance, view('/client'));
+
+    expect(clientRoot.querySelector('a')?.getAttribute('href')).toBe('/client');
+    container.remove();
+  });
+
+  it('keeps server light DOM that already matches legacy string output', () => {
+    const root = document.createElement('section');
+    root.innerHTML = '<a href="/docs">Docs</a>';
+    const link = root.firstElementChild;
+
+    render(root, '<a href="/docs">Docs</a>');
+
+    expect(root.firstElementChild).toBe(link);
+  });
+
+  it('mounts repeated templates from one parse without sharing parts', () => {
+    const view = (label: string) => html`<p title="${label}">${label}</p>`;
+    const first = document.createElement('section');
+    const second = document.createElement('section');
+    render(first, view('one'));
+    const instance = render(second, view('two'));
+
+    update(instance, view('three'));
+
+    expect(first.querySelector('p')?.getAttribute('title')).toBe('one');
+    expect(first.textContent).toBe('one');
+    expect(second.querySelector('p')?.getAttribute('title')).toBe('three');
+    expect(second.textContent).toBe('three');
+  });
 });
