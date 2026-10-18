@@ -84,7 +84,7 @@ export class DocsAccentPickerComponent extends BaseElement {
     return html`
       <details class="group relative">
         <summary class="${MENU_TRIGGER}" aria-label="Accent color">
-          <span data-current class="${DOT} ${ACCENTS[DEFAULT_ACCENT]}"></span>Accent${menuChevron()}
+          <span data-current class="${DOT} ${ACCENTS[DEFAULT_ACCENT]}"></span><span class="hidden sm:inline">Accent</span>${menuChevron()}
         </summary>
         <div class="${MENU_PANEL} grid w-max grid-cols-4 gap-3 p-3">
           ${Object.entries(ACCENTS).map(([color, swatch]) => html`
