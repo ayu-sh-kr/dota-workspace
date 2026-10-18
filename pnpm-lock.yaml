@@ -241,6 +241,9 @@ importers:
 
   packages/libs/dota-core:
     dependencies:
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       '@ayu-sh-kr/dota-event':
         specifier: workspace:*
         version: link:../dota-event
@@ -309,6 +312,9 @@ importers:
 
   packages/libs/dota-rendering:
     dependencies:
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       consola:
         specifier: 'catalog:'
         version: 3.4.2
@@ -364,6 +370,9 @@ importers:
 
   packages/libs/dota-router:
     dependencies:
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../dota-core
@@ -435,6 +444,9 @@ importers:
 
   packages/libs/dota-ssr:
     dependencies:
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../dota-core
@@ -478,6 +490,9 @@ importers:
 
   packages/libs/dota-wrap:
     dependencies:
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../dota-core
@@ -548,6 +563,9 @@ importers:
       '@ayu-sh-kr/dota-ast-utils':
         specifier: workspace:*
         version: link:../../utils/dota-ast-utils
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../../libs/dota-core
@@ -594,6 +612,9 @@ importers:
       '@ayu-sh-kr/dota-ast-utils':
         specifier: workspace:*
         version: link:../../utils/dota-ast-utils
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       '@swc/core':
         specifier: 'catalog:'
         version: 1.13.5
@@ -634,6 +655,9 @@ importers:
       '@ayu-sh-kr/dota-ast-utils':
         specifier: workspace:*
         version: link:../../utils/dota-ast-utils
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../../libs/dota-core
@@ -729,6 +753,9 @@ importers:
 
   packages/ui/dota-ui:
     dependencies:
+      '@ayu-sh-kr/dota-common-utils':
+        specifier: workspace:*
+        version: link:../../utils/dota-common-utils
       '@ayu-sh-kr/dota-core':
         specifier: workspace:*
         version: link:../../libs/dota-core
@@ -814,6 +841,10 @@ importers:
         version: 4.1.10(@types/node@24.9.0)(@vitest/coverage-v8@4.1.10)(happy-dom@20.10.6)(jsdom@26.1.0)(vite@8.2.0(@types/node@24.9.0)(esbuild@0.28.1)(jiti@2.6.1))
 
   packages/utils/dota-common-utils:
+    dependencies:
+      consola:
+        specifier: 'catalog:'
+        version: 3.4.2
     devDependencies:
       '@microsoft/api-extractor':
         specifier: 'catalog:'
