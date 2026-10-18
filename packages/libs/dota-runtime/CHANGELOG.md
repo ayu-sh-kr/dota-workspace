@@ -1,5 +1,13 @@
 # @ayu-sh-kr/dota-runtime
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [ba59a15]
+  - @ayu-sh-kr/dota-router@0.3.2
+  - @ayu-sh-kr/dota-core@1.12.1
+
 ## 0.0.9
 
 ### Patch Changes

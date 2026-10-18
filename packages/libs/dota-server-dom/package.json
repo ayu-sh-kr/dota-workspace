@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Minimal DOM-free browser stand-ins for rendering web components on a server.",
   "keywords": [
     "dota",
