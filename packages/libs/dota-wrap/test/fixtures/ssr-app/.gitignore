@@ -1,0 +1,8 @@
+# Written by the ssr-deployment test's builds.
+dist
+dist-server
+.netlify
+api
+vercel.json
+wrangler.toml
+node_modules

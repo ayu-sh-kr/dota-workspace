@@ -1,5 +1,5 @@
 import {afterEach, describe, expect, it} from "vitest";
-import {Component, DotaPageElement, updateDocumentSEO} from "@dota/core";
+import {Component, DotaPageElement, SEO_JSON_LD_ATTRIBUTE, updateDocumentSEO} from "@dota/core";
 import {SEO} from "@dota/core/types";
 
 class TestPageElement extends DotaPageElement {
@@ -27,6 +27,20 @@ afterEach(() => {
 });
 
 describe("updateDocumentSEO", () => {
+  it("keeps one managed JSON-LD script in sync and leaves authored scripts alone", () => {
+    document.head.innerHTML = '<script type="application/ld+json">{"authored":true}</script>';
+
+    updateDocumentSEO({title: "A", description: "", jsonLd: {"@type": "Article", headline: "A"}});
+    updateDocumentSEO({title: "B", description: "", jsonLd: [{"@type": "WebPage"}]});
+    const managed = () => document.head.querySelectorAll(`script[${SEO_JSON_LD_ATTRIBUTE}]`);
+
+    expect(managed()).toHaveLength(1);
+    expect(managed()[0].textContent).toBe('[{"@type":"WebPage"}]');
+    updateDocumentSEO({title: "C", description: ""});
+    expect(managed()).toHaveLength(0);
+    expect(document.head.querySelectorAll('script[type="application/ld+json"]')).toHaveLength(1);
+  });
+
   it("writes every supported SEO field to the document head", () => {
     updateDocumentSEO({
       title: "Dota",

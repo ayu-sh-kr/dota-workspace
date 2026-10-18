@@ -64,4 +64,13 @@ describe('DocsViewComponent', () => {
     expect(view.querySelector('[data-md-content]')?.children).toHaveLength(0);
     expect(loadDoc).not.toHaveBeenCalled();
   });
+
+  it('keeps both navigation scroll areas opt-in to hidden scrollbars', async () => {
+    const view = await mount('<docs-view slug="ssr-request"></docs-view>');
+
+    expect(view.querySelector('aside[aria-label="Documentation navigation"]')?.classList.contains('no-scrollbar')).toBe(true);
+    expect(view.querySelector('aside[aria-label="Documentation navigation"]')?.getAttribute('tabindex')).toBe('0');
+    expect(view.querySelector('md-toc')?.getAttribute('container-class')).toContain('no-scrollbar');
+    expect(view.querySelector('md-toc')?.getAttribute('container-class')).toContain('overflow-y-auto');
+  });
 });

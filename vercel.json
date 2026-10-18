@@ -163,6 +163,18 @@
   ],
   "rewrites": [
     {
+      "source": "/blogs/content/:category/:blog",
+      "destination": "/api/dota-ssr?__dota_path=/blogs/content/:category/:blog"
+    },
+    {
+      "source": "/blogs",
+      "destination": "/api/dota-ssr?__dota_path=/blogs"
+    },
+    {
+      "source": "/community",
+      "destination": "/api/dota-ssr?__dota_path=/community"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

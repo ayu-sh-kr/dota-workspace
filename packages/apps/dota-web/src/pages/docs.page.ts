@@ -33,7 +33,7 @@ abstract class DocsRoutePage extends DotaPageElement {
 export class DocsPage extends DocsRoutePage {}
 
 /** `/docs` entry point; renders the first documentation page. */
-@Route({path: '/docs', ssr: true})
+@Route({path: '/docs', mode: 'ssg'})
 @Component({
   selector: 'docs-index-page',
   shadow: false

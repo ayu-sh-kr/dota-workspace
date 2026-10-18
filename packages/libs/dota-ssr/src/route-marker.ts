@@ -21,3 +21,8 @@ export const HYDRATION_ROUTE_ATTRIBUTE = 'data-dh-route';
 export const HYDRATION_ROUTE_VERSION_ATTRIBUTE = 'data-dh-route-version';
 /** Marker schema version shared by prerendering and browser adoption. */
 export const HYDRATION_ROUTE_VERSION = '1';
+
+/** Attributes that mark a route host for adoption; written by both SSG and the string SSR engine. */
+export function routeMarkerAttributes(): Record<string, string> {
+  return {[HYDRATION_ROUTE_ATTRIBUTE]: 'true', [HYDRATION_ROUTE_VERSION_ATTRIBUTE]: HYDRATION_ROUTE_VERSION};
+}

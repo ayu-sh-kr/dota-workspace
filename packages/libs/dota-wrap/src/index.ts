@@ -8,8 +8,10 @@ import {
   Router,
   RouterService,
   RouteRenderer,
+  RouterUtils,
   createRouteRenderer,
 } from '@ayu-sh-kr/dota-router';
+import {getApplicationCaptureHook} from '@ayu-sh-kr/dota-ssr';
 import type {DotaRuntimeContext, DotaRuntimePlugin} from './runtime-plugin';
 
 export * from './core';
@@ -94,22 +96,21 @@ async function extractComponent(modules: Record<string, unknown>): Promise<DotaE
  * @param externalComponents Additional constructors supplied by UI libraries.
  * @returns Complete constructor list passed to bootstrap.
  */
+/** Collects the application's components, external UI components included, without registering them. */
+async function resolveComponents(
+  modules: Record<string, unknown> | DotaElementConstructor[],
+  externalComponents: DotaElementConstructor[] = []
+): Promise<DotaElementConstructor[]> {
+  const components = Array.isArray(modules) ? [...modules] : await extractComponent(modules);
+  components.push(...externalComponents);
+  return components;
+}
+
 export async function registerComponents(
   modules: Record<string, unknown> | DotaElementConstructor[],
   externalComponents: DotaElementConstructor[] = []
 ) {
-  let components: DotaElementConstructor[];
-
-  if (Array.isArray(modules)) {
-    components = modules;
-  } else {
-    components = await extractComponent(modules);
-  }
-
-  if (externalComponents.length > 0) {
-    components.push(...externalComponents);
-  }
-
+  const components = await resolveComponents(modules, externalComponents);
   bootstrap(components);
   return components;
 }
@@ -152,6 +153,8 @@ export async function registerRoutes(
  * Composes runtime extensions, registers elements, and initializes application routing.
  * Plugin setup intentionally precedes custom-element definition so an existing static
  * document can hydrate during upgrade instead of taking the default client mount path.
+ * When Dota SSR loads the entry on a server, the configuration is reported to it and the
+ * returned promise never settles, so code chained on it only ever runs in the browser.
  * @param config Components, routes, root, hooks, and opt-in runtime plugins.
  * @returns Registered constructors and initialized router service.
  */
@@ -159,6 +162,16 @@ export async function initializeApp(config: AppConfig): Promise<{
   components: ComponentClass[],
   routerService: RouterService<Router<HTMLElement>>
 }> {
+  // A server loading this entry (Dota SSR) receives the configuration instead; the
+  // application never starts there, so browser-only startup code never runs.
+  const captureHook = getApplicationCaptureHook();
+  if (captureHook) {
+    const components = await resolveComponents(config.modules, config.externalComponents);
+    const routes = config.routes?.length ? config.routes : RouterUtils.prepareConfig(components);
+    captureHook({components, routes, errorRoute: config.errorRoute, defaultRoute: config.defaultRoute, root: config.root});
+    return new Promise(() => {});
+  }
+
   let routeRenderer = createRouteRenderer(config.root);
 
   // Track which plugin owns the mount strategy slot so a double-registration

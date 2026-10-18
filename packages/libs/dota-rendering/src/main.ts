@@ -3,4 +3,5 @@ export * from './template';
 export * from './diff';
 export * from './renderer';
 export * from './template-id';
+export * from './hydration-markers';
 export * from './logger';

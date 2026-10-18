@@ -20,6 +20,8 @@ import type {
 } from '@ayu-sh-kr/dota-runtime';
 import {updateDocumentSEO} from '@ayu-sh-kr/dota-core';
 import type {ComponentClass, NavigationContext, RouteMatch, RouteRenderer} from '@ayu-sh-kr/dota-router';
+export {getApplicationCaptureHook, setApplicationCaptureHook} from './application-capture';
+export type {ApplicationCaptureHook, CapturedApplication} from './application-capture';
 export {
   HYDRATION_ROUTE_ATTRIBUTE,
   HYDRATION_ROUTE_VERSION_ATTRIBUTE,

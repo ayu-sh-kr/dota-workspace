@@ -10,6 +10,17 @@ const blogRoutes = blogPosts.map(post =>
   `/blogs/content/${encodeURIComponent(post.category)}/${encodeURIComponent(post.path)}`
 );
 const docRoutes = DOCS.map(doc => docUrl(doc.slug));
+// Hosting target for SSG and SSR output; `DOTA_DEPLOYMENT=node` builds a local Node server.
+const deployment = (process.env.DOTA_DEPLOYMENT ?? 'vercel') as 'vercel' | 'node';
+// Parameterized pages to prerender. Blog articles render per request (`mode: 'ssr'`);
+// the render-mode benchmark (tool-scripts/render-mode-benchmark) sets DOTA_BENCH_VARIANT
+// to prerender every page (`ssg`) or none (`ssr`, `csr`).
+const prerenderedPages = {
+  mixed: docRoutes,
+  ssg: [...blogRoutes, ...docRoutes],
+  ssr: [],
+  csr: [],
+}[process.env.DOTA_BENCH_VARIANT ?? 'mixed'] ?? docRoutes;
 
 export default defineConfig({
   oxc: {
@@ -29,6 +40,7 @@ export default defineConfig({
         resolve(projectRoot, '../../ui/dota-md'),
       ],
       logType: 'info',
+      deployment,
       eventMap: {
         outFile: 'src/event-map.d.ts',
       },
@@ -44,8 +56,8 @@ export default defineConfig({
         concurrency: 1,
         entry: '/src/main.ts',
         autoDetectRoutes: true,
-        routes: [...blogRoutes, ...docRoutes],
-        deployment: 'vercel',
+        routes: prerenderedPages,
+        deployment: deployment === 'node' ? false : deployment,
       },
     }),
   ],

@@ -1,83 +1,53 @@
 import { BaseElement } from "@dota/core/elements";
 import {type SEO} from "@dota/core/types";
+import {SEO_JSON_LD_ATTRIBUTE, seoHeadTags, seoHeadTagSelector, type SeoHeadTag} from "@dota/core/elements/document-head.ts";
+
+export {SEO_JSON_LD_ATTRIBUTE, seoHeadTags, seoHeadTagSelector, type SeoHeadTag} from "@dota/core/elements/document-head.ts";
 
 /**
  * Synchronizes framework-managed page metadata with the current document head.
- * A missing optional value removes its existing tag so a previous route cannot leak
- * metadata into the next page.
+ * Every tag in {@link seoHeadTags} is applied, so a value the page omits removes the
+ * previous page's tag instead of leaking it into the next route.
  * @param seo Complete metadata to expose for the active page or route.
  */
 export function updateDocumentSEO(seo: SEO): void {
-  document.title = seo.title;
-  upsertMeta('name', 'description', seo.description);
-  upsertMeta('name', 'keywords', normalizeKeywords(seo.keywords));
-  upsertMeta('name', 'robots', seo.robots);
-  upsertLink('icon', seo.favicon ?? seo.image);
-  upsertLink('canonical', seo.canonical);
-
-  upsertMeta('property', 'og:title', seo.og?.title);
-  upsertMeta('property', 'og:description', seo.og?.description);
-  upsertMeta('property', 'og:image', seo.og?.image);
-  upsertMeta('property', 'og:type', seo.og?.type);
-  upsertMeta('property', 'og:url', seo.og?.url);
-  upsertMeta('property', 'og:site_name', seo.og?.siteName);
-
-  upsertMeta('name', 'twitter:card', seo.twitter?.card);
-  upsertMeta('name', 'twitter:title', seo.twitter?.title);
-  upsertMeta('name', 'twitter:description', seo.twitter?.description);
-  upsertMeta('name', 'twitter:image', seo.twitter?.image);
-  upsertMeta('name', 'twitter:site', seo.twitter?.site);
-  upsertMeta('name', 'twitter:creator', seo.twitter?.creator);
+  seoHeadTags(seo).forEach(applyHeadTag);
 }
 
 /**
- * Converts supported keyword input into the content value accepted by a meta tag.
- * Array entries are trimmed and empty values are discarded so pages cannot emit
- * blank comma-separated terms.
- * @param keywords Search terms supplied by a page or route.
- * @returns A normalized comma-separated value, or `undefined` when no term remains.
+ * Creates, updates, or removes the one head element a managed tag describes.
+ * The element is found by {@link seoHeadTagSelector}, so repeated updates reuse it; an
+ * empty value removes it. JSON-LD is written with `textContent` so it is never parsed as HTML.
+ * @param tag Managed head element and its value for the current page.
  */
-function normalizeKeywords(keywords: SEO['keywords']): string | undefined {
-  if (Array.isArray(keywords)) return keywords.filter(Boolean).map(keyword => keyword.trim()).filter(Boolean).join(', ');
-  return typeof keywords === 'string' ? keywords.trim() : undefined;
-}
-
-/**
- * Keeps one framework-managed meta tag aligned with an optional SEO value.
- * Removing an omitted value is necessary because routes share one document head.
- * @param attr Attribute namespace used to identify the tag.
- * @param key Metadata name or Open Graph property to update.
- * @param value Content to write; an empty value removes the matching tag.
- */
-function upsertMeta(attr: 'name' | 'property', key: string, value: string | undefined): void {
-  const selector = `meta[${attr}="${key}"]`;
-  const existing = document.head.querySelector(selector) as HTMLMetaElement | null;
+function applyHeadTag(tag: SeoHeadTag): void {
+  if (tag.kind === "title") {
+    document.title = tag.text;
+    return;
+  }
+  const existing = document.head.querySelector(seoHeadTagSelector(tag));
+  const value = tag.kind === "meta" ? tag.content : tag.kind === "link" ? tag.href : tag.data;
   if (!value) {
     existing?.remove();
     return;
   }
-  const element = existing ?? document.createElement('meta');
-  element.setAttribute(attr, key);
-  element.content = value;
-  if (!existing) document.head.appendChild(element);
-}
 
-/**
- * Keeps one framework-managed link element aligned with an optional SEO URL.
- * Removing an omitted URL prevents a favicon or canonical link from a prior route
- * from remaining active.
- * @param rel Link relationship that identifies the managed element.
- * @param href URL to write; an empty value removes the matching link.
- */
-function upsertLink(rel: string, href: string | undefined): void {
-  const existing = document.head.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement | null;
-  if (!href) {
-    existing?.remove();
-    return;
+  const element = existing ?? document.createElement(tag.kind === "json-ld" ? "script" : tag.kind);
+  switch (tag.kind) {
+    case "meta":
+      element.setAttribute(tag.attribute, tag.key);
+      element.setAttribute("content", tag.content!);
+      break;
+    case "link":
+      element.setAttribute("rel", tag.rel);
+      element.setAttribute("href", tag.href!);
+      break;
+    case "json-ld":
+      element.setAttribute("type", "application/ld+json");
+      element.setAttribute(SEO_JSON_LD_ATTRIBUTE, "");
+      element.textContent = JSON.stringify(tag.data);
+      break;
   }
-  const element = existing ?? document.createElement('link');
-  element.rel = rel;
-  element.href = href;
   if (!existing) document.head.appendChild(element);
 }
 

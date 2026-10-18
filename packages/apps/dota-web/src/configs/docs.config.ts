@@ -1,4 +1,4 @@
-/** One documentation page, served at `/docs/<slug>` from `public/docs/<slug>.md`. */
+/** One documentation page, loaded from a public Markdown file or a custom source. */
 export interface DocEntry {
   /** URL segment and Markdown file name. */
   slug: string;
@@ -21,6 +21,16 @@ export const DOCS: readonly DocEntry[] = [
   {slug: 'core', title: 'Core', section: 'Concepts'},
   {slug: 'decorators', title: 'Decorators', section: 'Concepts'},
   {slug: 'life-cycle', title: 'Life Cycle', section: 'Concepts'},
+  {slug: 'ssg-ssr-csr', title: 'Start here', section: 'Server Rendering'},
+  {slug: 'ssr-html-first', title: '1. From URL to HTML', section: 'Server Rendering'},
+  {slug: 'ssr-component', title: '2. A server-ready component', section: 'Server Rendering'},
+  {slug: 'ssr-request', title: '3. Inside one SSR request', section: 'Server Rendering'},
+  {slug: 'ssr-templates', title: '4. Templates become HTML', section: 'Server Rendering'},
+  {slug: 'ssr-static-build', title: '5. SSG: render at build time', section: 'Server Rendering'},
+  {slug: 'ssr-hydration', title: '6. Make HTML interactive', section: 'Server Rendering'},
+  {slug: 'ssr-hosting', title: '7. Build and serve a mixed app', section: 'Server Rendering'},
+  {slug: 'ssr-package-map', title: '8. Packages and server limits', section: 'Server Rendering'},
+  {slug: 'ssr-file-reference', title: 'Reference: every changed file', section: 'Server Rendering'},
   {slug: 'rest-client', title: 'Rest Client', section: 'Tools'},
   {slug: 'router', title: 'Router', section: 'Tools'},
 ];

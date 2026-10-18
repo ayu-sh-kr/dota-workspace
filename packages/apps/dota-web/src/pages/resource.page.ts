@@ -2,7 +2,7 @@ import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
 import { Route } from "@ayu-sh-kr/dota-wrap/router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
-@Route({path: '/resources'})
+@Route({path: '/resources', mode: 'csr'})
 @Component({
   selector: "resource-page",
   shadow: false

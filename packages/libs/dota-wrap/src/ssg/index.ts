@@ -1,9 +1,9 @@
 import type {Plugin} from 'vite';
 import dotaSsgImplementation, {
+  dotaSsr,
   resolveDecoratedSsgRoutes,
   resolveSsgRoutes,
   type DotaSsgOptions,
-
 } from '@ayu-sh-kr/dota-ssr/vite';
 
 export type {
@@ -13,8 +13,10 @@ export type {
   DotaSsgRouteInput,
   DotaSsgVercelOptions,
   ResolvedDotaSsgRoute,
+  DotaServerTarget,
+  DotaSsrOptions,
 } from '@ayu-sh-kr/dota-ssr/vite';
-export {resolveDecoratedSsgRoutes, resolveSsgRoutes};
+export {dotaSsr, resolveDecoratedSsgRoutes, resolveSsgRoutes};
 
 /**
  * Creates the wrapper-owned SSG plugin and points its rendering bridge at the

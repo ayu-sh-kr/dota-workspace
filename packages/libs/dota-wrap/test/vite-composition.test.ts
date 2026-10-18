@@ -13,7 +13,12 @@ describe('dotaVitePlugins', () => {
       'vite-plugin-dota-preloader',
       'vite-plugin-event-map-generator',
       'vite-plugin-dota-web-type-json',
+      'vite-plugin-dota-ssr',
     ]);
+  });
+
+  it('can leave out request-time rendering', () => {
+    expect(dotaVitePlugins({ssg: false, ssr: false}).map(plugin => plugin.name)).not.toContain('vite-plugin-dota-ssr');
   });
 
   it('appends explicitly supplied integrations without enabling them by default', () => {
@@ -24,6 +29,7 @@ describe('dotaVitePlugins', () => {
       eventMap: false,
       webTypes: false,
       ssg: false,
+      ssr: false,
       extensions: [nitro],
     });
 

@@ -8,7 +8,7 @@ import {installWindowGlobals} from './window-globals';
 import type {PrerenderAssetReader} from './asset-reader';
 import type {PrerenderNetworkCache} from './network-cache';
 import type {DotaSsgOptions, ResolvedDotaSsgRoute} from './types';
-import {HYDRATION_ROUTE_ATTRIBUTE, HYDRATION_ROUTE_VERSION_ATTRIBUTE, HYDRATION_ROUTE_VERSION} from '../route-marker';
+import {routeMarkerAttributes} from '../route-marker';
 
 /** Application namespace loaded from the configured SSG entry module. */
 type SsgApplicationModule = Record<string, unknown>;
@@ -213,8 +213,7 @@ export class CompiledModuleEvaluator extends ESModulesEvaluator {
 function markPrerenderedRoute(window: Window, pathname: string): void {
   for (const element of window.document.querySelectorAll('[path]')) {
     if (element.getAttribute('path') !== pathname || !element.parentElement?.localName.includes('-')) continue;
-    element.setAttribute(HYDRATION_ROUTE_ATTRIBUTE, 'true');
-    element.setAttribute(HYDRATION_ROUTE_VERSION_ATTRIBUTE, HYDRATION_ROUTE_VERSION);
+    Object.entries(routeMarkerAttributes()).forEach(([name, value]) => element.setAttribute(name, value));
     return;
   }
 }

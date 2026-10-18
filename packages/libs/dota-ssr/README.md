@@ -18,7 +18,7 @@ For package internals, see the [source layout](../../../documentation/packages/l
 pnpm add @ayu-sh-kr/dota-ssr
 ```
 
-The package requires Dota Core, Rendering, Router, and Runtime at runtime. Vite
+The package requires Dota Core, Rendering, Router, Runtime, and Server DOM at runtime. Vite
 is an optional peer used only by the `/vite` entry.
 
 ## Quick start
@@ -359,12 +359,69 @@ build when changing custom outputs. GitHub Pages does not gain server redirects
 or a SPA fallback from this option. Publishing and CI workflow configuration
 remain separate from generating these deployment files.
 
+## Request-time rendering
+
+Declare a route `mode: 'ssr'` and it is rendered on the server for every request. There
+is no server code to write: with `dotaVitePlugins()` from Dota Wrap (or `dotaSsr()` from
+`@ayu-sh-kr/dota-ssr/vite`), the same route modes drive development, the build, and the
+deployment.
+
+```ts
+@Route({path: '/tasks/:id', mode: 'ssr'})
+export class TaskPage extends DotaPageElement {
+  async serverLoad(context: RenderContext) {
+    this.task = await (await context.fetch(`/api/tasks/${context.params.id}`)).json();
+  }
+}
+```
+
+```ts
+// vite.config.ts: one deployment target for SSG and SSR output
+plugins: [...dotaVitePlugins({deployment: 'vercel', ssg: {autoDetectRoutes: true}})]
+```
+
+| Route mode | `vite dev` | Build output | Served by |
+| --- | --- | --- | --- |
+| `ssg` | client-rendered | prerendered HTML (`build:ssg`) | static hosting |
+| `ssr` | rendered by dev middleware | server bundle for the target | the platform's server runtime |
+| `csr` (default) | client-rendered | the SPA shell | static hosting, SPA fallback |
+
+The server reads components and routes from the application entry itself: on the server,
+`initializeApp()` reports its configuration instead of starting, so nothing is declared
+twice. The built `index.html` is the document shell; the page is rendered inside the root
+element and the page `seo` replaces the shell's `<title>`. Output carries hydration
+markers, which `dotaHydration()` adopts in the browser.
+
+| `deployment` | What the build writes |
+| --- | --- |
+| `node` (default) | `dist-server/`; run `node dist-server/server.mjs` (serves static files, `ssr` routes, and the SPA fallback on `PORT`) |
+| `vercel` | `api/dota-ssr.mjs` beside `vercel.json`, plus rewrites for `ssr` routes ahead of authored rewrites |
+| `netlify` | a Functions API function in `.netlify/v1/functions/dota-ssr/` claiming only `ssr` paths |
+| `cloudflare-pages` | `_worker.js/` and `_routes.json` in the output directory; a `wrangler.toml` enabling `nodejs_compat` when none exists |
+| `github-pages` | nothing: static only, so `ssr` routes render in the browser (with a warning) |
+
+Builds whose sources never declare `mode: 'ssr'` skip the server build. While a page
+renders, `window`, `document`, `location`, `history`, storage, and `matchMedia` are backed
+by that request; host changes through `classList`, `dataset`, `style`, and attributes
+reach the HTML.
+
+### Custom servers
+
+The pieces are public for hosts the targets do not cover: `createApplicationHandler(() =>
+import('./main.ts'), {template})` returns a web-standard `(Request) => Response | undefined`
+handler, `toNodeListener` adapts it to `node:http`, and `createNodeServer` from
+`@ayu-sh-kr/dota-ssr/node` adds static files and the SPA fallback. `createStringAdapter`
+and `createRequestHandler` remain available for explicit component and route lists; see
+`playground/light-dom`. Design: [light-DOM string rendering](../../../documentation/packages/libs/dota-ssr/architecture/light-dom-string-rendering.md).
+
 ## Public API
 
 | Entry point | Main exports | Use |
 | --- | --- | --- |
 | `@ayu-sh-kr/dota-ssr` | `dotaHydration`, `DotaHydrationOptions`, route-marker constants | Browser-side adoption of compatible static markup and initial route hosts. |
-| `@ayu-sh-kr/dota-ssr/vite` | `dotaSsg`, route types and route resolvers | Build-time route rendering and output mapping. |
+| `@ayu-sh-kr/dota-ssr/vite` | `dotaSsg`, `dotaSsr`, route types and route resolvers | Build-time prerendering, request-time rendering, and deployment output. |
+| `@ayu-sh-kr/dota-ssr/server` | `createApplicationHandler`, `captureApplication`, `createStringAdapter`, `createRequestHandler`, `toNodeListener`, `runInBrowserScope`, `RenderContext` | Request-time rendering to hydratable HTML strings without a DOM library. |
+| `@ayu-sh-kr/dota-ssr/node` | `createNodeServer` | Node hosting: static files, `ssr` routes, and the SPA fallback. |
 
 The package is opt-in by design: adding it as a dependency does not change
 rendering until one of these functions is installed.

@@ -20,7 +20,10 @@
   },
   "license": "MIT",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/ssr/server-globals.mjs",
+    "./dist/ssr/server-globals.cjs"
+  ],
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -39,6 +42,20 @@
       "import": "./dist/vite/index.mjs",
       "require": "./dist/vite/index.cjs",
       "default": "./dist/vite/index.mjs"
+    },
+    "./server": {
+      "types": "./dist/ssr/index.d.ts",
+      "module": "./dist/ssr/index.mjs",
+      "import": "./dist/ssr/index.mjs",
+      "require": "./dist/ssr/index.cjs",
+      "default": "./dist/ssr/index.mjs"
+    },
+    "./node": {
+      "types": "./dist/ssr/node.d.ts",
+      "module": "./dist/ssr/node.mjs",
+      "import": "./dist/ssr/node.mjs",
+      "require": "./dist/ssr/node.cjs",
+      "default": "./dist/ssr/node.mjs"
     }
   },
   "scripts": {
@@ -46,13 +63,15 @@
     "release": "pnpm run build && changeset publish",
     "test": "tsc --noEmit && vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "playground": "node playground/light-dom/server.mjs"
   },
   "dependencies": {
     "@ayu-sh-kr/dota-core": "workspace:*",
     "@ayu-sh-kr/dota-rendering": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-runtime": "workspace:*",
+    "@ayu-sh-kr/dota-server-dom": "workspace:*",
     "consola": "catalog:"
   },
   "devDependencies": {

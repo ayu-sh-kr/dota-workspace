@@ -3,10 +3,11 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
-    alias: {
-      '@dota': resolve(import.meta.dirname, 'src'),
-      '@test': resolve(import.meta.dirname, 'test')
-    }
+    alias: [
+      {find: /^@ayu-sh-kr\/dota-rendering$/, replacement: resolve(import.meta.dirname, 'src/main.ts')},
+      {find: '@dota', replacement: resolve(import.meta.dirname, 'src')},
+      {find: '@test', replacement: resolve(import.meta.dirname, 'test')}
+    ]
   },
   test: {
     globals: true,

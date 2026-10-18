@@ -547,6 +547,12 @@ export type TwitterSEO = {
  * Pages expose it through `DotaPageElement.seo`; routes may declare the same object
  * so non-page components and custom renderers receive equivalent head metadata.
  */
+/**
+ * One schema.org structured-data object, such as `{'@context': 'https://schema.org', '@type': 'Article', …}`.
+ * Written verbatim as JSON into a `<script type="application/ld+json">` so search engines can read it.
+ */
+export type JsonLd = Readonly<Record<string, unknown>>;
+
 export type SEO = {
   /** Text written to the document title. */
   title: string;
@@ -566,4 +572,6 @@ export type SEO = {
   og?: OpenGraphSEO;
   /** Twitter/X card metadata. */
   twitter?: TwitterSEO;
+  /** Structured data for search engines; an array is written as one JSON-LD array. */
+  jsonLd?: JsonLd | readonly JsonLd[];
 }
