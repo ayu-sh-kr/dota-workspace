@@ -13,6 +13,8 @@ export type {
   ResolvedDotaSsgRoute
 } from '../ssg/types';
 export {resolveDecoratedSsgRoutes, resolveSsgRoutes} from '../ssg/route-output';
+export {dotaSsr} from './ssr/plugin';
+export type {DotaServerTarget, DotaSsrOptions} from './ssr/types';
 
 /**
  * Prerenders isolated route documents and prepares optional hosting files after the client build.
