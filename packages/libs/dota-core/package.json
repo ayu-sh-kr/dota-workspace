@@ -50,6 +50,7 @@
     "Decorated Components"
   ],
   "dependencies": {
+    "@ayu-sh-kr/dota-common-utils": "workspace:*",
     "reflect-metadata": "catalog:",
     "@ayu-sh-kr/dota-event": "workspace:*",
     "@ayu-sh-kr/dota-rendering": "workspace:*"
