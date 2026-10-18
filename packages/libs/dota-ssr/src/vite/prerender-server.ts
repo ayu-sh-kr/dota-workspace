@@ -1,6 +1,7 @@
 import {isAbsolute, resolve} from 'node:path';
 import type {Plugin, ResolvedConfig, ViteDevServer} from 'vite';
-import {createServer, loadConfigFromFile} from 'vite';
+import {createServer} from 'vite';
+import {loadApplicationConfig} from './application-config';
 import {resolveDecoratedSsgRoutes} from '../ssg/route-output';
 import type {DotaDecoratedRoute, DotaSsgOptions, DotaSsgRouteInput, ResolvedDotaSsgRoute} from '../ssg/types';
 
@@ -60,30 +61,20 @@ export async function createPrerenderServer(
   };
 
   // The client build already owns generated metadata; renderers only need runtime transforms.
-  const loadedConfig = config.configFile
-    ? (await loadConfigFromFile({command: 'serve', mode: config.mode}, config.configFile, root))?.config
-    : undefined;
-  const excludedPlugins = new Set(['vite-plugin-event-map-generator', 'vite-plugin-dota-web-type-json']);
-  const plugins: Plugin[] = [];
-  const pendingPlugins = [...(loadedConfig?.plugins ?? [])];
-  while (pendingPlugins.length) {
-    const plugin = await pendingPlugins.shift();
-    if (Array.isArray(plugin)) pendingPlugins.unshift(...plugin);
-    else if (plugin && !excludedPlugins.has(plugin.name)) plugins.push(plugin);
-  }
+  const {config: loadedConfig, plugins} = await loadApplicationConfig(config, root, 'serve');
   const server = await createServer({
     ...loadedConfig,
-    configFile: config.configFile ? false : config.configFile,
+    configFile: false,
     root,
     mode: config.mode,
     appType: 'custom',
     optimizeDeps: {noDiscovery: true, include: []},
-    server: {...loadedConfig?.server, middlewareMode: true, hmr: false, ws: false, watch: null},
+    server: {...loadedConfig.server, middlewareMode: true, hmr: false, ws: false, watch: null},
     ssr: {
-      ...loadedConfig?.ssr,
-      noExternal: loadedConfig?.ssr?.noExternal === true ? true : [
+      ...loadedConfig.ssr,
+      noExternal: loadedConfig.ssr?.noExternal === true ? true : [
         /^@ayu-sh-kr\/dota-/,
-        ...[loadedConfig?.ssr?.noExternal ?? []].flat()
+        ...[loadedConfig.ssr?.noExternal ?? []].flat()
       ]
     },
     plugins: [...plugins, virtualEntryPlugin]
