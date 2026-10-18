@@ -23,7 +23,7 @@ export class AiButtonComponent extends BaseElement {
     return `
       <span id="github-button" class="active:scale-95 cursor-pointer">
         <a target="_blank">
-            <dota-icon name="healthicons:artificial-intelligence" color="pink" variant="ghost" size="md"/>
+            <dota-icon name="healthicons:artificial-intelligence" color="pink" variant="ghost" size="md"></dota-icon>
         </a>
       </span>
     `;
