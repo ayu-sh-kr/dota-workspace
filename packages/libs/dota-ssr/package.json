@@ -20,7 +20,10 @@
   },
   "license": "MIT",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/ssr/server-globals.mjs",
+    "./dist/ssr/server-globals.cjs"
+  ],
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -46,6 +49,13 @@
       "import": "./dist/ssr/index.mjs",
       "require": "./dist/ssr/index.cjs",
       "default": "./dist/ssr/index.mjs"
+    },
+    "./node": {
+      "types": "./dist/ssr/node.d.ts",
+      "module": "./dist/ssr/node.mjs",
+      "import": "./dist/ssr/node.mjs",
+      "require": "./dist/ssr/node.cjs",
+      "default": "./dist/ssr/node.mjs"
     }
   },
   "scripts": {
@@ -61,6 +71,7 @@
     "@ayu-sh-kr/dota-rendering": "workspace:*",
     "@ayu-sh-kr/dota-router": "workspace:*",
     "@ayu-sh-kr/dota-runtime": "workspace:*",
+    "@ayu-sh-kr/dota-server-dom": "workspace:*",
     "consola": "catalog:"
   },
   "devDependencies": {
