@@ -39,6 +39,8 @@ A **render session** remembers how future outputs relate to nodes/parts. It is h
 
 For ordinary eligible hosts, the hydration mount strategy checks the structured template's identity, marker version, and scope before calling Rendering's `hydrate`. Missing markers take the ordinary mount path. Marked but incompatible output follows the mismatch policy.
 
+This is a **strategy pattern**: Core asks the installed strategy how to create the first render session instead of hard-coding “always mount.” The plugin chooses whether to mount, adopt, or defer; Core's ordinary lifecycle still performs binding and subsequent updates.
+
 ## Why the root and initial page need special handling
 
 At startup the router also wants to display its first page. If it replaced a server-produced page host, even correctly marked descendants could disappear.

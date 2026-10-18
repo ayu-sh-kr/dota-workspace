@@ -39,7 +39,11 @@ await context.fetch('/api/tasks/42'); // resolves against https://example.com
 
 The matcher checks routes in order; first match wins. It supports literal and `:name` path segments and ignores trailing slashes. It is not the complete browser router or an API/authentication layer. `context.state` is a request-local `Map` shared with descendants; `Map` is a key/value store, not a client-state transfer mechanism.
 
+`context.fetch` resolves URLs; it does not automatically forward the visitor's cookies or authorization headers. An application that needs authenticated server fetches must explicitly supply that behavior without putting visitor-specific credentials into shared global state.
+
 ## Every host: construct, load, render
+
+The **adapter pattern** separates request orchestration from the HTML engine. The handler calls `adapter.render(selector, context)` and receives `{html, head?}`; `head?` means metadata is optional. The default string adapter supplies that contract. Another engine could implement it without rewriting route matching and response composition.
 
 For the matching page, `createStringAdapter` performs this sequence:
 

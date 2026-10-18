@@ -52,6 +52,8 @@ export const applicationReady = initializeApp({
 
 Here `components`, `routeConfig`, `AppComponent`, and `initializeApplicationData` are application-owned values. The important contract is the exported promise. SSG awaits `applicationReady` by default; `readyExport` can select another export. Export a real promise, not a boolean saying “started.” A promise represents work whose completion can be awaited.
 
+In `.then(async () => { ... })`, `() =>` declares an **arrow function**, a callback to run after startup resolves. Returning/awaiting its asynchronous work extends the exported promise. Starting a detached operation without returning or awaiting it does not make that operation part of this readiness contract.
+
 The pre-render runner enables server-render/hydration emission, loads the entry, and runs normal `initializeApp`. The request-time application-capture hook is **not** active. Custom elements connect, the router starts, and after-init work can run.
 
 > **For the task example:** SSG reaches `initializeFromBrowserUrl`, not `serverLoad`. If the initial static HTML needs API data, the normal startup/data-loading path must request it. Putting it only in `serverLoad` will not populate SSG output.

@@ -62,11 +62,11 @@ The `RenderContext` import is **type-only**: TypeScript removes it from emitted 
 </task-page>
 ```
 
-**3. Describe output.** `render()` reads prepared state and returns an `html` template. It should not fetch data or access layout. The same description can be serialized on the server or rendered in the browser.
+**3. Describe output.** `render()` reads prepared state and returns an `html` template. Keep it **pure**: describing the same state should produce the same output without starting fetches or changing external state. The same description can be serialized on the server or rendered in the browser; it should not depend on layout measurements.
 
 **4. Handle the other startup path.** `serverLoad` runs in request-time string SSR, not in the browser or the current SSG pipeline. `@AfterInit` handles ordinary browser/SSG startup. The guard avoids overwriting a value already transferred in the host's attribute. `updateHTML()` applies changed state; `updateSEO()` refreshes the browser title after the ID is available.
 
-> **Host** means the outer component element, here `<task-page>`. **Instance** means one object constructed from `TaskPage`. HTML transfers attributes and content, not that JavaScript object. A plain field or `context.state` is not automatically serialized for the browser.
+> **Host** means the outer component element, here `<task-page>`. **Instance** means one object constructed from `TaskPage`. HTML transfers attributes and content, not that JavaScript object. A plain field or `context.state` is not automatically serialized for the browser. Reflected property values are public HTML; never use them to transfer secrets.
 
 ## Understand the symbols
 

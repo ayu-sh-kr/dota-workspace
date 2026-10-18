@@ -6,7 +6,7 @@
 
 ## Wrap composes the pieces; it does not replace the engine
 
-For an application using `initializeApp`, use the wrapper's Vite composition and hydration plugin. The server captures the existing application declarations; you do not duplicate the component registry or SSR route list.
+For an application using `initializeApp`, use the wrapper's Vite composition and hydration plugin. Wrap is a **facade**: a coordinated public entry point over collaborating libraries, not a second rendering engine. The server captures the existing application declarations; you do not duplicate the component registry or SSR route list.
 
 ```ts
 // vite.config.ts — wrapper-based build configuration.
