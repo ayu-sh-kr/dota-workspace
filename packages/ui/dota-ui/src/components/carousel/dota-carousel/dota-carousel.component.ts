@@ -98,12 +98,28 @@ export class DotaCarouselComponent extends BaseElement {
   private _isPaused: boolean = false;
   private _dragStartX: number = 0;
 
+  private lightDomCaptured = false;
+
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = this.innerHTML;
-    const slideEls = tempDiv.querySelectorAll('dota-slide');
-    this.dotaSlides = Array.from(slideEls).map(el => el.innerHTML);
+  }
+
+  /**
+   * Captures authored light DOM once, before the first mount.
+   * Reading it here rather than in the constructor also works where children are not yet
+   * visible during element upgrade (as in happy-dom prerendering).
+   */
+  connectedCallback() {
+    if (!this.lightDomCaptured) {
+      this.lightDomCaptured = true;
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = this.innerHTML;
+      const slideEls = tempDiv.querySelectorAll('dota-slide');
+      // Slides assigned as a property before connection stay when no slides are authored.
+      if (slideEls.length > 0) this.dotaSlides = Array.from(slideEls).map(el => el.innerHTML);
+    }
+    super.connectedCallback();
   }
 
   @AfterInit()
