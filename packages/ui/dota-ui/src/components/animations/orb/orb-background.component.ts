@@ -1,3 +1,4 @@
+import {startAnimationLoop} from "@dota/components/animations/animation-loop.ts";
 import {BaseElement, Component, Number, Property, String} from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 
@@ -362,7 +363,6 @@ function startParticleLoop(
   const ctx = canvas.getContext('2d')!;
   const TAU = Math.PI * 2;
 
-  let raf = 0;
   let cw = 0;
   let ch = 0;
 
@@ -472,13 +472,12 @@ function startParticleLoop(
       }
     }
 
-    raf = requestAnimationFrame(loop);
   };
 
-  raf = requestAnimationFrame(loop);
+  const stopLoop = startAnimationLoop(canvas, loop);
 
   return () => {
-    cancelAnimationFrame(raf);
+    stopLoop();
     window.removeEventListener('resize', resize);
     themeObserver.disconnect();
   };
