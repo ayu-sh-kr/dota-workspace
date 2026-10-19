@@ -1,3 +1,4 @@
+import {startAnimationLoop} from "@dota/components/animations/animation-loop.ts";
 import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-core";
 import { OnEvent } from "@ayu-sh-kr/dota-event";
 import { ORB_COLOR_MAP } from "@dota/components/animations/orb/orb-background.component.ts";
@@ -79,7 +80,6 @@ function startLoop(canvas: HTMLCanvasElement, color: OrbitColor): () => void {
     return () => {};
   }
 
-  let raf = 0;
   let frame = 0;
   let width = 0;
   let height = 0;
@@ -258,14 +258,12 @@ function startLoop(canvas: HTMLCanvasElement, color: OrbitColor): () => void {
 
     renderTracers();
     renderCursorGlow();
-
-    raf = requestAnimationFrame(step);
   };
 
-  raf = requestAnimationFrame(step);
+  const stopLoop = startAnimationLoop(canvas, step);
 
   return () => {
-    cancelAnimationFrame(raf);
+    stopLoop();
     themeObserver.disconnect();
     window.removeEventListener("resize", resize);
     window.removeEventListener("mousemove", onMove);
