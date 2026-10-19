@@ -11,6 +11,38 @@ const logger = createDotaLogger('dota-wrap', 'lazy-components.ts');
  */
 const DEFINITION_BUDGET_MS = 40;
 
+/** Longest wait for first paint before prerendered routes load their components anyway. */
+const FIRST_PAINT_TIMEOUT_MS = 3000;
+
+/**
+ * Resolves once the browser has painted the document's first content.
+ * Prerendered HTML is readable without JavaScript, so a route's component chunks wait for this
+ * instead of competing for bandwidth with the stylesheets that gate first paint. Resolves
+ * immediately for a hidden tab, which records no paint; falls back to the next animation frame
+ * where the Paint Timing API is missing, and to a timeout so hydration always proceeds.
+ * @returns Promise settled after first contentful paint.
+ */
+export function afterFirstPaint(): Promise<void> {
+  const painted = () => performance.getEntriesByType?.('paint').some(entry => entry.name === 'first-contentful-paint') ?? false;
+  if (document.visibilityState === 'hidden' || painted()) return Promise.resolve();
+  if (typeof PerformanceObserver === 'undefined' || !PerformanceObserver.supportedEntryTypes?.includes('paint')) {
+    return new Promise(resolve => requestAnimationFrame(() => resolve()));
+  }
+
+  return new Promise(resolve => {
+    const done = () => {
+      observer.disconnect();
+      window.clearTimeout(timer);
+      resolve();
+    };
+    const observer = new PerformanceObserver(() => {
+      if (painted()) done();
+    });
+    const timer = window.setTimeout(done, FIRST_PAINT_TIMEOUT_MS);
+    observer.observe({type: 'paint', buffered: true});
+  });
+}
+
 /** Lets the browser handle input and paint before the next batch of definitions. */
 function yieldToMain(): Promise<void> {
   const scheduler = (globalThis as {scheduler?: {yield?: () => Promise<void>}}).scheduler;
