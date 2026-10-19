@@ -1,5 +1,16 @@
 # @ayu-sh-kr/dota-ui
 
+## 0.2.1
+
+### Patch Changes
+
+- fcca00d: Light-DOM components now read their authored content when they connect instead of in their constructor, so static generation keeps their content and pages using them hydrate without a mismatch.
+
+  - Affects `dota-popover`, `dota-badge`, `dota-button`, `dota-chip`, `dota-card`, the card footer, `dota-avatar`, `dota-slide`, `scroll-deck`, and `dota-carousel`.
+  - `dota-carousel` keeps slides assigned through `dotaSlides` when no `<dota-slide>` children are authored.
+  - @ayu-sh-kr/dota-core@1.12.2
+  - @ayu-sh-kr/dota-web-type-json@0.0.23
+
 ## 0.2.0
 
 ### Minor Changes
