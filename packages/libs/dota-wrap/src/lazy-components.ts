@@ -90,6 +90,8 @@ export class LazyComponentLoader {
   private readonly loaders = new Map<string, ComponentLoader>();
   private readonly dependencies = new Map<string, readonly string[]>();
   private readonly pending = new Map<string, Promise<DotaElementConstructor | undefined>>();
+  /** Observers to notify after a batch is defined, since upgrades attach new shadow roots. */
+  private readonly definitionListeners = new Set<(tags: readonly string[]) => void>();
   /** Registry of the window this loader was created in; definitions stop if that window goes away. */
   private readonly registry: CustomElementRegistry | undefined = typeof customElements === 'undefined' ? undefined : customElements;
 
@@ -141,6 +143,7 @@ export class LazyComponentLoader {
 
   private async define(missing: string[]): Promise<void> {
     const constructors = await Promise.all(missing.map(tag => this.load(tag)));
+    const defined: string[] = [];
     let batchStart = performance.now();
     for (const [index, constructor] of constructors.entries()) {
       if (!this.isCurrentRealm()) return;
@@ -150,8 +153,12 @@ export class LazyComponentLoader {
         batchStart = performance.now();
         if (!this.isCurrentRealm()) return;
       }
-      if (!this.registry?.get(missing[index])) bootstrap([constructor]);
+      if (!this.registry?.get(missing[index])) {
+        bootstrap([constructor]);
+        defined.push(missing[index]);
+      }
     }
+    if (defined.length > 0) this.definitionListeners.forEach(listener => listener(defined));
   }
 
   /** False once the window that created this loader is no longer the global one, e.g. after server prerendering. */
@@ -170,30 +177,66 @@ export class LazyComponentLoader {
 
   /**
    * Defines registry elements already in `root` and any added later, until every registry tag is defined.
+   * Open shadow roots are scanned and observed as roots of their own, including roots that
+   * components attach when they upgrade, because neither selectors nor mutation records cross a
+   * shadow boundary. Tags inside closed shadow roots are out of reach; declare them in the
+   * registry's `dependencies` instead.
    * @param root Subtree to watch, normally `document.documentElement`.
    * @returns Stops observing.
    */
   observe(root: Element): () => void {
-    const ensureWithin = (element: Element) => {
+    const watchedRoots = new WeakSet<Node>();
+    const watchedList: Array<Element | ShadowRoot> = [];
+    let stopped = false;
+
+    const stop = () => {
+      stopped = true;
+      observer.disconnect();
+      this.definitionListeners.delete(onDefined);
+    };
+
+    /** Loads undefined registry tags in `scope` and starts watching the shadow roots inside it. */
+    const scan = (scope: Element | ShadowRoot) => {
       const tags = new Set<string>();
-      if (!this.registry?.get(element.localName) && this.loaders.has(element.localName)) tags.add(element.localName);
-      element.querySelectorAll(':not(:defined)').forEach(child => {
-        if (this.loaders.has(child.localName)) tags.add(child.localName);
-      });
+      const visit = (element: Element) => {
+        if (this.loaders.has(element.localName) && !this.registry?.get(element.localName)) tags.add(element.localName);
+        if (element.shadowRoot) watch(element.shadowRoot);
+      };
+      if (scope instanceof Element) visit(scope);
+      scope.querySelectorAll('*').forEach(visit);
       if (tags.size > 0) void this.ensure(tags);
+    };
+
+    const watch = (scope: Element | ShadowRoot) => {
+      if (stopped || watchedRoots.has(scope)) return;
+      watchedRoots.add(scope);
+      watchedList.push(scope);
+      observer.observe(scope, {childList: true, subtree: true});
+      scan(scope);
+    };
+
+    /** Upgraded elements may have just attached shadow roots that need watching. */
+    const onDefined = (tags: readonly string[]) => {
+      const selector = tags.join(',');
+      for (const scope of [...watchedList]) {
+        scope.querySelectorAll(selector).forEach(host => {
+          if (host.shadowRoot) watch(host.shadowRoot);
+        });
+      }
     };
 
     const observer = new MutationObserver(records => {
       for (const record of records) {
         record.addedNodes.forEach(node => {
-          if (node.nodeType === Node.ELEMENT_NODE) ensureWithin(node as Element);
+          if (node.nodeType === Node.ELEMENT_NODE) scan(node as Element);
         });
       }
-      if ([...this.loaders.keys()].every(tag => this.registry?.get(tag))) observer.disconnect();
+      if ([...this.loaders.keys()].every(tag => this.registry?.get(tag))) stop();
     });
-    observer.observe(root, {childList: true, subtree: true});
-    ensureWithin(root);
-    return () => observer.disconnect();
+
+    this.definitionListeners.add(onDefined);
+    watch(root);
+    return stop;
   }
 
   private load(tag: string): Promise<DotaElementConstructor | undefined> {
