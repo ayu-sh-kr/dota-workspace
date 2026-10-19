@@ -274,6 +274,8 @@ function hasPrerenderedContent(root: ComponentClass): boolean {
 
 /**
  * Defers each route render until the page's dependency closure is defined.
+ * Loads are shared, but a navigation aborted while it waited never presents its route, so a
+ * slow import cannot overwrite the page of the navigation that replaced it.
  * A prerendered first route is already visible, so its components load after first paint
  * rather than competing with the requests that gate it.
  * After the first render it starts the loader's document observer, so elements outside
@@ -291,9 +293,12 @@ function withLazyComponents(
   let observing = false;
   return async (match, context) => {
     if (context.initial && prerendered) await afterFirstPaint();
+    // A newer navigation may have superseded this one while it waited; it must not render.
+    if (context.signal.aborted) return;
     const component = match.route.component as ComponentClass & {__dotaSelector?: string};
     const selector = Metadata.for(component).own(CoreMetadata.component)?.selector ?? component.__dotaSelector;
     if (selector && !match.route.render) await loader.ensure([selector]);
+    if (context.signal.aborted) return;
     await next(match, context);
     if (!observing) {
       observing = true;
