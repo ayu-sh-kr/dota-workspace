@@ -14,7 +14,7 @@ import {
 import {getApplicationCaptureHook} from '@ayu-sh-kr/dota-ssr';
 import {configureDotaLogging, createDotaLogger, type DotaLoggingOptions} from '@ayu-sh-kr/dota-common-utils';
 import type {DotaRuntimeContext, DotaRuntimePlugin} from './runtime-plugin';
-import {LazyComponentLoader, type ComponentRegistry} from './lazy-components';
+import {afterFirstPaint, LazyComponentLoader, type ComponentRegistry} from './lazy-components';
 
 const logger = createDotaLogger('dota-wrap', 'index.ts');
 
@@ -228,7 +228,7 @@ export async function initializeApp(config: AppConfig): Promise<{
   // Outermost by construction: a route's code is defined before any plugin (hydration) presents it.
   let firstRender: Promise<void> | undefined;
   if (componentLoader) {
-    const lazy = withLazyComponents(routeRenderer, componentLoader);
+    const lazy = withLazyComponents(routeRenderer, componentLoader, hasPrerenderedContent(config.root));
     // Readiness means the first render settled; a failed render stays the router's to report.
     firstRender = new Promise<void>(resolve => {
       routeRenderer = (match, context) => {
@@ -260,16 +260,37 @@ export async function initializeApp(config: AppConfig): Promise<{
 }
 
 /**
+ * Reports whether the root host already holds server-rendered content, read before any
+ * component upgrades so client rendering cannot be mistaken for it.
+ * @param root Root component whose host receives route output.
+ * @returns True when the document arrived with prerendered route markup.
+ */
+function hasPrerenderedContent(root: ComponentClass): boolean {
+  const selector = Metadata.for(root).own(CoreMetadata.component)?.selector ?? (root as {__dotaSelector?: string}).__dotaSelector;
+  if (!selector) return false;
+  const host = document.getElementById(selector) ?? document.querySelector(selector);
+  return (host?.childElementCount ?? 0) > 0;
+}
+
+/**
  * Defers each route render until the page's dependency closure is defined.
+ * A prerendered first route is already visible, so its components load after first paint
+ * rather than competing with the requests that gate it.
  * After the first render it starts the loader's document observer, so elements outside
  * route templates are defined too without racing the initial hydration hand-off.
  * @param next Renderer that presents the route once its components exist.
  * @param loader Loader holding the application's lazy registries.
+ * @param prerendered Whether the document arrived with the first route already rendered.
  * @returns Renderer that loads, then delegates.
  */
-function withLazyComponents(next: RouteRenderer<HTMLElement>, loader: LazyComponentLoader): RouteRenderer<HTMLElement> {
+function withLazyComponents(
+  next: RouteRenderer<HTMLElement>,
+  loader: LazyComponentLoader,
+  prerendered: boolean
+): RouteRenderer<HTMLElement> {
   let observing = false;
   return async (match, context) => {
+    if (context.initial && prerendered) await afterFirstPaint();
     const component = match.route.component as ComponentClass & {__dotaSelector?: string};
     const selector = Metadata.for(component).own(CoreMetadata.component)?.selector ?? component.__dotaSelector;
     if (selector && !match.route.render) await loader.ensure([selector]);
