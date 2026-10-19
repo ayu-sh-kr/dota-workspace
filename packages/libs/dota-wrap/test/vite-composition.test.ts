@@ -14,6 +14,7 @@ describe('dotaVitePlugins', () => {
       'vite-plugin-event-map-generator',
       'vite-plugin-dota-web-type-json',
       'vite-plugin-dota-ssr',
+      'vite-plugin-dota-remote-stylesheets',
     ]);
   });
 
@@ -30,6 +31,7 @@ describe('dotaVitePlugins', () => {
       webTypes: false,
       ssg: false,
       ssr: false,
+      remoteStylesheets: false,
       extensions: [nitro],
     });
 
