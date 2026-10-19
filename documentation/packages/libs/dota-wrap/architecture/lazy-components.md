@@ -24,7 +24,11 @@ unchanged; applications opt in.
    Each dynamic import becomes its own chunk, and Vite hoists shared code automatically.
 2. **Start-up.** `initializeApp` registers `modules` and `externalComponents` as before, then
    starts the router. The lazy route renderer wraps every plugin renderer (hydration included),
-   so a page's code is always defined before anything presents it.
+   so a page's code is always defined before anything presents it. When the document arrived
+   with the first route already rendered (SSG or SSR), its components load after the browser's
+   first contentful paint, because the server HTML is readable without them and their requests
+   would otherwise compete with the stylesheets that gate first paint. A hidden tab, a browser
+   without the Paint Timing API, or a 3 s timeout ends that wait.
 3. **Navigation.** Before each render, `LazyComponentLoader.ensure([pageSelector])` walks the
    page's dependency closure, loads every missing component in parallel, and defines them
    parents first. Definitions run in batches of about 40 ms and yield to the browser between
@@ -36,6 +40,18 @@ unchanged; applications opt in.
    the first route has rendered. Each load is also reported through `trackPendingWork` from
    `@ayu-sh-kr/dota-ssr`, so static generation serializes a page only after late components
    are defined too.
+
+## Build output
+
+Two build steps keep the start-up requests few, without application configuration:
+
+- The preloader groups the application's start-up support modules (modules under `src` on the
+  entry's static import chain that are not components, pages, or the entry itself) into one
+  `app-shared` chunk. Otherwise each module shared between the entry and a component chunk
+  becomes a tiny preloaded chunk. `preloader: {sharedChunk: false}` turns this off.
+- `dotaVitePlugins` moves remote stylesheet `@import`s (web fonts) from the built CSS into
+  preconnected `<link>`s in the HTML head, so they no longer wait for the CSS bundle.
+  `remoteStylesheets: false` turns this off.
 
 ## Configuration or usage
 
