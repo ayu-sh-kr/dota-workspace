@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 import {ScrollDeckStyle} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
 import type {ScrollDeckStyleConfig} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
 
@@ -78,11 +78,12 @@ export class ScrollDeckComponent extends BaseElement {
   }
 
   /**
-   * Captures authored light DOM once, before the first mount.
-   * Reading it here rather than in the constructor also works where children are not yet
-   * visible during element upgrade (as in happy-dom prerendering).
+   * Captures authored light DOM once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
    */
-  connectedCallback() {
+  @BeforeInit()
+  captureLightDom() {
     if (!this.lightDomCaptured) {
       this.lightDomCaptured = true;
       this.content = this.innerHTML;
@@ -90,7 +91,6 @@ export class ScrollDeckComponent extends BaseElement {
       this.style.width = "100%";
       this.style.minWidth = "0";
     }
-    super.connectedCallback();
   }
 
   private getScroller(): HTMLElement | null {
