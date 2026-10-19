@@ -227,6 +227,39 @@ describe('durable rendering and hydration', () => {
     expect(root.firstElementChild).toBe(link);
   });
 
+  it('keeps server light DOM whose nested components are already rendered and marked', () => {
+    const root = document.createElement('section');
+    root.innerHTML = '<nav class="top"><app-icon name="home" data-dh-c="1" class="ready"><svg></svg></app-icon><a href="/">Home</a></nav>';
+    const nav = root.firstElementChild;
+    const icon = root.querySelector('app-icon');
+
+    render(root, '<nav class="top"><app-icon name="home"></app-icon><a href="/">Home</a></nav>');
+
+    expect(root.firstElementChild).toBe(nav);
+    expect(root.querySelector('app-icon')).toBe(icon);
+    expect(icon?.innerHTML).toBe('<svg></svg>');
+  });
+
+  it('replaces server light DOM whose own markup differs from the output', () => {
+    const cases = [
+      ['<p>Server</p>', '<p>Client</p>'],
+      ['<a href="/old">Docs</a>', '<a href="/new">Docs</a>'],
+      ['<p class="x" title="extra">Text</p>', '<p class="x">Text</p>'],
+      ['<app-icon name="home"></app-icon>', '<app-icon name="away"></app-icon>'],
+      ['<p>One</p>', '<p>One</p><p>Two</p>'],
+    ];
+    for (const [server, client] of cases) {
+      const root = document.createElement('section');
+      root.innerHTML = server;
+      const first = root.firstChild;
+
+      render(root, client);
+
+      expect(root.firstChild).not.toBe(first);
+      expect(root.innerHTML).toBe(client);
+    }
+  });
+
   it('mounts repeated templates from one parse without sharing parts', () => {
     const view = (label: string) => html`<p title="${label}">${label}</p>`;
     const first = document.createElement('section');
