@@ -19,6 +19,7 @@ import {
   prepareRouteConfigExport,
   buildComponentDependencyGraph,
   prepareComponentRegistryExport,
+  prepareSharedChunkGroup,
   type ComponentDependencyGraph
 } from "@dota/domain";
 
@@ -30,10 +31,12 @@ let logger = createDotaLogger('dota-vite-preloader', 'main.ts');
  *
  * @property root - Root directory path for component scanning (defaults to process.cwd())
  * @property logType - Logging level for plugin output (defaults to 'info')
+ * @property sharedChunk - `false` stops merging shared support modules into one client chunk
  */
 export type PluginConfig = {
   root?: string;
-  logType?: LogType
+  logType?: LogType;
+  sharedChunk?: false;
 }
 
 /**
@@ -47,7 +50,7 @@ export type PluginConfig = {
  * @param config - Plugin configuration with optional root path and log level
  * @returns Vite plugin instance with resolveId, load, and buildStart hooks
  */
-export default function dotaVitePreloader({root = process.cwd(), logType}: PluginConfig): Plugin {
+export default function dotaVitePreloader({root = process.cwd(), logType, sharedChunk}: PluginConfig): Plugin {
   // Plugin-scope cache: accessible from buildStart/resolveId/load/etc.
   let cachedCandidates: DotaComponentCandidate[] | null = null;
   let cachedRouteCandidates: DotaRouteCandidate[] | null = null;
@@ -100,6 +103,14 @@ export default function dotaVitePreloader({root = process.cwd(), logType}: Plugi
 
   return {
     name: 'vite-plugin-dota-preloader',
+
+    /** Groups shared support modules for client builds; server builds keep Vite's defaults. */
+    config(_config, env) {
+      if (sharedChunk === false || env.command !== 'build' || env.isSsrBuild) return;
+      // Only the matched modules join the group; libraries they import keep their own chunks.
+      const codeSplitting = {includeDependenciesRecursively: false, groups: [prepareSharedChunkGroup(root)]};
+      return {build: {rolldownOptions: {output: {codeSplitting}}}};
+    },
     resolveId(id) {
       if (id === VirtualImportID.DOTA_COMPONENTS) return VirtualImportID.RESOLVED_DOTA_COMPONENTS;
       if (id === VirtualImportID.DOTA_ROUTES) return VirtualImportID.RESOLVED_DOTA_ROUTES;
