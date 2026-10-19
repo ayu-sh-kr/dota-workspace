@@ -1,4 +1,4 @@
-import {BaseElement, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 import {BadgeStyle} from "@dota/components/badge/badge.config.ts";
 import type {BadgeColor, BadgeRounded, BadgeSize, BadgeStyleConfig, BadgeVariant} from "@dota/components/badge/badge.config.ts";
 
@@ -57,11 +57,26 @@ class BadgeComponent extends BaseElement {
   @Property({name: "config", type: ObjectType})
   config: BadgeStyleConfig = {};
 
-  content: string;
+  content = "";
 
+  private lightDomCaptured = false;
+
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
+  }
+
+  /**
+   * Captures authored light DOM once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
+   */
+  @BeforeInit()
+  captureLightDom() {
+    if (!this.lightDomCaptured) {
+      this.lightDomCaptured = true;
+      this.content = this.innerHTML;
+    }
   }
 
   /**

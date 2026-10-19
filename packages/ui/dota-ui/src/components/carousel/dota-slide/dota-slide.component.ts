@@ -1,4 +1,4 @@
-import {BaseElement, Component, Object as ObjectType, Property} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Object as ObjectType, Property, BeforeInit} from "@ayu-sh-kr/dota-core";
 import {DotaSlideStyle} from "@dota/components/carousel/dota-slide/dota-slide.config.ts";
 import type {DotaSlideStyleConfig} from "@dota/components/carousel/dota-slide/dota-slide.config.ts";
 
@@ -22,9 +22,24 @@ export class DotaSlideComponent extends BaseElement {
   @Property({name: "config", type: ObjectType})
   config: DotaSlideStyleConfig = {};
 
+  private lightDomCaptured = false;
+
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
+  }
+
+  /**
+   * Captures authored light DOM once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
+   */
+  @BeforeInit()
+  captureLightDom() {
+    if (!this.lightDomCaptured) {
+      this.lightDomCaptured = true;
+      this.content = this.innerHTML;
+    }
   }
 
   render(): string {

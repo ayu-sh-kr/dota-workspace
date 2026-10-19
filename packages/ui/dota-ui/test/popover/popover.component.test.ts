@@ -159,4 +159,12 @@ describe('PopoverComponent', () => {
       expect.stringContaining('Invalid anchored-selector')
     );
   });
+  it('keeps authored content when upgraded before its children are parsed', () => {
+    const template = document.createElement('template');
+    template.innerHTML = '<dota-popover-test><button type="button">Open</button></dota-popover-test>';
+    document.body.append(template.content);
+    const host = document.body.querySelector('dota-popover-test')!;
+
+    expect(host.querySelector('button')?.textContent).toBe('Open');
+  });
 });

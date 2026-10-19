@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 import {ScrollDeckStyle} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
 import type {ScrollDeckStyleConfig} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
 
@@ -68,14 +68,29 @@ export class ScrollDeckComponent extends BaseElement {
     }
   };
 
-  private readonly content!: string;
+  private content = "";
 
+  private lightDomCaptured = false;
+
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
-    this.style.display = "block";
-    this.style.width = "100%";
-    this.style.minWidth = "0";
+  }
+
+  /**
+   * Captures authored light DOM once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
+   */
+  @BeforeInit()
+  captureLightDom() {
+    if (!this.lightDomCaptured) {
+      this.lightDomCaptured = true;
+      this.content = this.innerHTML;
+      this.style.display = "block";
+      this.style.width = "100%";
+      this.style.minWidth = "0";
+    }
   }
 
   private getScroller(): HTMLElement | null {

@@ -2,6 +2,7 @@ import {autoUpdate, computePosition, flip, offset, shift, type Placement} from "
 import "./popover.css";
 import {
   BaseElement,
+  BeforeInit,
   Component,
   DocumentListener,
   HostListener,
@@ -59,11 +60,21 @@ class PopoverComponent extends BaseElement {
   private isOpen = false;
   private isPositionOnly = false;
   private panelId = "";
-  private content: string;
+  private content: string | undefined;
 
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
+  }
+
+  /**
+   * Captures the authored trigger and panel markup once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
+   */
+  @BeforeInit()
+  captureLightDom() {
+    this.content ??= this.innerHTML;
   }
 
   @OnEvent(LifecycleEventConstants.CONNECTED, true)
@@ -93,7 +104,7 @@ class PopoverComponent extends BaseElement {
   private initializePopover() {
     this.stopAutoUpdate();
     this.panel = this.resolvePanel();
-    this.isPositionOnly = !this.content.trim();
+    this.isPositionOnly = !this.content?.trim();
 
     if (!this.panel) return;
 
@@ -234,7 +245,7 @@ class PopoverComponent extends BaseElement {
   }
 
   render(): string {
-    return this.content;
+    return this.content ?? "";
   }
 }
 

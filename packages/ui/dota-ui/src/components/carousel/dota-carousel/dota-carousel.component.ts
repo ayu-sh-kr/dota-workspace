@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, BindEvent, Boolean, Component, Number, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, BindEvent, Boolean, Component, Number, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 import {DotaCarouselStyle} from "@dota/components/carousel/dota-carousel/dota-carousel.config.ts";
 import type {DotaCarouselStyleConfig} from "@dota/components/carousel/dota-carousel/dota-carousel.config.ts";
 import {
@@ -98,12 +98,28 @@ export class DotaCarouselComponent extends BaseElement {
   private _isPaused: boolean = false;
   private _dragStartX: number = 0;
 
+  private lightDomCaptured = false;
+
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = this.innerHTML;
-    const slideEls = tempDiv.querySelectorAll('dota-slide');
-    this.dotaSlides = Array.from(slideEls).map(el => el.innerHTML);
+  }
+
+  /**
+   * Captures authored light DOM once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
+   */
+  @BeforeInit()
+  captureLightDom() {
+    if (!this.lightDomCaptured) {
+      this.lightDomCaptured = true;
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = this.innerHTML;
+      const slideEls = tempDiv.querySelectorAll('dota-slide');
+      // Slides assigned as a property before connection stay when no slides are authored.
+      if (slideEls.length > 0) this.dotaSlides = Array.from(slideEls).map(el => el.innerHTML);
+    }
   }
 
   @AfterInit()

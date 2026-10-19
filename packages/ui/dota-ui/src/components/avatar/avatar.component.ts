@@ -1,4 +1,4 @@
-import {BaseElement, Boolean as BooleanType, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Boolean as BooleanType, Component, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 import type {ChipColor, ChipPosition} from "@dota/components/chip/chip.config.ts";
 import {AvatarStyle} from "@dota/components/avatar/avatar.config.ts";
 import type {AvatarColor, AvatarSize, AvatarStyleConfig, AvatarVariant} from "@dota/components/avatar/avatar.config.ts";
@@ -151,7 +151,7 @@ export class AvatarComponent extends BaseElement {
   shadow: false,
 })
 export class AvatarWrapper extends BaseElement {
-  content: string;
+  content = "";
 
   @Property({name: "color", type: String, default: "gray"})
   color: AvatarColor = "gray";
@@ -168,9 +168,24 @@ export class AvatarWrapper extends BaseElement {
   @Property({name: "config", type: ObjectType})
   config: AvatarStyleConfig = {};
 
+  private lightDomCaptured = false;
+
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
+  }
+
+  /**
+   * Captures authored light DOM once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
+   */
+  @BeforeInit()
+  captureLightDom() {
+    if (!this.lightDomCaptured) {
+      this.lightDomCaptured = true;
+      this.content = this.innerHTML;
+    }
   }
 
   /** Resolves each visual slot independently so a config cannot erase sibling defaults. */

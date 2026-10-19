@@ -1,4 +1,4 @@
-import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 
 
 /**
@@ -28,9 +28,24 @@ export class CardComponent extends BaseElement {
     @Property({name: 'className', type: String})
     className!: string
 
+    private lightDomCaptured = false;
+
+    /** Public so the class can be registered with `customElements.define` and app component lists. */
     constructor() {
         super();
-        this.content = this.innerHTML;
+    }
+
+    /**
+     * Captures authored light DOM once, before the first render.
+     * Runs on connect rather than in the constructor, where happy-dom prerendering
+     * has not parsed the children yet.
+     */
+    @BeforeInit()
+    captureLightDom() {
+        if (!this.lightDomCaptured) {
+            this.lightDomCaptured = true;
+            this.content = this.innerHTML;
+        }
     }
 
     render(): string {
@@ -167,9 +182,24 @@ export class CardFooterComponent extends BaseElement {
     @Property({name: 'className', type: String})
     className!: string;
 
+    private lightDomCaptured = false;
+
+    /** Public so the class can be registered with `customElements.define` and app component lists. */
     constructor() {
         super();
-        this.content = this.innerHTML;
+    }
+
+    /**
+     * Captures authored light DOM once, before the first render.
+     * Runs on connect rather than in the constructor, where happy-dom prerendering
+     * has not parsed the children yet.
+     */
+    @BeforeInit()
+    captureLightDom() {
+        if (!this.lightDomCaptured) {
+            this.lightDomCaptured = true;
+            this.content = this.innerHTML;
+        }
     }
 
     render(): string {

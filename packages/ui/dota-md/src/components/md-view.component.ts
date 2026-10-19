@@ -1,4 +1,4 @@
-import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, BeforeInit, Component, Property, String} from "@ayu-sh-kr/dota-core";
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-event";
 import {html, type TemplateResult, trustedHTML, type TrustedHtmlValue} from "@ayu-sh-kr/dota-rendering";
 import {resolveTheme, type ThemeName} from "@dota/themes.ts";
@@ -74,11 +74,12 @@ export class MdViewComponent extends BaseElement {
   }
 
   /**
-   * Adopts authored or prerendered light DOM as the initial content before the first mount.
-   * Capturing here rather than in the constructor also works where children are not yet
-   * visible during element upgrade (as in happy-dom prerendering).
+   * Adopts authored or prerendered light DOM as the initial content before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering has not
+   * parsed the children yet.
    */
-  connectedCallback(): void {
+  @BeforeInit()
+  captureLightDom(): void {
     if (!this.content) {
       // Prerendered views already contain the wrapper; adopt its children rather than nesting it.
       const prerendered = this.querySelector('[data-md-content]');
@@ -87,7 +88,6 @@ export class MdViewComponent extends BaseElement {
       // Its classes come from the serialized theme, which a saved preference may replace.
       if (prerendered) this.prior = {theme: resolveTheme(this.getAttribute('theme') ?? undefined), color: this.getAttribute('color') ?? 'neutral'};
     }
-    super.connectedCallback();
   }
 
   /**
