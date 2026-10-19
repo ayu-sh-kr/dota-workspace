@@ -1,5 +1,14 @@
 # @ayu-sh-kr/dota-ssr
 
+## 0.5.0
+
+### Minor Changes
+
+- c1c690b: Static generation waits for asynchronous rendering work the page reports before it serializes a route.
+
+  - `trackPendingWork(promise)` reports work such as loading a lazily defined component; it does nothing in the browser. Dota Wrap reports its lazy component loads automatically.
+  - Each route's settle phase now waits for reported work alongside timers and requests, within the existing `settleTimeout`.
+
 ## 0.4.2
 
 ### Patch Changes
