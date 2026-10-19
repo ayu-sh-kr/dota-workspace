@@ -1,7 +1,7 @@
 import {BaseElement, Component, DocumentListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
-import {MDService} from "@ayu-sh-kr/dota-md";
+import {MDService} from "@dota/configs/markdown.config.ts";
 import {DOCS, docUrl, type DocEntry} from "@dota/configs/docs.config.ts";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 
