@@ -151,7 +151,7 @@ export class AvatarComponent extends BaseElement {
   shadow: false,
 })
 export class AvatarWrapper extends BaseElement {
-  content: string;
+  content = "";
 
   @Property({name: "color", type: String, default: "gray"})
   color: AvatarColor = "gray";
@@ -168,9 +168,24 @@ export class AvatarWrapper extends BaseElement {
   @Property({name: "config", type: ObjectType})
   config: AvatarStyleConfig = {};
 
+  private lightDomCaptured = false;
+
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
+  }
+
+  /**
+   * Captures authored light DOM once, before the first mount.
+   * Reading it here rather than in the constructor also works where children are not yet
+   * visible during element upgrade (as in happy-dom prerendering).
+   */
+  connectedCallback() {
+    if (!this.lightDomCaptured) {
+      this.lightDomCaptured = true;
+      this.content = this.innerHTML;
+    }
+    super.connectedCallback();
   }
 
   /** Resolves each visual slot independently so a config cannot erase sibling defaults. */
