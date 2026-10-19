@@ -1,4 +1,5 @@
 import {afterEach, describe, expect, it} from 'vitest';
+import {BeforeInit, Component} from '@ayu-sh-kr/dota-core';
 import {html, trustedHTML, type TemplateResult} from '@ayu-sh-kr/dota-rendering';
 import {MD_RENDERED_EVENT, MdViewComponent, type MdRenderedDetail} from '@dota/components/md-view.component.ts';
 import {flatMarkdownTheme} from '@dota/md-themes';
@@ -10,8 +11,20 @@ class LegacyMdView extends MdViewComponent {
   }
 }
 
+/** Decorated subclass with its own before-init hook, which must not replace the base capture. */
+@Component({selector: 'hooked-md-view', shadow: false})
+class HookedMdView extends MdViewComponent {
+  ownHookRan = false;
+
+  @BeforeInit()
+  markOwnHook() {
+    this.ownHookRan = true;
+  }
+}
+
 if (!customElements.get('md-view')) customElements.define('md-view', MdViewComponent);
 if (!customElements.get('legacy-md-view')) customElements.define('legacy-md-view', LegacyMdView);
+if (!customElements.get('hooked-md-view')) customElements.define('hooked-md-view', HookedMdView);
 
 /** Parses markup off-document, then connects it, so views see their children on connect. */
 const connect = (markup: string): MdViewComponent => {
@@ -125,5 +138,16 @@ describe('MdViewComponent prerendered content', () => {
     expect(paragraph.className).toContain(flatMarkdownTheme.color.rose!.p!.text!);
     expect(paragraph.className).not.toContain(indigo);
     expect(view.querySelector('code')!.className).toBe('hljs');
+  });
+  it('adopts authored content when upgraded before its children are parsed, in subclasses too', async () => {
+    const template = document.createElement('template');
+    template.innerHTML = '<hooked-md-view><p>authored</p></hooked-md-view>';
+    document.body.append(template.content);
+    const view = document.querySelector('hooked-md-view') as HookedMdView;
+    await initialized();
+
+    expect(view.content).toBe('<p>authored</p>');
+    expect(view.ownHookRan).toBe(true);
+    expect(view.querySelectorAll('[data-md-content]')).toHaveLength(1);
   });
 });
