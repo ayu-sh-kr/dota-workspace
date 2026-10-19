@@ -1,5 +1,26 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.5.0
+
+### Minor Changes
+
+- c1c690b: Pages reach first paint sooner, with no application changes.
+
+  - `dotaVitePlugins` moves remote stylesheet `@import`s, such as Google Fonts, from the built CSS into preconnected `<link>`s in the HTML head, so they download alongside the CSS bundle instead of after it. Each page gets only the imports of its own start-up CSS; stylesheets loaded only by lazy routes keep theirs. Prerendered pages and the SSR shell inherit them. Pass `remoteStylesheets: false` to keep the imports in CSS.
+  - With `lazyComponents`, a prerendered first route loads its components after the browser's first paint instead of competing with the requests that gate it. Client-rendered routes still load immediately.
+  - Client builds keep the application's start-up support modules (data, config, services) in one `app-shared` chunk instead of many small preloaded chunks. Pass `preloader: {sharedChunk: false}` to restore the default splitting.
+
+- c1c690b: Applications can load each route's components on demand instead of bundling every component into the entry chunk.
+
+  - The preloader serves `virtual:dota-component-registry`: one lazy loader per `@Component` plus the tags each component renders, so Vite emits a chunk per component.
+  - `initializeApp({lazyComponents})` accepts that registry and loaders declared with `defineComponentLoaders`. Before each navigation renders, the page's whole component tree is loaded in parallel and defined parents first, in batches that yield to the browser instead of one long task; tags that appear later, including inside open shadow roots, are defined when they enter the document. A navigation superseded while its components load never renders.
+  - With `lazyComponents`, the promise returned by `initializeApp` resolves after the first route has rendered, and the result includes `componentLoader` for prefetching. Explicit `routes` are required. Applications that do not pass `lazyComponents` behave as before.
+
+### Patch Changes
+
+- Updated dependencies [c1c690b]
+  - @ayu-sh-kr/dota-ssr@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes
