@@ -35,7 +35,8 @@ unchanged; applications opt in.
    batches, because defining an element upgrades and hydrates every instance synchronously.
 4. **Fallback.** After the first render the loader observes the document and defines any
    registry tag that appears later, for example tags built at runtime or rendered by library
-   components. The observer disconnects once every registry tag is defined.
+   components. Open shadow roots are scanned and observed too, including roots that components
+   attach when they upgrade. The observer disconnects once every registry tag is defined.
 5. **Readiness.** With `lazyComponents`, the promise returned by `initializeApp` resolves after
    the first route has rendered. Each load is also reported through `trackPendingWork` from
    `@ayu-sh-kr/dota-ssr`, so static generation serializes a page only after late components
@@ -50,7 +51,8 @@ Two build steps keep the start-up requests few, without application configuratio
   `app-shared` chunk. Otherwise each module shared between the entry and a component chunk
   becomes a tiny preloaded chunk. `preloader: {sharedChunk: false}` turns this off.
 - `dotaVitePlugins` moves remote stylesheet `@import`s (web fonts) from the built CSS into
-  preconnected `<link>`s in the HTML head, so they no longer wait for the CSS bundle.
+  preconnected `<link>`s in the HTML head, so they no longer wait for the CSS bundle. Each page
+  gets only the imports of its own start-up CSS; CSS loaded only by lazy routes keeps its imports.
   `remoteStylesheets: false` turns this off.
 
 ## Configuration or usage
@@ -89,6 +91,10 @@ export const applicationReady = initializeApp({
   before any chunk loads. Their child components are what load lazily.
 - A tag that is only built in a non-component helper file is not in the build-time graph and is
   defined by the observer one render later.
+- Tags inside closed shadow roots are out of the observer's reach; declare them in the registry's
+  `dependencies` so the route closure loads them.
+- A navigation superseded while its components load never renders, so a slow import cannot
+  overwrite the page that replaced it.
 - A failed loader is logged, and the next `ensure` for that tag retries it.
 - If a guard cancels the initial navigation, `initializeApp` resolves when the next route renders.
 - A loader created in one window stops defining components once that window is no longer
