@@ -44,4 +44,12 @@ describe('BadgeComponent', () => {
     expect(fallback.firstElementChild?.className).toContain('px-2.5');
     expect(fallback.firstElementChild?.className).toContain('rounded-full');
   });
+  it('keeps authored content when upgraded before its children are parsed', () => {
+    const template = document.createElement('template');
+    template.innerHTML = '<dota-badge-test><strong>child</strong></dota-badge-test>';
+    document.body.append(template.content);
+    const host = document.body.querySelector('dota-badge-test')!;
+
+    expect(host.querySelector('strong')?.textContent).toBe('child');
+  });
 });
