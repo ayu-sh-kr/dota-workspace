@@ -72,6 +72,52 @@ describe("LazyComponentLoader", () => {
     stop();
   });
 
+  it("defines registry elements inside an existing open shadow root", async () => {
+    const icon = element("shadow-existing");
+    const host = document.createElement("div");
+    host.attachShadow({mode: "open"}).innerHTML = `<${icon.tag}></${icon.tag}>`;
+    document.body.append(host);
+    const loader = new LazyComponentLoader([{loaders: {[icon.tag]: icon.loader}}]);
+
+    const stop = loader.observe(document.body);
+
+    await vi.waitFor(() => expect(customElements.get(icon.tag)).toBeDefined());
+    stop();
+  });
+
+  it("defines registry elements added to a shadow root later", async () => {
+    const icon = element("shadow-later");
+    const host = document.createElement("div");
+    const shadow = host.attachShadow({mode: "open"});
+    document.body.append(host);
+    const loader = new LazyComponentLoader([{loaders: {[icon.tag]: icon.loader}}]);
+    const stop = loader.observe(document.body);
+
+    shadow.innerHTML = `<section><${icon.tag}></${icon.tag}></section>`;
+
+    await vi.waitFor(() => expect(customElements.get(icon.tag)).toBeDefined());
+    stop();
+  });
+
+  it("watches shadow roots that lazily defined components attach on upgrade", async () => {
+    const icon = element("shadow-upgrade-child");
+    const hostTag = `lazy-shadow-host-${++sequence}`;
+    const childTag = icon.tag;
+    const host = class extends HTMLElement {
+      static __dotaSelector = hostTag;
+      connectedCallback() {
+        this.attachShadow({mode: "open"}).innerHTML = `<${childTag}></${childTag}>`;
+      }
+    } as unknown as DotaElementConstructor;
+    document.body.insertAdjacentHTML("beforeend", `<${hostTag}></${hostTag}>`);
+    const loader = new LazyComponentLoader([{loaders: {[hostTag]: async () => host, [childTag]: icon.loader}}]);
+
+    const stop = loader.observe(document.body);
+
+    await vi.waitFor(() => expect(customElements.get(childTag)).toBeDefined());
+    stop();
+  });
+
   it("resolves every component for server rendering without defining them", async () => {
     const page = element("server");
     const loader = new LazyComponentLoader([{loaders: {[page.tag]: page.loader}}]);
