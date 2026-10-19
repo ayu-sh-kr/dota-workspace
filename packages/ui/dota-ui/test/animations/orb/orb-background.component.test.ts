@@ -1,5 +1,6 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {OrbBackgroundComponent} from '@dota/components/animations/orb/orb-background.component.ts';
+import {visibleAnimationEnvironment} from '../../setup/animation-environment.ts';
 import type {OrbitPosition} from '@dota/components/animations/orb/orb-background.component.ts';
 
 if (!customElements.get('orb-background-test')) customElements.define('orb-background-test', OrbBackgroundComponent);
@@ -22,7 +23,12 @@ const createContext = () => ({
 
 const flush = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
+beforeEach(() => {
+  visibleAnimationEnvironment();
+});
+
 afterEach(() => {
+  vi.unstubAllGlobals();
   document.body.innerHTML = '';
   document.documentElement.classList.remove('dark');
   vi.restoreAllMocks();

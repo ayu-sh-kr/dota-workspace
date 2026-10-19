@@ -1,6 +1,6 @@
 import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {type MessageType} from "@dota/pages/chat.page.ts";
-import {MDService} from "@ayu-sh-kr/dota-md";
+import {MDService} from "@dota/configs/markdown.config.ts";
 
 @Component({
   selector: "message-card",

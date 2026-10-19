@@ -1,3 +1,4 @@
+import {startAnimationLoop, type AnimationLoop} from "@dota/components/animations/animation-loop.ts";
 import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-core";
 import { OnEvent } from "@ayu-sh-kr/dota-event";
 import { ORB_COLOR_MAP } from "@dota/components/animations/orb/orb-background.component.ts";
@@ -79,7 +80,6 @@ function startLoop(canvas: HTMLCanvasElement, color: OrbitColor): () => void {
     return () => {};
   }
 
-  let raf = 0;
   let frame = 0;
   let width = 0;
   let height = 0;
@@ -94,8 +94,11 @@ function startLoop(canvas: HTMLCanvasElement, color: OrbitColor): () => void {
   let pulses: Pulse[] = [];
   let tracers: Tracer[] = [];
 
+  // Resize and theme changes clear or restyle the canvas, so a paused loop must repaint once.
+  let loop: AnimationLoop | undefined;
   const themeObserver = new MutationObserver(() => {
     palette = resolvePalette(color);
+    loop?.invalidate();
   });
 
   const createTracers = () => {
@@ -118,6 +121,7 @@ function startLoop(canvas: HTMLCanvasElement, color: OrbitColor): () => void {
     canvas.height = Math.floor(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     createTracers();
+    loop?.invalidate();
   };
 
   const spawnPulse = (x: number, y: number, speed: number) => {
@@ -258,14 +262,12 @@ function startLoop(canvas: HTMLCanvasElement, color: OrbitColor): () => void {
 
     renderTracers();
     renderCursorGlow();
-
-    raf = requestAnimationFrame(step);
   };
 
-  raf = requestAnimationFrame(step);
+  loop = startAnimationLoop(canvas, step);
 
   return () => {
-    cancelAnimationFrame(raf);
+    loop?.stop();
     themeObserver.disconnect();
     window.removeEventListener("resize", resize);
     window.removeEventListener("mousemove", onMove);

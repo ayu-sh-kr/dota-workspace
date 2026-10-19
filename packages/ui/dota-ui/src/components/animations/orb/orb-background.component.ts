@@ -1,3 +1,4 @@
+import {startAnimationLoop, type AnimationLoop} from "@dota/components/animations/animation-loop.ts";
 import {BaseElement, Component, Number, Property, String} from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 
@@ -362,7 +363,6 @@ function startParticleLoop(
   const ctx = canvas.getContext('2d')!;
   const TAU = Math.PI * 2;
 
-  let raf = 0;
   let cw = 0;
   let ch = 0;
 
@@ -383,6 +383,8 @@ function startParticleLoop(
     }));
   };
 
+  // Resize and theme changes clear or restyle the canvas, so a paused loop must repaint once.
+  let loop: AnimationLoop | undefined;
   const resize = () => {
     if (orbitPosition === 'center') {
       const container = canvas.parentElement!;
@@ -393,15 +395,19 @@ function startParticleLoop(
       ch = canvas.height = window.innerHeight;
     }
     build();
+    loop?.invalidate();
   };
   resize();
   window.addEventListener('resize', resize);
 
   // Rebuild band colours when the user switches light/dark mode.
-  const themeObserver = new MutationObserver(build);
+  const themeObserver = new MutationObserver(() => {
+    build();
+    loop?.invalidate();
+  });
   themeObserver.observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
 
-  const loop = () => {
+  const drawFrame = () => {
     ctx.clearRect(0, 0, cw, ch);
 
     const cx = orbitPosition === 'center' ? cw / 2 : cw + ORB_CENTER_OFFSET;
@@ -472,13 +478,12 @@ function startParticleLoop(
       }
     }
 
-    raf = requestAnimationFrame(loop);
   };
 
-  raf = requestAnimationFrame(loop);
+  loop = startAnimationLoop(canvas, drawFrame);
 
   return () => {
-    cancelAnimationFrame(raf);
+    loop?.stop();
     window.removeEventListener('resize', resize);
     themeObserver.disconnect();
   };

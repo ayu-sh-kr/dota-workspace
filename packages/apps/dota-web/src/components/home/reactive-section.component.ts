@@ -1,6 +1,6 @@
 import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
-import {MDService} from "@ayu-sh-kr/dota-md";
+import {MDService} from "@dota/configs/markdown.config.ts";
 import {notificationService} from "@dota/main.ts";
 import {CapabilityTab, TAB_REGISTRY} from "@dota/components/home/utils/capability.config.ts";
 

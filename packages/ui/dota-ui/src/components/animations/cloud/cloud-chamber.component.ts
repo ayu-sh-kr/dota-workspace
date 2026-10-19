@@ -1,3 +1,4 @@
+import {startAnimationLoop, type AnimationLoop} from "@dota/components/animations/animation-loop.ts";
 import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-core";
 import { OnEvent } from "@ayu-sh-kr/dota-event";
 import { ORB_COLOR_MAP } from "@dota/components/animations/orb/orb-background.component.ts";
@@ -8,6 +9,17 @@ const MOTE_COUNT = 180;
 const VAPOR_TEXTURE_WIDTH = 180;
 const VAPOR_TEXTURE_HEIGHT = 110;
 const VAPOR_FIELD_LAYER_COUNT = 5;
+/**
+ * Canvas pixels per CSS pixel. Every layer is heavily blurred, so drawing at half resolution
+ * and letting CSS upscale looks the same while the blur filters touch a quarter of the pixels
+ * (far fewer than drawing at the device pixel ratio).
+ */
+const RENDER_SCALE = 0.5;
+
+/** A canvas blur filter, whose radius is in canvas pixels and so scales with {@link RENDER_SCALE}. */
+function blur(radius: number): string {
+  return `blur(${(radius * RENDER_SCALE).toFixed(2)}px)`;
+}
 
 type RGB = [number, number, number];
 
@@ -85,8 +97,6 @@ function startLoop(
 
   let width = 0;
   let height = 0;
-  let dpr = 1;
-  let raf = 0;
   let frame = 0;
   let motes: Mote[] = [];
   let vaporImageData: ImageData | null = null;
@@ -104,8 +114,12 @@ function startLoop(
   const densityStrength = clamp(vaporDensity, 0.1, 3.2);
   const glowStrength = clamp(vaporGlow, 0, 3);
 
+  // Resize and theme changes clear or restyle the canvas, so a paused loop must repaint once.
+  let loop: AnimationLoop | undefined;
   const themeObserver = new MutationObserver(() => {
     palette = resolvePalette(color);
+    composeStaticLayers();
+    loop?.invalidate();
   });
 
   const seedMotes = () => {
@@ -138,24 +152,68 @@ function startLoop(
     };
   };
 
+  // Frame-invariant parts of the vapor field, rebuilt whenever the field is reseeded.
+  const vaporBase = new Float32Array(VAPOR_TEXTURE_WIDTH * VAPOR_TEXTURE_HEIGHT);
+  const columnField = new Float32Array(VAPOR_TEXTURE_WIDTH);
+  const rowField = new Float32Array(VAPOR_TEXTURE_HEIGHT);
+  const diagonalColumnSin = Array.from({ length: VAPOR_FIELD_LAYER_COUNT }, () => new Float32Array(VAPOR_TEXTURE_WIDTH));
+  const diagonalColumnCos = Array.from({ length: VAPOR_FIELD_LAYER_COUNT }, () => new Float32Array(VAPOR_TEXTURE_WIDTH));
+  const diagonalRowSin = Array.from({ length: VAPOR_FIELD_LAYER_COUNT }, () => new Float32Array(VAPOR_TEXTURE_HEIGHT));
+  const diagonalRowCos = Array.from({ length: VAPOR_FIELD_LAYER_COUNT }, () => new Float32Array(VAPOR_TEXTURE_HEIGHT));
+
+  const precomputeVaporField = () => {
+    for (let y = 0; y < VAPOR_TEXTURE_HEIGHT; y++) {
+      const ny = y / (VAPOR_TEXTURE_HEIGHT - 1);
+      const coldPlate = Math.max(0, 1 - Math.abs(ny - vaporField.coldPlateY) * vaporField.coldPlateSpread);
+      for (let x = 0; x < VAPOR_TEXTURE_WIDTH; x++) {
+        const nx = x / (VAPOR_TEXTURE_WIDTH - 1);
+        const center = Math.max(
+          0,
+          1 - Math.hypot(
+            (nx - vaporField.centerX) * vaporField.scaleX,
+            (ny - vaporField.centerY) * vaporField.scaleY
+          )
+        );
+        vaporBase[y * VAPOR_TEXTURE_WIDTH + x] = center * 0.68 + coldPlate * 0.3;
+      }
+      vaporField.layers.forEach((layer, l) => {
+        const weight = layer.weight * 0.58;
+        diagonalRowSin[l][y] = Math.sin(ny * layer.diagonal) * weight;
+        diagonalRowCos[l][y] = Math.cos(ny * layer.diagonal) * weight;
+      });
+    }
+  };
+
   const resize = () => {
     width = window.innerWidth;
     height = window.innerHeight;
-    dpr = Math.max(1, window.devicePixelRatio || 1);
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvas.width = Math.floor(width * RENDER_SCALE);
+    canvas.height = Math.floor(height * RENDER_SCALE);
+    ctx.setTransform(RENDER_SCALE, 0, 0, RENDER_SCALE, 0, 0);
     vaporCanvas.width = VAPOR_TEXTURE_WIDTH;
     vaporCanvas.height = VAPOR_TEXTURE_HEIGHT;
     vaporImageData = vaporCtx.createImageData(VAPOR_TEXTURE_WIDTH, VAPOR_TEXTURE_HEIGHT);
     seedMotes();
+    composeStaticLayers();
+    loop?.invalidate();
   };
 
-  const renderVapor = () => {
-    if (glowStrength > 0) {
-      const pulse = 0.9 + Math.sin(frame * 0.009 + vaporField.centerX * TAU) * 0.1;
-      const glowRadius = Math.max(width, height) * (0.48 + glowStrength * 0.08) * pulse;
-      const glow = ctx.createRadialGradient(
+  // Blurred full-canvas layers that do not move are drawn once per size or theme; frames only
+  // composite them, because canvas blur filters are the most expensive part of a frame.
+  const glowLayer = document.createElement("canvas");
+  const pearlLayer = document.createElement("canvas");
+
+  const composeStaticLayers = () => {
+    const premiumAlpha = clamp(0.72 + glowStrength * 0.18, 0.72, 1.18);
+    for (const layer of [glowLayer, pearlLayer]) {
+      layer.width = canvas.width;
+      layer.height = canvas.height;
+    }
+
+    const glowCtx = glowLayer.getContext("2d");
+    if (glowCtx && glowStrength > 0) {
+      const glowRadius = Math.max(width, height) * (0.48 + glowStrength * 0.08);
+      const glow = glowCtx.createRadialGradient(
         width * vaporField.centerX,
         height * vaporField.centerY,
         0,
@@ -163,44 +221,91 @@ function startLoop(
         height * vaporField.centerY,
         glowRadius
       );
-
       glow.addColorStop(0, `rgba(${palette.core[0]}, ${palette.core[1]}, ${palette.core[2]}, ${(0.12 * glowStrength).toFixed(3)})`);
       glow.addColorStop(0.36, `rgba(${palette.mid[0]}, ${palette.mid[1]}, ${palette.mid[2]}, ${(0.07 * glowStrength).toFixed(3)})`);
       glow.addColorStop(0.72, `rgba(${palette.edge[0]}, ${palette.edge[1]}, ${palette.edge[2]}, ${(0.025 * glowStrength).toFixed(3)})`);
       glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+      glowCtx.setTransform(RENDER_SCALE, 0, 0, RENDER_SCALE, 0, 0);
+      glowCtx.filter = blur(28 + glowStrength * 18);
+      glowCtx.fillStyle = glow;
+      glowCtx.fillRect(0, 0, width, height);
+    }
 
-      ctx.save();
-      ctx.filter = `blur(${(28 + glowStrength * 18).toFixed(2)}px)`;
-      ctx.globalCompositeOperation = "screen";
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, width, height);
-      ctx.restore();
+    const pearlCtx = pearlLayer.getContext("2d");
+    if (pearlCtx) {
+      const blobX = width * vaporField.centerX;
+      const blobY = height * (vaporField.centerY - 0.02);
+      const blobRadius = Math.min(width, height) * 0.36;
+      const pearlGloss = pearlCtx.createRadialGradient(
+        blobX - blobRadius * 0.28,
+        blobY - blobRadius * 0.32,
+        blobRadius * 0.08,
+        blobX - blobRadius * 0.12,
+        blobY - blobRadius * 0.18,
+        blobRadius * 0.98
+      );
+      pearlGloss.addColorStop(0, `rgba(255, 255, 255, ${(0.11 * premiumAlpha).toFixed(3)})`);
+      pearlGloss.addColorStop(0.34, `rgba(${palette.core[0]}, ${palette.core[1]}, ${palette.core[2]}, ${(0.055 * premiumAlpha).toFixed(3)})`);
+      pearlGloss.addColorStop(0.68, `rgba(${palette.mid[0]}, ${palette.mid[1]}, ${palette.mid[2]}, ${(0.02 * premiumAlpha).toFixed(3)})`);
+      pearlGloss.addColorStop(1, "rgba(0, 0, 0, 0)");
+      pearlCtx.setTransform(RENDER_SCALE, 0, 0, RENDER_SCALE, 0, 0);
+      pearlCtx.filter = `${blur(24)} saturate(1.14)`;
+      pearlCtx.fillStyle = pearlGloss;
+      pearlCtx.fillRect(0, 0, width, height);
+    }
+  };
+
+  /** Screens a pre-blurred layer over the frame; `pulse` stands in for the layer's breathing. */
+  const drawCachedLayer = (layer: HTMLCanvasElement, pulse: number) => {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = "screen";
+    ctx.globalAlpha = clamp(pulse, 0, 1);
+    ctx.drawImage(layer, 0, 0);
+    ctx.restore();
+  };
+
+  const renderVapor = () => {
+    if (glowStrength > 0) {
+      drawCachedLayer(glowLayer, 0.9 + Math.sin(frame * 0.009 + vaporField.centerX * TAU) * 0.1);
     }
 
     if (vaporImageData) {
       const data = vaporImageData.data;
       const time = frame * 0.012;
-      for (let y = 0; y < VAPOR_TEXTURE_HEIGHT; y++) {
-        const ny = y / (VAPOR_TEXTURE_HEIGHT - 1);
+      const strength = vaporStrength * densityStrength;
+      // The field is separable: per-column and per-row terms are computed once per frame
+      // (sin(a + b) = sin a·cos b + cos a·sin b splits the diagonal term), so each pixel costs
+      // a few multiply-adds instead of fifteen sine calls.
+      columnField.fill(0);
+      rowField.fill(0);
+      for (let l = 0; l < vaporField.layers.length; l++) {
+        const layer = vaporField.layers[l];
+        const phase = layer.phase + time * layer.speed;
+        const diagonalSin = diagonalColumnSin[l];
+        const diagonalCos = diagonalColumnCos[l];
         for (let x = 0; x < VAPOR_TEXTURE_WIDTH; x++) {
           const nx = x / (VAPOR_TEXTURE_WIDTH - 1);
-          const center = Math.max(
-            0,
-            1 - Math.hypot(
-              (nx - vaporField.centerX) * vaporField.scaleX,
-              (ny - vaporField.centerY) * vaporField.scaleY
-            )
-          );
-          const coldPlate = Math.max(0, 1 - Math.abs(ny - vaporField.coldPlateY) * vaporField.coldPlateSpread);
-          const field = vaporField.layers.reduce((sum, layer) => {
-            const phase = layer.phase + time * layer.speed;
-            return sum +
-              Math.sin(nx * layer.frequencyX + phase) * layer.weight +
-              Math.sin(ny * layer.frequencyY - phase * 0.73) * layer.weight * 0.82 +
-              Math.sin((nx + ny) * layer.diagonal + phase * 0.43) * layer.weight * 0.58;
-          }, 0);
-          const density = clamp((center * 0.68 + coldPlate * 0.3 + field) * vaporStrength * densityStrength, 0, 1);
-          const index = (y * VAPOR_TEXTURE_WIDTH + x) * 4;
+          columnField[x] += Math.sin(nx * layer.frequencyX + phase) * layer.weight;
+          diagonalSin[x] = Math.sin(nx * layer.diagonal + phase * 0.43);
+          diagonalCos[x] = Math.cos(nx * layer.diagonal + phase * 0.43);
+        }
+        for (let y = 0; y < VAPOR_TEXTURE_HEIGHT; y++) {
+          const ny = y / (VAPOR_TEXTURE_HEIGHT - 1);
+          rowField[y] += Math.sin(ny * layer.frequencyY - phase * 0.73) * layer.weight * 0.82;
+        }
+      }
+
+      const layerCount = vaporField.layers.length;
+      for (let y = 0; y < VAPOR_TEXTURE_HEIGHT; y++) {
+        for (let x = 0; x < VAPOR_TEXTURE_WIDTH; x++) {
+          let field = columnField[x] + rowField[y];
+          for (let l = 0; l < layerCount; l++) {
+            field += diagonalColumnSin[l][x] * diagonalRowCos[l][y] + diagonalColumnCos[l][x] * diagonalRowSin[l][y];
+          }
+          const pixel = y * VAPOR_TEXTURE_WIDTH + x;
+          const density = clamp((vaporBase[pixel] + field) * strength, 0, 1);
+          const index = pixel * 4;
           data[index] = Math.round(palette.edge[0] + (palette.mid[0] - palette.edge[0]) * density);
           data[index + 1] = Math.round(palette.edge[1] + (palette.mid[1] - palette.edge[1]) * density);
           data[index + 2] = Math.round(palette.edge[2] + (palette.mid[2] - palette.edge[2]) * density);
@@ -211,7 +316,7 @@ function startLoop(
       vaporCtx.putImageData(vaporImageData, 0, 0);
       ctx.save();
       ctx.imageSmoothingEnabled = true;
-      ctx.filter = "blur(18px) saturate(1.16)";
+      ctx.filter = `${blur(18)} saturate(1.16)`;
       ctx.globalAlpha = 0.92;
       ctx.drawImage(vaporCanvas, -28, -28, width + 56, height + 56);
       ctx.restore();
@@ -252,30 +357,13 @@ function startLoop(
     const blobY = height * (vaporField.centerY - 0.02);
     const blobRadius = Math.min(width, height) * 0.36;
 
-    ctx.save();
-    ctx.globalCompositeOperation = "screen";
-    ctx.filter = "blur(24px) saturate(1.14)";
-    const pearlGloss = ctx.createRadialGradient(
-      blobX - blobRadius * 0.28,
-      blobY - blobRadius * 0.32,
-      blobRadius * 0.08,
-      blobX - blobRadius * 0.12,
-      blobY - blobRadius * 0.18,
-      blobRadius * 0.98
-    );
-    pearlGloss.addColorStop(0, `rgba(255, 255, 255, ${(0.11 * premiumAlpha * premiumPulse).toFixed(3)})`);
-    pearlGloss.addColorStop(0.34, `rgba(${palette.core[0]}, ${palette.core[1]}, ${palette.core[2]}, ${(0.055 * premiumAlpha).toFixed(3)})`);
-    pearlGloss.addColorStop(0.68, `rgba(${palette.mid[0]}, ${palette.mid[1]}, ${palette.mid[2]}, ${(0.02 * premiumAlpha).toFixed(3)})`);
-    pearlGloss.addColorStop(1, "rgba(0, 0, 0, 0)");
-    ctx.fillStyle = pearlGloss;
-    ctx.fillRect(0, 0, width, height);
-    ctx.restore();
+    drawCachedLayer(pearlLayer, premiumPulse);
 
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    ctx.filter = "blur(10px)";
+    ctx.filter = blur(10);
     for (let i = 0; i < 4; i++) {
       const phase = frame * (0.006 + i * 0.0012) + vaporField.layers[i % vaporField.layers.length].phase;
       const ribbonWidth = blobRadius * (0.46 + i * 0.1);
@@ -302,7 +390,7 @@ function startLoop(
 
     ctx.save();
     ctx.globalCompositeOperation = "screen";
-    ctx.filter = "blur(7px)";
+    ctx.filter = blur(7);
     const rimAlpha = 0.08 * premiumAlpha * premiumPulse;
     const rimGradient = ctx.createLinearGradient(blobX - blobRadius, blobY - blobRadius, blobX + blobRadius, blobY + blobRadius);
     rimGradient.addColorStop(0, `rgba(255, 255, 255, ${(rimAlpha * 0.95).toFixed(3)})`);
@@ -336,18 +424,18 @@ function startLoop(
     frame += 1;
     ctx.clearRect(0, 0, width, height);
     renderVapor();
-
-    raf = requestAnimationFrame(drawFrame);
   };
 
   seedVaporField();
+  precomputeVaporField();
   resize();
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", resize, { passive: true });
-  raf = requestAnimationFrame(drawFrame);
+  // The vapor field drifts slowly, so 30 fps is visually identical at half the cost.
+  loop = startAnimationLoop(canvas, drawFrame, {fps: 30});
 
   return () => {
-    cancelAnimationFrame(raf);
+    loop?.stop();
     themeObserver.disconnect();
     window.removeEventListener("resize", resize);
   };

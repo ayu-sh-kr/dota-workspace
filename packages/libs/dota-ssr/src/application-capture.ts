@@ -39,3 +39,26 @@ export function setApplicationCaptureHook(hook: ApplicationCaptureHook | undefin
 export function getApplicationCaptureHook(): ApplicationCaptureHook | undefined {
   return (globalThis as Record<symbol, unknown>)[CAPTURE_SLOT] as ApplicationCaptureHook | undefined;
 }
+
+/** Global slot holding the prerender's pending-work set, present only while a server renders a route. */
+const PENDING_WORK_SLOT = Symbol.for('dota.ssr.pending-work');
+
+/**
+ * Installs or clears the set that collects work reported through {@link trackPendingWork}.
+ * Only server prerendering sets it, once per route, and waits for its entries before serializing.
+ */
+export function setPendingWorkTracker(tracker: Set<Promise<unknown>> | undefined): void {
+  (globalThis as Record<symbol, unknown>)[PENDING_WORK_SLOT] = tracker;
+}
+
+/**
+ * Reports asynchronous rendering work, such as loading a lazily defined component, so server
+ * prerendering serializes the page only after it finishes. A no-op in the browser.
+ * @param work Promise that settles when the work is done; its rejection is not observed here.
+ */
+export function trackPendingWork(work: Promise<unknown>): void {
+  const tracker = (globalThis as Record<symbol, unknown>)[PENDING_WORK_SLOT] as Set<Promise<unknown>> | undefined;
+  if (!tracker) return;
+  tracker.add(work);
+  void work.finally(() => tracker.delete(work)).catch(() => undefined);
+}

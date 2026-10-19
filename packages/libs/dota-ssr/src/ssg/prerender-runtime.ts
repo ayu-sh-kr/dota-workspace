@@ -9,6 +9,7 @@ import type {PrerenderAssetReader} from './asset-reader';
 import type {PrerenderNetworkCache} from './network-cache';
 import type {DotaSsgOptions, ResolvedDotaSsgRoute} from './types';
 import {routeMarkerAttributes} from '../route-marker';
+import {setPendingWorkTracker} from '../application-capture';
 
 /** Application namespace loaded from the configured SSG entry module. */
 type SsgApplicationModule = Record<string, unknown>;
@@ -78,6 +79,9 @@ export async function prerenderRoute(
   const window = createPrerenderWindow(route.path);
   const waitForFetches = installPrerenderFetch(window, outputDirectory, options.fetchBaseUrl, readAsset, networkCache);
   const restoreGlobals = installWindowGlobals(window);
+  // Work the page reports through `trackPendingWork`, such as lazily loaded components.
+  const pendingWork = new Set<Promise<unknown>>();
+  setPendingWorkTracker(pendingWork);
   window.document.write(template);
   window.document.close();
   // Re-evaluate modules against this route's window, but keep Vite's transform cache across routes.
@@ -101,10 +105,10 @@ export async function prerenderRoute(
     timings.ready = nodePerformance.now() - phaseStarted;
     phaseStarted = nodePerformance.now();
     const settleTimeout = options.settleTimeout ?? DEFAULT_SETTLE_TIMEOUT;
-    let settled = await settlePrerenderWindow(window, waitForFetches, settleTimeout);
+    let settled = await settlePrerenderWindow(window, waitForFetches, pendingWork, settleTimeout);
     if (options.settle) {
       await options.settle(window, route);
-      settled = await settlePrerenderWindow(window, waitForFetches, settleTimeout) && settled;
+      settled = await settlePrerenderWindow(window, waitForFetches, pendingWork, settleTimeout) && settled;
     }
     timings.settle = nodePerformance.now() - phaseStarted;
     phaseStarted = nodePerformance.now();
@@ -119,6 +123,7 @@ export async function prerenderRoute(
       finishPrerender?.();
       await closePrerenderWindow(window);
     } finally {
+      setPendingWorkTracker(undefined);
       restoreGlobals();
       timings.cleanup = nodePerformance.now() - cleanupStarted;
       timings.total = nodePerformance.now() - started;
@@ -222,7 +227,8 @@ function markPrerenderedRoute(window: Window, pathname: string): void {
 export const MAX_SETTLE_PASSES = 25;
 
 /**
- * Re-checks both Happy DOM tasks and tracked fetches until a pass finds no fetch to wait for.
+ * Re-checks Happy DOM tasks, tracked fetches, and reported pending work until a pass finds
+ * nothing to wait for.
  * A completed fetch can start another fetch or schedule DOM work, so a fixed number of passes
  * misses content from loaders that chain requests. A pass in which no request was pending ends
  * the loop, because its task barrier already drained any work queued by earlier responses.
@@ -230,18 +236,26 @@ export const MAX_SETTLE_PASSES = 25;
  * first; the page is then serialized with whatever has rendered.
  * @param window Route-isolated Happy DOM window whose task queue is settling.
  * @param waitForFetches Barrier returned by the route fetch adapter.
+ * @param pendingWork Work reported through `trackPendingWork` that has not settled yet.
  * @param timeout Milliseconds this settle may take before the page is serialized as it is.
  * @returns Whether the page went quiet before either limit.
  */
-async function settlePrerenderWindow(window: Window, waitForFetches: PrerenderFetchWaiter, timeout: number): Promise<boolean> {
+async function settlePrerenderWindow(
+  window: Window,
+  waitForFetches: PrerenderFetchWaiter,
+  pendingWork: ReadonlySet<Promise<unknown>>,
+  timeout: number
+): Promise<boolean> {
   const deadline = nodePerformance.now() + timeout;
   for (let pass = 0; pass < MAX_SETTLE_PASSES; pass += 1) {
     await Promise.resolve();
     await Promise.resolve();
     if (!await settlesBefore(window.happyDOM.waitUntilComplete(), deadline)) return false;
     const waited = await waitForFetches(deadline);
+    const waitedForWork = pendingWork.size > 0;
+    if (waitedForWork && !await settlesBefore(Promise.allSettled([...pendingWork]), deadline)) return false;
     if (nodePerformance.now() >= deadline) return false;
-    if (!waited) return true;
+    if (!waited && !waitedForWork) return true;
   }
   return false;
 }
