@@ -2,4 +2,7 @@
 "@ayu-sh-kr/dota-ui": patch
 ---
 
-`dota-popover` now reads its trigger and panel markup when it connects instead of in its constructor, so static generation keeps its content and pages using it hydrate without a mismatch.
+Light-DOM components now read their authored content when they connect instead of in their constructor, so static generation keeps their content and pages using them hydrate without a mismatch.
+
+- Affects `dota-popover`, `dota-badge`, `dota-button`, `dota-chip`, `dota-card`, the card footer, `dota-avatar`, `dota-slide`, `scroll-deck`, and `dota-carousel`.
+- `dota-carousel` keeps slides assigned through `dotaSlides` when no `<dota-slide>` children are authored.
