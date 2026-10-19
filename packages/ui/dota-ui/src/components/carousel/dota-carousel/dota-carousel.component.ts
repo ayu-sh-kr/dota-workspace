@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, BindEvent, Boolean, Component, Number, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, BindEvent, Boolean, Component, Number, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 import {DotaCarouselStyle} from "@dota/components/carousel/dota-carousel/dota-carousel.config.ts";
 import type {DotaCarouselStyleConfig} from "@dota/components/carousel/dota-carousel/dota-carousel.config.ts";
 import {
@@ -106,11 +106,12 @@ export class DotaCarouselComponent extends BaseElement {
   }
 
   /**
-   * Captures authored light DOM once, before the first mount.
-   * Reading it here rather than in the constructor also works where children are not yet
-   * visible during element upgrade (as in happy-dom prerendering).
+   * Captures authored light DOM once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
    */
-  connectedCallback() {
+  @BeforeInit()
+  captureLightDom() {
     if (!this.lightDomCaptured) {
       this.lightDomCaptured = true;
       const tempDiv = document.createElement('div');
@@ -119,7 +120,6 @@ export class DotaCarouselComponent extends BaseElement {
       // Slides assigned as a property before connection stay when no slides are authored.
       if (slideEls.length > 0) this.dotaSlides = Array.from(slideEls).map(el => el.innerHTML);
     }
-    super.connectedCallback();
   }
 
   @AfterInit()
