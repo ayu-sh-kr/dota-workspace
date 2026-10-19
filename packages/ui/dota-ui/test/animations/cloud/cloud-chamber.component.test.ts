@@ -1,5 +1,6 @@
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {CloudChamberComponent} from '@dota/components/animations/cloud/cloud-chamber.component.ts';
+import {visibleAnimationEnvironment} from '../../setup/animation-environment.ts';
 
 if (!customElements.get('cloud-chamber-test')) customElements.define('cloud-chamber-test', CloudChamberComponent);
 
@@ -33,7 +34,12 @@ const createContext = () => {
   } as unknown as CanvasRenderingContext2D;
 };
 
+beforeEach(() => {
+  visibleAnimationEnvironment();
+});
+
 afterEach(() => {
+  vi.unstubAllGlobals();
   document.body.innerHTML = '';
   vi.restoreAllMocks();
 });
