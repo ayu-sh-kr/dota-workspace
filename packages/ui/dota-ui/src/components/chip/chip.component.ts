@@ -1,4 +1,4 @@
-import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 import type {ChipColor, ChipPosition} from "@dota/components/chip/chip.config.ts";
 import {ChipStyle} from "@dota/components/chip/chip.config.ts";
 
@@ -49,16 +49,16 @@ class ChipComponent extends BaseElement{
     }
 
     /**
-     * Captures authored light DOM once, before the first mount.
-     * Reading it here rather than in the constructor also works where children are not yet
-     * visible during element upgrade (as in happy-dom prerendering).
+     * Captures authored light DOM once, before the first render.
+     * Runs on connect rather than in the constructor, where happy-dom prerendering
+     * has not parsed the children yet.
      */
-    connectedCallback() {
+    @BeforeInit()
+    captureLightDom() {
         if (!this.lightDomCaptured) {
             this.lightDomCaptured = true;
             this.content = this.innerHTML;
         }
-        super.connectedCallback();
     }
 
     render(): string {
