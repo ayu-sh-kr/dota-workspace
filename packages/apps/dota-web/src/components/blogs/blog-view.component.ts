@@ -1,6 +1,7 @@
 import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
-import {MDService, type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
+import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
+import {MDService} from "@dota/configs/markdown.config.ts";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
