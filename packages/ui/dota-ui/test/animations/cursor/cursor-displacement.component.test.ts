@@ -1,5 +1,6 @@
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {CursorDisplacementComponent} from '@dota/components/animations/cursor/cursor-displacement.component.ts';
+import {visibleAnimationEnvironment} from '../../setup/animation-environment.ts';
 
 if (!customElements.get('cursor-displacement-test')) customElements.define('cursor-displacement-test', CursorDisplacementComponent);
 
@@ -27,7 +28,12 @@ const createContext = () => {
   } as unknown as CanvasRenderingContext2D;
 };
 
+beforeEach(() => {
+  visibleAnimationEnvironment();
+});
+
 afterEach(() => {
+  vi.unstubAllGlobals();
   document.body.innerHTML = '';
   vi.restoreAllMocks();
 });
