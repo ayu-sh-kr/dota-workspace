@@ -68,14 +68,29 @@ export class ScrollDeckComponent extends BaseElement {
     }
   };
 
-  private readonly content!: string;
+  private content = "";
 
+  private lightDomCaptured = false;
+
+  /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
     super();
-    this.content = this.innerHTML;
-    this.style.display = "block";
-    this.style.width = "100%";
-    this.style.minWidth = "0";
+  }
+
+  /**
+   * Captures authored light DOM once, before the first mount.
+   * Reading it here rather than in the constructor also works where children are not yet
+   * visible during element upgrade (as in happy-dom prerendering).
+   */
+  connectedCallback() {
+    if (!this.lightDomCaptured) {
+      this.lightDomCaptured = true;
+      this.content = this.innerHTML;
+      this.style.display = "block";
+      this.style.width = "100%";
+      this.style.minWidth = "0";
+    }
+    super.connectedCallback();
   }
 
   private getScroller(): HTMLElement | null {
