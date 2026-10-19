@@ -29,4 +29,6 @@ export class VirtualImportID {
   static RESOLVED_DOTA_ROUTES = "\0virtual:dota-routes";
   static DOTA_ROUTE_METADATA = "virtual:dota-route-metadata";
   static RESOLVED_DOTA_ROUTE_METADATA = "\0virtual:dota-route-metadata";
+  static DOTA_COMPONENT_REGISTRY = "virtual:dota-component-registry";
+  static RESOLVED_DOTA_COMPONENT_REGISTRY = "\0virtual:dota-component-registry";
 }
