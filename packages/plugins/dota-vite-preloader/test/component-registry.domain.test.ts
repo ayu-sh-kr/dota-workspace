@@ -5,6 +5,7 @@ import {afterEach, describe, expect, it} from "vitest";
 import {
   buildComponentDependencyGraph,
   extractTemplateTags,
+  isRegistryOnlyIneffectiveImport,
   prepareComponentRegistryExport,
   scanDotaComponents
 } from "@dota/domain";
@@ -55,5 +56,21 @@ describe("component-registry.domain", () => {
 
     expect(source).toContain(`"app-header": () => import("./src/components/header.component.ts").then(m => m.HeaderComponent)`);
     expect(source).toContain(`dependencies: {"app-header":["dota-icon"]}`);
+  });
+
+  it("drops ineffective dynamic imports caused only by the registry", () => {
+    const message = (importers: string) =>
+      `src/pages/home.page.ts is dynamically imported by ${importers} but also statically imported by \0virtual:dota-routes, src/pages/index.ts, dynamic import will not move module into another chunk.`;
+
+    expect(isRegistryOnlyIneffectiveImport({code: "INEFFECTIVE_DYNAMIC_IMPORT", message: message("\0virtual:dota-component-registry")})).toBe(true);
+    expect(isRegistryOnlyIneffectiveImport({code: "INEFFECTIVE_DYNAMIC_IMPORT", message: message("\\0virtual:dota-component-registry")})).toBe(true);
+  });
+
+  it("keeps ineffective dynamic imports that other modules also cause", () => {
+    const message = "src/pages/home.page.ts is dynamically imported by \0virtual:dota-component-registry, src/main.ts but also statically imported by src/pages/index.ts, dynamic import will not move module into another chunk.";
+
+    expect(isRegistryOnlyIneffectiveImport({code: "INEFFECTIVE_DYNAMIC_IMPORT", message})).toBe(false);
+    expect(isRegistryOnlyIneffectiveImport({code: "PLUGIN_WARNING", message: "virtual:dota-component-registry"})).toBe(false);
+    expect(isRegistryOnlyIneffectiveImport({code: "INEFFECTIVE_DYNAMIC_IMPORT"})).toBe(false);
   });
 });
