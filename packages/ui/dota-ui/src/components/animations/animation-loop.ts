@@ -9,6 +9,18 @@ export interface AnimationLoopOptions {
   deferUntilIdle?: boolean;
 }
 
+/** Controls a loop started by {@link startAnimationLoop}. */
+export interface AnimationLoop {
+  /** Stops the loop and releases its observers and listeners. */
+  stop(): void;
+  /**
+   * Redraws once on the next frame, for example after a resize cleared the canvas, without
+   * restarting an animation that reduced motion or the slow-frame policy has stopped. A loop
+   * that is running redraws anyway; a hidden or off-screen canvas repaints when it is seen again.
+   */
+  invalidate(): void;
+}
+
 /**
  * A gap this long between animation frames means drawing plus painting a frame is a long task.
  * The gap is measured instead of the draw call because canvas filters cost most at paint time.
@@ -31,13 +43,13 @@ const IDLE_TIMEOUT_MS = 2000;
  * @param target Element whose visibility gates the loop, normally the canvas.
  * @param frame Draws one frame; receives the number of frames drawn so far.
  * @param options Frame-rate cap and start deferral.
- * @returns Stops the loop and releases its observers and listeners.
+ * @returns Controls to stop the loop or request a one-off repaint.
  */
 export function startAnimationLoop(
   target: Element,
   frame: (count: number) => void,
   options: AnimationLoopOptions = {}
-): () => void {
+): AnimationLoop {
   const minInterval = 1000 / (options.fps ?? 60);
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
   let raf = 0;
@@ -49,6 +61,8 @@ export function startAnimationLoop(
   let tooSlow = false;
   let previousTick: number | undefined;
   let slowFrames = 0;
+  let dirty = false;
+  let repaintRaf = 0;
 
   const tick = (time: number) => {
     raf = 0;
@@ -61,6 +75,7 @@ export function startAnimationLoop(
     }
     if (time - last >= minInterval - 1) {
       last = time;
+      dirty = false;
       frame(count++);
       if (reducedMotion) return;
     }
@@ -69,8 +84,24 @@ export function startAnimationLoop(
 
   const shouldRun = () => !stopped && !tooSlow && ready && intersecting && !document.hidden && !(reducedMotion && count > 0);
 
+  /** Whether a one-off repaint can be seen; before the first frame there is nothing to restore. */
+  const canRepaint = () => !stopped && ready && intersecting && !document.hidden && count > 0;
+
+  const repaint = () => {
+    if (!dirty || raf !== 0 || repaintRaf !== 0 || !canRepaint()) return;
+    repaintRaf = requestAnimationFrame(() => {
+      repaintRaf = 0;
+      if (!dirty || !canRepaint()) return;
+      dirty = false;
+      frame(count++);
+    });
+  };
+
   const update = () => {
-    if (!shouldRun() || raf !== 0) return;
+    if (!shouldRun() || raf !== 0) {
+      repaint();
+      return;
+    }
     // A pause is not a slow frame: measure intervals afresh after resuming.
     previousTick = undefined;
     raf = requestAnimationFrame(tick);
@@ -91,12 +122,19 @@ export function startAnimationLoop(
     });
   }
 
-  return () => {
-    stopped = true;
-    cancelStart();
-    if (raf) cancelAnimationFrame(raf);
-    observer.disconnect();
-    document.removeEventListener("visibilitychange", update);
+  return {
+    stop() {
+      stopped = true;
+      cancelStart();
+      if (raf) cancelAnimationFrame(raf);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", update);
+      if (repaintRaf) cancelAnimationFrame(repaintRaf);
+    },
+    invalidate() {
+      dirty = true;
+      repaint();
+    },
   };
 }
 
