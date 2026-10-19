@@ -1,5 +1,15 @@
 # @ayu-sh-kr/dota-ssr
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [fcca00d]
+  - @ayu-sh-kr/dota-rendering@0.2.2
+  - @ayu-sh-kr/dota-core@1.12.2
+  - @ayu-sh-kr/dota-router@0.3.3
+  - @ayu-sh-kr/dota-runtime@0.0.11
+
 ## 0.4.1
 
 ### Patch Changes

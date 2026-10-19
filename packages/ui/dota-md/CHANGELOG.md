@@ -1,5 +1,15 @@
 # @ayu-sh-kr/dota-md
 
+## 0.2.5
+
+### Patch Changes
+
+- fcca00d: `applyMarkdownThemeToElement` only adds or removes the classes that differ, so hydrating a prerendered `md-view` no longer rewrites every element's `class` and restyles the article.
+- Updated dependencies [fcca00d]
+  - @ayu-sh-kr/dota-rendering@0.2.2
+  - @ayu-sh-kr/dota-core@1.12.2
+  - @ayu-sh-kr/dota-web-type-json@0.0.23
+
 ## 0.2.4
 
 ### Patch Changes
