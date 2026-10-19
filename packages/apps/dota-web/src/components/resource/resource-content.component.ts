@@ -1,6 +1,6 @@
 import {AfterInit, BaseElement, Component, Property, String, Watcher} from "@ayu-sh-kr/dota-wrap/core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
-import {MDService} from "@ayu-sh-kr/dota-md";
+import {MDService} from "@dota/configs/markdown.config.ts";
 
 @Component({
   selector: "resource-content",
