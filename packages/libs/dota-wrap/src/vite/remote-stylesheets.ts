@@ -50,39 +50,111 @@ export function remoteStylesheetTags(urls: readonly string[]): HtmlTagDescriptor
   ];
 }
 
+/** Output chunk fields this plugin reads; `viteMetadata` is added by Vite's CSS plugin. */
+type ChunkLike = {
+  type: 'chunk';
+  fileName: string;
+  isEntry: boolean;
+  imports: readonly string[];
+  viteMetadata?: {importedCss: Set<string>};
+};
+
+/** Output asset fields this plugin reads and rewrites. */
+type AssetLike = {type: 'asset'; fileName: string; source: string | Uint8Array};
+
 /**
- * Moves remote stylesheet `@import`s (typically web fonts) out of the built CSS and into the
- * HTML head. Inside CSS, the browser only discovers such a stylesheet after the bundle that
- * imports it has downloaded, which chains two render-blocking requests before first paint;
- * as `<link>`s with a preconnect they download in parallel with the bundle. The stylesheets
- * are prepended, so they still precede the bundle in the cascade as the `@import` did.
- * Applies to production builds only; prerendered pages inherit it from the built `index.html`.
+ * Lists the CSS each entry chunk loads at start-up: its own and that of every chunk it
+ * imports statically, in import order.
+ * @param bundle Output bundle.
+ * @returns CSS file names per entry chunk file name.
+ */
+export function startupStylesheets(bundle: Record<string, ChunkLike | AssetLike>): Map<string, string[]> {
+  const result = new Map<string, string[]>();
+  for (const output of Object.values(bundle)) {
+    if (output.type !== 'chunk' || !output.isEntry) continue;
+    const css: string[] = [];
+    const visited = new Set<string>();
+    const visit = (fileName: string) => {
+      const chunk = bundle[fileName];
+      if (visited.has(fileName) || chunk?.type !== 'chunk') return;
+      visited.add(fileName);
+      chunk.imports.forEach(visit);
+      chunk.viteMetadata?.importedCss.forEach(file => { if (!css.includes(file)) css.push(file); });
+    };
+    visit(output.fileName);
+    result.set(output.fileName, css);
+  }
+  return result;
+}
+
+/**
+ * Moves remote stylesheet `@import`s (typically web fonts) out of an HTML page's start-up CSS
+ * and into that page's head. Inside CSS, the browser only discovers such a stylesheet after
+ * the bundle that imports it has downloaded, which chains two render-blocking requests before
+ * first paint; as `<link>`s with a preconnect they download in parallel with the bundle.
+ *
+ * Each page receives only the imports of the CSS its own entry loads at start-up. CSS that a
+ * lazily loaded chunk also uses keeps its imports, so a route's stylesheet never becomes active
+ * on pages that do not load it. The links are prepended, so they still precede the bundle in
+ * the cascade as the `@import` did. Applies to production builds only; prerendered pages
+ * inherit it from the built `index.html`.
  * @returns Vite plugin.
  */
 export function dotaRemoteStylesheets(): Plugin {
-  const urls = new Set<string>();
+  /** Hoisted URLs per entry chunk file name, rebuilt for every build. */
+  let urlsByEntry = new Map<string, string[]>();
 
   return {
     name: 'vite-plugin-dota-remote-stylesheets',
     apply: 'build',
+    buildStart() {
+      urlsByEntry = new Map();
+    },
     generateBundle: {
       // Before Vite's HTML plugin, whose `transformIndexHtml` pass runs in its own generateBundle.
       order: 'pre',
-      handler(_options, bundle) {
+      handler(_options, outputBundle) {
+        const bundle = outputBundle as unknown as Record<string, ChunkLike | AssetLike>;
+        const startup = startupStylesheets(bundle);
+        const startupChunks = new Set<string>();
+        for (const entry of startup.keys()) {
+          const visit = (fileName: string) => {
+            const chunk = bundle[fileName];
+            if (startupChunks.has(fileName) || chunk?.type !== 'chunk') return;
+            startupChunks.add(fileName);
+            chunk.imports.forEach(visit);
+          };
+          visit(entry);
+        }
+        const lazyCss = new Set<string>();
         for (const output of Object.values(bundle)) {
-          if (output.type !== 'asset' || !output.fileName.endsWith('.css')) continue;
-          const source = typeof output.source === 'string' ? output.source : new TextDecoder().decode(output.source);
+          if (output.type === 'chunk' && !startupChunks.has(output.fileName)) {
+            output.viteMetadata?.importedCss.forEach(file => lazyCss.add(file));
+          }
+        }
+
+        const urlsByCss = new Map<string, string[]>();
+        for (const css of new Set([...startup.values()].flat())) {
+          const asset = bundle[css];
+          if (lazyCss.has(css) || asset?.type !== 'asset') continue;
+          const source = typeof asset.source === 'string' ? asset.source : new TextDecoder().decode(asset.source);
           const extracted = extractRemoteImports(source);
           if (extracted.urls.length === 0) continue;
-          extracted.urls.forEach(url => urls.add(url));
-          output.source = extracted.css;
+          asset.source = extracted.css;
+          urlsByCss.set(css, extracted.urls);
+        }
+
+        for (const [entry, cssFiles] of startup) {
+          const urls = [...new Set(cssFiles.flatMap(css => urlsByCss.get(css) ?? []))];
+          if (urls.length > 0) urlsByEntry.set(entry, urls);
         }
       },
     },
     transformIndexHtml: {
       order: 'post',
-      handler() {
-        return remoteStylesheetTags([...urls]);
+      handler(_html, context) {
+        const entry = context.chunk?.fileName;
+        return entry ? remoteStylesheetTags(urlsByEntry.get(entry) ?? []) : [];
       },
     },
   };
