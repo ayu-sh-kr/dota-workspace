@@ -2,6 +2,7 @@ import {autoUpdate, computePosition, flip, offset, shift, type Placement} from "
 import "./popover.css";
 import {
   BaseElement,
+  BeforeInit,
   Component,
   DocumentListener,
   HostListener,
@@ -67,13 +68,13 @@ class PopoverComponent extends BaseElement {
   }
 
   /**
-   * Captures the authored trigger and panel markup before the first mount.
-   * Reading it here rather than in the constructor also works where children are not yet
-   * visible during element upgrade (as in happy-dom prerendering).
+   * Captures the authored trigger and panel markup once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
    */
-  connectedCallback() {
+  @BeforeInit()
+  captureLightDom() {
     this.content ??= this.innerHTML;
-    super.connectedCallback();
   }
 
   @OnEvent(LifecycleEventConstants.CONNECTED, true)
