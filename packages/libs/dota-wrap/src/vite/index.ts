@@ -5,9 +5,16 @@ import dotaVitePreloader from '../preloader-plugin';
 import eventMapGenerator, {type EventMapGeneratorPluginConfig} from '../event-map-generator';
 import dotaWebTypeJson, {type WebTypeJsonPluginConfig} from '../web-type-json';
 import dotaSsg, {dotaSsr, type DotaServerTarget, type DotaSsgOptions, type DotaSsrOptions} from '../ssg';
+import {dotaRemoteStylesheets} from './remote-stylesheets';
+
+export {dotaRemoteStylesheets, extractRemoteImports, remoteStylesheetTags} from './remote-stylesheets';
 
 /** Options forwarded to the wrapped Dota preloader plugin. */
-export type DotaVitePreloaderOptions = {logType?: LogType};
+export type DotaVitePreloaderOptions = {
+  logType?: LogType;
+  /** `false` stops grouping start-up support modules into one `app-shared` client chunk. */
+  sharedChunk?: false;
+};
 
 /** Options forwarded to the wrapped event-map generator. */
 export type DotaEventMapOptions = Omit<EventMapGeneratorPluginConfig, 'root' | 'scanRoots'>;
@@ -46,6 +53,11 @@ export type DotaVitePluginsOptions = {
    * `ssr.deployment` says otherwise. SSR defaults to `node` when no target is set.
    */
   deployment?: DotaServerTarget;
+  /**
+   * Moves remote stylesheet `@import`s (web fonts) from the built CSS into `<link>`s in the
+   * HTML head so they no longer wait for the CSS bundle; on by default, `false` removes it.
+   */
+  remoteStylesheets?: false;
   /** Explicitly supplied third-party or application-specific Vite plugins. */
   extensions?: Plugin[];
 };
@@ -56,7 +68,7 @@ export type DotaVitePluginsOptions = {
  * the original plugin objects so Vite controls their native hooks and ordering.
  * Nitro and other server-owning integrations remain explicit extensions.
  * @param options Shared defaults and per-plugin configuration.
- * @returns Vite plugins in preloader, event-map, Web Types, SSG, SSR, and extension order.
+ * @returns Vite plugins in preloader, event-map, Web Types, SSG, SSR, remote stylesheet, and extension order.
  */
 export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] {
   const root = options.root ?? process.cwd();
@@ -107,6 +119,8 @@ export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] 
       ...options.ssr,
     }));
   }
+
+  if (options.remoteStylesheets !== false) plugins.push(dotaRemoteStylesheets());
 
   plugins.push(...(options.extensions ?? []));
   return plugins;
