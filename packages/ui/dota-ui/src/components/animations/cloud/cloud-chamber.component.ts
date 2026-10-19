@@ -1,4 +1,4 @@
-import {startAnimationLoop} from "@dota/components/animations/animation-loop.ts";
+import {startAnimationLoop, type AnimationLoop} from "@dota/components/animations/animation-loop.ts";
 import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-core";
 import { OnEvent } from "@ayu-sh-kr/dota-event";
 import { ORB_COLOR_MAP } from "@dota/components/animations/orb/orb-background.component.ts";
@@ -114,9 +114,12 @@ function startLoop(
   const densityStrength = clamp(vaporDensity, 0.1, 3.2);
   const glowStrength = clamp(vaporGlow, 0, 3);
 
+  // Resize and theme changes clear or restyle the canvas, so a paused loop must repaint once.
+  let loop: AnimationLoop | undefined;
   const themeObserver = new MutationObserver(() => {
     palette = resolvePalette(color);
     composeStaticLayers();
+    loop?.invalidate();
   });
 
   const seedMotes = () => {
@@ -192,6 +195,7 @@ function startLoop(
     vaporImageData = vaporCtx.createImageData(VAPOR_TEXTURE_WIDTH, VAPOR_TEXTURE_HEIGHT);
     seedMotes();
     composeStaticLayers();
+    loop?.invalidate();
   };
 
   // Blurred full-canvas layers that do not move are drawn once per size or theme; frames only
@@ -428,10 +432,10 @@ function startLoop(
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", resize, { passive: true });
   // The vapor field drifts slowly, so 30 fps is visually identical at half the cost.
-  const stopLoop = startAnimationLoop(canvas, drawFrame, {fps: 30});
+  loop = startAnimationLoop(canvas, drawFrame, {fps: 30});
 
   return () => {
-    stopLoop();
+    loop?.stop();
     themeObserver.disconnect();
     window.removeEventListener("resize", resize);
   };
