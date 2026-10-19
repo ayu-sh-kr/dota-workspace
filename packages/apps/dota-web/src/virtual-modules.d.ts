@@ -14,3 +14,8 @@ declare module "virtual:dota-component-modules" {
   const modules: Record<string, any>;
   export default modules;
 }
+
+declare module "virtual:dota-component-registry" {
+  import {ComponentRegistry} from "@ayu-sh-kr/dota-wrap";
+  export const componentRegistry: ComponentRegistry;
+}
