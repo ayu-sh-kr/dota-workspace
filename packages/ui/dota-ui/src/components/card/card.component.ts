@@ -28,9 +28,24 @@ export class CardComponent extends BaseElement {
     @Property({name: 'className', type: String})
     className!: string
 
+    private lightDomCaptured = false;
+
+    /** Public so the class can be registered with `customElements.define` and app component lists. */
     constructor() {
         super();
-        this.content = this.innerHTML;
+    }
+
+    /**
+     * Captures authored light DOM once, before the first mount.
+     * Reading it here rather than in the constructor also works where children are not yet
+     * visible during element upgrade (as in happy-dom prerendering).
+     */
+    connectedCallback() {
+        if (!this.lightDomCaptured) {
+            this.lightDomCaptured = true;
+            this.content = this.innerHTML;
+        }
+        super.connectedCallback();
     }
 
     render(): string {
@@ -167,9 +182,24 @@ export class CardFooterComponent extends BaseElement {
     @Property({name: 'className', type: String})
     className!: string;
 
+    private lightDomCaptured = false;
+
+    /** Public so the class can be registered with `customElements.define` and app component lists. */
     constructor() {
         super();
-        this.content = this.innerHTML;
+    }
+
+    /**
+     * Captures authored light DOM once, before the first mount.
+     * Reading it here rather than in the constructor also works where children are not yet
+     * visible during element upgrade (as in happy-dom prerendering).
+     */
+    connectedCallback() {
+        if (!this.lightDomCaptured) {
+            this.lightDomCaptured = true;
+            this.content = this.innerHTML;
+        }
+        super.connectedCallback();
     }
 
     render(): string {
