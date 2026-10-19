@@ -1,4 +1,5 @@
 import {diff} from './diff';
+import {matchesServerMarkup} from './markup-match';
 import {
   isConditionalValue,
   isKeyedValue,
@@ -138,7 +139,7 @@ interface RenderRoot {
    */
   writeHTML(value: string): void;
   /**
-   * Reports whether the boundary already holds exactly this serialized markup.
+   * Reports whether the boundary already holds this markup, such as server-rendered output.
    * @param value Complete trusted legacy render string.
    */
   hasHTML(value: string): boolean;
@@ -272,9 +273,14 @@ class NativeRoot implements RenderRoot {
     this.root.innerHTML = value;
   }
 
-  /** Compares against the root's current serialization; an empty root never matches. */
+  /**
+   * Compares against the root's current content; an empty root never matches. Exact
+   * serialization is the fast path; otherwise nested components' rendered content and
+   * hydration markers are tolerated (see {@link matchesServerMarkup}).
+   */
   hasHTML(value: string): boolean {
-    return this.root.firstChild !== null && this.root.innerHTML === value;
+    if (this.root.firstChild === null) return false;
+    return this.root.innerHTML === value || matchesServerMarkup(this.root, value);
   }
 
   /** Collects marker-bearing descendants without including the root host itself. */
