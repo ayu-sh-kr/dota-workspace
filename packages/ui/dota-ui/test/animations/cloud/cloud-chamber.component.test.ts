@@ -89,4 +89,25 @@ describe('CloudChamberComponent', () => {
 
     expect(cancel).toHaveBeenCalled();
   });
+  it('repaints its static frame after a resize when the user prefers reduced motion', () => {
+    vi.stubGlobal('matchMedia', () => ({matches: true}));
+    const callbacks: FrameRequestCallback[] = [];
+    const context = createContext();
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(callback => callbacks.push(callback));
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined);
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context);
+    const element = render();
+    element.onConnected();
+    callbacks.shift()?.(0);
+    callbacks.shift()?.(16);
+    const drawsBeforeResize = vi.mocked(context.clearRect).mock.calls.length;
+
+    window.dispatchEvent(new Event('resize'));
+    callbacks.shift()?.(500);
+
+    expect(drawsBeforeResize).toBe(1);
+    expect(vi.mocked(context.clearRect).mock.calls.length).toBe(2);
+    expect(callbacks).toHaveLength(0);
+    element.onDisconnected();
+  });
 });
