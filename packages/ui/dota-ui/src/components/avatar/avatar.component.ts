@@ -1,4 +1,4 @@
-import {BaseElement, Boolean as BooleanType, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Boolean as BooleanType, Component, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
 import type {ChipColor, ChipPosition} from "@dota/components/chip/chip.config.ts";
 import {AvatarStyle} from "@dota/components/avatar/avatar.config.ts";
 import type {AvatarColor, AvatarSize, AvatarStyleConfig, AvatarVariant} from "@dota/components/avatar/avatar.config.ts";
@@ -176,16 +176,16 @@ export class AvatarWrapper extends BaseElement {
   }
 
   /**
-   * Captures authored light DOM once, before the first mount.
-   * Reading it here rather than in the constructor also works where children are not yet
-   * visible during element upgrade (as in happy-dom prerendering).
+   * Captures authored light DOM once, before the first render.
+   * Runs on connect rather than in the constructor, where happy-dom prerendering
+   * has not parsed the children yet.
    */
-  connectedCallback() {
+  @BeforeInit()
+  captureLightDom() {
     if (!this.lightDomCaptured) {
       this.lightDomCaptured = true;
       this.content = this.innerHTML;
     }
-    super.connectedCallback();
   }
 
   /** Resolves each visual slot independently so a config cannot erase sibling defaults. */
