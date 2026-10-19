@@ -1,4 +1,4 @@
-import { bootstrap, DotaElementConstructor, setMountStrategy } from '@ayu-sh-kr/dota-core';
+import { bootstrap, CoreMetadata, DotaElementConstructor, Metadata, setMountStrategy } from '@ayu-sh-kr/dota-core';
 import {
   ComponentClass,
   DomHistoryRouter,
@@ -14,6 +14,7 @@ import {
 import {getApplicationCaptureHook} from '@ayu-sh-kr/dota-ssr';
 import {configureDotaLogging, createDotaLogger, type DotaLoggingOptions} from '@ayu-sh-kr/dota-common-utils';
 import type {DotaRuntimeContext, DotaRuntimePlugin} from './runtime-plugin';
+import {LazyComponentLoader, type ComponentRegistry} from './lazy-components';
 
 const logger = createDotaLogger('dota-wrap', 'index.ts');
 
@@ -22,6 +23,7 @@ export * from './event';
 export * from './rest';
 export * from './router';
 export * from './runtime-plugin';
+export * from './lazy-components';
 export {configureDotaLogging, createDotaLogger, DotaLogType, resolveDotaLogType, type DotaLoggingOptions} from '@ayu-sh-kr/dota-common-utils';
 
 /** Export map returned by eager or lazily imported application modules. */
@@ -39,6 +41,15 @@ export type AppConfig = {
   modules: Record<string, unknown> | DotaElementConstructor[];
   /** Additional constructors supplied by external UI packages. */
   externalComponents?: ComponentClass[];
+  /**
+   * Components defined on demand instead of at startup, such as `virtual:dota-component-registry`
+   * and library loaders from `defineComponentLoaders`. Each navigation loads the page's
+   * dependency closure before it renders, so a route downloads only the code it shows.
+   * Requires explicit `routes`; components rendered elsewhere are defined when they enter the DOM.
+   * With this option `initializeApp` resolves once the first route has rendered, so code
+   * chained on it sees the page; server prerendering also waits for components loaded later.
+   */
+  lazyComponents?: ComponentRegistry | readonly ComponentRegistry[];
   /** Explicit flat route declarations; decorated routes remain the fallback. */
   routes?: RouteConfig<HTMLElement>[];
   /** Route shown when the requested destination cannot be resolved. */
@@ -166,14 +177,20 @@ export async function registerRoutes(
  */
 export async function initializeApp(config: AppConfig): Promise<{
   components: ComponentClass[],
-  routerService: RouterService<Router<HTMLElement>>
+  routerService: RouterService<Router<HTMLElement>>,
+  /** Present with `lazyComponents`; `ensure()` prefetches a tag tree, e.g. on link hover. */
+  componentLoader?: LazyComponentLoader
 }> {
   if (config.logging) configureDotaLogging(config.logging);
+  const componentLoader = config.lazyComponents
+    ? new LazyComponentLoader(([] as ComponentRegistry[]).concat(config.lazyComponents))
+    : undefined;
   // A server loading this entry (Dota SSR) receives the configuration instead; the
   // application never starts there, so browser-only startup code never runs.
   const captureHook = getApplicationCaptureHook();
   if (captureHook) {
     const components = await resolveComponents(config.modules, config.externalComponents);
+    if (componentLoader) components.push(...await componentLoader.loadAll());
     const routes = config.routes?.length ? config.routes : RouterUtils.prepareConfig(components);
     captureHook({components, routes, errorRoute: config.errorRoute, defaultRoute: config.defaultRoute, root: config.root});
     return new Promise(() => {});
@@ -208,6 +225,20 @@ export async function initializeApp(config: AppConfig): Promise<{
     plugin.setup?.(runtimeContext);
   });
 
+  // Outermost by construction: a route's code is defined before any plugin (hydration) presents it.
+  let firstRender: Promise<void> | undefined;
+  if (componentLoader) {
+    const lazy = withLazyComponents(routeRenderer, componentLoader);
+    // Readiness means the first render settled; a failed render stays the router's to report.
+    firstRender = new Promise<void>(resolve => {
+      routeRenderer = (match, context) => {
+        const rendered = Promise.resolve(lazy(match, context));
+        rendered.then(() => resolve(), () => resolve());
+        return rendered;
+      };
+    });
+  }
+
   const components = await registerComponents(config.modules, config.externalComponents);
   logger.debug(`${components.length} components registered`);
 
@@ -222,7 +253,30 @@ export async function initializeApp(config: AppConfig): Promise<{
   );
   routerService.init();
   logger.debug(`${routerService._routes.length} routes registered`);
+  await firstRender;
 
   logger.info('Application initialized');
-  return { components, routerService };
+  return { components, routerService, componentLoader };
+}
+
+/**
+ * Defers each route render until the page's dependency closure is defined.
+ * After the first render it starts the loader's document observer, so elements outside
+ * route templates are defined too without racing the initial hydration hand-off.
+ * @param next Renderer that presents the route once its components exist.
+ * @param loader Loader holding the application's lazy registries.
+ * @returns Renderer that loads, then delegates.
+ */
+function withLazyComponents(next: RouteRenderer<HTMLElement>, loader: LazyComponentLoader): RouteRenderer<HTMLElement> {
+  let observing = false;
+  return async (match, context) => {
+    const component = match.route.component as ComponentClass & {__dotaSelector?: string};
+    const selector = Metadata.for(component).own(CoreMetadata.component)?.selector ?? component.__dotaSelector;
+    if (selector && !match.route.render) await loader.ensure([selector]);
+    await next(match, context);
+    if (!observing) {
+      observing = true;
+      loader.observe(document.documentElement);
+    }
+  };
 }
