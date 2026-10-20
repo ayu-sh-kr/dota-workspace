@@ -1,13 +1,14 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {CloudChamberComponent} from '@dota/components/animations/cloud/cloud-chamber.component.ts';
 import {visibleAnimationEnvironment} from '../../setup/animation-environment.ts';
+import {mountTemplate} from '../../setup/render-template';
 
 if (!customElements.get('cloud-chamber-test')) customElements.define('cloud-chamber-test', CloudChamberComponent);
 
 const render = (props: Partial<CloudChamberComponent> = {}) => {
   const element = document.createElement('cloud-chamber-test') as CloudChamberComponent;
   Object.assign(element, props);
-  element.innerHTML = element.render();
+  mountTemplate(element);
   document.body.append(element);
   return element;
 };
