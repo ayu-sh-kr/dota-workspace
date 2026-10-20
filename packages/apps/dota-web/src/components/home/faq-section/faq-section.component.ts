@@ -8,17 +8,18 @@ interface FaqItem {
 }
 
 const FAQ_ACCORDION_CONFIG = {
-  container: "overflow-hidden rounded-card border border-default bg-surface transition-colors hover:border-primary-border",
+  container: "faq-item",
   button: {
-    base: "flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-semibold text-foreground transition-colors hover:bg-primary-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-focus",
+    base: "faq-question flex w-full items-center justify-between gap-6 py-5 text-left font-semibold text-foreground transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
     size: {lg: ""},
     color: {purple: {ghost: ""}},
   },
-  paragraph: "px-5 pb-5 text-sm leading-6 text-muted",
+  paragraph: "type-body max-w-[60ch] pb-6 text-muted",
 } satisfies AccordionStyleConfig;
 
 /**
- * Presents product and maintenance questions on the home page as styled Dota UI disclosures.
+ * Presents product and maintenance questions on the home page as a hairline-divided list of
+ * Dota UI disclosures that sits directly on the page, without a surrounding panel.
  *
  * State: the component keeps a fixed private FAQ collection; each render maps it to one
  * `dota-accordion`, whose expanded state remains owned by that child component.
@@ -67,17 +68,14 @@ export class FaqSectionComponent extends BaseElement {
   render(): TemplateResult {
     return html`
       <section aria-labelledby="faq-heading"
-               class="relative isolate overflow-hidden layout-section">
-        <div aria-hidden="true"
-             class="absolute inset-x-0 top-1/2 -z-10 h-72 -translate-y-1/2 bg-gradient-to-r from-transparent
-                     via-primary-subtle to-transparent blur-3xl"></div>
+               class="layout-section home-section-divider">
 
         <div class="layout-page faq-grid">
-          <div class="lg:pt-5">
+          <div class="faq-intro">
             <span class="type-eyebrow">
               FAQ
             </span>
-            <h2 id="faq-heading" class="mt-5 max-w-lg type-section text-foreground">
+            <h2 id="faq-heading" class="mt-3 max-w-lg type-section text-foreground">
               Clear answers for building with Dota.
             </h2>
             <p class="mt-4 max-w-xl type-body text-muted">
@@ -90,8 +88,8 @@ export class FaqSectionComponent extends BaseElement {
             </a>
           </div>
 
-          <div class="rounded-card border border-default bg-surface p-3 shadow-lift backdrop-blur-xl sm:p-4">
-            <div class="space-y-2" role="list">
+          <div>
+            <div class="faq-list" role="list">
               ${this.faqs.map((faq) => html`
                 <div role="listitem">
                   <dota-accordion
