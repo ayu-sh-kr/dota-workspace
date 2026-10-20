@@ -1,0 +1,75 @@
+/* Code grammar: one quiet panel for every code sample, in the page theme.
+ * `.code-panel` (color.css) draws the surface. A snippet may add `.code-header` for its
+ * file name and copy action; the code itself sits in `.code-body`, or is a Markdown `<pre>`.
+ */
+@layer components {
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--layout-space-3);
+    padding: var(--layout-space-2) var(--layout-space-2) 0 var(--layout-space-4);
+    color: var(--code-muted-color);
+  }
+
+  .code-filename {
+    overflow: hidden;
+    font-family: var(--font-code);
+    font-size: var(--type-label-size);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .code-copy {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border: 0;
+    border-radius: var(--layout-radius-control);
+    background: transparent;
+    color: var(--code-muted-color);
+    cursor: pointer;
+    transition: color var(--motion-fast), background-color var(--motion-fast);
+  }
+  .code-copy:hover { background: var(--surface-raised-color); color: var(--code-foreground-color); }
+  .code-copy svg { inline-size: 1rem; block-size: 1rem; }
+
+  .code-body { overflow-x: auto; }
+}
+
+/* Every code block shares one inset and type size, whether a snippet body or a Markdown block. */
+.code-body pre,
+.code-body code.hljs,
+pre.code-panel > code {
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+.code-body pre,
+.code-body code.hljs,
+pre.code-panel,
+pre.code-panel > code {
+  color: var(--code-foreground-color);
+  font-family: var(--font-code);
+  font-size: var(--type-code-size);
+  line-height: var(--type-code-leading);
+}
+.code-body pre { padding: var(--layout-space-3) var(--layout-space-4) var(--layout-space-4); }
+pre.code-panel { padding: var(--layout-space-4); }
+.code-body code.hljs, pre.code-panel > code { display: block; padding: 0; overflow: visible; }
+
+/* Syntax colors; replaces a fixed highlight.js theme so code follows light and dark mode. */
+.hljs { color: var(--code-foreground-color); background: transparent; }
+.hljs-comment, .hljs-quote, .hljs-meta { color: var(--code-muted-color); font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-doctag, .hljs-template-tag { color: var(--syntax-keyword-color); }
+.hljs-title, .hljs-title.function_, .hljs-section, .hljs-name, .hljs-selector-id { color: var(--syntax-function-color); }
+.hljs-string, .hljs-regexp, .hljs-template-variable, .hljs-addition, .hljs-selector-attr { color: var(--syntax-string-color); }
+.hljs-number, .hljs-literal, .hljs-symbol, .hljs-bullet, .hljs-variable.constant_ { color: var(--syntax-number-color); }
+.hljs-type, .hljs-built_in, .hljs-title.class_, .hljs-class .hljs-title, .hljs-selector-class { color: var(--syntax-type-color); }
+.hljs-attr, .hljs-attribute, .hljs-property, .hljs-params { color: var(--code-foreground-color); }
+.hljs-variable, .hljs-subst, .hljs-tag { color: var(--code-foreground-color); }
+.hljs-deletion { color: var(--code-danger-color); }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 600; }
