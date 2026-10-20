@@ -125,6 +125,45 @@ html, html body, html.dark body {
     box-shadow: var(--shadow-lift);
   }
 
+  /* A whole-card link: the border takes the accent instead of the card growing or glowing. */
+  .surface-card-link {
+    transition: border-color var(--motion-fast), transform var(--motion-normal);
+  }
+  .surface-card-link:hover { border-color: var(--primary-color-border); transform: translateY(-2px); }
+
+  /* Quiet inset area inside a page, such as a message log. */
+  .surface-inset {
+    border: 1px solid var(--border-color);
+    border-radius: var(--layout-radius-card);
+    background: var(--surface-raised-color);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--layout-space-1);
+    padding: var(--layout-space-1) var(--layout-space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--layout-radius-control);
+    background: var(--surface-color);
+    color: var(--muted-color);
+    font-size: var(--type-label-size);
+    font-weight: 500;
+    line-height: var(--type-control-leading);
+  }
+
+  .field {
+    min-block-size: var(--layout-control-height);
+    padding: var(--layout-space-2) var(--layout-space-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--layout-radius-control);
+    background: var(--surface-color);
+    color: var(--foreground-color);
+    transition: border-color var(--motion-fast);
+  }
+  .field:hover { border-color: var(--border-strong-color); }
+  .field:focus-visible { border-color: var(--primary-color); outline-offset: 1px; }
+
   .code-panel {
     overflow: hidden;
     border: 1px solid var(--code-border-color);
