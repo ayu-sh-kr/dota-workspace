@@ -866,11 +866,17 @@ class TemplateStrategy implements RenderStrategy {
       // The server wrote its own locator; re-resolving a replaced element must search for that one.
       part.locator = element.getAttribute(DYNAMIC_ATTRIBUTE) ?? part.locator;
       part.valueIndexes.forEach((index) => recordRenderPart(adoptedParts, index, part));
+      // Later updates diff against this client output, so a value the server wrote
+      // differently (for example, state read only in the browser) is written now.
+      const value = part.templateValue.replace(this.markerPattern, (_, markerIndex: string) =>
+        valueText(output.values[Number(markerIndex)]));
+      if (element.getAttribute(part.name) !== value) element.setAttribute(part.name, value);
     }
 
     for (const {index, start, end} of collectHydrationChildParts(hydrationNodes, this.hydrationScope!)) {
       const part: ChildPart = {kind: 'child', index, start, end};
       this.adoptChildRepresentation(part, output.values[index]);
+      if (part.text && part.text.data !== valueText(output.values[index])) part.text.data = valueText(output.values[index]);
       recordRenderPart(adoptedParts, index, part);
     }
 
