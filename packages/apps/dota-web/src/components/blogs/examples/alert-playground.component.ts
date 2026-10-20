@@ -1,4 +1,5 @@
-import { BaseElement, BindEvent, Component, HTML } from "@ayu-sh-kr/dota-wrap/core";
+import { BaseElement, BindEvent, Component } from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import { Alert, type AlertController } from "@ayu-sh-kr/dota-ui";
 
 type ShowcaseResult = { name: string; value: unknown };
@@ -12,8 +13,8 @@ export class AlertPlaygroundComponent extends BaseElement {
     super();
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
       <section class="not-prose overflow-hidden rounded-2xl border border-gray-200 bg-white text-gray-950 shadow-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-50">
         <header class="border-b border-gray-200 px-6 py-8 dark:border-gray-700 sm:px-10 sm:py-10">
           <div class="max-w-2xl">
@@ -126,8 +127,8 @@ export class AlertPlaygroundComponent extends BaseElement {
   }
 
   /** Builds the repeated example card while keeping labels and IDs in one place. */
-  private scenarioButton(number: string, title: string, description: string, id: string): string {
-    return `<button id="${id}" type="button" class="group flex min-h-32 flex-col items-start rounded-xl border border-gray-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-lime-400 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-500 dark:border-gray-700 dark:bg-gray-950 dark:hover:border-lime-600"><span class="flex w-full items-center justify-between"><span class="grid size-8 place-items-center rounded-lg bg-lime-100 font-mono text-[10px] text-lime-800 dark:bg-lime-900/40 dark:text-lime-200">${number}</span><span class="text-gray-400 transition group-hover:translate-x-0.5 group-hover:text-lime-600">↗</span></span><span class="mt-5 block text-base font-medium">${title}</span><span class="mt-2 block text-sm leading-6 text-gray-500 dark:text-gray-400">${description}</span></button>`;
+  private scenarioButton(number: string, title: string, description: string, id: string): TemplateResult {
+    return html`<button id="${id}" type="button" class="group flex min-h-32 flex-col items-start rounded-xl border border-gray-200 bg-white p-5 text-left transition hover:-translate-y-0.5 hover:border-lime-400 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime-500 dark:border-gray-700 dark:bg-gray-950 dark:hover:border-lime-600"><span class="flex w-full items-center justify-between"><span class="grid size-8 place-items-center rounded-lg bg-lime-100 font-mono text-[10px] text-lime-800 dark:bg-lime-900/40 dark:text-lime-200">${number}</span><span class="text-gray-400 transition group-hover:translate-x-0.5 group-hover:text-lime-600">↗</span></span><span class="mt-5 block text-base font-medium">${title}</span><span class="mt-2 block text-sm leading-6 text-gray-500 dark:text-gray-400">${description}</span></button>`;
   }
 
   /** Creates caller-owned custom content to demonstrate the controller boundary. */
