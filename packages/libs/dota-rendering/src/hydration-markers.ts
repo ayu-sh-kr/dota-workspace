@@ -22,6 +22,11 @@ export const NODE_INDEX_ATTRIBUTE = 'data-dota-index';
 export const COMPONENT_ATTRIBUTE = 'data-dota-component';
 /** Written on elements that own a child or attribute part. */
 export const DYNAMIC_ATTRIBUTE = 'data-dota-dynamic';
+/**
+ * Marks the element in a light-DOM component's template that holds the host's authored
+ * children. Server renderers place the children there, so hydration adopts them in place.
+ */
+export const LIGHT_DOM_SLOT_ATTRIBUTE = 'data-dota-slot';
 /** Host attributes {@link hydrationIdentity} writes; clear these before re-stamping a host. */
 export const HYDRATION_IDENTITY_ATTRIBUTES = [HYDRATION_COMPONENT_ATTRIBUTE, HYDRATION_TEMPLATE_ATTRIBUTE, HYDRATION_VERSION_ATTRIBUTE, HYDRATION_SCOPE_ATTRIBUTE] as const;
 
