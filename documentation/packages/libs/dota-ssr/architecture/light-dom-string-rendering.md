@@ -64,9 +64,11 @@ node:http / connect middleware
    interpolations, interpolated attribute or tag names, duplicate keys, and `trustedHTML` in an
    attribute throw, as they do in the browser.
 8. The serialized markup is tokenized to find registered custom-element hosts. Each one is rendered by
-   the same steps, concurrently with its siblings, and replaces its tag's content. Light-DOM hosts drop
-   authored children, matching the client mount. Shadow hosts emit `<template shadowrootmode="open">`
-   and keep authored children for slots.
+   the same steps, concurrently with its siblings, and replaces its tag's content. A light-DOM host
+   places its authored children inside the first element of its own template marked
+   `data-dota-slot` (`LIGHT_DOM_SLOT_ATTRIBUTE`), where Dota UI's wrappers move them in the browser,
+   so hydration adopts them in place; without a slot element they are dropped, matching the client
+   mount. Shadow hosts emit `<template shadowrootmode="open">` and keep authored children for slots.
 9. Components declared `@Component({mode: 'csr'})` are emitted as empty hosts marked `data-dota-csr`,
    without `serverLoad`, `render()`, or descendants, following the
    [render modes standard](../../../../standards/hydration-ssr/render-modes.md).
