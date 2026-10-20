@@ -1,4 +1,5 @@
 import {Component, AfterInit, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 
 
@@ -31,13 +32,12 @@ export class BlogPage extends DotaPageElement {
     window.scrollTo({top: 0, behavior: 'instant'});
   }
 
-  render(): string {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <app-header></app-header>
-      <page-wrapper>
+      <section class="font-dm mx-auto max-w-7xl px-3 py-2 mt-10">
         <blog-section></blog-section>
-      </page-wrapper>
+      </section>
       <app-footer></app-footer>
     `
   }
