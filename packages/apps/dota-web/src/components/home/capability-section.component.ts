@@ -1,5 +1,6 @@
 import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
 import {html, trustedHTML, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
+import {codeHeader} from "@dota/components/home/utils/code-snippet/code-header.ts";
 import {MDService} from "@dota/configs/markdown.config.ts";
 import {notificationService} from "@dota/main.ts";
 import {CapabilityTab, TAB_REGISTRY} from "@dota/components/home/utils/capability.config.ts";
@@ -109,30 +110,10 @@ export class CapabilitySectionComponent extends BaseElement {
                         <div id="cap-code-card"
                              class="code-panel w-full min-w-0">
 
-                            <!-- Title bar -->
-                            <div class="code-toolbar flex items-center justify-between px-4 py-3">
-                                <div class="flex items-center gap-2" aria-hidden="true">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-code-danger"></span>
-                                    <span class="w-2.5 h-2.5 rounded-full bg-code-warning"></span>
-                                    <span class="w-2.5 h-2.5 rounded-full bg-code-success"></span>
-                                    <span id="cap-tab-filename"
-                                          class="ml-2 text-xs text-code-muted font-mono">
-                                        ${tab.filename}
-                                    </span>
-                                </div>
-                                <button id="cap-copy-btn"
-                                        class="button-link button-compact button-code"
-                                        aria-label="Copy code to clipboard"
-                                        title="Copy to clipboard">
-                                    <dota-icon name="material-symbols:content-copy-rounded"
-                                               classname="text-code-accent" variant="ghost" size="sm">
-                                    </dota-icon>
-                                    <span>Copy</span>
-                                </button>
-                            </div>
+                            ${codeHeader(tab.filename, {copy: 'cap-copy-btn', filename: 'cap-tab-filename'})}
 
                             <div id="cap-tab-code-body"
-                                 class="tab-code-body overflow-x-auto custom-scrollbar type-code select-text">
+                                 class="code-body custom-scrollbar select-text">
                                 ${trustedHTML(this.renderCode(tab))}
                             </div>
 
