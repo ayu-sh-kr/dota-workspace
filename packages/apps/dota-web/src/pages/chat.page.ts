@@ -1,4 +1,5 @@
 import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import { Route } from "@ayu-sh-kr/dota-wrap/router";
 import {OpenAIService} from "@dota/service/OpenAIService.ts";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
@@ -27,9 +28,8 @@ export class ChatPage extends BaseElement {
     this.messages = LocalStorageService.getList<MessageRecord>("message");
   }
 
-  render(): string {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <app-header></app-header>
       <main id="chat-main" class="flex-1  min-h-screen">
         <div class="container mx-auto px-4 py-6 mt-8 ">
@@ -45,6 +45,7 @@ export class ChatPage extends BaseElement {
               </div>
             </div>
           </div>
+        </div>
       </main>
       <app-footer></app-footer>
     `;
