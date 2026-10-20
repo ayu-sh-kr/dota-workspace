@@ -38,7 +38,7 @@ export class HeaderComponent extends BaseElement {
                 <nav class="app-header-nav">
                      <div class="flex min-w-0 items-center px-2 sm:px-3">
                         <a href="/"
-                           class="inline-flex items-center gap-1 rounded-full px-2 text-xl sm:text-2xl font-extrabold tracking-tight
+                           class="type-brand inline-flex items-center gap-1 rounded-full px-2 text-xl sm:text-2xl
                                    text-foreground transition-colors duration-200 hover:text-primary">
                             <span class="app-header-symbol" aria-hidden="true"></span>
                             Dota

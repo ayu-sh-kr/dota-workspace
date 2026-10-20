@@ -31,7 +31,7 @@
           "name": "ai-form",
           "source": {
             "file": "./src/components/chat/ai-form.component.ts",
-            "offset": 464
+            "offset": 458
           },
           "attributes": [
             {
@@ -42,7 +42,7 @@
               },
               "source": {
                 "file": "./src/components/chat/ai-form.component.ts",
-                "offset": 601
+                "offset": 595
               }
             }
           ],
@@ -53,7 +53,7 @@
                 "type": "boolean",
                 "source": {
                   "file": "./src/components/chat/ai-form.component.ts",
-                  "offset": 601
+                  "offset": 595
                 }
               }
             ]
@@ -618,7 +618,7 @@
           "name": "blog-content",
           "source": {
             "file": "./src/pages/blog-content.page.ts",
-            "offset": 583
+            "offset": 679
           },
           "attributes": [],
           "js": {
@@ -706,7 +706,7 @@
           "name": "blog-preview",
           "source": {
             "file": "./src/components/blogs/blog-preview.component.ts",
-            "offset": 947
+            "offset": 822
           },
           "attributes": [
             {
@@ -718,7 +718,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1317
+                "offset": 1192
               }
             },
             {
@@ -730,7 +730,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1035
+                "offset": 910
               }
             },
             {
@@ -742,7 +742,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1242
+                "offset": 1117
               }
             },
             {
@@ -754,7 +754,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1169
+                "offset": 1044
               }
             },
             {
@@ -766,7 +766,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1395
+                "offset": 1270
               }
             },
             {
@@ -778,7 +778,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1101
+                "offset": 976
               }
             }
           ],
@@ -790,7 +790,7 @@
                 "default": "Rant",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1317
+                  "offset": 1192
                 }
               },
               {
@@ -799,7 +799,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1035
+                  "offset": 910
                 }
               },
               {
@@ -808,7 +808,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1242
+                  "offset": 1117
                 }
               },
               {
@@ -817,7 +817,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1169
+                  "offset": 1044
                 }
               },
               {
@@ -826,7 +826,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1395
+                  "offset": 1270
                 }
               },
               {
@@ -835,7 +835,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1101
+                  "offset": 976
                 }
               }
             ]
@@ -911,19 +911,19 @@
           "name": "blog-view",
           "source": {
             "file": "./src/components/blogs/blog-view.component.ts",
-            "offset": 547
+            "offset": 643
           },
           "attributes": [
             {
               "name": "color",
-              "default": "lime",
+              "default": "SITE_MARKDOWN_COLOR",
               "required": false,
               "value": {
                 "type": "string"
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 942
+                "offset": 1066
               }
             },
             {
@@ -935,7 +935,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 673
+                "offset": 769
               }
             },
             {
@@ -947,19 +947,19 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 1089
+                "offset": 1219
               }
             },
             {
               "name": "theme",
-              "default": "apple",
+              "default": "SITE_MARKDOWN_THEME",
               "required": false,
               "value": {
                 "type": "string"
               },
               "source": {
                 "file": "./src/components/blogs/blog-view.component.ts",
-                "offset": 807
+                "offset": 910
               }
             }
           ],
@@ -968,10 +968,10 @@
               {
                 "name": "color",
                 "type": "string",
-                "default": "lime",
+                "default": "SITE_MARKDOWN_COLOR",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 942
+                  "offset": 1066
                 }
               },
               {
@@ -980,7 +980,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 673
+                  "offset": 769
                 }
               },
               {
@@ -989,16 +989,16 @@
                 "default": "max-w-3xl",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 1089
+                  "offset": 1219
                 }
               },
               {
                 "name": "theme",
                 "type": "string",
-                "default": "apple",
+                "default": "SITE_MARKDOWN_THEME",
                 "source": {
                   "file": "./src/components/blogs/blog-view.component.ts",
-                  "offset": 807
+                  "offset": 910
                 }
               }
             ]
@@ -1008,7 +1008,7 @@
           "name": "capability-section",
           "source": {
             "file": "./src/components/home/capability-section.component.ts",
-            "offset": 449
+            "offset": 533
           },
           "attributes": [],
           "js": {
@@ -1326,7 +1326,7 @@
           "name": "code-snippet",
           "source": {
             "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-            "offset": 367
+            "offset": 451
           },
           "attributes": [
             {
@@ -1338,7 +1338,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                "offset": 779
+                "offset": 873
               }
             },
             {
@@ -1350,7 +1350,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                "offset": 495
+                "offset": 589
               }
             },
             {
@@ -1362,7 +1362,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                "offset": 635
+                "offset": 729
               }
             }
           ],
@@ -1374,7 +1374,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                  "offset": 779
+                  "offset": 873
                 }
               },
               {
@@ -1383,7 +1383,7 @@
                 "default": "component.ts",
                 "source": {
                   "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                  "offset": 495
+                  "offset": 589
                 }
               },
               {
@@ -1392,7 +1392,7 @@
                 "default": "typescript",
                 "source": {
                   "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                  "offset": 635
+                  "offset": 729
                 }
               }
             ]
@@ -2039,7 +2039,7 @@
           "name": "docs-accent-picker",
           "source": {
             "file": "./src/components/docs/docs-accent-picker.component.ts",
-            "offset": 1680
+            "offset": 1804
           },
           "attributes": [],
           "js": {
@@ -2072,7 +2072,7 @@
           "name": "docs-theme-picker",
           "source": {
             "file": "./src/components/docs/docs-theme-picker.component.ts",
-            "offset": 1671
+            "offset": 1845
           },
           "attributes": [],
           "js": {
@@ -2083,7 +2083,7 @@
           "name": "docs-view",
           "source": {
             "file": "./src/components/docs/docs-view.component.ts",
-            "offset": 1392
+            "offset": 1489
           },
           "attributes": [
             {
@@ -2095,7 +2095,7 @@
               },
               "source": {
                 "file": "./src/components/docs/docs-view.component.ts",
-                "offset": 1730
+                "offset": 1827
               }
             }
           ],
@@ -2107,7 +2107,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/docs/docs-view.component.ts",
-                  "offset": 1730
+                  "offset": 1827
                 }
               }
             ]
@@ -3905,7 +3905,7 @@
           "name": "faq-section",
           "source": {
             "file": "./src/components/home/faq-section/faq-section.component.ts",
-            "offset": 1629
+            "offset": 1603
           },
           "attributes": [],
           "js": {
@@ -4599,7 +4599,7 @@
           "name": "our-tools",
           "source": {
             "file": "./src/components/home/our-tools/our-tools.component.ts",
-            "offset": 1465
+            "offset": 1105
           },
           "attributes": [],
           "js": {
@@ -4610,7 +4610,7 @@
           "name": "reactive-dota",
           "source": {
             "file": "./src/components/home/reactive-section.component.ts",
-            "offset": 448
+            "offset": 532
           },
           "attributes": [],
           "js": {
@@ -4621,7 +4621,7 @@
           "name": "resource-content",
           "source": {
             "file": "./src/components/resource/resource-content.component.ts",
-            "offset": 399
+            "offset": 565
           },
           "attributes": [
             {
@@ -4632,7 +4632,7 @@
               },
               "source": {
                 "file": "./src/components/resource/resource-content.component.ts",
-                "offset": 513
+                "offset": 679
               }
             }
           ],
@@ -4643,7 +4643,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/resource/resource-content.component.ts",
-                  "offset": 513
+                  "offset": 679
                 }
               }
             ]
@@ -4667,6 +4667,18 @@
             "offset": 271
           },
           "attributes": [
+            {
+              "name": "active",
+              "default": "false",
+              "required": false,
+              "value": {
+                "type": "string"
+              },
+              "source": {
+                "file": "./src/components/resource/resource-path.component.ts",
+                "offset": 564
+              }
+            },
             {
               "name": "path",
               "required": true,
@@ -4692,6 +4704,15 @@
           ],
           "js": {
             "properties": [
+              {
+                "name": "active",
+                "type": "string",
+                "default": "false",
+                "source": {
+                  "file": "./src/components/resource/resource-path.component.ts",
+                  "offset": 564
+                }
+              },
               {
                 "name": "path",
                 "type": "string",
@@ -4790,9 +4811,33 @@
           "name": "section-header",
           "source": {
             "file": "./src/components/utils/header/section-header.component.ts",
-            "offset": 521
+            "offset": 626
           },
           "attributes": [
+            {
+              "name": "description",
+              "default": "",
+              "required": false,
+              "value": {
+                "type": "string"
+              },
+              "source": {
+                "file": "./src/components/utils/header/section-header.component.ts",
+                "offset": 987
+              }
+            },
+            {
+              "name": "eyebrow",
+              "default": "",
+              "required": false,
+              "value": {
+                "type": "string"
+              },
+              "source": {
+                "file": "./src/components/utils/header/section-header.component.ts",
+                "offset": 767
+              }
+            },
             {
               "name": "heading",
               "default": "",
@@ -4802,40 +4847,58 @@
               },
               "source": {
                 "file": "./src/components/utils/header/section-header.component.ts",
-                "offset": 679
+                "offset": 858
               }
             },
             {
-              "name": "highlight",
-              "default": "",
+              "name": "level",
+              "default": "1",
               "required": false,
               "value": {
                 "type": "string"
               },
               "source": {
                 "file": "./src/components/utils/header/section-header.component.ts",
-                "offset": 813
+                "offset": 1142
               }
             }
           ],
           "js": {
             "properties": [
               {
+                "name": "description",
+                "type": "string",
+                "default": "",
+                "source": {
+                  "file": "./src/components/utils/header/section-header.component.ts",
+                  "offset": 987
+                }
+              },
+              {
+                "name": "eyebrow",
+                "type": "string",
+                "default": "",
+                "source": {
+                  "file": "./src/components/utils/header/section-header.component.ts",
+                  "offset": 767
+                }
+              },
+              {
                 "name": "heading",
                 "type": "string",
                 "default": "",
                 "source": {
                   "file": "./src/components/utils/header/section-header.component.ts",
-                  "offset": 679
+                  "offset": 858
                 }
               },
               {
-                "name": "highlight",
+                "name": "level",
                 "type": "string",
-                "default": "",
+                "default": "1",
                 "source": {
                   "file": "./src/components/utils/header/section-header.component.ts",
-                  "offset": 813
+                  "offset": 1142
                 }
               }
             ]
@@ -4860,17 +4923,6 @@
           },
           "attributes": [
             {
-              "name": "color",
-              "required": true,
-              "value": {
-                "type": "string"
-              },
-              "source": {
-                "file": "./src/components/community/social-button.component.ts",
-                "offset": 401
-              }
-            },
-            {
               "name": "link",
               "required": true,
               "value": {
@@ -4878,7 +4930,7 @@
               },
               "source": {
                 "file": "./src/components/community/social-button.component.ts",
-                "offset": 546
+                "offset": 472
               }
             },
             {
@@ -4889,26 +4941,18 @@
               },
               "source": {
                 "file": "./src/components/community/social-button.component.ts",
-                "offset": 474
+                "offset": 400
               }
             }
           ],
           "js": {
             "properties": [
               {
-                "name": "color",
-                "type": "string",
-                "source": {
-                  "file": "./src/components/community/social-button.component.ts",
-                  "offset": 401
-                }
-              },
-              {
                 "name": "link",
                 "type": "string",
                 "source": {
                   "file": "./src/components/community/social-button.component.ts",
-                  "offset": 546
+                  "offset": 472
                 }
               },
               {
@@ -4916,7 +4960,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/community/social-button.component.ts",
-                  "offset": 474
+                  "offset": 400
                 }
               }
             ]

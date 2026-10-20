@@ -12,7 +12,7 @@ import shell from "highlight.js/lib/languages/shell";
 import typescript from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import highlightjs from "markdown-it-highlightjs/core";
-import "highlight.js/styles/github-dark.css";
+import "@dota/configs/markdown-theme.config.ts";
 
 /**
  * Languages used by the site's Markdown fences. Aliases such as `ts`, `html`, `sh`, and
@@ -26,7 +26,7 @@ Object.entries(LANGUAGES).forEach(([name, language]) => hljs.registerLanguage(na
  * The site's Markdown setup, applied to `MDService` when this module first loads.
  * Highlights fenced code with the trimmed highlight.js above, so only the registered grammars
  * are bundled; unlabeled fences are auto-detected among them, and code gets the `hljs` class
- * that the highlight.js theme styles.
+ * that the site's `code.css` colors.
  */
 export const markdownSetup: MarkdownSetup = {
   plugins: [[highlightjs, {hljs, auto: true, code: true}]],

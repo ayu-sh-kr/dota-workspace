@@ -10,6 +10,7 @@
   --layout-section-space: clamp(4rem, 7vw, 6rem);
   --layout-section-compact: clamp(2rem, 4vw, 3rem);
   --layout-hero-space: clamp(7rem, 15vh, 10rem);
+  --layout-page-top: calc(var(--layout-header-height) + var(--layout-space-4) + var(--layout-section-space));
   --layout-space-1: 0.25rem;
   --layout-space-2: 0.5rem;
   --layout-space-3: 0.75rem;
@@ -54,14 +55,27 @@ app-root, home-page { display: block; }
   .layout-form { max-inline-size: var(--layout-form-max); }
   .layout-section { padding-block: var(--layout-section-space); }
   .layout-section-compact { padding-block: var(--layout-section-compact); }
+  /* First section of a page below the floating header. */
+  .layout-section-page { padding-block: var(--layout-page-top) var(--layout-section-space); }
+  .layout-page-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--layout-space-3);
+    margin-block-end: var(--layout-space-7);
+    text-align: center;
+  }
+  .layout-page-head > p { max-inline-size: 48ch; }
+  .layout-stack { display: flex; flex-direction: column; gap: var(--layout-space-7); }
   .layout-split { display: grid; align-items: center; gap: var(--layout-space-7); }
-  .layout-card-grid { display: grid; gap: var(--layout-space-5); }
+  .layout-card-grid, .layout-grid-3 { display: grid; gap: var(--layout-space-5); }
 
   @media (min-width: 640px) {
-    .layout-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .layout-card-grid, .layout-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (min-width: 1024px) {
     .layout-split { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--layout-space-8); }
     .layout-card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .layout-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 }

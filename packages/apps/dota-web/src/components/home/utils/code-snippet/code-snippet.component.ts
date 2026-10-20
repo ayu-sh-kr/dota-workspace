@@ -2,6 +2,7 @@ import {BaseElement, BindEvent, Component, Property, String} from "@ayu-sh-kr/do
 import {html, trustedHTML, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {MDService} from "@dota/configs/markdown.config.ts";
 import {notificationService} from "@dota/main.ts";
+import {codeHeader} from "@dota/components/home/utils/code-snippet/code-header.ts";
 
 @Component({
   selector: 'code-snippet',
@@ -9,7 +10,7 @@ import {notificationService} from "@dota/main.ts";
 })
 export class CodeSnippetComponent extends BaseElement {
 
-  /** Displayed in the title bar */
+  /** File name shown in the panel header. */
   @Property({name: 'filename', type: String})
   filename: string = 'component.ts';
 
@@ -40,29 +41,10 @@ export class CodeSnippetComponent extends BaseElement {
     return html`
         <div class="code-panel w-full min-w-0">
 
-            <!-- Title bar -->
-            <div class="code-toolbar flex items-center justify-between px-4 py-3">
-
-                <div class="flex items-center gap-2" aria-hidden="true">
-                    <span class="w-2.5 h-2.5 rounded-full bg-code-danger"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-code-warning"></span>
-                    <span class="w-2.5 h-2.5 rounded-full bg-code-success"></span>
-                    <span class="ml-2 text-xs text-code-muted font-mono">${this.filename}</span>
-                </div>
-
-                <button id="copy-btn"
-                        class="button-link button-compact button-code"
-                        aria-label="Copy code to clipboard"
-                        title="Copy to clipboard">
-                    <dota-icon name="material-symbols:content-copy-rounded"
-                               classname="text-code-accent" variant="ghost" size="sm">
-                    </dota-icon>
-                    <span>Copy</span>
-                </button>
-            </div>
+            ${codeHeader(this.filename, {copy: 'copy-btn'})}
 
             <div id="snippet-body"
-                 class="overflow-x-auto custom-scrollbar type-code select-text"
+                 class="code-body custom-scrollbar select-text"
                  aria-label="Code snippet: ${this.filename}">
                 ${trustedHTML(MDService.renderHtml(`\`\`\`${this.language}\n${this.code}\n\`\`\``))}
             </div>

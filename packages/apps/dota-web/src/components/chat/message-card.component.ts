@@ -46,9 +46,11 @@ export class MessageCardComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-      <div class="flex items-center gap-2  self-end">
-        ${when(this.type === "SERVER", html`<img src="https://icon-library.com/images/bot-icon/bot-icon-29.jpg" class="size-8 self-start" alt="server-message-dota-bot"/>`)}
-        <div class="prose-sm prose-slate dark:prose-invert h-fit rounded-md p-2 break-all max-w-[92%]   ${messageStyleConfig[this.type]}">
+      <div class="flex items-start gap-2">
+        ${when(this.type === "SERVER", html`<span class="grid size-8 shrink-0 place-items-center rounded-full bg-surface text-foreground" aria-label="Dota AI">
+          <span class="app-header-symbol scale-75" aria-hidden="true"></span>
+        </span>`)}
+        <div class="h-fit max-w-[92%] break-words rounded-control px-4 py-3 ${messageStyleConfig[this.type]}">
           ${trustedHTML(this.renderMarkdown(this.message))}
         </div>
       </div>
@@ -57,6 +59,6 @@ export class MessageCardComponent extends BaseElement {
 }
 
 const messageStyleConfig = {
-  "USER": "bg-purple-400 dark:text-white dark:bg-purple-900 text-gray-50 ml-auto !max-w-[50%]",
-  "SERVER": "bg-white dark:text-gray-300 dark:bg-slate-800 text-slate-700 w-full "
+  "USER": "type-compact ml-auto !max-w-[75%] bg-[var(--action-primary-background)] text-[var(--action-primary-foreground)]",
+  "SERVER": "prose prose-sm dark:prose-invert w-full border border-default bg-surface text-foreground"
 }

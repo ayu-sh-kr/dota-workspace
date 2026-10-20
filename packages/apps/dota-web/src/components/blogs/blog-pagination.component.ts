@@ -182,19 +182,16 @@ export class BlogPaginationComponent extends BaseElement {
 
     return html`
       <nav aria-label="Blog pagination"
-           class="mt-10 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm
-                  dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-        <p class="text-sm text-slate-600 dark:text-slate-300" aria-live="polite">
-          Showing <span class="font-semibold text-slate-950 dark:text-white">${startItem}–${endItem}</span>
-          of <span class="font-semibold text-slate-950 dark:text-white">${this.totalItems}</span> posts
+           class="mt-10 flex flex-col gap-4 border-t border-default pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <p class="type-compact text-muted tabular-nums" aria-live="polite">
+          Showing <span class="font-semibold text-foreground">${startItem}–${endItem}</span>
+          of <span class="font-semibold text-foreground">${this.totalItems}</span> posts
         </p>
 
         <div class="flex flex-wrap items-center gap-2">
           <label for="blog-page-size" class="sr-only">Posts per page</label>
           <select id="blog-page-size"
-                  class="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-700
-                         outline-none transition focus-visible:ring-2 focus-visible:ring-purple-500
-                         dark:border-gray-700 dark:bg-gray-900 dark:text-slate-200"
+                  class="field type-compact min-h-10 py-1"
                   aria-label="Posts per page">
             ${keyed(BLOG_PAGE_SIZE_OPTIONS, pageSize => pageSize, pageSize => state.pageSize === pageSize
               ? html`<option value="${pageSize}" selected>${pageSize} per page</option>`
@@ -205,7 +202,7 @@ export class BlogPaginationComponent extends BaseElement {
             ${this.renderActionButton("first", "First page", "«", state.currentPage === 1)}
             ${this.renderActionButton("previous", "Previous page", "‹", state.currentPage === 1)}
             ${keyed(pageItems, (item, index) => item === "ellipsis" ? `ellipsis-${index}` : item, item => item === "ellipsis"
-              ? html`<span aria-hidden="true" class="grid size-10 place-items-center text-slate-400 dark:text-slate-500">…</span>`
+              ? html`<span aria-hidden="true" class="grid size-10 place-items-center text-muted">…</span>`
               : this.renderPageButton(item, state.currentPage))}
             ${this.renderActionButton("next", "Next page", "›", state.currentPage === totalPages)}
             ${this.renderActionButton("last", "Last page", "»", state.currentPage === totalPages)}
@@ -222,11 +219,8 @@ export class BlogPaginationComponent extends BaseElement {
   private renderActionButton(action: string, label: string, icon: string, disabled: boolean): TemplateResult {
     return html`
       <button type="button" data-pagination-action="${action}" aria-label="${label}" aria-disabled="${disabled}"
-              class="grid size-10 place-items-center rounded-xl border border-transparent text-lg text-slate-600 transition
-                     hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950
-                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500
-                     aria-disabled:pointer-events-none aria-disabled:opacity-35
-                     dark:text-slate-300 dark:hover:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white">
+              class="grid size-10 place-items-center rounded-full text-lg text-muted transition-colors
+                     hover:bg-raised hover:text-foreground aria-disabled:pointer-events-none aria-disabled:opacity-35">
         <span aria-hidden="true">${icon}</span>
       </button>
     `;
@@ -237,11 +231,10 @@ export class BlogPaginationComponent extends BaseElement {
     return html`
       <button type="button" data-pagination-action="page" data-page="${page}" aria-current="${isCurrent ? "page" : "false"}"
               aria-label="Page ${page}"
-              class="grid size-10 place-items-center rounded-xl text-sm font-semibold transition
-                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500
+              class="type-compact grid size-10 place-items-center rounded-full font-semibold tabular-nums transition-colors
                      ${isCurrent
-                       ? "bg-purple-600 text-white shadow-sm dark:bg-purple-500"
-                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-gray-700 dark:hover:text-white"}">
+                       ? "bg-[var(--action-primary-background)] text-[var(--action-primary-foreground)]"
+                       : "text-muted hover:bg-raised hover:text-foreground"}">
         ${page}
       </button>
     `;

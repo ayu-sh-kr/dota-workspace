@@ -13,7 +13,7 @@ export class SelfEndComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-      <div class="flex justify-center items-center text-sm text-slate-700 dark:text-slate-200 font-medium font-dm lg:mt-5 md:mt-3 mt-2 gap-x-2">
+      <div class="type-compact flex justify-center items-center font-medium text-muted lg:mt-5 md:mt-3 mt-2 gap-x-2">
         <span>Made with</span>
         <dota-icon name="mdi:heart" color="purple" variant="link" size="md"></dota-icon>
         <span>by Team Dota</span>

@@ -10,12 +10,6 @@ import {notificationService} from "@dota/main.ts";
 export class SocialButtonComponent extends BaseElement {
 
   @Property({
-    name: "color",
-    type: String
-  })
-  color!: string;
-
-  @Property({
     name: "text",
     type: String
   })
@@ -46,11 +40,10 @@ export class SocialButtonComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-      <div class="flex justify-center">
-        <dota-button color="${this.color}" variant="link" size="sm">
-          ${this.text}
-        </dota-button>
-      </div>
+      <button type="button" class="button-link">
+        ${this.text}
+        <span aria-hidden="true">&rarr;</span>
+      </button>
     `
   }
 }

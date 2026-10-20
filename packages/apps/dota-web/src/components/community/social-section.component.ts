@@ -10,7 +10,6 @@ export class SocialSectionComponent extends BaseElement {
   data: SocialDataType[] = [
     {
       icon: 'mdi:discord',
-      color: 'purple',
       heading: 'Discord',
       description: 'Join our Discord community to connect with other developers, share ideas, and get support.',
       buttonText: 'Join Now',
@@ -18,7 +17,6 @@ export class SocialSectionComponent extends BaseElement {
 
     {
       icon: 'mdi:github',
-      color: 'slate',
       heading: 'GitHub',
       description: 'Contribute to our open-source projects on GitHub. We welcome pull requests and issues.',
       link: 'https://github.com/ayu-sh-kr/dota-web',
@@ -27,7 +25,6 @@ export class SocialSectionComponent extends BaseElement {
 
     {
       icon: 'mdi:twitter',
-      color: 'blue',
       heading: 'Twitter',
       description: 'Follow us on Twitter for the latest updates, news, and announcements.',
       buttonText: 'Follow Us'
@@ -35,7 +32,6 @@ export class SocialSectionComponent extends BaseElement {
 
     {
       icon: 'mdi:youtube',
-      color: 'red',
       heading: 'YouTube',
       description: 'Watch our tutorials and webinars on YouTube to learn more about our projects.',
       buttonText: 'Subscribe Now'
@@ -48,22 +44,19 @@ export class SocialSectionComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-      <section class="mt-10 font-dm">
-        <section-header heading="Our" highlight="Socials"></section-header>
+      <section class="layout-page layout-section home-section-divider">
+        <section-header level="2" eyebrow="Socials" heading="Follow along"
+                        description="Talk with other developers and keep up with releases."></section-header>
 
-        <div class="flex justify-between items-center gap-5 w-full flex-wrap">
+        <div class="layout-card-grid">
           ${this.data.map((item) => html`
-            <div class="lg:w-1/5 md:w-1/4 sm:w-1/3 rounded-xl bg-white dark:bg-slate-800 dark:text-white shadow-lg lg:p-4 md:p-3 p-2 space-y-3">
-              <dota-icon name="${item.icon}" color="${item.color}" variant="link" size="xl"></dota-icon>
-              <div class="space-y-2">
-                <h3 class="font-semibold text-gray-900 dark:text-gray-100">${item.heading}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed tracking-wide">${item.description}</p>
+            <div class="surface-card flex flex-col gap-4 p-[var(--layout-pad-card)]">
+              <dota-icon name="${item.icon}" color="slate" variant="ghost" size="xl"></dota-icon>
+              <div class="flex flex-col gap-2">
+                <h3 class="font-semibold text-foreground">${item.heading}</h3>
+                <p class="type-compact text-muted">${item.description}</p>
               </div>
-              <social-button 
-                color="${item.color}" 
-                text="${item.buttonText}" 
-                link="${item.link || ''}">
-              </social-button>
+              <social-button class="mt-auto" text="${item.buttonText}" link="${item.link || ''}"></social-button>
             </div>`)}
         </div>
       </section>
@@ -73,7 +66,6 @@ export class SocialSectionComponent extends BaseElement {
 
 export interface SocialDataType {
   icon: string;
-  color: string;
   heading: string;
   description: string;
   link?: string;

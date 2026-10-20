@@ -395,7 +395,7 @@
               "type": {
                 "text": "string"
               },
-              "default": "lime"
+              "default": "SITE_MARKDOWN_COLOR"
             },
             {
               "kind": "field",
@@ -422,7 +422,7 @@
               "type": {
                 "text": "string"
               },
-              "default": "apple"
+              "default": "SITE_MARKDOWN_THEME"
             }
           ],
           "attributes": [
@@ -432,7 +432,7 @@
               "type": {
                 "text": "string"
               },
-              "default": "lime"
+              "default": "SITE_MARKDOWN_COLOR"
             },
             {
               "name": "current-blog",
@@ -456,7 +456,7 @@
               "type": {
                 "text": "string"
               },
-              "default": "apple"
+              "default": "SITE_MARKDOWN_THEME"
             }
           ]
         }
@@ -1016,14 +1016,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "color",
-              "attribute": "color",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "kind": "field",
               "name": "link",
               "attribute": "link",
               "type": {
@@ -1040,13 +1032,6 @@
             }
           ],
           "attributes": [
-            {
-              "name": "color",
-              "fieldName": "color",
-              "type": {
-                "text": "string"
-              }
-            },
             {
               "name": "link",
               "fieldName": "link",
@@ -2082,6 +2067,15 @@
           "members": [
             {
               "kind": "field",
+              "name": "active",
+              "attribute": "active",
+              "type": {
+                "text": "string"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
               "name": "path",
               "attribute": "path",
               "type": {
@@ -2098,6 +2092,14 @@
             }
           ],
           "attributes": [
+            {
+              "name": "active",
+              "fieldName": "active",
+              "type": {
+                "text": "string"
+              },
+              "default": "false"
+            },
             {
               "name": "path",
               "fieldName": "path",
@@ -2482,6 +2484,24 @@
           "members": [
             {
               "kind": "field",
+              "name": "description",
+              "attribute": "description",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            },
+            {
+              "kind": "field",
+              "name": "eyebrow",
+              "attribute": "eyebrow",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            },
+            {
+              "kind": "field",
               "name": "heading",
               "attribute": "heading",
               "type": {
@@ -2491,15 +2511,31 @@
             },
             {
               "kind": "field",
-              "name": "highlight",
-              "attribute": "highlight",
+              "name": "level",
+              "attribute": "level",
+              "type": {
+                "text": "string"
+              },
+              "default": "1"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "description",
+              "fieldName": "description",
               "type": {
                 "text": "string"
               },
               "default": ""
-            }
-          ],
-          "attributes": [
+            },
+            {
+              "name": "eyebrow",
+              "fieldName": "eyebrow",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            },
             {
               "name": "heading",
               "fieldName": "heading",
@@ -2509,12 +2545,12 @@
               "default": ""
             },
             {
-              "name": "highlight",
-              "fieldName": "highlight",
+              "name": "level",
+              "fieldName": "level",
               "type": {
                 "text": "string"
               },
-              "default": ""
+              "default": "1"
             }
           ]
         }

@@ -35,9 +35,9 @@ export class BlogPage extends DotaPageElement {
   render(): TemplateResult {
     return html`
       <app-header></app-header>
-      <section class="font-dm mx-auto max-w-7xl px-3 py-2 mt-10">
+      <main>
         <blog-section></blog-section>
-      </section>
+      </main>
       <app-footer></app-footer>
     `
   }

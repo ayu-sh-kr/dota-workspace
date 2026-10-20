@@ -21,7 +21,7 @@ export class GetStartedButtonComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-      <button type="button" class="button-primary">Getting Started</button>
+      <button type="button" class="button-primary w-full">Getting Started</button>
     `;
   }
 

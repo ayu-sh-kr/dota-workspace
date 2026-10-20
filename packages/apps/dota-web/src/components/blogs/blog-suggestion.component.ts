@@ -28,22 +28,13 @@ export class BlogSuggestionComponent extends BaseElement {
     }
 
     return html`
-      <section class="font-dm mt-14 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/60 sm:p-6">
-        <div class="mb-5 flex items-end justify-between gap-4">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
-              Continue reading
-            </p>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
-              Next blogs to open
-            </h2>
-          </div>
-          <p class="max-w-sm text-sm text-slate-600 dark:text-slate-400">
-            A quick path to the next few posts in this series.
-          </p>
+      <section class="mt-16 border-t border-default pt-10">
+        <div class="mb-6 flex flex-col gap-2">
+          <span class="type-eyebrow">Continue reading</span>
+          <h2 class="type-section text-foreground">Next posts</h2>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div class="layout-grid-3">
           ${suggestions.map(post => html`
             <blog-preview
               date="${post.date}"
