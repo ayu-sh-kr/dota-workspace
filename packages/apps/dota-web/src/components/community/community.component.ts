@@ -14,9 +14,11 @@ export class CommunityComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-      <section class="p-4 space-y-4">
-        <section-header heading="Word from" highlight="Dota Team"></section-header>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <section class="layout-page layout-section-page">
+        <section-header eyebrow="Community"
+                        heading="A word from the Dota team"
+                        description="The people building Dota, and why they started."></section-header>
+        <div class="layout-grid-3">
           ${communityData.map(member => html`
             <community-card
               image-src="${member.imageSrc}"
