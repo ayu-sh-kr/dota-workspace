@@ -1,4 +1,5 @@
 import {Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import { GeneralUtils } from "@dota/utils/GeneralUtils.ts";
@@ -48,13 +49,12 @@ export class BlogContentPage extends DotaPageElement {
     this.updateSEO();
   }
 
-  render() {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <app-header></app-header>
-      <page-wrapper>
+      <section class="font-dm mx-auto max-w-7xl px-3 py-2 mt-10">
         <blog-view theme="${this.theme}" color="${this.color}" max-width="max-w-5xl"></blog-view>
-      </page-wrapper>
+      </section>
       <app-footer></app-footer>
     `
   }
