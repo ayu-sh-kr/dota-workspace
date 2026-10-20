@@ -1,5 +1,5 @@
 import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
-import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
+import {html, trustedHTML, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {MDService} from "@dota/configs/markdown.config.ts";
 import {notificationService} from "@dota/main.ts";
 import {CapabilityTab, TAB_REGISTRY} from "@dota/components/home/utils/capability.config.ts";
@@ -30,12 +30,8 @@ export class ReactiveSectionComponent extends BaseElement {
         card.classList.add('tab-content-exit');
 
         setTimeout(() => {
-            const fname = this.querySelector<HTMLElement>('#react-tab-filename');
-            const body  = this.querySelector<HTMLElement>('#react-tab-code-body');
-
-            desc.textContent   = tab.description;
-            if (fname) fname.textContent = tab.filename;
-            if (body)  body.innerHTML    = this.renderCode(tab);
+            this.activeTab = tab;
+            this.updateHTML();
 
             desc.classList.remove('tab-content-exit');
             card.classList.remove('tab-content-exit');
@@ -50,14 +46,11 @@ export class ReactiveSectionComponent extends BaseElement {
 
     @AfterInit()
     afterViewInit() {
-        const body = this.querySelector<HTMLElement>('#react-tab-code-body');
-        if (body) body.innerHTML = this.renderCode(this.activeTab);
 
         this.addEventListener('tab:change', (e: Event) => {
             const {tabId} = (e as CustomEvent<{tabId: string}>).detail;
             const tab = this.tabs.find(t => t.id === tabId);
             if (!tab) return;
-            this.activeTab = tab;
             this.updateContent(tab);
         });
 
@@ -76,7 +69,7 @@ export class ReactiveSectionComponent extends BaseElement {
     }
 
     render(): TemplateResult {
-        const first = this.tabs[0];
+        const tab = this.activeTab;
 
         return html`
         <section role="region" aria-labelledby="reactive-heading"
@@ -98,7 +91,7 @@ export class ReactiveSectionComponent extends BaseElement {
                                     <span class="w-2.5 h-2.5 rounded-full bg-code-success"></span>
                                     <span id="react-tab-filename"
                                           class="ml-2 text-xs text-code-muted font-mono">
-                                        ${first.filename}
+                                        ${tab.filename}
                                     </span>
                                 </div>
                                 <button id="react-copy-btn"
@@ -112,9 +105,9 @@ export class ReactiveSectionComponent extends BaseElement {
                                 </button>
                             </div>
 
-                            <!-- Code body: populated by MDService in afterViewInit -->
                             <div id="react-tab-code-body"
                                  class="tab-code-body overflow-x-auto custom-scrollbar type-code select-text">
+                                ${trustedHTML(this.renderCode(tab))}
                             </div>
 
                         </div>
@@ -138,7 +131,7 @@ export class ReactiveSectionComponent extends BaseElement {
                             <!-- Active tab description -->
                             <p id="react-tab-desc"
                                class="type-body text-muted">
-                                ${first.description}
+                                ${tab.description}
                             </p>
                         </div>
 
