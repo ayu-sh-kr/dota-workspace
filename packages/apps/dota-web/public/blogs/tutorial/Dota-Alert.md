@@ -2,7 +2,8 @@
 
 The best way to understand an alert is to use one. Try each example below and see how it opens, waits for a choice, and gives a result back to the page.
 
-<alert-playground></alert-playground>
+<alert-playground>
+</alert-playground>
 
 Start with the message, then try the prompt and the delete example. You can use a mouse or your keyboard. The examples are small, but they show the main ways an alert can help.
 
