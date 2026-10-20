@@ -87,7 +87,7 @@ export class NavigationSidebarComponent extends BaseElement {
         class="fixed ${this.visible ? 'block' : 'hidden'} md:hidden bg-surface text-foreground top-0 left-0 h-screen w-full z-50">
         <div class="relative h-full">
           <header class="p-4 border-b flex items-center justify-between">
-            <div class="font-extrabold text-2xl w-1/6 px-5 text-foreground">
+            <div class="type-brand text-2xl w-1/6 px-5 text-foreground">
               <a href="/">Dota</a>
             </div>
             <button id="close-button" class="">
@@ -104,7 +104,7 @@ export class NavigationSidebarComponent extends BaseElement {
                 `)}
               </ul>
               <div class="bg-raised rounded-control p-3 mt-6 flex items-center justify-between">
-                <p class="text-[13px] text-muted font-medium">Appearance</p>
+                <p class="type-meta text-muted">Appearance</p>
                 <dark-mode-button></dark-mode-button>
               </div>
               <div class="mt-4 flex gap-2 items-center justify-center">
