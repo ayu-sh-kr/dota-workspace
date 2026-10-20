@@ -2,16 +2,17 @@ import {ApplicationEventService, BaseElement, BindEvent, Component, DocumentList
 import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
+import {SITE_MARKDOWN_COLOR} from "@dota/configs/markdown-theme.config.ts";
 import {closeMenuOnEscape, closeMenuOnOutsideClick, MENU_PANEL, MENU_TRIGGER, menuChevron, selectMenuOption} from "@dota/components/docs/appearance-menu.ts";
 
 /** Accent colors offered by the menu, with their swatch class; each is a color key of every built-in theme. */
 const ACCENTS: Record<string, string> = {
-  indigo: 'bg-indigo-500', violet: 'bg-violet-500', purple: 'bg-purple-500', blue: 'bg-blue-500',
+  [SITE_MARKDOWN_COLOR]: 'bg-primary', indigo: 'bg-indigo-500', violet: 'bg-violet-500', purple: 'bg-purple-500', blue: 'bg-blue-500',
   sky: 'bg-sky-500', teal: 'bg-teal-500', emerald: 'bg-emerald-500', lime: 'bg-lime-500',
   amber: 'bg-amber-500', orange: 'bg-orange-500', rose: 'bg-rose-500', slate: 'bg-slate-500',
 };
 
-const DEFAULT_ACCENT = 'indigo';
+const DEFAULT_ACCENT = SITE_MARKDOWN_COLOR;
 const STORAGE_KEY = 'docs-color';
 
 /** Classes of the accent dot inside the trigger; the swatch class is appended. */
@@ -89,7 +90,7 @@ export class DocsAccentPickerComponent extends BaseElement {
         <div class="${MENU_PANEL} grid w-max grid-cols-4 gap-3 p-3">
           ${Object.entries(ACCENTS).map(([color, swatch]) => html`
             <button type="button" data-value="${color}" aria-label="${color}" title="${color}" aria-pressed="${color === DEFAULT_ACCENT}"
-                    class="${swatch} h-6 w-6 shrink-0 cursor-pointer rounded-full ring-offset-2 ring-offset-white transition-transform hover:scale-110 aria-pressed:ring-2 aria-pressed:ring-gray-400 dark:ring-offset-gray-900 dark:aria-pressed:ring-gray-300"></button>`)}
+                    class="${swatch} h-6 w-6 shrink-0 cursor-pointer rounded-full ring-offset-2 ring-offset-[var(--surface-color)] transition-transform hover:scale-110 aria-pressed:ring-2 aria-pressed:ring-[var(--border-strong-color)]"></button>`)}
         </div>
       </details>
     `;
