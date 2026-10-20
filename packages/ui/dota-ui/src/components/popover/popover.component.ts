@@ -2,19 +2,21 @@ import {autoUpdate, computePosition, flip, offset, shift, type Placement} from "
 import "./popover.css";
 import {
   BaseElement,
-  BeforeInit,
   Component,
   DocumentListener,
   HostListener,
+  html,
   LifecycleEventConstants,
   Number,
   Property,
   String,
+  type TemplateResult,
   WindowListener,
 } from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 import type {ApplicationEvent} from "@ayu-sh-kr/dota-event";
 import {createDotaLogger} from '@ayu-sh-kr/dota-common-utils';
+import {LightDomSlot} from "@dota/components/utils/light-dom-slot.ts";
 
 const INTERACTIVE_SELECTOR = "a[href], button, input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex='-1'])";
 const CUSTOM_ELEMENT_NAME = /^[a-z][.0-9_a-z]*-[.0-9_a-z-]*$/;
@@ -35,8 +37,8 @@ const PLACEMENTS = new Set<Placement>([
  * Events: clicking a non-empty trigger toggles the panel; outside clicks and Escape close it,
  * with Escape returning focus to the trigger. An empty host is a position-only anchor and
  * leaves panel visibility to its consumer. No custom events emit.
- * Lifecycle and integration: light DOM preserves trigger markup and lets consumer Tailwind
- * classes apply. Connected and reactive attribute changes resolve the panel and start
+ * Lifecycle and integration: light DOM preserves trigger markup, moved into a
+ * `display: contents` wrapper, and lets consumer Tailwind classes apply. Connected and reactive attribute changes resolve the panel and start
  * Floating UI auto-updates; disconnect stops that work and removes only a panel it created.
  */
 @Component({
@@ -60,7 +62,7 @@ class PopoverComponent extends BaseElement {
   private isOpen = false;
   private isPositionOnly = false;
   private panelId = "";
-  private content: string | undefined;
+  private readonly triggerSlot = new LightDomSlot();
 
   /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
@@ -68,13 +70,13 @@ class PopoverComponent extends BaseElement {
   }
 
   /**
-   * Captures the authored trigger and panel markup once, before the first render.
-   * Runs on connect rather than in the constructor, where happy-dom prerendering
-   * has not parsed the children yet.
+   * Renders with the authored trigger moved into the content wrapper. The trigger is
+   * detached just before the first render and returned right after it.
    */
-  @BeforeInit()
-  captureLightDom() {
-    this.content ??= this.innerHTML;
+  connectedCallback() {
+    this.triggerSlot.capture(this);
+    super.connectedCallback();
+    this.triggerSlot.restore(this);
   }
 
   @OnEvent(LifecycleEventConstants.CONNECTED, true)
@@ -104,7 +106,7 @@ class PopoverComponent extends BaseElement {
   private initializePopover() {
     this.stopAutoUpdate();
     this.panel = this.resolvePanel();
-    this.isPositionOnly = !this.content?.trim();
+    this.isPositionOnly = !this.triggerSlot.hasContent(this);
 
     if (!this.panel) return;
 
@@ -244,8 +246,8 @@ class PopoverComponent extends BaseElement {
     this.setOpen(!this.isOpen);
   }
 
-  render(): string {
-    return this.content ?? "";
+  render(): TemplateResult {
+    return html`<div data-dota-slot style="display: contents"></div>`;
   }
 }
 

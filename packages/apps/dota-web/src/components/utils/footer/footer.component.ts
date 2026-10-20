@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: "app-footer",
@@ -10,9 +11,8 @@ export class FooterComponent extends BaseElement {
     super();
   }
 
-  render(): string {
-    // language=HTML
-    return HTML`
+  render(): TemplateResult {
+    return html`
       <footer class="app-footer">
         <div class="layout-page">
           <div class="layout-card-grid">
@@ -61,22 +61,22 @@ export class FooterComponent extends BaseElement {
               <ul class="mt-2 flex gap-2 items-center md:justify-center">
                 <li>
                   <a href="#" class="text-muted hover:underline" title="discord">
-                    <dota-icon name="mdi:discord" color="slate" variant="ghost" size="md"/>
+                    <dota-icon name="mdi:discord" color="slate" variant="ghost" size="md"></dota-icon>
                   </a>
                 </li>
                 <li>
                   <a href="#" class="text-muted hover:underline" title="twitter">
-                    <dota-icon name="mdi:twitter" color="slate" variant="ghost" size="md"/>
+                    <dota-icon name="mdi:twitter" color="slate" variant="ghost" size="md"></dota-icon>
                   </a>
                 </li>
                 <li>
                   <a href="#" class="text-muted hover:underline" title="github">
-                    <dota-icon name="mdi:github" color="slate" variant="ghost" size="md"/>
+                    <dota-icon name="mdi:github" color="slate" variant="ghost" size="md"></dota-icon>
                   </a>
                 </li>
                 <li>
                   <a href="/blogs" class="text-muted hover:underline inline-flex pt-1.5" title="blog">
-                    <dota-icon name="mdi:blogger" color="slate" variant="ghost" size="md"/>
+                    <dota-icon name="mdi:blogger" color="slate" variant="ghost" size="md"></dota-icon>
                   </a>
                 </li>
               </ul>

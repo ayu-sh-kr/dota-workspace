@@ -4,11 +4,11 @@ import {
   BindEvent,
   Component,
   HostListener,
-  HTML,
   Number as DNumber,
   Property,
   String, ApplicationEventService
 } from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 
 @Component({
@@ -95,13 +95,13 @@ export class NotificationComponent extends BaseElement {
     this.scheduleRemoval();
   }
 
-  render(): string {
+  render(): TemplateResult {
     const color = `${NotificationConfig.color[this.color] ?? NotificationConfig.color.none}`;
-    return HTML`
+    return html`
            <div class="z-10">
                 <div class="${NotificationConfig.base}">
                     <div class="flex items-center gap-x-2 px-3">
-                        <span class="${color}} text-lg">
+                        <span class="${color} text-lg">
                             <dota-icon name="${this.icon ?? 'material-symbols-light:notifications-active-rounded'}" size="lg" color="${this.color}" variant="ghost"></dota-icon>
                         </span>
                         <div>

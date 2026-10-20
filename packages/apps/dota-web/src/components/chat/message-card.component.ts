@@ -1,4 +1,5 @@
 import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, trustedHTML, type TemplateResult, when} from "@ayu-sh-kr/dota-wrap/rendering";
 import {type MessageType} from "@dota/pages/chat.page.ts";
 import {MDService} from "@dota/configs/markdown.config.ts";
 
@@ -37,18 +38,18 @@ export class MessageCardComponent extends BaseElement {
     this.classList.add(...result);
   }
 
-  escapeHtml(html: string): string {
-    if(!html) return "";
-    return MDService.renderHtml(html);
+  /** Renders the message's Markdown; the output is trusted markup from MDService. */
+  renderMarkdown(message: string): string {
+    if(!message) return "";
+    return MDService.renderHtml(message);
   }
 
-  render() {
-    //   language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <div class="flex items-center gap-2  self-end">
-        ${this.type==="SERVER" ?"<img src='https://icon-library.com/images/bot-icon/bot-icon-29.jpg' class='size-8 self-start' alt='server-message-dota-bot'/>":""}
+        ${when(this.type === "SERVER", html`<img src="https://icon-library.com/images/bot-icon/bot-icon-29.jpg" class="size-8 self-start" alt="server-message-dota-bot"/>`)}
         <div class="prose-sm prose-slate dark:prose-invert h-fit rounded-md p-2 break-all max-w-[92%]   ${messageStyleConfig[this.type]}">
-          ${this.escapeHtml(this.message)}
+          ${trustedHTML(this.renderMarkdown(this.message))}
         </div>
       </div>
     `

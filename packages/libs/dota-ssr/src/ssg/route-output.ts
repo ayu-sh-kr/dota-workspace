@@ -39,12 +39,14 @@ export function resolveSsgRoutes(routes: readonly DotaSsgRouteInput[]): Resolved
  * Combines explicit routes with decorated routes whose render mode is `ssg`.
  * `mode` wins; without it the legacy `ssr: true` still selects the route. `ssr` and
  * `csr` routes are left to request-time rendering or the browser.
+ * A dynamic `ssg` route, such as `/docs/:slug`, is prerendered through the explicit routes
+ * that match it, so at least one concrete path must be listed for it.
  * Explicit entries replace matching discovered paths before the final validation,
  * preserving caller-controlled output files without making build output nondeterministic.
  * @param decoratedRoutes Route metadata produced by the Dota Vite preloader.
  * @param routes Explicit SSG routes supplied to the plugin.
  * @returns Validated routes in deterministic pathname order.
- * @throws Error when an opted-in decorated route has a dynamic path segment.
+ * @throws Error when an opted-in dynamic decorated route matches no explicit route.
  */
 export function resolveDecoratedSsgRoutes(
   decoratedRoutes: readonly DotaDecoratedRoute[],
@@ -54,13 +56,28 @@ export function resolveDecoratedSsgRoutes(
   const decoratedInputs = decoratedRoutes
     .filter(route => (route.mode ?? (route.ssr === true ? 'ssg' : 'csr')) === 'ssg')
     .map(route => route.path);
-  const dynamicRoute = decoratedInputs.find(path => path.split('/').some(segment => segment.startsWith(':')));
-  if (dynamicRoute) {
-    throw new Error(`Decorated SSG route must be concrete: ${dynamicRoute}`);
+  const explicitRoutes = resolveSsgRoutes(routes);
+  const isDynamic = (path: string) => path.split('/').some(segment => segment.startsWith(':'));
+  const unlistedRoute = decoratedInputs.filter(isDynamic)
+    .find(pattern => !explicitRoutes.some(route => matchesRoutePattern(pattern, route.path)));
+  if (unlistedRoute) {
+    throw new Error(`Dynamic SSG route needs concrete paths in the SSG routes option: ${unlistedRoute}`);
   }
 
-  const explicitRoutes = resolveSsgRoutes(routes);
   const explicitPaths = new Set(explicitRoutes.map(route => route.path));
-  const detectedRoutes = resolveSsgRoutes(decoratedInputs).filter(route => !explicitPaths.has(route.path));
+  const detectedRoutes = resolveSsgRoutes(decoratedInputs.filter(path => !isDynamic(path)))
+    .filter(route => !explicitPaths.has(route.path));
   return resolveSsgRoutes([...detectedRoutes, ...explicitRoutes]);
+}
+
+/**
+ * Reports whether a concrete pathname fills a route pattern segment for segment.
+ * @param pattern Route path whose `:name` segments match any one non-empty segment.
+ * @param path Normalized concrete pathname.
+ */
+function matchesRoutePattern(pattern: string, path: string): boolean {
+  const patternSegments = pattern.split('/').filter(Boolean);
+  const pathSegments = path.split('/').filter(Boolean);
+  return patternSegments.length === pathSegments.length &&
+    patternSegments.every((segment, index) => segment.startsWith(':') || segment === pathSegments[index]);
 }

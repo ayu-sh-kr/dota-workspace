@@ -1,5 +1,6 @@
 import {describe, expect, it, vi} from "vitest";
 import {BreadcrumbComponent, BreadcrumbMachine, normalizeBreadcrumbItems, partitionBreadcrumb} from "@dota/components/breadcrumb/breadcrumb.component.ts";
+import {mountTemplate} from '../setup/render-template';
 
 if (!customElements.get("dota-breadcrumb-test")) customElements.define("dota-breadcrumb-test", BreadcrumbComponent);
 
@@ -75,7 +76,7 @@ describe("BreadcrumbComponent", () => {
     element.path = [{label: "Home", href: "/"}, {label: "<Current>"}];
     element.config = {container: "custom-container", crumb: "custom-crumb", current: "custom-current"};
 
-    element.innerHTML = element.render();
+    mountTemplate(element);
 
     expect(element.querySelector("nav")?.getAttribute("aria-label")).toBe("Breadcrumb");
     expect(element.querySelector(".custom-container")).not.toBeNull();
@@ -90,7 +91,7 @@ describe("BreadcrumbComponent", () => {
     element.budget = 2;
     element.machine = new BreadcrumbMachine(element.path, element.budget);
     element.machine.openFold();
-    element.innerHTML = element.render();
+    mountTemplate(element);
 
     expect(element.querySelector("dota-popover[anchored-selector]")).not.toBeNull();
     expect(element.querySelector("[data-breadcrumb-fold]")?.getAttribute("aria-expanded")).toBeNull();
@@ -107,7 +108,7 @@ describe("BreadcrumbComponent", () => {
       separatorIcon: "lucide:slash",
       foldIcon: "material-symbols:more-horiz",
     };
-    element.innerHTML = element.render();
+    mountTemplate(element);
 
     expect(element.querySelector('dota-icon[name="lucide:slash"]')).not.toBeNull();
     expect(element.querySelector('dota-icon[name="material-symbols:more-horiz"]')).not.toBeNull();

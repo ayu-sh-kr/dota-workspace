@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: "app-header",
@@ -31,8 +32,8 @@ export class HeaderComponent extends BaseElement {
     super();
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
            <header class="app-header">
                 <nav class="app-header-nav">
                      <div class="flex min-w-0 items-center px-2 sm:px-3">
@@ -45,8 +46,7 @@ export class HeaderComponent extends BaseElement {
                      </div>
                     <div class="md:flex justify-center items-center hidden flex-1">
                         <ul class="flex items-center gap-x-1 rounded-full bg-surface p-1 backdrop-blur-xl">
-                                ${this.items.map((item) => {
-                                  return `
+                                ${this.items.map((item) => html`
                                      <li>
                                         <a href="${item.url}"
                                            class="block rounded-full px-3 py-1.5 text-sm font-semibold text-muted transition-all duration-200
@@ -54,8 +54,7 @@ export class HeaderComponent extends BaseElement {
                                             ${item.name}
                                         </a>
                                      </li>
-                                    `;
-                                }).join("")}
+                                `)}
                          </ul>
                       </div>
                       <div class="app-header-actions flex items-center gap-x-1 justify-end rounded-full bg-surface p-1

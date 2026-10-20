@@ -11,8 +11,19 @@ Use this skill when a Markdown document needs an interactive or visual custom el
 
 - Create the component under `packages/apps/dota-web/src/components/...`.
 - Keep the component self-contained and `shadow: false`.
-- Use `HTML` templates and Tailwind classes the same way as other app components.
-- Insert the custom tag directly into the markdown file.
+- Use `html` templates and Tailwind classes the same way as other app components.
+- Insert the custom tag directly into the markdown file, as an HTML block: the complete opening
+  tag on one line, with every attribute, and the closing tag on its own line, separated from
+  surrounding text by blank lines.
+
+  ```markdown
+  <aes-flow mode="encryption">
+  </aes-flow>
+  ```
+
+  markdown-it wraps an opening and closing tag on the same line, or an opening tag split across
+  lines, in a `<p>`. The browser then closes that paragraph at the component's first block element,
+  so the page parses differently from the prerendered DOM and the component cannot hydrate.
 - Keep the surrounding markdown short and explanatory.
 - Keep interaction and gesture handling inside the embed; never intercept the article's vertical scrolling.
 
@@ -44,7 +55,7 @@ Use this skill when a Markdown document needs an interactive or visual custom el
 
 Before finishing, verify:
 
-1. The markdown file renders the custom element tag.
+1. The markdown file renders the custom element tag outside a `<p>`.
 2. The component selector exactly matches the tag name.
 3. The component file is inside the app's component scan path.
 4. The component is visible in the app build.

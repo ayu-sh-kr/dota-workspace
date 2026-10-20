@@ -203,11 +203,13 @@ This repeated structure is what gives AES its strength. Each round adds more con
 
 The round flow is easier to understand when you watch the block move through the pipeline instead of reading the steps as separate ideas. The first example below shows encryption as a forward pass from plaintext to ciphertext.
 
-<aes-flow mode="encryption"></aes-flow>
+<aes-flow mode="encryption">
+</aes-flow>
 
 Decryption uses the same secret key, but the round keys are applied in reverse order and the transformations are undone in the opposite direction. The second example shows that reverse path from ciphertext back to plaintext.
 
-<aes-flow mode="decryption"></aes-flow>
+<aes-flow mode="decryption">
+</aes-flow>
 
 ---
 

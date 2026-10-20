@@ -1,26 +1,8 @@
-import {BaseElement, Boolean as BooleanType, Component, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Boolean as BooleanType, Component, html, Object as ObjectType, Property, String, type TemplateResult} from "@ayu-sh-kr/dota-core";
+import {LightDomSlot} from "@dota/components/utils/light-dom-slot.ts";
 import type {ChipColor, ChipPosition} from "@dota/components/chip/chip.config.ts";
 import {AvatarStyle} from "@dota/components/avatar/avatar.config.ts";
 import type {AvatarColor, AvatarSize, AvatarStyleConfig, AvatarVariant} from "@dota/components/avatar/avatar.config.ts";
-
-/**
- * Escapes text before it is placed in the component's HTML-string template.
- * Attribute and text values come from the element's public API, so encoding
- * them here prevents a consumer value from changing the generated markup.
- * @param value - Public attribute or property value to render.
- * @returns The value encoded for safe insertion into HTML text or attributes.
- */
-function escapeHtml(value: string | number | undefined): string {
-  const text = value === undefined ? "" : `${value}`;
-
-  return text.replace(/[&<>"']/g, (character: string) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "\"": "&quot;",
-    "'": "&#39;",
-  })[character]!);
-}
 
 /**
  * Produces the one- or two-letter fallback shown when an avatar has a label.
@@ -97,27 +79,26 @@ export class AvatarComponent extends BaseElement {
   }
 
   /** Builds the content branch while keeping image, initials, and icon precedence explicit. */
-  private renderContent(): string {
+  private renderContent(): TemplateResult {
     if (this.img) {
-      return `<img src="${escapeHtml(this.img)}" alt="${escapeHtml(this.imgAlt)}" class="${escapeHtml(this.config?.image ?? AvatarStyle.image)}">`;
+      return html`<img src="${this.img}" alt="${this.imgAlt}" class="${this.config?.image ?? AvatarStyle.image}">`;
     }
 
     if (this.label) {
-      return `<span class="${escapeHtml(this.config?.initials ?? AvatarStyle.initials)}">${escapeHtml(getInitials(this.label))}</span>`;
+      return html`<span class="${this.config?.initials ?? AvatarStyle.initials}">${getInitials(this.label)}</span>`;
     }
 
-    return `<dota-icon aria-hidden="true" name="${escapeHtml(this.icon)}" color="${escapeHtml(this.color)}" size="${escapeHtml(this.size)}" variant="${escapeHtml(this.variant)}" classname="${escapeHtml(this.config?.icon ?? AvatarStyle.icon)}"></dota-icon>`;
+    return html`<dota-icon aria-hidden="true" name="${this.icon}" color="${this.color}" size="${this.size}" variant="${this.variant}" classname="${this.config?.icon ?? AvatarStyle.icon}"></dota-icon>`;
   }
 
-  render(): string {
-    const config = escapeHtml(JSON.stringify(this.config ?? {}));
-    const avatar = `
+  render(): TemplateResult {
+    const avatar = html`
       <avatar-wrapper
-        color="${escapeHtml(this.color)}"
-        variant="${escapeHtml(this.variant)}"
-        size="${escapeHtml(this.size)}"
-        aria-label="${escapeHtml(this.img ? "" : this.label)}"
-        config="${config}">
+        color="${this.color}"
+        variant="${this.variant}"
+        size="${this.size}"
+        aria-label="${this.img ? "" : this.label}"
+        config="${JSON.stringify(this.config ?? {})}">
         ${this.renderContent()}
       </avatar-wrapper>
     `;
@@ -126,11 +107,11 @@ export class AvatarComponent extends BaseElement {
       return avatar;
     }
 
-    return `
+    return html`
       <dota-chip
-        text="${escapeHtml(this.chipText)}"
-        color="${escapeHtml(this.chipColor || this.color)}"
-        position="${escapeHtml(this.chipPosition)}">
+        text="${this.chipText}"
+        color="${this.chipColor || this.color}"
+        position="${this.chipPosition}">
         ${avatar}
       </dota-chip>
     `;
@@ -143,15 +124,15 @@ export class AvatarComponent extends BaseElement {
  * Inputs: `color` (`"gray"`), `variant` (`"solid"`), and `size` (`"md"`) resolve a
  * default token from `AvatarStyle`; `config` may replace the container, selected size, or
  * color/variant slot. `aria-label` makes non-image fallback content available to assistive tech.
- * Lifecycle and integration: captures its initial light-DOM content and reuses it when attributes
- * update, allowing `d-avatar` to supply an image, initials, or `dota-icon` child.
+ * Lifecycle and integration: moves its initial light-DOM content into the rendered container,
+ * where it stays across attribute updates, allowing `d-avatar` to supply an image, initials,
+ * or `dota-icon` child.
  */
 @Component({
   selector: "avatar-wrapper",
   shadow: false,
 })
 export class AvatarWrapper extends BaseElement {
-  content = "";
 
   @Property({name: "color", type: String, default: "gray"})
   color: AvatarColor = "gray";
@@ -168,7 +149,7 @@ export class AvatarWrapper extends BaseElement {
   @Property({name: "config", type: ObjectType})
   config: AvatarStyleConfig = {};
 
-  private lightDomCaptured = false;
+  private readonly content = new LightDomSlot();
 
   /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
@@ -176,16 +157,13 @@ export class AvatarWrapper extends BaseElement {
   }
 
   /**
-   * Captures authored light DOM once, before the first render.
-   * Runs on connect rather than in the constructor, where happy-dom prerendering
-   * has not parsed the children yet.
+   * Renders with the authored avatar content moved into the container. The content is
+   * detached just before the first render and returned right after it.
    */
-  @BeforeInit()
-  captureLightDom() {
-    if (!this.lightDomCaptured) {
-      this.lightDomCaptured = true;
-      this.content = this.innerHTML;
-    }
+  connectedCallback() {
+    this.content.capture(this);
+    super.connectedCallback();
+    this.content.restore(this);
   }
 
   /** Resolves each visual slot independently so a config cannot erase sibling defaults. */
@@ -201,11 +179,11 @@ export class AvatarWrapper extends BaseElement {
     };
   }
 
-  render(): string {
+  render(): TemplateResult {
     const style = this.getStyle();
-    const accessibleLabel = this.ariaLabel ? ` role="img" aria-label="${escapeHtml(this.ariaLabel)}"` : "";
 
-    return `<span class="${escapeHtml(`${style.container} ${style.size} ${style.color}`)}"${accessibleLabel}>${this.content}</span>`;
+    // A label turns the container into a named image; otherwise it adds no semantics.
+    return html`<span class="${style.container} ${style.size} ${style.color}" role="${this.ariaLabel ? "img" : "none"}" aria-label="${this.ariaLabel}" data-dota-slot></span>`;
   }
 }
 

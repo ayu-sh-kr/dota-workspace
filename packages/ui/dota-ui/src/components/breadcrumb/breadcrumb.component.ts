@@ -1,4 +1,4 @@
-import {BaseElement, Component, HostListener, Number, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, HostListener, html, Number, Object as ObjectType, Property, String, type TemplateResult, when} from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 import {BreadcrumbStyle} from "@dota/components/breadcrumb/breadcrumb.config.ts";
 import type {BreadcrumbStyleConfig} from "@dota/components/breadcrumb/breadcrumb.config.ts";
@@ -402,80 +402,53 @@ class BreadcrumbComponent extends BaseElement {
   }
 
   /**
-   * Escapes consumer-provided text before interpolation into light-DOM markup.
-   * This protects labels, IDs, URLs, class names, and accessible names from
-   * changing the generated element structure.
-   * @param value Text supplied through a public property or path item.
-   * @returns HTML-safe text with the five markup-significant characters encoded.
-   */
-  private escape(value: string): string {
-    return value.replace(/[&<>"']/g, character => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    })[character]!);
-  }
-
-  /**
    * Converts the current machine snapshot into accessible light-DOM markup.
    * The template intentionally references `dota-icon` and `dota-popover` without
    * registering them; the consuming application owns registration and loading.
+   * Labels, URLs, and class names are written as text and attribute values, so the
+   * renderer escapes them and they cannot change the element structure.
    * @returns Rendered breadcrumb markup using the resolved visual slots.
    */
-  render(): string {
+  render(): TemplateResult {
     const style = this.getStyle();
     const state = (this.machine ?? new BreadcrumbMachine(this.path, this.budget, this.foldMin)).get();
     const crumb = (item: NormalizedBreadcrumbItem) => item.isCurrent
-      ? `<span class="${style.current}" aria-current="page" title="${this.escape(item.label)}">${this.escape(item.label)}</span>`
-      : `<a class="${style.crumb}" href="${this.escape(item.href ?? "#")}" data-breadcrumb-id="${this.escape(item.id)}">${this.escape(item.label)}</a>`;
-    const separator = [
-      `<span class="${style.separator}" aria-hidden="true">`,
-      `<dota-icon class="inline-flex shrink-0 leading-none" name="${this.escape(style.separatorIcon)}" `,
-      `classname="${this.escape(style.separatorIconClass)}" size="sm"></dota-icon>`,
-      `</span>`,
-    ].join("");
-    const renderItem = (item: NormalizedBreadcrumbItem, index: number) => [
-      `<div role="listitem" class="${style.item}">`,
-      index ? separator : "",
-      crumb(item),
-      `</div>`,
-    ].join("");
-    const items = state.visible.map(renderItem).join("");
-    const menuItems = state.folded.map(item => [
-      `<div role="listitem">`,
-      `<a class="${style.menuItem}" href="${this.escape(item.href ?? "#")}" data-breadcrumb-id="${this.escape(item.id)}">`,
-      `<span class="mr-3 font-mono text-xs text-gray-400">${item.index + 1}</span>`,
-      this.escape(item.label),
-      `</a></div>`,
-    ].join("")).join("");
-    const menu = state.isFolded ? [
-      `<div id="${this.foldPanelId}" class="${style.menu}" role="dialog" aria-label="Hidden breadcrumb levels" style="display: none; position: absolute;">`,
-      `<div class="m-0 grid list-none gap-0.5 p-0" role="list">${menuItems}</div>`,
-      `</div>`,
-    ].join("") : "";
-    const fold = state.isFolded ? [
-      `<div role="listitem" class="${style.item}">`,
-      state.visible.length > 1 ? separator : "",
-      `<dota-popover class="inline-flex items-center leading-none" placement="bottom-start" offset="8" anchored-selector="#${this.foldPanelId}">`,
-      `<button type="button" class="${style.fold}" data-breadcrumb-fold aria-label="${state.folded.length} more level${state.folded.length === 1 ? "" : "s"}">`,
-      `<dota-icon class="inline-flex shrink-0 leading-none" name="${this.escape(style.foldIcon)}" `,
-      `classname="${this.escape(style.foldIconClass)}" size="sm"></dota-icon>`,
-      `</button></dota-popover></div>`,
-      menu,
-    ].join("") : "";
+      ? html`<span class="${style.current}" aria-current="page" title="${item.label}">${item.label}</span>`
+      : html`<a class="${style.crumb}" href="${item.href ?? "#"}" data-breadcrumb-id="${item.id}">${item.label}</a>`;
+    const separator = html`<span class="${style.separator}" aria-hidden="true"><dota-icon class="inline-flex shrink-0 leading-none" name="${style.separatorIcon}" classname="${style.separatorIconClass}" size="sm"></dota-icon></span>`;
+    const renderItem = (item: NormalizedBreadcrumbItem, index: number) =>
+      html`<div role="listitem" class="${style.item}">${when(index, separator)}${crumb(item)}</div>`;
+    const fold = html`
+      <div role="listitem" class="${style.item}">
+        ${when(state.visible.length > 1, separator)}
+        <dota-popover class="inline-flex items-center leading-none" placement="bottom-start" offset="8" anchored-selector="#${this.foldPanelId}">
+          <button type="button" class="${style.fold}" data-breadcrumb-fold aria-label="${state.folded.length} more level${state.folded.length === 1 ? "" : "s"}">
+            <dota-icon class="inline-flex shrink-0 leading-none" name="${style.foldIcon}" classname="${style.foldIconClass}" size="sm"></dota-icon>
+          </button>
+        </dota-popover>
+      </div>
+      <div id="${this.foldPanelId}" class="${style.menu}" role="dialog" aria-label="Hidden breadcrumb levels" style="display: none; position: absolute;">
+        <div class="m-0 grid list-none gap-0.5 p-0" role="list">
+          ${state.folded.map(item => html`
+            <div role="listitem">
+              <a class="${style.menuItem}" href="${item.href ?? "#"}" data-breadcrumb-id="${item.id}"><span class="mr-3 font-mono text-xs text-gray-400">${item.index + 1}</span>${item.label}</a>
+            </div>
+          `)}
+        </div>
+      </div>
+    `;
     const listItems = state.isFolded && state.visible.length > 1
-      ? [renderItem(state.visible[0], 0), fold, ...state.visible.slice(1).map((item, index) => renderItem(item, index + 1))].join("")
-      : state.isFolded ? fold + items : items;
-    return [
-      `<div class="not-prose ${style.container} ${this.escape(this.className)}">`,
-      `<nav class="${style.nav}" aria-label="${this.escape(this.label)}">`,
-      `<div class="${style.list}" role="list">${listItems}</div>`,
-      `</nav>`,
-      `<p class="${style.live}" aria-live="polite" aria-atomic="true"></p>`,
-      `</div>`,
-    ].join("");
+      ? [renderItem(state.visible[0], 0), fold, ...state.visible.slice(1).map((item, index) => renderItem(item, index + 1))]
+      : state.isFolded ? [fold, ...state.visible.map(renderItem)] : state.visible.map(renderItem);
+
+    return html`
+      <div class="not-prose ${style.container} ${this.className}">
+        <nav class="${style.nav}" aria-label="${this.label}">
+          <div class="${style.list}" role="list">${listItems}</div>
+        </nav>
+        <p class="${style.live}" aria-live="polite" aria-atomic="true"></p>
+      </div>
+    `;
   }
 }
 

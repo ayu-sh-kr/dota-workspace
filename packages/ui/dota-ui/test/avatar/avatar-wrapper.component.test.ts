@@ -6,8 +6,7 @@ if (!customElements.get('avatar-wrapper-test')) customElements.define('avatar-wr
 const render = (props: Partial<AvatarWrapper> = {}, content = '<span>content</span>') => {
   const element = document.createElement('avatar-wrapper-test') as AvatarWrapper;
   Object.assign(element, props);
-  (element as AvatarWrapper & {content: string}).content = content;
-  element.innerHTML = element.render();
+  element.innerHTML = content;
   document.body.append(element);
   return element;
 };

@@ -1,6 +1,24 @@
 import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
+const BUTTON_COMPONENT_CODE = `import { Component, Property } from '@ayu-sh-kr/dota-wrap/core';
+import { html } from '@ayu-sh-kr/dota-wrap/rendering';
+
+@Component({ selector: 'app-button' })
+class ButtonComponent extends BaseElement {
+
+  @Property({ name: 'label', type: String })
+  label: string = 'Click me';
+
+  render() {
+    return html\`
+      <button class="btn-primary">
+        \${this.label}
+      </button>
+    \`;
+  }
+}`;
+
 @Component({
   selector: "code-section",
   shadow: false,
@@ -11,7 +29,6 @@ export class CodeSectionComponent extends BaseElement {
   }
 
   render(): TemplateResult {
-    // language=HTML
     return html`
         <section class="hero-fade-up relative isolate font-sans w-full home-section-divider">
             <div class="layout-page layout-section">
@@ -34,22 +51,7 @@ export class CodeSectionComponent extends BaseElement {
 
                         <!-- Right: code snippet -->
                         <div class="w-full min-w-0">
-                            <code-snippet filename="app-button.component.ts" language="typescript">
-                              import { Component, Property, HTML } from '@ayu-sh-kr/dota-wrap/core';
-                                @Component({ selector: 'app-button' })
-                                class ButtonComponent extends BaseElement {
-                                
-                                  @Property({ name: 'label', type: String })
-                                  label: string = 'Click me';
-                                
-                                  render() {
-                                    return HTML\`
-                                      &lt;button class="btn-primary"&gt;
-                                        \${this.label}
-                                      &lt;/button&gt;
-                                    \`;
-                                  }
-                                }
+                            <code-snippet filename="app-button.component.ts" language="typescript" code="${BUTTON_COMPONENT_CODE}">
                             </code-snippet>
                         </div>
 

@@ -57,13 +57,33 @@ export interface WidgetStyleConfig {
 
 Resolve each slot independently with `override?.slot ?? WidgetStyle.slot`. Do not shallow-spread nested objects: it can erase default sibling variants unexpectedly. Treat an explicit empty string as a valid replacement by using nullish fallback, not truthiness fallback.
 
-Use an object `@Property` for per-instance configurations. In HTML-string templates, serialize it deliberately:
+Use an object `@Property` for per-instance configurations. In a template, serialize it into a quoted attribute; the renderer escapes the value:
 
 ```ts
-config='${JSON.stringify(MY_WIDGET_STYLE)}'
+html`<dota-accordion config="${JSON.stringify(MY_WIDGET_STYLE)}"></dota-accordion>`
 ```
 
-Keep JSON values serializable. Escape or reject untrusted content before placing it in an HTML attribute or HTML-string template.
+Keep JSON values serializable. Never pass untrusted content to `unsafeHTML` or `trustedHTML`.
+
+## Rendering and Authored Content
+
+Return an `html` template from `render()` (imported from `@ayu-sh-kr/dota-core`), never a string.
+Applications prerender and server-render these components, and only templates can hydrate: string
+output is rebuilt in the browser, which repaints content and shifts the layout.
+
+- Use `when()` for optional fragments and `keyed()` for lists that change at runtime.
+- Templates write attribute values only. Apply presence-only attributes such as `disabled`, and
+  attributes that must be absent rather than empty (`aria-label`), after each render, as
+  `dota-button`'s `syncNativeAttributes()` does from `connectedCallback` and `DOM_UPDATED`.
+- A component that wraps authored children (a trigger, label, or slides) marks one template element
+  with `data-dota-slot` and moves the children there with `LightDomSlot`
+  (`components/utils/light-dom-slot.ts`): call `capture(this)` before `super.connectedCallback()` and
+  `restore(this)` right after it. Never copy children through `innerHTML`; that recreates them,
+  drops their listeners and a parent template's hydration markers, and on a hydrated host it
+  captures the server output instead of the authored content. The slot element must not contain
+  template interpolations. Dota SSR places authored children in the same element.
+- Do not depend on browser-only state (theme, storage, viewport) in the first render; render a
+  stable default and update after connection, so server and browser output match.
 
 ## Keep Animation Machinery Style-Neutral
 

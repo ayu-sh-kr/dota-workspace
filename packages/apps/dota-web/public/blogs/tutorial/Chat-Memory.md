@@ -70,7 +70,8 @@ The manage step is about maintenance. Memories may need to be merged, corrected,
 
 The read step is about relevance. A memory about Kotlin should help in a Kotlin task, but it should not be forced into an unrelated conversation.
 
-<chat-memory-map></chat-memory-map>
+<chat-memory-map>
+</chat-memory-map>
 
 ---
 

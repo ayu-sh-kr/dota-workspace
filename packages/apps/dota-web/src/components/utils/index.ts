@@ -8,7 +8,5 @@ export {AiButtonComponent} from "@dota/components/utils/buttons/ai-button.compon
 export {ScrollBottomButtonComponent} from "@dota/components/utils/buttons/scroll-bottom-button.component.ts";
 export {HamBurgerButtonComponent} from "@dota/components/utils/buttons/ham-burger-button.component.ts";
 export {SelfEndComponent} from "@dota/components/utils/self-end.component.ts";
-export {PageWrapperComponent} from "@dota/components/utils/wrapper/page-wrapper.component.ts";
 export {SectionHeaderComponent} from "@dota/components/utils/header/section-header.component.ts";
 export {NoContentComponent} from "@dota/components/utils/section/no-content.component.ts";
-export {SectionWrapperComponent} from "@dota/components/utils/wrapper/section-wrapper.component.ts";

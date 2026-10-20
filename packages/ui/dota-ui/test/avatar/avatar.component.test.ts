@@ -1,12 +1,13 @@
 import {afterEach, describe, expect, it} from 'vitest';
 import {AvatarComponent} from '@dota/components/avatar/avatar.component.ts';
+import {mountTemplate} from '../setup/render-template';
 
 if (!customElements.get('d-avatar-test')) customElements.define('d-avatar-test', AvatarComponent);
 
 const render = (props: Partial<AvatarComponent> = {}) => {
   const element = document.createElement('d-avatar-test') as AvatarComponent;
   Object.assign(element, props);
-  element.innerHTML = element.render();
+  mountTemplate(element);
   document.body.append(element);
   return element;
 };
@@ -17,7 +18,6 @@ describe('AvatarComponent', () => {
   it('prefers an escaped image over initials and icon content', () => {
     const element = render({img: '/avatar?name=<x>', imgAlt: 'A & B'});
     const image = element.querySelector('avatar-wrapper img')!;
-    expect(element.render()).toContain('src="/avatar?name=&lt;x&gt;"');
     expect(image.getAttribute('src')).toBe('/avatar?name=<x>');
     expect(image.getAttribute('alt')).toBe('A & B');
     expect(element.querySelector('avatar-wrapper span')).toBeNull();

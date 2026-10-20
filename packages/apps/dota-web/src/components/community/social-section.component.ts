@@ -1,4 +1,5 @@
 import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: "social-section",
@@ -45,18 +46,13 @@ export class SocialSectionComponent extends BaseElement {
     super();
   }
 
-  render() {
-    // language=html
-    return `
-      <section-wrapper>
-        <section-header>
-          Our <span class="text-purple-500 dark:text-purple-600">Socials</span>
-        </section-header>
+  render(): TemplateResult {
+    return html`
+      <section class="mt-10 font-dm">
+        <section-header heading="Our" highlight="Socials"></section-header>
 
         <div class="flex justify-between items-center gap-5 w-full flex-wrap">
-          ${this.data.map((item) => {
-            // language=html
-            return `
+          ${this.data.map((item) => html`
             <div class="lg:w-1/5 md:w-1/4 sm:w-1/3 rounded-xl bg-white dark:bg-slate-800 dark:text-white shadow-lg lg:p-4 md:p-3 p-2 space-y-3">
               <dota-icon name="${item.icon}" color="${item.color}" variant="link" size="xl"></dota-icon>
               <div class="space-y-2">
@@ -68,10 +64,9 @@ export class SocialSectionComponent extends BaseElement {
                 text="${item.buttonText}" 
                 link="${item.link || ''}">
               </social-button>
-            </div>`
-          }).join('')}
+            </div>`)}
         </div>
-      </section-wrapper>
+      </section>
     `
   }
 }

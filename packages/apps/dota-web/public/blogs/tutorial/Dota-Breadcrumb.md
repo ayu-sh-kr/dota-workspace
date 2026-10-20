@@ -8,7 +8,8 @@ This tutorial introduces `dota-breadcrumb`, a light-DOM Dota UI component design
 
 The smallest useful trail has a root, a section, and the current page. Ancestors render as links, while the current page is rendered as text with `aria-current="page"`; this prevents a breadcrumb from offering a link that simply reloads the page you are already reading.
 
-<dota-breadcrumb path='[{"id":"home","label":"Home","href":"/"},{"id":"tutorials","label":"Tutorials","href":"/blogs"},{"id":"component","label":"Breadcrumb patterns"}]' label="Article location"></dota-breadcrumb>
+<dota-breadcrumb path='[{"id":"home","label":"Home","href":"/"},{"id":"tutorials","label":"Tutorials","href":"/blogs"},{"id":"component","label":"Breadcrumb patterns"}]' label="Article location">
+</dota-breadcrumb>
 
 The `path` value is a JSON array when supplied as an HTML attribute. Each item can provide an explicit `id`, a visible `label`, and an optional `href`. If an ID is omitted, the component derives one from the destination or label and repairs duplicates so navigation remains unambiguous.
 
@@ -16,7 +17,8 @@ The `path` value is a JSON array when supplied as an HTML attribute. Each item c
 
 Real applications often have more hierarchy than a header can display. Set `budget` to the number of visible crumbs and the component keeps both ends of the trail: the root remains a way out, the current page remains visible, and the middle becomes a disclosure menu.
 
-<dota-breadcrumb path='[{"id":"home","label":"Home","href":"/"},{"id":"docs","label":"Documentation","href":"/blogs"},{"id":"guides","label":"Guides","href":"/blogs"},{"id":"components","label":"Components","href":"/blogs"},{"id":"navigation","label":"Navigation","href":"/blogs"},{"id":"current","label":"Breadcrumb patterns"}]' budget="3" label="Documentation location"></dota-breadcrumb>
+<dota-breadcrumb path='[{"id":"home","label":"Home","href":"/"},{"id":"docs","label":"Documentation","href":"/blogs"},{"id":"guides","label":"Guides","href":"/blogs"},{"id":"components","label":"Components","href":"/blogs"},{"id":"navigation","label":"Navigation","href":"/blogs"},{"id":"current","label":"Breadcrumb patterns"}]' budget="3" label="Documentation location">
+</dota-breadcrumb>
 
 Activate the ellipsis with a mouse or keyboard. The folded items are still real links, and the disclosure button exposes its state through `aria-expanded`. A fold containing only one hidden item is suppressed by default because the control would cost about as much space as the item it hides.
 
@@ -24,11 +26,8 @@ Activate the ellipsis with a mouse or keyboard. The folded items are still real 
 
 The component keeps behavior and presentation separate. The `config` property accepts a JSON object whose slots replace the default classes independently. This example changes the row surface, separators, links, current item, fold control, and revealed menu without changing the path or accessibility structure.
 
-<dota-breadcrumb
-  path='[{"id":"home","label":"Home","href":"/"},{"id":"design","label":"Design system","href":"/blogs"},{"id":"patterns","label":"Patterns","href":"/blogs"},{"id":"current","label":"Themed breadcrumb"}]'
-  budget="3"
-  label="Themed navigation"
-  config='{"container":"block min-w-0 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900","nav":"relative min-w-0","list":"m-0 flex min-w-0 list-none items-center gap-2 overflow-hidden p-0","item":"flex min-w-0 shrink-0 items-center gap-2","crumb":"block max-w-56 truncate rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 no-underline hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700","current":"block max-w-56 truncate rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white","separator":"inline-flex size-4 shrink-0 items-center justify-center leading-none text-indigo-500","separatorIcon":"lucide:slash","separatorIconClass":"!size-3 !p-0","fold":"inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-indigo-300 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900","menu":"absolute z-10 mt-2 min-w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-700 dark:bg-gray-900","menuItem":"block w-full truncate rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"}'></dota-breadcrumb>
+<dota-breadcrumb path='[{"id":"home","label":"Home","href":"/"},{"id":"design","label":"Design system","href":"/blogs"},{"id":"patterns","label":"Patterns","href":"/blogs"},{"id":"current","label":"Themed breadcrumb"}]' budget="3" label="Themed navigation" config='{"container":"block min-w-0 rounded-xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900","nav":"relative min-w-0","list":"m-0 flex min-w-0 list-none items-center gap-2 overflow-hidden p-0","item":"flex min-w-0 shrink-0 items-center gap-2","crumb":"block max-w-56 truncate rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 no-underline hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700","current":"block max-w-56 truncate rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white","separator":"inline-flex size-4 shrink-0 items-center justify-center leading-none text-indigo-500","separatorIcon":"lucide:slash","separatorIconClass":"!size-3 !p-0","fold":"inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-indigo-300 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900","menu":"absolute z-10 mt-2 min-w-48 rounded-xl border border-gray-200 bg-white p-2 shadow-xl dark:border-gray-700 dark:bg-gray-900","menuItem":"block w-full truncate rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"}'>
+</dota-breadcrumb>
 
 The override is intentionally shallow by slot. You can replace only `current` or `fold`, or supply the complete visual treatment as above. An empty string is also a valid replacement, which is useful when a consuming application owns a slot entirely through its own CSS.
 
@@ -36,11 +35,8 @@ The override is intentionally shallow by slot. You can replace only `current` or
 
 Separators and fold markers carry rhythm rather than navigation meaning, so they are presentation slots. The default skin uses a fine chevron and a three-dot fold marker, but a product with a different icon grammar can provide Iconify names through `separatorIcon` and `foldIcon`. The component renders both through the shared `dota-icon` element, so sizing and loading stay consistent with the rest of the UI.
 
-<dota-breadcrumb
-  path='[{"id":"home","label":"Home","href":"/"},{"id":"workspace","label":"Workspace","href":"/blogs"},{"id":"projects","label":"Projects","href":"/blogs"},{"id":"milestones","label":"Milestones","href":"/blogs"},{"id":"current","label":"Icon override"}]'
-  budget="3"
-  label="Icon override example"
-  config='{"separatorIcon":"lucide:slash","foldIcon":"material-symbols:more-horiz","separator":"inline-flex size-4 shrink-0 items-center justify-center leading-none text-indigo-500","separatorIconClass":"!size-3 !p-0","fold":"inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-indigo-300 bg-indigo-50 px-2 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300","foldIconClass":"!size-4 !p-0"}'></dota-breadcrumb>
+<dota-breadcrumb path='[{"id":"home","label":"Home","href":"/"},{"id":"workspace","label":"Workspace","href":"/blogs"},{"id":"projects","label":"Projects","href":"/blogs"},{"id":"milestones","label":"Milestones","href":"/blogs"},{"id":"current","label":"Icon override"}]' budget="3" label="Icon override example" config='{"separatorIcon":"lucide:slash","foldIcon":"material-symbols:more-horiz","separator":"inline-flex size-4 shrink-0 items-center justify-center leading-none text-indigo-500","separatorIconClass":"!size-3 !p-0","fold":"inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-indigo-300 bg-indigo-50 px-2 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950 dark:text-indigo-300","foldIconClass":"!size-4 !p-0"}'>
+</dota-breadcrumb>
 
 The override changes the icon name, not the machine’s semantics: the separator remains hidden from assistive technology and the fold control keeps its accessible name and expanded state. The slash is intentionally a visual punctuation choice; it does not become a navigation action.
 

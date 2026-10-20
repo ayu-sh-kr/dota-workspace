@@ -1,4 +1,4 @@
-import { BaseElement, BindEvent, Component, HostListener, HTML } from "@ayu-sh-kr/dota-core";
+import { BaseElement, BindEvent, Component, HostListener, html, type TemplateResult } from "@ayu-sh-kr/dota-core";
 import { OnEvent } from "@ayu-sh-kr/dota-event";
 import { ButtonStyle } from "@dota/components/button/button.config.ts";
 import {
@@ -138,8 +138,8 @@ export class DotaAlertComponent extends BaseElement implements AlertHost {
    * modal state, and event bindings survive each queued request.
    * @returns The light-DOM dialog skeleton used by every alert request.
    */
-  render(): string {
-    return HTML`<dialog id="dota-alert-dialog" class="dota-alert__dialog">
+  render(): TemplateResult {
+    return html`<dialog id="dota-alert-dialog" class="dota-alert__dialog">
       <form id="dota-alert-form" class="dota-alert__form" method="dialog">
         <section id="dota-alert-built-in">
           <div class="dota-alert__body"><div class="dota-alert__head"><span id="dota-alert-icon" class="dota-alert__icon" aria-hidden="true"></span><div><h2 id="dota-alert-title" class="dota-alert__title"></h2><p id="dota-alert-body" class="dota-alert__text"></p></div></div>

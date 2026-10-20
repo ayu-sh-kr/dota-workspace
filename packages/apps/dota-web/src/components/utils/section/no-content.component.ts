@@ -1,4 +1,5 @@
 import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: "no-content",
@@ -10,9 +11,8 @@ export class NoContentComponent extends BaseElement {
     super();
   }
 
-  render() {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
         <div class="grid sm:grid-cols-1 md:grid-cols-2 place-items-center overflow-hidden">
             <div class="text-center py-10 font-semibold text-gray-700 dark:text-gray-300">
                 <h1 class="text-5xl md:text-6xl lg:text-7xl">Oops!</h1>

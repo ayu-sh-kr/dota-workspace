@@ -1,4 +1,4 @@
-import {BaseElement, BindEvent, Component, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, BindEvent, Component, html, Object as ObjectType, Property, String, type TemplateResult, when} from "@ayu-sh-kr/dota-core";
 import "@dota/components/icon/icons.component.ts";
 import './accordion.css';
 import {AccordionStyle} from "@dota/components/accordian/accordion.config.ts";
@@ -78,15 +78,6 @@ class AccordionComponent extends BaseElement {
   }
 
   /**
-   * Processes the icon name and returns the HTML string for the icon component.
-   * @param icon - The name of the icon to be displayed
-   * @returns HTML string containing the icon component or empty string if no icon provided
-   */
-  processIcon = (icon: string) => {
-    return icon ? `<dota-icon className="text-blue-400 text-xl" name="${icon}"></dota-icon>` : '';
-  }
-
-  /**
    * Resolves a consumer-supplied theme against the library defaults.
    * Each missing slot falls back independently, so consumers can override one
    * part of the visual design without restating the entire configuration.
@@ -107,14 +98,14 @@ class AccordionComponent extends BaseElement {
     };
   }
 
-  render(): string {
+  render(): TemplateResult {
     const style = this.getStyle();
 
-    return `
+    return html`
         <div class="${this.className ?? ''} ${style.container} w-full flex flex-col">
             <button type="button" id="header" aria-controls="description" aria-expanded="false" class="${style.button.base} ${style.button.size} ${style.button.color}">
                 <div class="flex">
-                    ${this.processIcon(this.icon)}
+                    ${when(this.icon, html`<dota-icon classname="text-blue-400 text-xl" name="${this.icon}"></dota-icon>`)}
                     <span class="text-left break-all line-clamp-1">${this.header}</span>
                 </div>
                 <div id="icon" class="icon">

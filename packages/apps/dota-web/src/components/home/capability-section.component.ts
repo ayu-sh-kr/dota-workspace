@@ -1,5 +1,5 @@
 import {AfterInit, BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
-import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
+import {html, trustedHTML, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {MDService} from "@dota/configs/markdown.config.ts";
 import {notificationService} from "@dota/main.ts";
 import {CapabilityTab, TAB_REGISTRY} from "@dota/components/home/utils/capability.config.ts";
@@ -31,12 +31,8 @@ export class CapabilitySectionComponent extends BaseElement {
     card.classList.add('tab-content-exit');
 
     setTimeout(() => {
-      const fname = this.querySelector<HTMLElement>('#cap-tab-filename');
-      const body  = this.querySelector<HTMLElement>('#cap-tab-code-body');
-
-      desc.textContent   = tab.description;
-      if (fname) fname.textContent = tab.filename;
-      if (body)  body.innerHTML    = this.renderCode(tab);
+      this.activeTab = tab;
+      this.updateHTML();
 
       desc.classList.remove('tab-content-exit');
       card.classList.remove('tab-content-exit');
@@ -51,16 +47,12 @@ export class CapabilitySectionComponent extends BaseElement {
 
   @AfterInit()
   afterViewInit() {
-    // Render initial code block
-    const body = this.querySelector<HTMLElement>('#cap-tab-code-body');
-    if (body) body.innerHTML = this.renderCode(this.activeTab);
 
     // Listen for tab selections from the child <tab-holder>
     this.addEventListener('tab:change', (e: Event) => {
       const {tabId} = (e as CustomEvent<{tabId: string}>).detail;
       const tab = this.tabs.find(t => t.id === tabId);
       if (!tab) return;
-      this.activeTab = tab;
       this.updateContent(tab);
     });
 
@@ -80,7 +72,7 @@ export class CapabilitySectionComponent extends BaseElement {
   }
 
   render(): TemplateResult {
-    const first = this.tabs[0];
+    const tab = this.activeTab;
 
     return html`
         <section role="region" aria-labelledby="capability-heading"
@@ -109,7 +101,7 @@ export class CapabilitySectionComponent extends BaseElement {
                             <!-- Active tab description -->
                             <p id="cap-tab-desc"
                                class="type-body text-muted">
-                                ${first.description}
+                                ${tab.description}
                             </p>
                         </div>
 
@@ -125,7 +117,7 @@ export class CapabilitySectionComponent extends BaseElement {
                                     <span class="w-2.5 h-2.5 rounded-full bg-code-success"></span>
                                     <span id="cap-tab-filename"
                                           class="ml-2 text-xs text-code-muted font-mono">
-                                        ${first.filename}
+                                        ${tab.filename}
                                     </span>
                                 </div>
                                 <button id="cap-copy-btn"
@@ -139,9 +131,9 @@ export class CapabilitySectionComponent extends BaseElement {
                                 </button>
                             </div>
 
-                            <!-- Code body: populated by MDService in afterViewInit -->
                             <div id="cap-tab-code-body"
                                  class="tab-code-body overflow-x-auto custom-scrollbar type-code select-text">
+                                ${trustedHTML(this.renderCode(tab))}
                             </div>
 
                         </div>

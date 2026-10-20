@@ -65,6 +65,9 @@ The browser then needs nothing adapter-specific: `BaseElement` handles the marke
   Vite plugin runs in Node without a DOM global and cannot load Dota Core.
 - `mode` must be a string literal in `@Route`; the preloader reads source and cannot evaluate
   expressions.
+- A parameterized `ssg` route, such as `@Route({path: '/docs/:slug', mode: 'ssg'})`, is prerendered
+  through the concrete paths in the SSG `routes` option that match it. The build fails when no
+  listed path matches, because the route would otherwise never be generated.
 - Client-only components produce no server content, so they should not hold content needed for SEO
   or first paint.
 - Hydration per component (`load`, `visible`, `none`) is not part of this API yet.

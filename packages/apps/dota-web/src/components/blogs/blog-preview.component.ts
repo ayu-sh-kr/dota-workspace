@@ -1,4 +1,5 @@
 import {AfterInit, BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {type BlogCategory} from "@dota/configs/blogs.config.ts";
 
 import {routerService} from "@dota/main.ts";
@@ -12,13 +13,6 @@ const categoryAccent: Record<BlogCategory, string> = {
 };
 
 let revealObserver: IntersectionObserver | undefined;
-
-const escapeHtml = (value: string): string => value
-  .replaceAll("&", "&amp;")
-  .replaceAll("<", "&lt;")
-  .replaceAll(">", "&gt;")
-  .replaceAll('"', "&quot;")
-  .replaceAll("'", "&#039;");
 
 const estimateReadTime = (header: string, description: string): number => {
   const wordCount = `${header} ${description}`.trim().split(/\s+/).filter(Boolean).length;
@@ -99,12 +93,12 @@ export class BlogPreviewComponent extends BaseElement {
     return `/blogs/content/${encodeURIComponent(this.category)}/${encodeURIComponent(this.path)}`;
   }
 
-  render(): string {
+  render(): TemplateResult {
     const category = this.category in categoryAccent ? this.category : "Others";
     const accentClass = categoryAccent[category];
     const readTime = estimateReadTime(this.header, this.description);
 
-    return `
+    return html`
       <style>
         .blog-preview-card {
           transform: translateY(1.25rem);
@@ -128,7 +122,7 @@ export class BlogPreviewComponent extends BaseElement {
       <a
         data-blog-card
         href="${this.blogUrl}"
-        aria-label="Read ${escapeHtml(this.header)}"
+        aria-label="Read ${this.header}"
         class="blog-preview-card group relative flex h-full min-h-[16rem] w-full flex-col overflow-hidden rounded-[20px]
                border border-slate-200/90 bg-white p-[30px_28px_26px] text-left text-slate-950
                shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[transform,box-shadow,background-color]
@@ -141,20 +135,20 @@ export class BlogPreviewComponent extends BaseElement {
       >
         <div>
           <span class="${accentClass} text-[11px] font-medium uppercase tracking-[0.04em]">
-            ${escapeHtml(category)}
+            ${category}
           </span>
         </div>
 
         <h2 class="mt-6 text-2xl font-medium leading-[1.18] tracking-[-0.02em] text-slate-950 text-balance dark:text-white">
-          ${escapeHtml(this.header)}
+          ${this.header}
         </h2>
 
         <p class="mt-2 line-clamp-3 text-[15px] leading-[1.55] text-slate-600 dark:text-slate-300">
-          ${escapeHtml(this.description)}
+          ${this.description}
         </p>
 
         <div class="mt-auto flex items-center gap-2 pt-8 text-[13px] leading-5 text-slate-500 dark:text-slate-400">
-          <span class="truncate">${escapeHtml(this.writer)}</span>
+          <span class="truncate">${this.writer}</span>
           <span aria-hidden="true" class="size-[3px] shrink-0 rounded-full bg-slate-400 dark:bg-slate-500"></span>
           <span class="shrink-0">${readTime} min read</span>
           <span aria-hidden="true" class="${accentClass} ml-auto text-lg leading-none opacity-80 transition-transform duration-[400ms]
