@@ -49,8 +49,8 @@ export class BlogViewComponent extends BaseElement {
   }
 
   render(): TemplateResult {
-    const routeBlog = resolveBlogRouteParams(window.location.pathname, window.location.search).blog;
-    const blogLabel = (this.currentBlog || routeBlog || 'Blog')
+    const blog = this.currentBlog || resolveBlogRouteParams(window.location.pathname, window.location.search).blog || '';
+    const blogLabel = (blog || 'Blog')
       .replace(/\.md$/i, '')
       .replace(/-/g, ' ');
     const breadcrumbPath = JSON.stringify([
@@ -59,7 +59,6 @@ export class BlogViewComponent extends BaseElement {
       {id: 'current-blog', label: blogLabel},
     ]);
 
-    // language=html
     return html`
       <section class="mx-auto w-full max-w-screen-2xl px-3 py-12 sm:px-5 lg:px-8">
         <dota-breadcrumb
@@ -70,7 +69,7 @@ export class BlogViewComponent extends BaseElement {
         <div class="flex w-full flex-col xl:flex-row xl:items-start xl:gap-8">
           <div class="min-w-0 flex-1 ${this.maxWidth}" style="overflow-anchor: none;">
             <md-view theme="${this.theme}" color="${this.color}"></md-view>
-            <blog-suggestion current-blog="${this.currentBlog}" limit="3"></blog-suggestion>
+            <blog-suggestion current-blog="${blog}" limit="3"></blog-suggestion>
           </div>
           <aside class="hidden xl:block shrink-0 self-start sticky top-16">
             <md-toc
