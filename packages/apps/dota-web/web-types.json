@@ -1008,7 +1008,7 @@
           "name": "capability-section",
           "source": {
             "file": "./src/components/home/capability-section.component.ts",
-            "offset": 449
+            "offset": 533
           },
           "attributes": [],
           "js": {
@@ -1326,7 +1326,7 @@
           "name": "code-snippet",
           "source": {
             "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-            "offset": 367
+            "offset": 451
           },
           "attributes": [
             {
@@ -1338,7 +1338,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                "offset": 779
+                "offset": 873
               }
             },
             {
@@ -1350,7 +1350,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                "offset": 495
+                "offset": 589
               }
             },
             {
@@ -1362,7 +1362,7 @@
               },
               "source": {
                 "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                "offset": 635
+                "offset": 729
               }
             }
           ],
@@ -1374,7 +1374,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                  "offset": 779
+                  "offset": 873
                 }
               },
               {
@@ -1383,7 +1383,7 @@
                 "default": "component.ts",
                 "source": {
                   "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                  "offset": 495
+                  "offset": 589
                 }
               },
               {
@@ -1392,7 +1392,7 @@
                 "default": "typescript",
                 "source": {
                   "file": "./src/components/home/utils/code-snippet/code-snippet.component.ts",
-                  "offset": 635
+                  "offset": 729
                 }
               }
             ]
@@ -4599,7 +4599,7 @@
           "name": "our-tools",
           "source": {
             "file": "./src/components/home/our-tools/our-tools.component.ts",
-            "offset": 1465
+            "offset": 1105
           },
           "attributes": [],
           "js": {
@@ -4610,7 +4610,7 @@
           "name": "reactive-dota",
           "source": {
             "file": "./src/components/home/reactive-section.component.ts",
-            "offset": 448
+            "offset": 532
           },
           "attributes": [],
           "js": {
