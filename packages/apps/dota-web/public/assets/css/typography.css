@@ -15,6 +15,11 @@
   --type-reading-size: 1.0625rem;
   --type-reading-leading: 1.75;
   --type-compact-size: 0.875rem;
+  --type-card-size: 1.25rem;
+  --type-card-leading: 1.3;
+  --type-card-tracking: -0.02em;
+  --type-meta-size: 0.8125rem;
+  --type-meta-leading: 1.45;
   --type-label-size: 0.75rem;
   --type-label-tracking: 0.12em;
   --type-control-size: 0.9375rem;
@@ -53,10 +58,24 @@ body {
   }
   .type-title { font-size: var(--type-title-size); }
   .type-section { font-size: var(--type-section-size); }
+  .type-card {
+    font-family: var(--font-display);
+    font-size: var(--type-card-size);
+    font-weight: var(--type-heading-weight);
+    line-height: var(--type-card-leading);
+    letter-spacing: var(--type-card-tracking);
+    text-wrap: balance;
+  }
+  .type-brand {
+    font-family: var(--font-display);
+    font-weight: var(--type-display-weight);
+    letter-spacing: var(--type-heading-tracking);
+  }
   .type-lede { font-size: var(--type-lede-size); line-height: var(--type-body-leading); }
   .type-body { font-size: var(--type-body-size); line-height: var(--type-body-leading); }
   .type-reading { font-size: var(--type-reading-size); line-height: var(--type-reading-leading); }
   .type-compact { font-size: var(--type-compact-size); line-height: var(--type-body-leading); }
+  .type-meta { font-size: var(--type-meta-size); font-weight: 500; line-height: var(--type-meta-leading); }
   .type-eyebrow {
     color: var(--primary-color);
     font-size: var(--type-label-size);
