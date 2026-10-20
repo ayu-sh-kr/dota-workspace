@@ -9,8 +9,9 @@ const ASSET_PATH = 'assets/icons/';
 /**
  * Publishes icons as same-origin assets before SSG runs.
  * Icons come from the installed `@iconify-json/*` sets, so builds and dev need no network;
- * only names outside those sets fall back to the disk cache and Iconify. Production
- * Node/static hosts serve the emitted files without upstream access.
+ * only names outside those sets fall back to the disk cache and Iconify. Production hosts serve
+ * the emitted files without upstream access; on Vercel, a name chosen at runtime that was not
+ * emitted is proxied to Iconify by the `/assets/icons/:icon` rewrite in `vercel.json`.
  * @returns App-owned Vite plugin, with disk state outside disposable build output.
  */
 export function iconAssets(): Plugin {
