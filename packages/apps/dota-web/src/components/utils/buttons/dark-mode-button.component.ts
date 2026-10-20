@@ -16,6 +16,13 @@ export class DarkModeButtonComponent extends BaseElement {
   })
   color: string = 'purple';
 
+  /**
+   * Theme the button currently shows. It starts as the server's light render so hydration
+   * adopts matching markup; reading the live theme during that first render would record the
+   * dark values as already applied and leave the server's sun icon in place.
+   */
+  private isDarkTheme = false;
+
   constructor() {
     super();
   }
@@ -31,16 +38,17 @@ export class DarkModeButtonComponent extends BaseElement {
    */
   @OnEvent('connected', true)
   syncWithTheme() {
+    this.isDarkTheme = GeneralUtils.isDarkMode();
     this.updateHTML();
   }
 
   @WindowListener({event: 'themeChange'})
   handleThemeChange() {
-    this.updateHTML();
+    this.syncWithTheme();
   }
 
   render(): TemplateResult {
-    const isDarkTheme = GeneralUtils.isDarkMode();
+    const isDarkTheme = this.isDarkTheme;
     const icon = isDarkTheme ? 'material-symbols:dark-mode' : 'material-symbols:sunny-rounded';
     return html`
       <button id="dark-button" type="button"
