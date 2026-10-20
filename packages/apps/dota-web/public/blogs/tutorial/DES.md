@@ -21,7 +21,8 @@ can be used to decrypt the data.
 The visual below is interactive. You can step through one round of DES and watch the block move from the input, through the round function,
 into the XOR and swap that prepare the next round.
 
-<des-flow></des-flow>
+<des-flow>
+</des-flow>
 
 #### The Feistel architecture
 
