@@ -1286,75 +1286,6 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/components/home/blob-wrapper/blob-wrapper.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "BlobWrapperComponent",
-          "customElement": true,
-          "tagName": "blob-wrapper",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [
-            {
-              "kind": "field",
-              "name": "index",
-              "attribute": "index",
-              "type": {
-                "text": "number"
-              },
-              "default": "0"
-            },
-            {
-              "kind": "field",
-              "name": "side",
-              "attribute": "side",
-              "type": {
-                "text": "string"
-              },
-              "default": "left"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "index",
-              "fieldName": "index",
-              "type": {
-                "text": "number"
-              },
-              "default": "0"
-            },
-            {
-              "name": "side",
-              "fieldName": "side",
-              "type": {
-                "text": "string"
-              },
-              "default": "left"
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "BlobWrapperComponent",
-          "declaration": {
-            "name": "BlobWrapperComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "blob-wrapper",
-          "declaration": {
-            "name": "BlobWrapperComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
       "path": "src/components/home/capability-section.component.js",
       "declarations": [
         {
@@ -1750,6 +1681,15 @@
           "members": [
             {
               "kind": "field",
+              "name": "code",
+              "attribute": "code",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            },
+            {
+              "kind": "field",
               "name": "filename",
               "attribute": "filename",
               "type": {
@@ -1768,6 +1708,14 @@
             }
           ],
           "attributes": [
+            {
+              "name": "code",
+              "fieldName": "code",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            },
             {
               "name": "filename",
               "fieldName": "filename",
@@ -2531,8 +2479,44 @@
           "superclass": {
             "name": "BaseElement"
           },
-          "members": [],
-          "attributes": []
+          "members": [
+            {
+              "kind": "field",
+              "name": "heading",
+              "attribute": "heading",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            },
+            {
+              "kind": "field",
+              "name": "highlight",
+              "attribute": "highlight",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            }
+          ],
+          "attributes": [
+            {
+              "name": "heading",
+              "fieldName": "heading",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            },
+            {
+              "name": "highlight",
+              "fieldName": "highlight",
+              "type": {
+                "text": "string"
+              },
+              "default": ""
+            }
+          ]
         }
       ],
       "exports": [
@@ -2548,86 +2532,6 @@
           "name": "section-header",
           "declaration": {
             "name": "SectionHeaderComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/utils/icons.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "IconsComponent",
-          "customElement": true,
-          "tagName": "app-icon",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [
-            {
-              "kind": "field",
-              "name": "class",
-              "attribute": "class",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "color",
-              "attribute": "color",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "attribute": "name",
-              "type": {
-                "text": "string"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "class",
-              "fieldName": "class",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "name": "color",
-              "fieldName": "color",
-              "type": {
-                "text": "string"
-              }
-            },
-            {
-              "name": "name",
-              "fieldName": "name",
-              "type": {
-                "text": "string"
-              }
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "IconsComponent",
-          "declaration": {
-            "name": "IconsComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "app-icon",
-          "declaration": {
-            "name": "IconsComponent"
           }
         }
       ]
@@ -2869,72 +2773,6 @@
           "name": "self-end",
           "declaration": {
             "name": "SelfEndComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/utils/wrapper/page-wrapper.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "PageWrapperComponent",
-          "customElement": true,
-          "tagName": "page-wrapper",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [],
-          "attributes": []
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "PageWrapperComponent",
-          "declaration": {
-            "name": "PageWrapperComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "page-wrapper",
-          "declaration": {
-            "name": "PageWrapperComponent"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "src/components/utils/wrapper/section-wrapper.component.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "name": "SectionWrapperComponent",
-          "customElement": true,
-          "tagName": "section-wrapper",
-          "superclass": {
-            "name": "BaseElement"
-          },
-          "members": [],
-          "attributes": []
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "SectionWrapperComponent",
-          "declaration": {
-            "name": "SectionWrapperComponent"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "section-wrapper",
-          "declaration": {
-            "name": "SectionWrapperComponent"
           }
         }
       ]
