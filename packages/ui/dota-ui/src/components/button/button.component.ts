@@ -1,4 +1,6 @@
-import {BaseElement, Boolean, Component, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Boolean, Component, html, LifecycleEventConstants, Object as ObjectType, Property, String, type TemplateResult, when} from "@ayu-sh-kr/dota-core";
+import {OnEvent} from "@ayu-sh-kr/dota-event";
+import {LightDomSlot} from "@dota/components/utils/light-dom-slot.ts";
 import {
   ButtonStyle,
   type ButtonAnimation,
@@ -37,7 +39,6 @@ import './button.css';
   shadow: false,
 })
 class ButtonComponent extends BaseElement {
-  content!: string;
 
   @Property({name: 'animation', type: String})
   animation?: ButtonAnimation;
@@ -84,7 +85,8 @@ class ButtonComponent extends BaseElement {
   @Property({name: 'config', type: ObjectType})
   config?: ButtonStyleConfig;
 
-  private lightDomCaptured = false;
+  /** Authored label content, used when no `label` attribute is set. */
+  private readonly labelSlot = new LightDomSlot();
 
   /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
@@ -92,16 +94,26 @@ class ButtonComponent extends BaseElement {
   }
 
   /**
-   * Captures authored light DOM once, before the first render.
-   * Runs on connect rather than in the constructor, where happy-dom prerendering
-   * has not parsed the children yet.
+   * Renders with the authored label content moved into the label span. The content is
+   * detached just before the first render and returned right after it.
    */
-  @BeforeInit()
-  captureLightDom() {
-    if (!this.lightDomCaptured) {
-      this.lightDomCaptured = true;
-      this.content = this.innerHTML;
-    }
+  connectedCallback() {
+    this.labelSlot.capture(this);
+    super.connectedCallback();
+    this.labelSlot.restore(this);
+    this.syncNativeAttributes();
+  }
+
+  /**
+   * Applies the native attributes a template cannot express as values: `disabled` is
+   * presence-only, and an absent `aria-label` must not become an empty accessible name.
+   */
+  @OnEvent(LifecycleEventConstants.DOM_UPDATED, true)
+  syncNativeAttributes() {
+    const button = this.querySelector('button');
+    button?.toggleAttribute('disabled', this.disabled || this.loading);
+    if (this.ariaLabel) button?.setAttribute('aria-label', this.ariaLabel);
+    else button?.removeAttribute('aria-label');
   }
 
   private getStyle() {
@@ -137,33 +149,20 @@ class ButtonComponent extends BaseElement {
     return this.type === 'submit' || this.type === 'reset' ? this.type : 'button';
   }
 
-  private renderIcon(style: ReturnType<ButtonComponent['getStyle']>): string {
-    return this.icon
-      ? `<dota-icon class="${style.icon}" name="${this.icon}" size="${this.size ?? 'md'}"></dota-icon>`
-      : '';
-  }
-
-  private renderLoadingIndicator(style: ReturnType<ButtonComponent['getStyle']>): string {
-    return this.loading
-      ? `<svg class="${style.loadingIndicator}" viewBox="0 0 24 24" aria-hidden="true" fill="none"><circle class="opacity-25" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3"></circle><path class="opacity-90" fill="currentColor" d="M21 12a9 9 0 0 0-9-9v3a6 6 0 0 1 6 6h3Z"></path></svg>`
-      : '';
-  }
-
-  render(): string {
+  render(): TemplateResult {
     const style = this.getStyle();
-    const isDisabled = this.disabled || this.loading;
-    const icon = this.renderIcon(style);
-    const label = this.label || this.content;
-    const content = this.iconPosition === 'forward'
-      ? `<span class="${style.label}">${label}</span>${icon}`
-      : `${icon}<span class="${style.label}">${label}</span>`;
-    const ariaLabel = this.ariaLabel ? ` aria-label="${this.ariaLabel}"` : '';
+    const icon = html`<dota-icon class="${style.icon}" name="${this.icon}" size="${this.size ?? 'md'}"></dota-icon>`;
+    const isForward = this.iconPosition === 'forward';
     const animation = style.animation ? ` ${style.animation.base} ${style.animation.color}` : '';
 
-    return `
-      <button type="${this.getButtonType()}" class="${style.base} ${style.color} ${style.size} ${style.rounded}${animation} ${this.className ?? ''}"${ariaLabel} aria-busy="${this.loading}" ${isDisabled ? 'disabled' : ''}>
-        ${this.renderLoadingIndicator(style)}
-        ${content}
+    // The slot span keeps authored label content; a `label` attribute replaces it visually.
+    return html`
+      <button type="${this.getButtonType()}" class="${style.base} ${style.color} ${style.size} ${style.rounded}${animation} ${this.className ?? ''}" aria-busy="${this.loading}">
+        ${when(this.loading, html`<svg class="${style.loadingIndicator}" viewBox="0 0 24 24" aria-hidden="true" fill="none"><circle class="opacity-25" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3"></circle><path class="opacity-90" fill="currentColor" d="M21 12a9 9 0 0 0-9-9v3a6 6 0 0 1 6 6h3Z"></path></svg>`)}
+        ${when(this.icon && !isForward, icon)}
+        ${when(this.label, html`<span class="${style.label}">${this.label}</span>`)}
+        <span class="${this.label ? 'hidden' : style.label}" data-dota-slot></span>
+        ${when(this.icon && isForward, icon)}
       </button>
     `;
   }
