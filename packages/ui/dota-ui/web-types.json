@@ -62,7 +62,7 @@
           "name": "avatar-wrapper",
           "source": {
             "file": "./src/components/avatar/avatar.component.ts",
-            "offset": 5699
+            "offset": 4949
           },
           "attributes": [
             {
@@ -74,7 +74,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 6082
+                "offset": 5313
               }
             },
             {
@@ -86,7 +86,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5817
+                "offset": 5048
               }
             },
             {
@@ -97,7 +97,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 6157
+                "offset": 5388
               }
             },
             {
@@ -109,7 +109,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 6006
+                "offset": 5237
               }
             },
             {
@@ -121,7 +121,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 5912
+                "offset": 5143
               }
             }
           ],
@@ -133,7 +133,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 6082
+                  "offset": 5313
                 }
               },
               {
@@ -142,7 +142,7 @@
                 "default": "gray",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 5817
+                  "offset": 5048
                 }
               },
               {
@@ -150,7 +150,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 6157
+                  "offset": 5388
                 }
               },
               {
@@ -159,7 +159,7 @@
                 "default": "md",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 6006
+                  "offset": 5237
                 }
               },
               {
@@ -168,7 +168,7 @@
                 "default": "solid",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 5912
+                  "offset": 5143
                 }
               }
             ]
@@ -265,7 +265,7 @@
           "name": "card-description",
           "source": {
             "file": "./src/components/card/card.component.ts",
-            "offset": 2833
+            "offset": 3336
           },
           "attributes": [
             {
@@ -276,7 +276,7 @@
               },
               "source": {
                 "file": "./src/components/card/card.component.ts",
-                "offset": 3012
+                "offset": 3515
               }
             },
             {
@@ -287,7 +287,7 @@
               },
               "source": {
                 "file": "./src/components/card/card.component.ts",
-                "offset": 2936
+                "offset": 3439
               }
             }
           ],
@@ -298,7 +298,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/card/card.component.ts",
-                  "offset": 3012
+                  "offset": 3515
                 }
               },
               {
@@ -306,7 +306,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/card/card.component.ts",
-                  "offset": 2936
+                  "offset": 3439
                 }
               }
             ]
@@ -316,7 +316,7 @@
           "name": "card-footer",
           "source": {
             "file": "./src/components/card/card.component.ts",
-            "offset": 3620
+            "offset": 4123
           },
           "attributes": [
             {
@@ -327,7 +327,7 @@
               },
               "source": {
                 "file": "./src/components/card/card.component.ts",
-                "offset": 3738
+                "offset": 4241
               }
             }
           ],
@@ -338,7 +338,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/card/card.component.ts",
-                  "offset": 3738
+                  "offset": 4241
                 }
               }
             ]
@@ -348,7 +348,7 @@
           "name": "card-header",
           "source": {
             "file": "./src/components/card/card.component.ts",
-            "offset": 2141
+            "offset": 2644
           },
           "attributes": [
             {
@@ -359,7 +359,7 @@
               },
               "source": {
                 "file": "./src/components/card/card.component.ts",
-                "offset": 2228
+                "offset": 2731
               }
             }
           ],
@@ -370,7 +370,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/card/card.component.ts",
-                  "offset": 2228
+                  "offset": 2731
                 }
               }
             ]
@@ -380,7 +380,7 @@
           "name": "card-title",
           "source": {
             "file": "./src/components/card/card.component.ts",
-            "offset": 1411
+            "offset": 1914
           },
           "attributes": [
             {
@@ -391,7 +391,7 @@
               },
               "source": {
                 "file": "./src/components/card/card.component.ts",
-                "offset": 1572
+                "offset": 2075
               }
             },
             {
@@ -402,7 +402,7 @@
               },
               "source": {
                 "file": "./src/components/card/card.component.ts",
-                "offset": 1502
+                "offset": 2005
               }
             }
           ],
@@ -413,7 +413,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/card/card.component.ts",
-                  "offset": 1572
+                  "offset": 2075
                 }
               },
               {
@@ -421,7 +421,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/card/card.component.ts",
-                  "offset": 1502
+                  "offset": 2005
                 }
               }
             ]
@@ -431,7 +431,7 @@
           "name": "cloud-chamber",
           "source": {
             "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-            "offset": 13639
+            "offset": 18086
           },
           "attributes": [
             {
@@ -443,7 +443,7 @@
               },
               "source": {
                 "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-                "offset": 13730
+                "offset": 18177
               }
             },
             {
@@ -455,7 +455,7 @@
               },
               "source": {
                 "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-                "offset": 13904
+                "offset": 18351
               }
             },
             {
@@ -467,7 +467,7 @@
               },
               "source": {
                 "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-                "offset": 13985
+                "offset": 18432
               }
             },
             {
@@ -479,7 +479,7 @@
               },
               "source": {
                 "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-                "offset": 13818
+                "offset": 18265
               }
             }
           ],
@@ -491,7 +491,7 @@
                 "default": "violet",
                 "source": {
                   "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-                  "offset": 13730
+                  "offset": 18177
                 }
               },
               {
@@ -500,7 +500,7 @@
                 "default": "1",
                 "source": {
                   "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-                  "offset": 13904
+                  "offset": 18351
                 }
               },
               {
@@ -509,7 +509,7 @@
                 "default": "1",
                 "source": {
                   "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-                  "offset": 13985
+                  "offset": 18432
                 }
               },
               {
@@ -518,7 +518,7 @@
                 "default": "1",
                 "source": {
                   "file": "./src/components/animations/cloud/cloud-chamber.component.ts",
-                  "offset": 13818
+                  "offset": 18265
                 }
               }
             ]
@@ -528,7 +528,7 @@
           "name": "cursor-displacement",
           "source": {
             "file": "./src/components/animations/cursor/cursor-displacement.component.ts",
-            "offset": 9020
+            "offset": 9242
           },
           "attributes": [
             {
@@ -540,7 +540,7 @@
               },
               "source": {
                 "file": "./src/components/animations/cursor/cursor-displacement.component.ts",
-                "offset": 9117
+                "offset": 9339
               }
             }
           ],
@@ -552,7 +552,7 @@
                 "default": "cyan",
                 "source": {
                   "file": "./src/components/animations/cursor/cursor-displacement.component.ts",
-                  "offset": 9117
+                  "offset": 9339
                 }
               }
             ]
@@ -562,7 +562,7 @@
           "name": "d-avatar",
           "source": {
             "file": "./src/components/avatar/avatar.component.ts",
-            "offset": 2542
+            "offset": 1967
           },
           "attributes": [
             {
@@ -574,7 +574,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 3165
+                "offset": 2590
               }
             },
             {
@@ -586,7 +586,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 3273
+                "offset": 2698
               }
             },
             {
@@ -598,7 +598,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 2999
+                "offset": 2424
               }
             },
             {
@@ -610,7 +610,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 3085
+                "offset": 2510
               }
             },
             {
@@ -621,7 +621,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 3551
+                "offset": 2976
               }
             },
             {
@@ -633,7 +633,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 2821
+                "offset": 2246
               }
             },
             {
@@ -645,7 +645,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 2623
+                "offset": 2048
               }
             },
             {
@@ -657,7 +657,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 2689
+                "offset": 2114
               }
             },
             {
@@ -669,7 +669,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 2911
+                "offset": 2336
               }
             },
             {
@@ -681,7 +681,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 2756
+                "offset": 2181
               }
             },
             {
@@ -693,7 +693,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 3475
+                "offset": 2900
               }
             },
             {
@@ -705,7 +705,7 @@
               },
               "source": {
                 "file": "./src/components/avatar/avatar.component.ts",
-                "offset": 3381
+                "offset": 2806
               }
             }
           ],
@@ -717,7 +717,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 3165
+                  "offset": 2590
                 }
               },
               {
@@ -726,7 +726,7 @@
                 "default": "top-right",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 3273
+                  "offset": 2698
                 }
               },
               {
@@ -735,7 +735,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 2999
+                  "offset": 2424
                 }
               },
               {
@@ -744,7 +744,7 @@
                 "default": "gray",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 3085
+                  "offset": 2510
                 }
               },
               {
@@ -752,7 +752,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 3551
+                  "offset": 2976
                 }
               },
               {
@@ -761,7 +761,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 2821
+                  "offset": 2246
                 }
               },
               {
@@ -770,7 +770,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 2623
+                  "offset": 2048
                 }
               },
               {
@@ -779,7 +779,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 2689
+                  "offset": 2114
                 }
               },
               {
@@ -788,7 +788,7 @@
                 "default": "false",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 2911
+                  "offset": 2336
                 }
               },
               {
@@ -797,7 +797,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 2756
+                  "offset": 2181
                 }
               },
               {
@@ -806,7 +806,7 @@
                 "default": "md",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 3475
+                  "offset": 2900
                 }
               },
               {
@@ -815,7 +815,7 @@
                 "default": "solid",
                 "source": {
                   "file": "./src/components/avatar/avatar.component.ts",
-                  "offset": 3381
+                  "offset": 2806
                 }
               }
             ]
@@ -825,7 +825,7 @@
           "name": "dota-accordion",
           "source": {
             "file": "./src/components/accordian/accordion.component.ts",
-            "offset": 1425
+            "offset": 1458
           },
           "attributes": [
             {
@@ -836,7 +836,7 @@
               },
               "source": {
                 "file": "./src/components/accordian/accordion.component.ts",
-                "offset": 1589
+                "offset": 1622
               }
             },
             {
@@ -847,7 +847,7 @@
               },
               "source": {
                 "file": "./src/components/accordian/accordion.component.ts",
-                "offset": 2063
+                "offset": 2096
               }
             },
             {
@@ -858,7 +858,7 @@
               },
               "source": {
                 "file": "./src/components/accordian/accordion.component.ts",
-                "offset": 2448
+                "offset": 2481
               }
             },
             {
@@ -869,7 +869,7 @@
               },
               "source": {
                 "file": "./src/components/accordian/accordion.component.ts",
-                "offset": 1839
+                "offset": 1872
               }
             },
             {
@@ -880,7 +880,7 @@
               },
               "source": {
                 "file": "./src/components/accordian/accordion.component.ts",
-                "offset": 1712
+                "offset": 1745
               }
             },
             {
@@ -891,7 +891,7 @@
               },
               "source": {
                 "file": "./src/components/accordian/accordion.component.ts",
-                "offset": 1964
+                "offset": 1997
               }
             },
             {
@@ -902,7 +902,7 @@
               },
               "source": {
                 "file": "./src/components/accordian/accordion.component.ts",
-                "offset": 2293
+                "offset": 2326
               }
             },
             {
@@ -913,7 +913,7 @@
               },
               "source": {
                 "file": "./src/components/accordian/accordion.component.ts",
-                "offset": 2182
+                "offset": 2215
               }
             }
           ],
@@ -924,7 +924,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/accordian/accordion.component.ts",
-                  "offset": 1589
+                  "offset": 1622
                 }
               },
               {
@@ -932,7 +932,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/accordian/accordion.component.ts",
-                  "offset": 2063
+                  "offset": 2096
                 }
               },
               {
@@ -940,7 +940,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/accordian/accordion.component.ts",
-                  "offset": 2448
+                  "offset": 2481
                 }
               },
               {
@@ -948,7 +948,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/accordian/accordion.component.ts",
-                  "offset": 1839
+                  "offset": 1872
                 }
               },
               {
@@ -956,7 +956,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/accordian/accordion.component.ts",
-                  "offset": 1712
+                  "offset": 1745
                 }
               },
               {
@@ -964,7 +964,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/accordian/accordion.component.ts",
-                  "offset": 1964
+                  "offset": 1997
                 }
               },
               {
@@ -972,7 +972,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/accordian/accordion.component.ts",
-                  "offset": 2293
+                  "offset": 2326
                 }
               },
               {
@@ -980,7 +980,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/accordian/accordion.component.ts",
-                  "offset": 2182
+                  "offset": 2215
                 }
               }
             ]
@@ -990,7 +990,7 @@
           "name": "dota-alert",
           "source": {
             "file": "./src/components/alert/alert.component.ts",
-            "offset": 2503
+            "offset": 2471
           },
           "attributes": [],
           "js": {
@@ -1001,7 +1001,7 @@
           "name": "dota-badge",
           "source": {
             "file": "./src/components/badge/badge.component.ts",
-            "offset": 1676
+            "offset": 1688
           },
           "attributes": [
             {
@@ -1013,7 +1013,7 @@
               },
               "source": {
                 "file": "./src/components/badge/badge.component.ts",
-                "offset": 1762
+                "offset": 1774
               }
             },
             {
@@ -1025,7 +1025,7 @@
               },
               "source": {
                 "file": "./src/components/badge/badge.component.ts",
-                "offset": 1849
+                "offset": 1861
               }
             },
             {
@@ -1036,7 +1036,7 @@
               },
               "source": {
                 "file": "./src/components/badge/badge.component.ts",
-                "offset": 2272
+                "offset": 2284
               }
             },
             {
@@ -1048,7 +1048,7 @@
               },
               "source": {
                 "file": "./src/components/badge/badge.component.ts",
-                "offset": 2201
+                "offset": 2213
               }
             },
             {
@@ -1060,7 +1060,7 @@
               },
               "source": {
                 "file": "./src/components/badge/badge.component.ts",
-                "offset": 2123
+                "offset": 2135
               }
             },
             {
@@ -1072,7 +1072,7 @@
               },
               "source": {
                 "file": "./src/components/badge/badge.component.ts",
-                "offset": 2034
+                "offset": 2046
               }
             },
             {
@@ -1084,7 +1084,7 @@
               },
               "source": {
                 "file": "./src/components/badge/badge.component.ts",
-                "offset": 1942
+                "offset": 1954
               }
             }
           ],
@@ -1096,7 +1096,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/badge/badge.component.ts",
-                  "offset": 1762
+                  "offset": 1774
                 }
               },
               {
@@ -1105,7 +1105,7 @@
                 "default": "gray",
                 "source": {
                   "file": "./src/components/badge/badge.component.ts",
-                  "offset": 1849
+                  "offset": 1861
                 }
               },
               {
@@ -1113,7 +1113,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/badge/badge.component.ts",
-                  "offset": 2272
+                  "offset": 2284
                 }
               },
               {
@@ -1122,7 +1122,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/badge/badge.component.ts",
-                  "offset": 2201
+                  "offset": 2213
                 }
               },
               {
@@ -1131,7 +1131,7 @@
                 "default": "full",
                 "source": {
                   "file": "./src/components/badge/badge.component.ts",
-                  "offset": 2123
+                  "offset": 2135
                 }
               },
               {
@@ -1140,7 +1140,7 @@
                 "default": "md",
                 "source": {
                   "file": "./src/components/badge/badge.component.ts",
-                  "offset": 2034
+                  "offset": 2046
                 }
               },
               {
@@ -1149,7 +1149,7 @@
                 "default": "soft",
                 "source": {
                   "file": "./src/components/badge/badge.component.ts",
-                  "offset": 1942
+                  "offset": 1954
                 }
               }
             ]
@@ -1159,7 +1159,7 @@
           "name": "dota-breadcrumb",
           "source": {
             "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-            "offset": 13616
+            "offset": 13649
           },
           "attributes": [
             {
@@ -1171,7 +1171,7 @@
               },
               "source": {
                 "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                "offset": 13940
+                "offset": 13973
               }
             },
             {
@@ -1183,7 +1183,7 @@
               },
               "source": {
                 "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                "offset": 14370
+                "offset": 14403
               }
             },
             {
@@ -1194,7 +1194,7 @@
               },
               "source": {
                 "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                "offset": 14518
+                "offset": 14551
               }
             },
             {
@@ -1206,7 +1206,7 @@
               },
               "source": {
                 "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                "offset": 14099
+                "offset": 14132
               }
             },
             {
@@ -1218,7 +1218,7 @@
               },
               "source": {
                 "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                "offset": 14228
+                "offset": 14261
               }
             },
             {
@@ -1229,7 +1229,7 @@
               },
               "source": {
                 "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                "offset": 13788
+                "offset": 13821
               }
             }
           ],
@@ -1241,7 +1241,7 @@
                 "default": "null",
                 "source": {
                   "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                  "offset": 13940
+                  "offset": 13973
                 }
               },
               {
@@ -1250,7 +1250,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                  "offset": 14370
+                  "offset": 14403
                 }
               },
               {
@@ -1258,7 +1258,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                  "offset": 14518
+                  "offset": 14551
                 }
               },
               {
@@ -1267,7 +1267,7 @@
                 "default": "2",
                 "source": {
                   "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                  "offset": 14099
+                  "offset": 14132
                 }
               },
               {
@@ -1276,7 +1276,7 @@
                 "default": "Breadcrumb",
                 "source": {
                   "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                  "offset": 14228
+                  "offset": 14261
                 }
               },
               {
@@ -1284,7 +1284,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/breadcrumb/breadcrumb.component.ts",
-                  "offset": 13788
+                  "offset": 13821
                 }
               }
             ]
@@ -1294,7 +1294,7 @@
           "name": "dota-button",
           "source": {
             "file": "./src/components/button/button.component.ts",
-            "offset": 1779
+            "offset": 1955
           },
           "attributes": [
             {
@@ -1305,7 +1305,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 1887
+                "offset": 2043
               }
             },
             {
@@ -1316,7 +1316,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2518
+                "offset": 2674
               }
             },
             {
@@ -1328,7 +1328,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2805
+                "offset": 2961
               }
             },
             {
@@ -1340,7 +1340,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 1966
+                "offset": 2122
               }
             },
             {
@@ -1351,7 +1351,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2090
+                "offset": 2246
               }
             },
             {
@@ -1362,7 +1362,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2889
+                "offset": 3045
               }
             },
             {
@@ -1374,7 +1374,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2361
+                "offset": 2517
               }
             },
             {
@@ -1385,7 +1385,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2230
+                "offset": 2386
               }
             },
             {
@@ -1396,7 +1396,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2433
+                "offset": 2589
               }
             },
             {
@@ -1407,7 +1407,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2028
+                "offset": 2184
               }
             },
             {
@@ -1419,7 +1419,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2294
+                "offset": 2450
               }
             },
             {
@@ -1430,7 +1430,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2731
+                "offset": 2887
               }
             },
             {
@@ -1441,7 +1441,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2666
+                "offset": 2822
               }
             },
             {
@@ -1452,7 +1452,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2602
+                "offset": 2758
               }
             },
             {
@@ -1463,7 +1463,7 @@
               },
               "source": {
                 "file": "./src/components/button/button.component.ts",
-                "offset": 2159
+                "offset": 2315
               }
             }
           ],
@@ -1474,7 +1474,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 1887
+                  "offset": 2043
                 }
               },
               {
@@ -1482,7 +1482,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2518
+                  "offset": 2674
                 }
               },
               {
@@ -1491,7 +1491,7 @@
                 "default": "null",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2805
+                  "offset": 2961
                 }
               },
               {
@@ -1500,7 +1500,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 1966
+                  "offset": 2122
                 }
               },
               {
@@ -1508,7 +1508,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2090
+                  "offset": 2246
                 }
               },
               {
@@ -1516,7 +1516,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2889
+                  "offset": 3045
                 }
               },
               {
@@ -1525,7 +1525,7 @@
                 "default": "false",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2361
+                  "offset": 2517
                 }
               },
               {
@@ -1533,7 +1533,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2230
+                  "offset": 2386
                 }
               },
               {
@@ -1541,7 +1541,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2433
+                  "offset": 2589
                 }
               },
               {
@@ -1549,7 +1549,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2028
+                  "offset": 2184
                 }
               },
               {
@@ -1558,7 +1558,7 @@
                 "default": "false",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2294
+                  "offset": 2450
                 }
               },
               {
@@ -1566,7 +1566,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2731
+                  "offset": 2887
                 }
               },
               {
@@ -1574,7 +1574,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2666
+                  "offset": 2822
                 }
               },
               {
@@ -1582,7 +1582,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2602
+                  "offset": 2758
                 }
               },
               {
@@ -1590,7 +1590,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/button/button.component.ts",
-                  "offset": 2159
+                  "offset": 2315
                 }
               }
             ]
@@ -1600,7 +1600,7 @@
           "name": "dota-card",
           "source": {
             "file": "./src/components/card/card.component.ts",
-            "offset": 779
+            "offset": 791
           },
           "attributes": [
             {
@@ -1611,7 +1611,7 @@
               },
               "source": {
                 "file": "./src/components/card/card.component.ts",
-                "offset": 892
+                "offset": 904
               }
             }
           ],
@@ -1622,7 +1622,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/card/card.component.ts",
-                  "offset": 892
+                  "offset": 904
                 }
               }
             ]
@@ -1632,7 +1632,7 @@
           "name": "dota-carousel",
           "source": {
             "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-            "offset": 1791
+            "offset": 1803
           },
           "attributes": [
             {
@@ -1644,7 +1644,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 3339
+                "offset": 3351
               }
             },
             {
@@ -1656,7 +1656,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2524
+                "offset": 2536
               }
             },
             {
@@ -1668,7 +1668,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 3425
+                "offset": 3437
               }
             },
             {
@@ -1679,7 +1679,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 3509
+                "offset": 3521
               }
             },
             {
@@ -1691,7 +1691,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 3261
+                "offset": 3273
               }
             },
             {
@@ -1703,7 +1703,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 3106
+                "offset": 3118
               }
             },
             {
@@ -1715,7 +1715,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2455
+                "offset": 2467
               }
             },
             {
@@ -1727,7 +1727,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 1945
+                "offset": 1957
               }
             },
             {
@@ -1739,7 +1739,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2046
+                "offset": 2058
               }
             },
             {
@@ -1751,7 +1751,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2160
+                "offset": 2172
               }
             },
             {
@@ -1763,7 +1763,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2669
+                "offset": 2681
               }
             },
             {
@@ -1775,7 +1775,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2933
+                "offset": 2945
               }
             },
             {
@@ -1787,7 +1787,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2597
+                "offset": 2609
               }
             },
             {
@@ -1798,7 +1798,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 1880
+                "offset": 1892
               }
             },
             {
@@ -1810,7 +1810,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2831
+                "offset": 2843
               }
             },
             {
@@ -1822,7 +1822,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2359
+                "offset": 2371
               }
             },
             {
@@ -1834,7 +1834,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2750
+                "offset": 2762
               }
             },
             {
@@ -1846,7 +1846,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 2261
+                "offset": 2273
               }
             },
             {
@@ -1858,7 +1858,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 3025
+                "offset": 3037
               }
             },
             {
@@ -1870,7 +1870,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                "offset": 3187
+                "offset": 3199
               }
             }
           ],
@@ -1882,7 +1882,7 @@
                 "default": "slide",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 3339
+                  "offset": 3351
                 }
               },
               {
@@ -1891,7 +1891,7 @@
                 "default": "false",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2524
+                  "offset": 2536
                 }
               },
               {
@@ -1900,7 +1900,7 @@
                 "default": "purple",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 3425
+                  "offset": 3437
                 }
               },
               {
@@ -1908,7 +1908,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 3509
+                  "offset": 3521
                 }
               },
               {
@@ -1917,7 +1917,7 @@
                 "default": "false",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 3261
+                  "offset": 3273
                 }
               },
               {
@@ -1926,7 +1926,7 @@
                 "default": "none",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 3106
+                  "offset": 3118
                 }
               },
               {
@@ -1935,7 +1935,7 @@
                 "default": "0",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2455
+                  "offset": 2467
                 }
               },
               {
@@ -1944,7 +1944,7 @@
                 "default": "icon",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 1945
+                  "offset": 1957
                 }
               },
               {
@@ -1953,7 +1953,7 @@
                 "default": "mdi:circle-medium",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2046
+                  "offset": 2058
                 }
               },
               {
@@ -1962,7 +1962,7 @@
                 "default": "mdi:circle-small",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2160
+                  "offset": 2172
                 }
               },
               {
@@ -1971,7 +1971,7 @@
                 "default": "3000",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2669
+                  "offset": 2681
                 }
               },
               {
@@ -1980,7 +1980,7 @@
                 "default": "true",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2933
+                  "offset": 2945
                 }
               },
               {
@@ -1989,7 +1989,7 @@
                 "default": "false",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2597
+                  "offset": 2609
                 }
               },
               {
@@ -1997,7 +1997,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 1880
+                  "offset": 1892
                 }
               },
               {
@@ -2006,7 +2006,7 @@
                 "default": "auto",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2831
+                  "offset": 2843
                 }
               },
               {
@@ -2015,7 +2015,7 @@
                 "default": "mdi:arrow-right-drop-circle",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2359
+                  "offset": 2371
                 }
               },
               {
@@ -2024,7 +2024,7 @@
                 "default": "true",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2750
+                  "offset": 2762
                 }
               },
               {
@@ -2033,7 +2033,7 @@
                 "default": "mdi:arrow-left-drop-circle",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 2261
+                  "offset": 2273
                 }
               },
               {
@@ -2042,7 +2042,7 @@
                 "default": "1",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 3025
+                  "offset": 3037
                 }
               },
               {
@@ -2051,7 +2051,7 @@
                 "default": "false",
                 "source": {
                   "file": "./src/components/carousel/dota-carousel/dota-carousel.component.ts",
-                  "offset": 3187
+                  "offset": 3199
                 }
               }
             ]
@@ -2061,7 +2061,7 @@
           "name": "dota-chip",
           "source": {
             "file": "./src/components/chip/chip.component.ts",
-            "offset": 999
+            "offset": 1097
           },
           "attributes": [
             {
@@ -2072,7 +2072,7 @@
               },
               "source": {
                 "file": "./src/components/chip/chip.component.ts",
-                "offset": 1226
+                "offset": 1324
               }
             },
             {
@@ -2083,7 +2083,7 @@
               },
               "source": {
                 "file": "./src/components/chip/chip.component.ts",
-                "offset": 1151
+                "offset": 1249
               }
             },
             {
@@ -2094,7 +2094,7 @@
               },
               "source": {
                 "file": "./src/components/chip/chip.component.ts",
-                "offset": 1083
+                "offset": 1181
               }
             }
           ],
@@ -2105,7 +2105,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/chip/chip.component.ts",
-                  "offset": 1226
+                  "offset": 1324
                 }
               },
               {
@@ -2113,7 +2113,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/chip/chip.component.ts",
-                  "offset": 1151
+                  "offset": 1249
                 }
               },
               {
@@ -2121,7 +2121,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/chip/chip.component.ts",
-                  "offset": 1083
+                  "offset": 1181
                 }
               }
             ]
@@ -2131,7 +2131,7 @@
           "name": "dota-icon",
           "source": {
             "file": "./src/components/icon/icons.component.ts",
-            "offset": 2439
+            "offset": 2460
           },
           "attributes": [
             {
@@ -2143,7 +2143,7 @@
               },
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2998
+                "offset": 3019
               }
             },
             {
@@ -2155,7 +2155,7 @@
               },
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2733
+                "offset": 2754
               }
             },
             {
@@ -2166,7 +2166,7 @@
               },
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2857
+                "offset": 2878
               }
             },
             {
@@ -2177,7 +2177,7 @@
               },
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 3082
+                "offset": 3103
               }
             },
             {
@@ -2189,7 +2189,7 @@
               },
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2672
+                "offset": 2693
               }
             },
             {
@@ -2200,7 +2200,7 @@
               },
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2794
+                "offset": 2815
               }
             },
             {
@@ -2211,7 +2211,7 @@
               },
               "source": {
                 "file": "./src/components/icon/icons.component.ts",
-                "offset": 2924
+                "offset": 2945
               }
             }
           ],
@@ -2223,7 +2223,7 @@
                 "default": "null",
                 "source": {
                   "file": "./src/components/icon/icons.component.ts",
-                  "offset": 2998
+                  "offset": 3019
                 }
               },
               {
@@ -2232,7 +2232,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/icon/icons.component.ts",
-                  "offset": 2733
+                  "offset": 2754
                 }
               },
               {
@@ -2240,7 +2240,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/icon/icons.component.ts",
-                  "offset": 2857
+                  "offset": 2878
                 }
               },
               {
@@ -2248,7 +2248,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/icon/icons.component.ts",
-                  "offset": 3082
+                  "offset": 3103
                 }
               },
               {
@@ -2257,7 +2257,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/icon/icons.component.ts",
-                  "offset": 2672
+                  "offset": 2693
                 }
               },
               {
@@ -2265,7 +2265,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/icon/icons.component.ts",
-                  "offset": 2794
+                  "offset": 2815
                 }
               },
               {
@@ -2273,7 +2273,7 @@
                 "type": "string",
                 "source": {
                   "file": "./src/components/icon/icons.component.ts",
-                  "offset": 2924
+                  "offset": 2945
                 }
               }
             ]
@@ -2494,7 +2494,7 @@
           "name": "dota-popover",
           "source": {
             "file": "./src/components/popover/popover.component.ts",
-            "offset": 2069
+            "offset": 2214
           },
           "attributes": [
             {
@@ -2506,7 +2506,7 @@
               },
               "source": {
                 "file": "./src/components/popover/popover.component.ts",
-                "offset": 2351
+                "offset": 2496
               }
             },
             {
@@ -2518,7 +2518,7 @@
               },
               "source": {
                 "file": "./src/components/popover/popover.component.ts",
-                "offset": 2268
+                "offset": 2413
               }
             },
             {
@@ -2530,7 +2530,7 @@
               },
               "source": {
                 "file": "./src/components/popover/popover.component.ts",
-                "offset": 2176
+                "offset": 2321
               }
             }
           ],
@@ -2542,7 +2542,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/popover/popover.component.ts",
-                  "offset": 2351
+                  "offset": 2496
                 }
               },
               {
@@ -2551,7 +2551,7 @@
                 "default": "8",
                 "source": {
                   "file": "./src/components/popover/popover.component.ts",
-                  "offset": 2268
+                  "offset": 2413
                 }
               },
               {
@@ -2560,7 +2560,7 @@
                 "default": "bottom",
                 "source": {
                   "file": "./src/components/popover/popover.component.ts",
-                  "offset": 2176
+                  "offset": 2321
                 }
               }
             ]
@@ -2570,7 +2570,7 @@
           "name": "dota-slide",
           "source": {
             "file": "./src/components/carousel/dota-slide/dota-slide.component.ts",
-            "offset": 858
+            "offset": 870
           },
           "attributes": [
             {
@@ -2581,7 +2581,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/dota-slide/dota-slide.component.ts",
-                "offset": 975
+                "offset": 987
               }
             }
           ],
@@ -2592,7 +2592,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/carousel/dota-slide/dota-slide.component.ts",
-                  "offset": 975
+                  "offset": 987
                 }
               }
             ]
@@ -2602,7 +2602,7 @@
           "name": "orb-background",
           "source": {
             "file": "./src/components/animations/orb/orb-background.component.ts",
-            "offset": 22439
+            "offset": 22718
           },
           "attributes": [
             {
@@ -2614,7 +2614,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 23312
+                "offset": 23591
               }
             },
             {
@@ -2626,7 +2626,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 22534
+                "offset": 22813
               }
             },
             {
@@ -2638,7 +2638,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 22851
+                "offset": 23130
               }
             },
             {
@@ -2650,7 +2650,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 23508
+                "offset": 23787
               }
             },
             {
@@ -2662,7 +2662,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 23413
+                "offset": 23692
               }
             },
             {
@@ -2674,7 +2674,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 22614
+                "offset": 22893
               }
             },
             {
@@ -2686,7 +2686,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 22954
+                "offset": 23233
               }
             },
             {
@@ -2698,7 +2698,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 23136
+                "offset": 23415
               }
             },
             {
@@ -2710,7 +2710,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 23225
+                "offset": 23504
               }
             },
             {
@@ -2722,7 +2722,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 23040
+                "offset": 23319
               }
             },
             {
@@ -2734,7 +2734,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 22696
+                "offset": 22975
               }
             },
             {
@@ -2746,7 +2746,7 @@
               },
               "source": {
                 "file": "./src/components/animations/orb/orb-background.component.ts",
-                "offset": 22772
+                "offset": 23051
               }
             }
           ],
@@ -2758,7 +2758,7 @@
                 "default": "purple",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 23312
+                  "offset": 23591
                 }
               },
               {
@@ -2767,7 +2767,7 @@
                 "default": "4",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 22534
+                  "offset": 22813
                 }
               },
               {
@@ -2776,7 +2776,7 @@
                 "default": "alternate",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 22851
+                  "offset": 23130
                 }
               },
               {
@@ -2785,7 +2785,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 23508
+                  "offset": 23787
                 }
               },
               {
@@ -2794,7 +2794,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 23413
+                  "offset": 23692
                 }
               },
               {
@@ -2803,7 +2803,7 @@
                 "default": "22",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 22614
+                  "offset": 22893
                 }
               },
               {
@@ -2812,7 +2812,7 @@
                 "default": "1.5",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 22954
+                  "offset": 23233
                 }
               },
               {
@@ -2821,7 +2821,7 @@
                 "default": "corner",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 23136
+                  "offset": 23415
                 }
               },
               {
@@ -2830,7 +2830,7 @@
                 "default": "md",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 23225
+                  "offset": 23504
                 }
               },
               {
@@ -2839,7 +2839,7 @@
                 "default": "random",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 23040
+                  "offset": 23319
                 }
               },
               {
@@ -2848,7 +2848,7 @@
                 "default": "14",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 22696
+                  "offset": 22975
                 }
               },
               {
@@ -2857,7 +2857,7 @@
                 "default": "1",
                 "source": {
                   "file": "./src/components/animations/orb/orb-background.component.ts",
-                  "offset": 22772
+                  "offset": 23051
                 }
               }
             ]
@@ -2867,7 +2867,7 @@
           "name": "scroll-deck",
           "source": {
             "file": "./src/components/carousel/scroll-deck/scroll-deck.component.ts",
-            "offset": 1759
+            "offset": 1937
           },
           "attributes": [
             {
@@ -2879,7 +2879,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/scroll-deck/scroll-deck.component.ts",
-                "offset": 1851
+                "offset": 2029
               }
             },
             {
@@ -2890,7 +2890,7 @@
               },
               "source": {
                 "file": "./src/components/carousel/scroll-deck/scroll-deck.component.ts",
-                "offset": 1937
+                "offset": 2115
               }
             }
           ],
@@ -2902,7 +2902,7 @@
                 "default": "Scroll deck",
                 "source": {
                   "file": "./src/components/carousel/scroll-deck/scroll-deck.component.ts",
-                  "offset": 1851
+                  "offset": 2029
                 }
               },
               {
@@ -2910,7 +2910,7 @@
                 "type": "ObjectType",
                 "source": {
                   "file": "./src/components/carousel/scroll-deck/scroll-deck.component.ts",
-                  "offset": 1937
+                  "offset": 2115
                 }
               }
             ]
