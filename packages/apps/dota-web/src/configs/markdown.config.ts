@@ -13,6 +13,7 @@ import typescript from "highlight.js/lib/languages/typescript";
 import xml from "highlight.js/lib/languages/xml";
 import highlightjs from "markdown-it-highlightjs/core";
 import "highlight.js/styles/github-dark.css";
+import "@dota/configs/markdown-theme.config.ts";
 
 /**
  * Languages used by the site's Markdown fences. Aliases such as `ts`, `html`, `sh`, and
