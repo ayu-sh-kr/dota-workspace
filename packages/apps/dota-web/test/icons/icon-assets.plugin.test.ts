@@ -27,25 +27,33 @@ afterEach(async () => {
 });
 
 describe('iconAssets', () => {
-  it('emits disk-cached assets before prerendering and reuses them on the next build', async () => {
-    const fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(SVG));
+  it('builds icons from the installed sets without network access', async () => {
+    const fetch = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'));
     await writeFile(resolve(root, 'public/example.md'), '<dota-icon name="material-symbols:dark-mode"></dota-icon>');
     await writeFile(resolve(root, '../../ui/dota-ui/src/default.ts'), 'export const icon = "mdi:home";');
 
     await build({configFile: false, root, logLevel: 'silent', plugins: [iconAssets()]});
 
-    expect(await readFile(resolve(root, 'dist/assets/icons/mdi:github.svg'), 'utf8')).toBe(SVG);
-    expect(await readFile(resolve(root, 'dist/assets/icons/mdi:home.svg'), 'utf8')).toBe(SVG);
-    expect(await readFile(resolve(root, 'dist/assets/icons/material-symbols:dark-mode.svg'), 'utf8')).toBe(SVG);
-    expect(fetch).toHaveBeenCalledTimes(3);
-
-    await build({configFile: false, root, logLevel: 'silent', plugins: [iconAssets()]});
-
-    expect(await readFile(resolve(root, 'dist/assets/icons/mdi:github.svg'), 'utf8')).toBe(SVG);
-    expect(fetch).toHaveBeenCalledTimes(3);
+    for (const name of ['mdi:github', 'mdi:home', 'material-symbols:dark-mode']) {
+      const svg = await readFile(resolve(root, `dist/assets/icons/${name}.svg`), 'utf8');
+      expect(svg).toMatch(/^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" width="1em" height="1em" viewBox="[\d. ]+">/);
+      expect(svg).toContain('fill="currentColor"');
+    }
+    expect(fetch).not.toHaveBeenCalled();
   });
 
-  it('serves dev icons from the shared disk cache with the configured base path', async () => {
+  it('falls back to the disk cache for names missing from the installed sets and reuses it', async () => {
+    const fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(SVG));
+    await writeFile(resolve(root, 'src/main.ts'), 'document.body.textContent = "mdi:not-in-the-set";');
+
+    await build({configFile: false, root, logLevel: 'silent', plugins: [iconAssets()]});
+    await build({configFile: false, root, logLevel: 'silent', plugins: [iconAssets()]});
+
+    expect(await readFile(resolve(root, 'dist/assets/icons/mdi:not-in-the-set.svg'), 'utf8')).toBe(SVG);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('serves dev icons from the installed sets, and other names from the disk cache, under the base path', async () => {
     const fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(SVG));
     const server = await createServer({
       configFile: false,
@@ -59,8 +67,13 @@ describe('iconAssets', () => {
       await server.listen();
       const address = server.httpServer!.address();
       if (!address || typeof address === 'string') throw new Error('Expected TCP listener');
-      const url = `http://127.0.0.1:${address.port}/docs/assets/icons/mdi:github.svg`;
+      const origin = `http://127.0.0.1:${address.port}/docs/assets/icons`;
+      const local = await nativeFetch(`${origin}/mdi:github.svg`);
+      expect(local.status).toBe(200);
+      expect(await local.text()).toContain('viewBox="0 0 24 24"');
+      expect(fetch).not.toHaveBeenCalled();
 
+      const url = `${origin}/simple-icons:github.svg`;
       const response = await nativeFetch(url);
       expect(response.status).toBe(200);
       expect(response.headers.get('cache-control')).toBe('public, max-age=604800');
