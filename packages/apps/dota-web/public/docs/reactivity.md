@@ -103,7 +103,8 @@ export class CounterComponent extends BaseElement {
 }
 ```
 
-<counter-component counter="0"></counter-component>
+<counter-component counter="0">
+</counter-component>
 
 ## Best Practices
 
