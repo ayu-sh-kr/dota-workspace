@@ -23,7 +23,6 @@ if (!customElements.get('dota-popover-test')) {
 
 const createPopover = (content = '<button type="button">Open</button>') => {
   const el = document.createElement('dota-popover-test') as PopoverComponent;
-  (el as unknown as {content: string}).content = content;
   el.innerHTML = content;
   document.body.append(el);
   return el;
