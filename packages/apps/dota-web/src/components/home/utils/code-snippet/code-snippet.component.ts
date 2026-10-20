@@ -1,5 +1,5 @@
-import {AfterInit, BaseElement, BindEvent, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
-import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
+import {BaseElement, BindEvent, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, trustedHTML, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {MDService} from "@dota/configs/markdown.config.ts";
 import {notificationService} from "@dota/main.ts";
 
@@ -17,46 +17,17 @@ export class CodeSnippetComponent extends BaseElement {
   @Property({name: 'language', type: String})
   language: string = 'typescript';
 
-  /** Raw code read from inner text content — used for copy and rendering */
-  private readonly rawCode: string = '';
+  /** Source shown in the panel and copied by the copy button. */
+  @Property({name: 'code', type: String})
+  code: string = '';
 
   constructor() {
     super();
-    // Read code from text content,
-    // then dedent so template indentation doesn't appear in the rendered output.
-    this.rawCode = CodeSnippetComponent.dedent(this.textContent ?? '');
-  }
-
-  /**
-   * Strips the common leading whitespace from all non-empty lines so that
-   * indented template literals render without extra left padding.
-   */
-  private static dedent(text: string): string {
-    const lines = text.split('\n');
-    const indent = lines
-      .filter(l => l.trim().length > 0)
-      .reduce((min, l) => {
-        const leading = l.match(/^(\s*)/)?.[1].length ?? 0;
-        return Math.min(min, leading);
-      }, Infinity);
-    return lines
-      .map(l => l.slice(indent === Infinity ? 0 : indent))
-      .join('\n')
-      .trim();
-  }
-
-  @AfterInit()
-  afterViewInit() {
-    const container = this.querySelector('#snippet-body');
-    if (!container || !this.rawCode) return;
-
-    const md = `\`\`\`${this.language}\n${this.rawCode}\n\`\`\``;
-    container.innerHTML = MDService.renderHtml(md);
   }
 
   @BindEvent({event: 'click', id: '#copy-btn'})
   copyCode() {
-    navigator.clipboard.writeText(this.rawCode).then(() => {
+    navigator.clipboard.writeText(this.code).then(() => {
       notificationService.info({
         duration: 3000,
         message: 'Code copied to clipboard',
@@ -90,10 +61,10 @@ export class CodeSnippetComponent extends BaseElement {
                 </button>
             </div>
 
-            <!-- Code body: populated by MDService in afterViewInit -->
             <div id="snippet-body"
                  class="overflow-x-auto custom-scrollbar type-code select-text"
                  aria-label="Code snippet: ${this.filename}">
+                ${trustedHTML(MDService.renderHtml(`\`\`\`${this.language}\n${this.code}\n\`\`\``))}
             </div>
 
         </div>
