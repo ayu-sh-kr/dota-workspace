@@ -13,14 +13,15 @@ const blogRoutes = blogPosts.map(post =>
 );
 // Hosting target for SSG and SSR output; `DOTA_DEPLOYMENT=node` builds a local Node server.
 const deployment = (process.env.DOTA_DEPLOYMENT ?? 'vercel') as 'vercel' | 'node';
-// Parameterized pages to prerender. The benchmark can also prerender documentation
-// pages in its all-SSG variant; the regular build leaves them to SSR.
+// Parameterized pages to prerender. Documentation and blog content is fetched from static
+// Markdown, so prerendering puts it in the first HTML response instead of after hydration.
+const contentRoutes = [...blogRoutes, ...DOCS.map(doc => docUrl(doc.slug))];
 const prerenderedPages = {
-  mixed: blogRoutes,
-  ssg: [...blogRoutes, ...DOCS.map(doc => docUrl(doc.slug))],
+  mixed: contentRoutes,
+  ssg: contentRoutes,
   ssr: [],
   csr: [],
-}[process.env.DOTA_BENCH_VARIANT ?? 'mixed'] ?? blogRoutes;
+}[process.env.DOTA_BENCH_VARIANT ?? 'mixed'] ?? contentRoutes;
 
 /** Keeps an unrendered HTML entry for browser-only routes after SSG replaces index.html. */
 function spaFallback(): Plugin {
