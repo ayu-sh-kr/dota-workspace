@@ -1,4 +1,5 @@
 import {BaseElement, Component, HostListener} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {NavigationSidebarComponent} from "@dota/components/sidebar";
 
 @Component({
@@ -19,9 +20,8 @@ export class HamBurgerButtonComponent extends BaseElement {
     }
   }
 
-  render() {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <button id="ham-button" class="md:hidden flex items-center justify-center active:scale-95">
         <dota-icon name="solar:hamburger-menu-linear" color="gray" variant="ghost" size="md"></dota-icon>
       </button>
