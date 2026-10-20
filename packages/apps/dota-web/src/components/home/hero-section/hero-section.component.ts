@@ -15,7 +15,7 @@ export class HeroSectionComponent extends BaseElement {
 
   @BindEvent({event: 'click', id: '#copy'})
   copyText() {
-    const text = 'npm install @ayu-sh-kr/dota-wrap/core'
+    const text = 'npm install @ayu-sh-kr/dota-wrap'
     navigator.clipboard.writeText(text)
       .then(() => {
         notificationService.info({duration: 5000, message: 'Text Copied to Clipboard', title: 'Notification'})
@@ -82,9 +82,9 @@ export class HeroSectionComponent extends BaseElement {
 
                 <!-- CTAs -->
                 <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full">
-                    <get-started-button></get-started-button>
+                    <get-started-button class="home-hero-action"></get-started-button>
                     <a href="/docs"
-                       class="button-secondary">
+                       class="home-hero-action button-secondary">
                         Browse the docs
                         <span class="text-base leading-none">&rarr;</span>
                     </a>
@@ -92,17 +92,14 @@ export class HeroSectionComponent extends BaseElement {
 
                 <!-- Install strip -->
                 <div class="home-install surface-card">
-                    <code class="type-code flex-1 min-w-0 overflow-x-auto select-all text-left">
-                        npm install @ayu-sh-kr/dota-wrap/core
-                    </code>
-                    <button id="copy"
-                            class="button-icon"
-                            title="Copy to clipboard">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2"
-                             stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    <code class="type-code flex-1 min-w-0 overflow-x-auto whitespace-nowrap no-scrollbar select-all text-left"><span class="text-muted select-none">$ </span>npm install @ayu-sh-kr/dota-wrap</code>
+                    <button id="copy" type="button"
+                            class="code-copy"
+                            aria-label="Copy install command" title="Copy">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="9" y="9" width="11" height="11" rx="2"/>
+                            <path d="M5 15V6a2 2 0 0 1 2-2h9"/>
                         </svg>
                     </button>
                 </div>
