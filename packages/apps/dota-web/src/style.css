@@ -8,7 +8,6 @@
 
 @import "./components/community/community-card.css";
 @import "./components/home/blob-separator.css";
-@import "./components/home/blob-wrapper/blob-wrapper.component.css";
 @import "./pages/home/home-layering.css";
 @import "./pages/home/home-motion.css";
 @import "./pages/home/home.page.css";
