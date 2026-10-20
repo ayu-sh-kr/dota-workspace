@@ -146,9 +146,11 @@ This is why many modern systems combine both. The browser gets a secure cookie o
 
 The two diagrams below separate the mental models. In the JWT flow, state travels with the signed token. In the opaque flow, the token is only a reference and the meaningful state stays on the server.
 
-<jwt-auth-flow></jwt-auth-flow>
+<jwt-auth-flow>
+</jwt-auth-flow>
 
-<opaque-auth-flow></opaque-auth-flow>
+<opaque-auth-flow>
+</opaque-auth-flow>
 
 ---
 
