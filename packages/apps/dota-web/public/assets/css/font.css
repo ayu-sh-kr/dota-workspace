@@ -1,7 +1,107 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fira+Code:wght@300..700&display=swap');
+/*
+ * Self-hosted variable fonts (SIL Open Font License 1.1; the licences sit beside the files in
+ * /assets/fonts). Serving them from the site removes the render-blocking Google Fonts
+ * stylesheet and its two extra connections. They are not preloaded: on slow connections a
+ * preload competes with the stylesheet and delays first paint, while the metric-matched
+ * fallbacks below keep the later swap from shifting the layout.
+ */
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/assets/fonts/dm-sans-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/assets/fonts/dm-sans-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "DM Sans";
+  font-style: italic;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/assets/fonts/dm-sans-italic-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "DM Sans";
+  font-style: italic;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("/assets/fonts/dm-sans-italic-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fira Code";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/assets/fonts/fira-code-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Fira Code";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/assets/fonts/fira-code-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Local fallbacks scaled to DM Sans, so text keeps its line breaks when the web font swaps in.
+ * DM Sans is wider than Arial at body sizes but narrower at display sizes (its optical-size
+ * axis), so body and display text get separate faces. Values come from the font tables:
+ * average advance of English text against Arial, and DM Sans ascender/descender per em.
+ */
+@font-face {
+  font-family: "DM Sans Fallback";
+  font-weight: 100 500;
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 104.8%;
+  ascent-override: 94.7%;
+  descent-override: 29.6%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "DM Sans Fallback";
+  font-weight: 600 1000;
+  src: local("Arial Bold"), local("Liberation Sans Bold"), local("Helvetica Bold");
+  size-adjust: 102.1%;
+  ascent-override: 97.2%;
+  descent-override: 30.4%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "DM Sans Display Fallback";
+  font-weight: 100 500;
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 94.2%;
+  ascent-override: 105.3%;
+  descent-override: 32.9%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "DM Sans Display Fallback";
+  font-weight: 600 1000;
+  src: local("Arial Bold"), local("Liberation Sans Bold"), local("Helvetica Bold");
+  size-adjust: 93.6%;
+  ascent-override: 106%;
+  descent-override: 33.1%;
+  line-gap-override: 0%;
+}
 
 :root {
-  --font-body: "DM Sans", system-ui, sans-serif;
-  --font-display: var(--font-body);
+  --font-body: "DM Sans", "DM Sans Fallback", system-ui, sans-serif;
+  --font-display: "DM Sans", "DM Sans Display Fallback", system-ui, sans-serif;
   --font-code: "Fira Code", ui-monospace, monospace;
 }
