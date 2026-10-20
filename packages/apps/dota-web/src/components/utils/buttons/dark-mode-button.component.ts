@@ -1,4 +1,6 @@
 import {BaseElement, Component, BindEvent, Property, String, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
 
 
@@ -23,16 +25,24 @@ export class DarkModeButtonComponent extends BaseElement {
     GeneralUtils.toggleDarkMode();
   }
 
+  /**
+   * Server HTML is rendered in light mode and hydration keeps its values, so the icon
+   * and label are patched to the reader's theme once the button connects.
+   */
+  @OnEvent('connected', true)
+  syncWithTheme() {
+    this.updateHTML();
+  }
+
   @WindowListener({event: 'themeChange'})
   handleThemeChange() {
     this.updateHTML();
   }
 
-  render(): string {
+  render(): TemplateResult {
     const isDarkTheme = GeneralUtils.isDarkMode();
     const icon = isDarkTheme ? 'material-symbols:dark-mode' : 'material-symbols:sunny-rounded';
-    // language=html
-    return `
+    return html`
       <button id="dark-button" type="button"
               class="inline-flex size-9 items-center justify-center rounded-full text-primary hover:bg-raised
                       active:scale-95 cursor-pointer"
