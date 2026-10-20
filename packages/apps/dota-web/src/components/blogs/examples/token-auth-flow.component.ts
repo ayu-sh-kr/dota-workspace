@@ -1,4 +1,5 @@
-import {AfterInit, BaseElement, Component, HTML, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, Component, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {
   appendRoundedRect,
   clamp,
@@ -407,6 +408,7 @@ abstract class TokenAuthFlowBase extends BaseElement {
   private hoveredEdgeKey = "";
   private lockedTargetKey = "";
   private animationFrame = 0;
+  /** Pairs the popover with its panel; hydration keeps the server id, so code finds the panel by data attribute. */
   private readonly popoverId = `token-auth-flow-popover-${Math.random().toString(36).slice(2)}`;
 
   constructor() {
@@ -430,7 +432,7 @@ abstract class TokenAuthFlowBase extends BaseElement {
     this.canvas = this.querySelector<HTMLCanvasElement>("[data-token-flow-canvas]");
     this.context = this.canvas?.getContext("2d") ?? null;
     this.anchor = this.querySelector<HTMLElement>("[data-token-flow-anchor]");
-    this.popup = this.querySelector<HTMLElement>(`#${this.popoverId}`);
+    this.popup = this.querySelector<HTMLElement>("[data-token-flow-popup]");
 
     if (!this.canvas || !this.context || !this.anchor || !this.popup) {
       return;
@@ -1115,8 +1117,8 @@ abstract class TokenAuthFlowBase extends BaseElement {
     });
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
       <section class="not-prose relative my-8 overflow-hidden rounded-lg border border-slate-200 bg-[#fcfbf7] shadow-sm dark:border-slate-800 dark:bg-slate-950">
         <style>
           jwt-auth-flow,
@@ -1153,7 +1155,7 @@ abstract class TokenAuthFlowBase extends BaseElement {
           anchored-selector="#${this.popoverId}">
         </dota-popover>
 
-        <div id="${this.popoverId}" style="display: none; position: absolute; z-index: 40;"></div>
+        <div id="${this.popoverId}" data-token-flow-popup style="display: none; position: absolute; z-index: 40;"></div>
 
         <canvas
           data-token-flow-canvas
