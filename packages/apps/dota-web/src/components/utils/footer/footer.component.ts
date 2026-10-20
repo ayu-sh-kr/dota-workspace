@@ -18,7 +18,7 @@ export class FooterComponent extends BaseElement {
           <div class="layout-card-grid">
             <!-- Logo and Copyright -->
             <div>
-              <a href="/" class="inline-flex items-center gap-1 text-3xl font-semibold text-foreground hover:text-primary transition-colors">
+              <a href="/" class="type-brand inline-flex items-center gap-1 text-3xl text-foreground hover:text-primary transition-colors">
                 <span class="app-footer-symbol" aria-hidden="true"></span>
                 Dota
               </a>
@@ -84,7 +84,7 @@ export class FooterComponent extends BaseElement {
           </div>
         </div>
         <self-end></self-end>
-        <p class="text-xs text-center mt-4 text-muted">&copy;${new Date().getFullYear()} Copyright Dota. All Rights
+        <p class="type-meta text-center mt-4 text-muted">&copy;${new Date().getFullYear()} Copyright Dota. All Rights
           Reserved</p>
       </footer>
     `
