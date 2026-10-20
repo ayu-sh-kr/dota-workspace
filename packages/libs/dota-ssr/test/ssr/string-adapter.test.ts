@@ -53,6 +53,15 @@ describe('createStringAdapter', () => {
     expect(html).toContain('<shadow-badge count="0"><template shadowrootmode="open"><span part="count">0</span><slot></slot></template><em>open</em></shadow-badge>');
   });
 
+  it('places a light-DOM host\'s authored children inside its data-dota-slot element', async () => {
+    const adapter = createStringAdapter({components: FIXTURE_COMPONENTS, hydration: false});
+
+    const {html} = await adapter.render('slot-page', createContext());
+
+    expect(html).toContain('<slot-card heading="Notes"><section class="card"><h3>Notes</h3><div class="body" data-dota-slot>'
+      + '<task-item label="Nested" position="0"><li class="task" data-position="0">Nested</li></task-item> and text</div></section></slot-card>');
+  });
+
   it('shares per-request state between components', async () => {
     const adapter = createStringAdapter({components: FIXTURE_COMPONENTS, hydration: false});
     const context = createContext();
