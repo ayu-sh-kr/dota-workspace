@@ -1,12 +1,13 @@
 import {afterEach, describe, expect, it, vi} from 'vitest';
 import {IconsComponent} from '@dota/components/icon/icons.component.ts';
+import {mountTemplate} from '../setup/render-template';
 
 if (!customElements.get('dota-icon-test')) customElements.define('dota-icon-test', IconsComponent);
 const flush = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 const render = (props: Partial<IconsComponent> = {}) => {
   const el = document.createElement('dota-icon-test') as IconsComponent;
   Object.assign(el, props);
-  el.innerHTML = el.render();
+  mountTemplate(el);
   document.body.append(el);
   return el;
 };
