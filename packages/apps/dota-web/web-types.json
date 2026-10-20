@@ -3905,7 +3905,7 @@
           "name": "faq-section",
           "source": {
             "file": "./src/components/home/faq-section/faq-section.component.ts",
-            "offset": 1629
+            "offset": 1603
           },
           "attributes": [],
           "js": {
