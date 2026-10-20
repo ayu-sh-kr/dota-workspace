@@ -51,10 +51,15 @@ states only; headings and body text stay neutral. Pages do not use decorative ba
 | Icon action | `button-icon` |
 | Tag | `chip` |
 | Input or select | `field` |
-| Code block | `code-panel` |
+| Code block | `code-panel`, with `code-body` around the code |
+| Code file name and copy | `codeHeader()` from `code-header.ts` (`code-header`, `code-copy`) |
 
 Radii come from the tokens: pills for actions, `--layout-radius-control` for chips and fields,
 `--layout-radius-card` for cards, `--layout-radius-code` for code panels.
+
+Code panels follow the page theme: a light inset in light mode and a dark one in dark mode, with
+syntax colors from the `--syntax-*` roles in `code.css`. They carry no title bar or window
+controls; a snippet shows only its file name and an icon copy button.
 
 ## Markdown
 
