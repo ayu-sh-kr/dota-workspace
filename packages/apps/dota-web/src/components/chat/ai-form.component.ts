@@ -1,4 +1,5 @@
 import {BaseElement, BindEvent, Boolean, Component, Emitter, EventEmitter, Property} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult, when} from "@ayu-sh-kr/dota-wrap/rendering";
 import {OpenAIService} from "@dota/service/OpenAIService.ts";
 import {MessageRecord} from "@dota/pages/chat.page.ts";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
@@ -60,14 +61,13 @@ export class AiFormComponent extends BaseElement {
   }
 
 
-  render(): string {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <div class="relative group flex-1 w-full">
-        ${this.isLoading ? `<div class="absolute border -inset-1 bg-gradient-to-r dark:from-pink-400 dark:to-purple-400 from-pink-600 to-purple-600 
+        ${when(this.isLoading, html`<div class="absolute border -inset-1 bg-gradient-to-r dark:from-pink-400 dark:to-purple-400 from-pink-600 to-purple-600
                     rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"
                 >
-                </div>` : ''}
+                </div>`)}
         <form id="chat-form" class="relative flex items-center gap-2  w-full bg-white dark:bg-slate-900 rounded-lg p-2 shadow-sm  dark:shadow-[0px_0px_12px_rgba(147,51,234,0.8)]">
 
           <div class="w-12 h-12 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center">
