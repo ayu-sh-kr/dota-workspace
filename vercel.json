@@ -94,14 +94,6 @@
       "destination": "/api/dota-ssr?__dota_path=/community"
     },
     {
-      "source": "/docs/:slug",
-      "destination": "/api/dota-ssr?__dota_path=/docs/:slug"
-    },
-    {
-      "source": "/docs",
-      "destination": "/api/dota-ssr?__dota_path=/docs"
-    },
-    {
       "source": "/(.*)",
       "destination": "/spa.html"
     }
