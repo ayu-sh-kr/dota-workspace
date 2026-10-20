@@ -1,4 +1,5 @@
 import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {getSuggestedBlogPosts} from "@dota/configs/blogs.config.ts";
 
 @Component({
@@ -18,15 +19,15 @@ export class BlogSuggestionComponent extends BaseElement {
   })
   limit: string = "3";
 
-  render(): string {
+  render(): TemplateResult | typeof nothing {
     const currentBlog = this.currentBlog?.trim() ?? "";
     const suggestions = getSuggestedBlogPosts(currentBlog, Number(this.limit) || 3);
 
     if (!suggestions.length) {
-      return "";
+      return nothing;
     }
 
-    return `
+    return html`
       <section class="font-dm mt-14 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/60 sm:p-6">
         <div class="mb-5 flex items-end justify-between gap-4">
           <div>
@@ -43,7 +44,7 @@ export class BlogSuggestionComponent extends BaseElement {
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          ${suggestions.map(post => `
+          ${suggestions.map(post => html`
             <blog-preview
               date="${post.date}"
               writer="${post.writer}"
@@ -52,7 +53,7 @@ export class BlogSuggestionComponent extends BaseElement {
               category="${post.category}"
               path="${post.path}">
             </blog-preview>
-          `).join("")}
+          `)}
         </div>
       </section>
     `;
