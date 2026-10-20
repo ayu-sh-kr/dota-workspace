@@ -1,4 +1,5 @@
 import { BaseElement, Component } from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import { communityData, CommunityMember } from "./CommunityData";
 
 @Component({
@@ -11,15 +12,12 @@ export class CommunityComponent extends BaseElement {
     super();
   }
 
-  render() {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <section class="p-4 space-y-4">
-        <section-header>
-          Word from <span class="text-purple-600 dark:text-purple-500">Dota Team</span>
-        </section-header>
+        <section-header heading="Word from" highlight="Dota Team"></section-header>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          ${communityData.map(member => `
+          ${communityData.map(member => html`
             <community-card
               image-src="${member.imageSrc}"
               name="${member.name}"
@@ -28,7 +26,7 @@ export class CommunityComponent extends BaseElement {
               linkedin-link="${member.linkedinLink || ''}"
               quote="${member.quote}"
             ></community-card>
-          `).join('')}
+          `)}
         </div>
       </section>
 `
