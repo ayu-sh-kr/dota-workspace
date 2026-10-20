@@ -24,8 +24,8 @@ abstract class DocsRoutePage extends DotaPageElement {
   }
 }
 
-/** Documentation page at `/docs/<slug>`; the server renders each requested document. */
-@Route({path: '/docs/:slug', mode: 'ssr'})
+/** Documentation page at `/docs/<slug>`; every document in `DOCS` is prerendered at build time. */
+@Route({path: '/docs/:slug', mode: 'ssg'})
 @Component({
   selector: 'docs-page',
   shadow: false
@@ -33,7 +33,7 @@ abstract class DocsRoutePage extends DotaPageElement {
 export class DocsPage extends DocsRoutePage {}
 
 /** `/docs` entry point; renders the first documentation page. */
-@Route({path: '/docs', mode: 'ssr'})
+@Route({path: '/docs', mode: 'ssg'})
 @Component({
   selector: 'docs-index-page',
   shadow: false
