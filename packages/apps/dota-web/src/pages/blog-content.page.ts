@@ -1,10 +1,11 @@
 import {Component, DotaPageElement, Param, SEO} from "@ayu-sh-kr/dota-wrap/core";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
-import {type ColorName, type ThemeName} from "@ayu-sh-kr/dota-md";
+import {type ColorKey, type ThemeName} from "@ayu-sh-kr/dota-md";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import { GeneralUtils } from "@dota/utils/GeneralUtils.ts";
 import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
+import {SITE_MARKDOWN_COLOR, SITE_MARKDOWN_THEME} from "@dota/configs/markdown-theme.config.ts";
 
 @Route({path: '/blogs/content/:category/:blog'})
 @Component({
@@ -14,10 +15,10 @@ import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 export class BlogContentPage extends DotaPageElement {
 
   @Param('theme')
-  theme: ThemeName = 'apple';
+  theme: ThemeName = SITE_MARKDOWN_THEME;
 
   @Param('color')
-  color: ColorName = 'lime';
+  color: ColorKey = SITE_MARKDOWN_COLOR;
 
   constructor() {
     super();
@@ -52,9 +53,9 @@ export class BlogContentPage extends DotaPageElement {
   render(): TemplateResult {
     return html`
       <app-header></app-header>
-      <section class="font-dm mx-auto max-w-7xl px-3 py-2 mt-10">
-        <blog-view theme="${this.theme}" color="${this.color}" max-width="max-w-5xl"></blog-view>
-      </section>
+      <main>
+        <blog-view theme="${this.theme}" color="${this.color}"></blog-view>
+      </main>
       <app-footer></app-footer>
     `
   }
