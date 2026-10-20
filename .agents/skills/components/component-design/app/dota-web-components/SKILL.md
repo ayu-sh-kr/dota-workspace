@@ -1,12 +1,12 @@
 ---
 name: dota-web-components
-description: Use when creating, modifying, or reviewing app-owned components and pages in packages/apps/dota-web. Covers custom-element conventions, routing, lifecycle, rendering, shared CSS grammar, colocated component styles, and Markdown views.
+description: Use when creating, modifying, or reviewing app-owned components and pages in packages/apps/dota-web. Covers custom-element conventions, routing, lifecycle, rendering and hydration, shared CSS grammar, colocated component styles, and Markdown views.
 ---
 
 # Dota Web Components
 
 Use this skill for feature and page composition that belongs to `packages/apps/dota-web`. Use `reusable-web-component-design` instead when the component is a public `dota-ui` library primitive.
-Dota web components are TypeScript classes built on `dota-core`/`dota-wrap`, registered with decorators, and rendered as custom elements using HTML string templates.
+Dota web components are TypeScript classes built on `dota-core`/`dota-wrap`, registered with decorators, and rendered as custom elements from `html` templates that prerendered pages hydrate in place.
 
 Primary local references:
 
@@ -28,7 +28,6 @@ import {
   String,
   BindEvent,
   WindowListener,
-  HTML,
 } from "@ayu-sh-kr/dota-wrap/core";
 ```
 
@@ -36,6 +35,7 @@ Use these package surfaces by responsibility:
 
 ```ts
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
+import { html, keyed, trustedHTML, when, type TemplateResult } from "@ayu-sh-kr/dota-wrap/rendering";
 import { Route } from "@ayu-sh-kr/dota-wrap/router";
 ```
 
@@ -63,8 +63,8 @@ export class ExampleCardComponent extends BaseElement {
     super();
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
       <section class="rounded-lg border border-gray-200 dark:border-gray-800">
         Example
       </section>
@@ -79,7 +79,7 @@ Conventions:
 - Use PascalCase class names with a suffix like `Component` or `Page`.
 - Keep `shadow: false` unless style isolation is explicitly required. `dota-web` relies on global Tailwind classes and dark-mode variants.
 - Include an explicit constructor that calls `super()` when matching existing component style.
-- Return a string from `render()`. Use either `HTML\`...\`` from core or a plain template string with `// language=html`.
+- Return an `html` template from `render()`, typed `TemplateResult`. Do not return strings or use the `HTML` helper: string output cannot be hydrated, so the browser rebuilds that component's prerendered DOM on load (see Rendering and Hydration below).
 
 ## Pages
 
@@ -109,8 +109,8 @@ export class DocPage extends DotaPageElement {
     };
   }
 
-  render(): string {
-    return HTML`<doc-section></doc-section>`;
+  render(): TemplateResult {
+    return html`<doc-section></doc-section>`;
   }
 }
 ```
@@ -216,23 +216,52 @@ handleClick(event: MouseEvent) {
 
 Use native `CustomEvent`s for browser-level concerns like `themeChange` and `onPathChange`. Use `ApplicationEventService` / `@OnEvent` for app-level message flows such as docs theme changes.
 
-## Rendering and Styling
+## Rendering and Hydration
 
-Render markup as HTML strings. Most components use Tailwind utilities directly in the returned template.
+Render markup with the `html` tag. Prerendered (SSG) and server-rendered pages stamp each template
+with hydration markers, and the browser adopts that DOM instead of rebuilding it, so the first paint
+stays the largest paint and nothing shifts. Most components use Tailwind utilities directly in the
+returned template.
 
 ```ts
-render(): string {
-  const icon = GeneralUtils.isDarkMode()
+render(): TemplateResult {
+  const isDarkTheme = GeneralUtils.isDarkMode();
+  const icon = isDarkTheme
     ? "material-symbols:dark-mode"
     : "material-symbols:sunny-rounded";
 
-  return `
-    <span id="dark-button" class="active:scale-95 cursor-pointer">
+  return html`
+    <button id="dark-button" type="button" aria-label="Switch to ${isDarkTheme ? "light" : "dark"} mode">
       <dota-icon name="${icon}" color="${this.color}" variant="ghost" size="md"></dota-icon>
-    </span>
+    </button>
   `;
 }
 ```
+
+Template rules:
+
+- Quote every attribute interpolation (`class="${value}"`). Interpolate values only, never attribute or tag names.
+- Text and attribute values are escaped by the renderer; do not escape them yourself.
+- Interpolate nested `html` templates for static structure, such as a list built from configuration: `` ${items.map(item => html`<li>${item.name}</li>`)} ``. Never `.join("")` template strings.
+- Use `keyed(items, key, render)` for lists that change at runtime, and `when(condition, template)` for optional fragments, so an update patches one range instead of replacing the component.
+- Boolean attributes such as `disabled`, `selected`, or `hidden` cannot be template values. Use ARIA or data attributes (`aria-disabled="${disabled}"` with an `aria-disabled:` style), or switch between two `keyed`/`when` templates that differ only by the attribute.
+- Insert trusted HTML, such as rendered Markdown or highlighted code, with `trustedHTML(markup)`. Use `unsafeHTML(markup)` only for constant markup.
+- Close custom elements explicitly (`<dota-icon ...></dota-icon>`); `<dota-icon />` nests the following siblings inside it.
+
+Hydration rules:
+
+- Hydration keeps the server's values until the next update. When the first render depends on
+  browser-only state (theme, `localStorage`, query parameters), render the server default, then read
+  the browser state in `@OnEvent("connected", true)` and call `this.updateHTML()`; the update patches
+  only the parts that differ. `blog-section`, `blog-pagination`, and `dark-mode-button` follow this pattern.
+- Never read authored children with `this.innerHTML` or `this.textContent` in the constructor or a
+  lifecycle hook. After hydration they hold the server-rendered output, not the authored input. Pass
+  data through attributes (`code-snippet` takes `code`, `section-header` takes `heading` and
+  `highlight`), or use a plain element for layout wrappers.
+- Look up elements by a data attribute rather than a per-instance random ID: hydration keeps the ID
+  the server generated.
+- Change a component's DOM through `render()` state and `updateHTML()`, not by writing `textContent`
+  or `innerHTML` into elements that hold template parts.
 
 Styling conventions:
 
@@ -240,7 +269,6 @@ Styling conventions:
 - Let semantic tokens resolve light/dark colors. Use `dark:` only for a component-specific structural or visual effect that cannot be expressed by the shared roles.
 - Use responsive prefixes such as `sm:`, `md:`, `lg:`, and `xl:` for layout changes.
 - Prefer composition with existing custom elements such as `app-header`, `app-footer`, `md-view`, `md-toc`, `dota-icon`, and section components.
-- For lists, map data to strings and `join("")` or `join(" ")`.
 
 ### Shared CSS grammar and ownership
 
@@ -377,4 +405,6 @@ Before finishing a Dota web component:
 - Markup consumes shared semantic color, typography, and layout roles.
 - Shared foundation CSS is in `public/assets/css`; component overrides are colocated and imported by `src/style.css`.
 - Internal state changes that affect markup call `this.updateHTML()`.
+- `render()` returns an `html` template and the component never captures `innerHTML` or `textContent`.
+- Browser-only state is applied after connection, so prerendered pages hydrate without warnings.
 - Data loading happens after connect/init, not in `render()` or the constructor.
