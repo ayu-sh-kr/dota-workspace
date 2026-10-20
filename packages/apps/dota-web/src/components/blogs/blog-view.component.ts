@@ -1,7 +1,8 @@
 import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
-import type {ColorName, ThemeName} from "@ayu-sh-kr/dota-md";
+import type {ColorKey, ThemeName} from "@ayu-sh-kr/dota-md";
 import {MDService} from "@dota/configs/markdown.config.ts";
+import {SITE_MARKDOWN_COLOR, SITE_MARKDOWN_THEME} from "@dota/configs/markdown-theme.config.ts";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
@@ -17,15 +18,15 @@ export class BlogViewComponent extends BaseElement {
   @Property({name: 'current-blog', type: String})
   currentBlog: string = '';
 
-  /** Theme passed through to <md-view>. Default: 'apple'. */
+  /** Theme passed through to <md-view>. Default: the site theme. */
   @Property({name: 'theme', type: String})
-  theme: ThemeName = 'apple';
+  theme: ThemeName = SITE_MARKDOWN_THEME;
 
-  /** Color passed through to <md-view>. Default: 'lime'. */
+  /** Color passed through to <md-view>. Default: the site accent. */
   @Property({name: 'color', type: String})
-  color: ColorName = 'lime';
+  color: ColorKey = SITE_MARKDOWN_COLOR;
 
-  /** max-width passed through to <md-view>. Default: 'max-w-3xl'. */
+  /** max-width of the article column. Default: 'max-w-3xl'. */
   @Property({name: 'max-width', type: String})
   maxWidth: string = 'max-w-3xl';
 
@@ -60,22 +61,22 @@ export class BlogViewComponent extends BaseElement {
     ]);
 
     return html`
-      <section class="mx-auto w-full max-w-screen-2xl px-3 py-12 sm:px-5 lg:px-8">
+      <section class="layout-page layout-section-page">
         <dota-breadcrumb
           path='${breadcrumbPath}'
           label="Blog breadcrumb"
           class="mb-8 block">
         </dota-breadcrumb>
-        <div class="flex w-full flex-col xl:flex-row xl:items-start xl:gap-8">
+        <div class="flex w-full flex-col xl:flex-row xl:items-start xl:justify-between xl:gap-8">
           <div class="min-w-0 flex-1 ${this.maxWidth}" style="overflow-anchor: none;">
             <md-view theme="${this.theme}" color="${this.color}"></md-view>
             <blog-suggestion current-blog="${blog}" limit="3"></blog-suggestion>
           </div>
-          <aside class="hidden xl:block shrink-0 self-start sticky top-16">
+          <aside class="hidden xl:block shrink-0 self-start sticky top-[var(--layout-sticky-top)]">
             <md-toc
               theme="${this.theme}"
               color="${this.color}"
-              header-height="64"
+              header-height="96"
               mode="sticky">
             </md-toc>
           </aside>
