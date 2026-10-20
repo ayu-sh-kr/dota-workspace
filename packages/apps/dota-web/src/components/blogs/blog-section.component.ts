@@ -3,9 +3,15 @@ import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
 import {blogPosts} from "@dota/configs/blogs.config.ts";
 import {
   BLOG_PAGINATION_CHANGE_EVENT,
+  type BlogPaginationState,
+  DEFAULT_PAGINATION_STATE,
   readBlogPaginationState,
 } from "@dota/components/blogs/blog-pagination.component.ts";
-import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {type ApplicationEvent, OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {html, keyed, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
+
+/** Published posts, newest first. */
+const LATEST_FIRST_POSTS = [...blogPosts].sort((left, right) => right.date.localeCompare(left.date));
 
 @Component({
   selector: 'blog-section',
@@ -13,24 +19,32 @@ import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 })
 export class BlogSectionComponent extends BaseElement {
 
+  /** Page shown by the list; starts at the default so prerendered and hydrated output agree. */
+  private paginationState: BlogPaginationState = DEFAULT_PAGINATION_STATE;
+
   constructor() {
     super();
   }
 
-  @OnEvent(BLOG_PAGINATION_CHANGE_EVENT)
-  handlePaginationChange() {
-    // Storage is the source of truth, so every render reads the latest persisted state.
+  /** Applies the reader's stored page after hydration has adopted the default first page. */
+  @OnEvent('connected', true)
+  restorePagination() {
+    this.paginationState = readBlogPaginationState(LATEST_FIRST_POSTS.length);
     this.updateHTML();
   }
 
-  render(): string {
-    const latestFirstPosts = [...blogPosts].sort((left, right) => right.date.localeCompare(left.date));
-    const paginationState = readBlogPaginationState(latestFirstPosts.length);
-    const startIndex = (paginationState.currentPage - 1) * paginationState.pageSize;
-    const visiblePosts = latestFirstPosts.slice(startIndex, startIndex + paginationState.pageSize);
+  @OnEvent(BLOG_PAGINATION_CHANGE_EVENT)
+  handlePaginationChange(event: ApplicationEvent<typeof BLOG_PAGINATION_CHANGE_EVENT>) {
+    this.paginationState = event.data;
+    this.updateHTML();
+  }
 
-    // language=html
-    return `
+  render(): TemplateResult {
+    const {currentPage, pageSize} = this.paginationState;
+    const startIndex = (currentPage - 1) * pageSize;
+    const visiblePosts = LATEST_FIRST_POSTS.slice(startIndex, startIndex + pageSize);
+
+    return html`
       <section class="relative isolate font-dm mx-auto max-w-7xl px-3 py-12 lg:pt-20">
         <orb-background orbit-count="7"
             orbit-spacing="10"
@@ -43,11 +57,9 @@ export class BlogSectionComponent extends BaseElement {
         </orb-background>
 
         <div class="relative z-10">
-          <section-header>
-            Blogs by the <span class="text-purple-600 dark:text-purple-500">Team Dota</span>
-          </section-header>
+          <section-header heading="Blogs by the" highlight="Team Dota"></section-header>
           <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            ${visiblePosts.map(post => `
+            ${keyed(visiblePosts, post => `${post.category}/${post.path}`, post => html`
               <blog-preview
                 date="${post.date}"
                 writer="${post.writer}"
@@ -56,9 +68,9 @@ export class BlogSectionComponent extends BaseElement {
                 category="${post.category}"
                 path="${post.path}"
               ></blog-preview>
-            `).join('')}
+            `)}
           </div>
-          <blog-pagination total="${latestFirstPosts.length}"></blog-pagination>
+          <blog-pagination total="${LATEST_FIRST_POSTS.length}"></blog-pagination>
         </div>
       </section>
     `;
