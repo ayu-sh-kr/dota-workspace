@@ -1,4 +1,5 @@
-import {BaseElement, Component, DotaPageElement, HTML, Property, SEO, String} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, DotaPageElement, Property, SEO, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {Route} from "@ayu-sh-kr/dota-wrap/router";
 import {GeneralUtils} from "@dota/utils/GeneralUtils.ts";
@@ -41,9 +42,8 @@ export class ErrorPage extends DotaPageElement {
     GeneralUtils.scrollToTop('instant');
   }
 
-  render(): string {
-    // language=html
-    return HTML`
+  render(): TemplateResult {
+    return html`
         <div class="relative flex flex-col justify-center items-center h-screen font-dm gap-y-2 md:gap-y-4 lg:gap-y-6 p-3">
         <span class="absolute top-4 right-4">
           <dark-mode-button></dark-mode-button>
