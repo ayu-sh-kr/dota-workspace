@@ -1,4 +1,5 @@
 import {AfterInit, BaseElement, Component, Property, String, Watcher} from "@ayu-sh-kr/dota-wrap/core";
+import {html, trustedHTML, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 import {MDService} from "@dota/configs/markdown.config.ts";
 
@@ -34,11 +35,10 @@ export class ResourceContentComponent extends BaseElement {
     this.updateHTML();
   }
 
-  render() {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <article class="prose dark:prose-invert text-lg font-medium">
-        ${this.content || ''}
+        ${trustedHTML(this.content ?? '')}
       </article>
     `
   }
