@@ -3,17 +3,3 @@ code-snippet {
     width: 100%;
     min-width: 0;
 }
-
-code-snippet #snippet-body pre,
-code-snippet #snippet-body code.hljs {
-    margin: 0 !important;
-    padding: var(--layout-space-4) var(--layout-space-5) !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    font-family: var(--font-code);
-    font-size: var(--type-code-size);
-    line-height: var(--type-code-leading);
-    color: var(--code-foreground-color);
-}
