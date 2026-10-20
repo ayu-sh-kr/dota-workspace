@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DotaAlertComponent } from "@dota/components/alert/alert.component.ts";
+import {mountTemplate} from '../setup/render-template';
 
 if (!customElements.get("dota-alert-test")) customElements.define("dota-alert-test", DotaAlertComponent);
 
@@ -19,7 +20,7 @@ describe("DotaAlertComponent", () => {
 
   it("restores mouse controls and scrim dismissal after an async alert closes", async () => {
     const alert = document.createElement("dota-alert-test") as DotaAlertComponent;
-    alert.innerHTML = alert.render();
+    mountTemplate(alert);
     document.body.append(alert);
     alert.onConnected();
 
