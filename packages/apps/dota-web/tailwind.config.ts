@@ -33,7 +33,6 @@ export default <Partial<Config>>{
         'code-foreground': 'var(--code-foreground-color)',
         'code-muted': 'var(--code-muted-color)',
         'code-border': 'var(--code-border-color)',
-        'code-toolbar': 'var(--code-toolbar-color)',
         'code-accent': 'var(--code-accent-color)',
         'code-success': 'var(--code-success-color)',
         'code-warning': 'var(--code-warning-color)',
