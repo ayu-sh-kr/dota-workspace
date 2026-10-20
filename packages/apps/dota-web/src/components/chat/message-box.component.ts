@@ -58,7 +58,7 @@ export class MessageBoxComponent extends BaseElement {
 
   render(): TemplateResult {
     return html`
-      <section id="card-section" class="h-[55vh] w-full shadow-md dark:shadow-[0px_0px_12px_rgba(147,51,234,0.8)] overflow-y-auto custom-scrollbar p-4 bg-slate-100 dark:bg-slate-900 rounded-lg flex flex-col gap-4">
+      <section id="card-section" aria-label="Messages" class="surface-inset custom-scrollbar flex h-[55vh] w-full flex-col gap-4 overflow-y-auto p-4">
         
       </section>
     `
