@@ -618,7 +618,7 @@
           "name": "blog-content",
           "source": {
             "file": "./src/pages/blog-content.page.ts",
-            "offset": 679
+            "offset": 692
           },
           "attributes": [],
           "js": {
@@ -706,7 +706,7 @@
           "name": "blog-preview",
           "source": {
             "file": "./src/components/blogs/blog-preview.component.ts",
-            "offset": 822
+            "offset": 762
           },
           "attributes": [
             {
@@ -718,7 +718,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1192
+                "offset": 1132
               }
             },
             {
@@ -730,7 +730,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 910
+                "offset": 850
               }
             },
             {
@@ -742,7 +742,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1117
+                "offset": 1057
               }
             },
             {
@@ -754,7 +754,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1044
+                "offset": 984
               }
             },
             {
@@ -766,7 +766,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 1270
+                "offset": 1210
               }
             },
             {
@@ -778,7 +778,7 @@
               },
               "source": {
                 "file": "./src/components/blogs/blog-preview.component.ts",
-                "offset": 976
+                "offset": 916
               }
             }
           ],
@@ -790,7 +790,7 @@
                 "default": "Rant",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1192
+                  "offset": 1132
                 }
               },
               {
@@ -799,7 +799,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 910
+                  "offset": 850
                 }
               },
               {
@@ -808,7 +808,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1117
+                  "offset": 1057
                 }
               },
               {
@@ -817,7 +817,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1044
+                  "offset": 984
                 }
               },
               {
@@ -826,7 +826,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 1270
+                  "offset": 1210
                 }
               },
               {
@@ -835,7 +835,7 @@
                 "default": "",
                 "source": {
                   "file": "./src/components/blogs/blog-preview.component.ts",
-                  "offset": 976
+                  "offset": 916
                 }
               }
             ]
