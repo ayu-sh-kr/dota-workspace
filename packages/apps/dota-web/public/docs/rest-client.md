@@ -119,7 +119,7 @@ during making the request.
 
 Adding timeout during client buildup.
 ```typescript
-import {RestClient} from "@ayu-sh-kr/rest";
+import {RestClient} from "@ayu-sh-kr/dota-rest";
 
 const restClient = RestClient.builder()
     .baseUrl('http://localhost:8080')
