@@ -7,7 +7,7 @@ import {resolveBlogRouteParams} from "@dota/utils/blog-route.utils.ts";
 import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
 import {SITE_MARKDOWN_COLOR, SITE_MARKDOWN_THEME} from "@dota/configs/markdown-theme.config.ts";
 
-@Route({path: '/blogs/content/:category/:blog'})
+@Route({path: '/blogs/content/:category/:blog', mode: 'ssg'})
 @Component({
   selector: "blog-content",
   shadow: false
