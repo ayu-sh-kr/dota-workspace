@@ -1,8 +1,6 @@
-import {AfterInit, BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {type BlogCategory} from "@dota/configs/blogs.config.ts";
-
-import {routerService} from "@dota/main.ts";
 
 /** Categories with their own label; anything else is filed under "Others". */
 const KNOWN_CATEGORIES = new Set<BlogCategory>(["Rant", "Tutorial", "News", "Tools", "Others"]);
@@ -74,16 +72,10 @@ export class BlogPreviewComponent extends BaseElement {
     revealObserver.observe(card);
   }
 
-  @HostListener({event: "click"})
-  handleClick(event: MouseEvent) {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-      return;
-    }
-
-    event.preventDefault();
-    routerService.route(this.blogUrl);
-  }
-
+  /**
+   * Prerendered article URL. The card links to it with a plain anchor so the browser loads the
+   * static page instead of rendering the article on the client and fetching its Markdown again.
+   */
   private get blogUrl(): string {
     return `/blogs/content/${encodeURIComponent(this.category)}/${encodeURIComponent(this.path)}`;
   }
