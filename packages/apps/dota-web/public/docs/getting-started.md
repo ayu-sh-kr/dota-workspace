@@ -88,7 +88,7 @@ document.querySelector('#app')!.innerHTML = `
 Define the component in `hello.component.ts`
 
 ```typescript
-import {Component} from '@ayu-sh-kr/dota-core';
+import {BaseElement, Component} from '@ayu-sh-kr/dota-core';
 
 @Component({
     selecter: 'hello-dota',
