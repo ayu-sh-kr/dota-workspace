@@ -94,6 +94,10 @@
       "destination": "/api/dota-ssr?__dota_path=/community"
     },
     {
+      "source": "/assets/icons/:icon",
+      "destination": "https://api.iconify.design/:icon"
+    },
+    {
       "source": "/(.*)",
       "destination": "/spa.html"
     }
@@ -105,6 +109,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/icons/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
         }
       ]
     }
