@@ -6,7 +6,7 @@ dom. Apart from this it stores a reference to the component itself for initializ
 with `bootstrap` method.
 
 ```typescript
-import {Component} from '@ayu-sh-kr/dota-core'
+import {BaseElement, Component} from '@ayu-sh-kr/dota-core'
 
 @Component({
     selector: 'hello-dota',
@@ -40,7 +40,7 @@ The `selector` property in the `@Component` decorator is used to define the cust
 Here is an example of how to define a selector in the `@Component` decorator:
 
 ```typescript
-import { Component } from '@ayu-sh-kr/dota-core';
+import { BaseElement, Component } from '@ayu-sh-kr/dota-core';
 
 @Component({
     selector: 'hello-dota',
@@ -83,7 +83,7 @@ The `shadow` property in the `@Component` decorator is a boolean field that dete
 Here is an example of how to define the `shadow` property in the `@Component` decorator:
 
 ```typescript
-import { Component } from '@ayu-sh-kr/dota-core';
+import { BaseElement, Component } from '@ayu-sh-kr/dota-core';
 
 @Component({
     selector: 'hello-dota',
@@ -185,7 +185,7 @@ When implementing the `render` method in a subclass, you define the specific HTM
 By adhering to these principles, the `render` method plays a vital role in defining and updating the content of web components, ensuring they are both dynamic and responsive to changes in their attributes.
 
 ```typescript
-import { Component, Property, String } from '@ayu-sh-kr/dota-core';
+import { BaseElement, Component, Property, String } from '@ayu-sh-kr/dota-core';
 
 @Component({
     selector: 'hello-dota',
