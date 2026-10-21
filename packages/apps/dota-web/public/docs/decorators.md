@@ -9,8 +9,7 @@ for bootstrap. It is used to define the selector for the component along with wh
 shadow DOM or not.
 
 ```typescript
-import {Component} from '@ayu-sh-kr/dota-core';
-import {BaseElement} from "@ayu-sh-kr/dota-core/dist";
+import {BaseElement, Component} from '@ayu-sh-kr/dota-core';
 
 @Component({
     selector: 'app-root',
