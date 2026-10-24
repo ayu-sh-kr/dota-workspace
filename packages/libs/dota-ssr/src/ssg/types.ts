@@ -95,6 +95,12 @@ export interface DotaSsgOptions {
   /** Optional application-specific barrier run after happy-dom's pending work has settled. */
   settle?: (window: Window, route: DotaSsgRoute) => void | Promise<void>;
   /**
+   * Whether route URLs end with a slash; defaults to `true`. `true` writes `/docs` to
+   * `docs/index.html` and redirects `/docs` to `/docs/`; `false` writes `docs.html`, served at
+   * `/docs` (Vercel gets `cleanUrls`). Changing it changes every public URL, so keep it stable.
+   */
+  trailingSlash?: boolean;
+  /**
    * Prepares one platform's files after rendering, including builds with no selected routes.
    * Accepts a target name or options object; false disables preparation even when `vercel` is set.
    * Omission uses the legacy `vercel` option, otherwise no hosting files are changed.
