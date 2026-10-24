@@ -2,10 +2,10 @@ import type {Plugin} from 'vite';
 import dotaSsg, {dotaSsr, type DotaServerTarget, type DotaSsgOptions, type DotaSsrOptions} from '../ssg';
 
 /**
- * Hosting platform a Dota build is packaged for. Every target keeps trailing-slash URLs
- * (`/blog/post/`) canonical: Vercel through generated redirects, Netlify, Cloudflare Pages,
- * and GitHub Pages through their native directory-index redirects, and `node` through the
- * generated server.
+ * Hosting platform a Dota build is packaged for. Every target keeps one canonical URL per
+ * page, `/blog/post/` by default or `/blog/post` with `trailingSlash: false`: Vercel through
+ * generated redirects or `cleanUrls`, Netlify, Cloudflare Pages, and GitHub Pages natively,
+ * and `node` through the generated server.
  */
 export type DotaPackageTarget = DotaServerTarget;
 
@@ -17,6 +17,8 @@ export type DotaPackageOptions = {
   vercelConfigFile?: string;
   /** `node` only: server output directory relative to the root; defaults to `dist-server`. */
   serverOutDir?: string;
+  /** Whether page URLs end with a slash; defaults to `true`. See `DotaSsgOptions.trailingSlash`. */
+  trailingSlash?: boolean;
 };
 
 /** A deployment target name or its object form. */
@@ -39,11 +41,15 @@ export type DotaPackagePlugins = {
  * @returns The SSG plugin when enabled, then the SSR plugin when enabled.
  */
 export function dotaPackage(deployment: DotaDeployment | undefined, plugins: DotaPackagePlugins = {}): Plugin[] {
-  const resolved = typeof deployment === 'string' ? {target: deployment} : deployment;
+  const resolved: DotaPackageOptions | undefined = typeof deployment === 'string' ? {target: deployment} : deployment;
   const result: Plugin[] = [];
 
   if (plugins.ssg) {
-    result.push(dotaSsg({...(resolved ? {deployment: ssgDeployment(resolved)} : {}), ...plugins.ssg}));
+    result.push(dotaSsg({
+      ...(resolved ? {deployment: ssgDeployment(resolved)} : {}),
+      ...(resolved?.trailingSlash === false ? {trailingSlash: false} : {}),
+      ...plugins.ssg,
+    }));
   }
 
   if (plugins.ssr !== false) {
