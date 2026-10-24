@@ -41,7 +41,8 @@ export type DotaPackagePlugins = {
  * @returns The SSG plugin when enabled, then the SSR plugin when enabled.
  */
 export function dotaPackage(deployment: DotaDeployment | undefined, plugins: DotaPackagePlugins = {}): Plugin[] {
-  const resolved: DotaPackageOptions | undefined = typeof deployment === 'string' ? {target: deployment} : deployment;
+  const resolved: DotaPackageOptions | undefined =
+    typeof deployment === 'string' ? {target: deployment} : deployment;
   const result: Plugin[] = [];
 
   if (plugins.ssg) {
