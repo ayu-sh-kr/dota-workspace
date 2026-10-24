@@ -4,10 +4,13 @@ import type {Plugin} from 'vite';
 import dotaVitePreloader from '../preloader-plugin';
 import eventMapGenerator, {type EventMapGeneratorPluginConfig} from '../event-map-generator';
 import dotaWebTypeJson, {type WebTypeJsonPluginConfig} from '../web-type-json';
-import dotaSsg, {dotaSsr, type DotaServerTarget, type DotaSsgOptions, type DotaSsrOptions} from '../ssg';
+import type {DotaSsgOptions, DotaSsrOptions} from '../ssg';
+import {dotaPackage, type DotaDeployment} from './package';
 import {dotaRemoteStylesheets} from './remote-stylesheets';
 
 export {dotaRemoteStylesheets, extractRemoteImports, remoteStylesheetTags} from './remote-stylesheets';
+export {dotaPackage} from './package';
+export type {DotaDeployment, DotaPackageOptions, DotaPackagePlugins, DotaPackageTarget} from './package';
 
 /** Options forwarded to the wrapped Dota preloader plugin. */
 export type DotaVitePreloaderOptions = {
@@ -49,10 +52,10 @@ export type DotaVitePluginsOptions = {
    */
   ssr?: DotaSsrOptions | false;
   /**
-   * Hosting platform for both SSG and SSR output, unless `ssg.deployment` or
-   * `ssr.deployment` says otherwise. SSR defaults to `node` when no target is set.
+   * Hosting platform for both SSG and SSR output (see {@link dotaPackage}), unless
+   * `ssg.deployment` or `ssr.deployment` says otherwise. SSR defaults to `node` when no target is set.
    */
-  deployment?: DotaServerTarget;
+  deployment?: DotaDeployment;
   /**
    * Moves remote stylesheet `@import`s (web fonts) from the built CSS into `<link>`s in the
    * HTML head so they no longer wait for the CSS bundle; on by default, `false` removes it.
@@ -102,34 +105,14 @@ export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] 
     }));
   }
 
-  if (options.ssg !== false && options.ssg !== undefined) {
-    plugins.push(dotaSsg({
-      root,
-      logType: resolveDotaLogType('dota-ssr', options.ssg.logType, options.logType, options.packageLogTypes?.['dota-ssr']),
-      ...(options.deployment && options.deployment !== 'node' ? {deployment: options.deployment} : {}),
-      ...options.ssg,
-    }));
-  }
-
-  if (options.ssr !== false) {
-    plugins.push(dotaSsr({
-      root,
-      logType: resolveDotaLogType('dota-ssr', options.ssr?.logType, options.logType, options.packageLogTypes?.['dota-ssr']),
-      deployment: options.deployment ?? ssgDeploymentTarget(options.ssg),
-      ...options.ssr,
-    }));
-  }
+  const logType = (nested?: LogType) => resolveDotaLogType('dota-ssr', nested, options.logType, options.packageLogTypes?.['dota-ssr']);
+  plugins.push(...dotaPackage(options.deployment, {
+    ssg: options.ssg && {root, logType: logType(options.ssg.logType), ...options.ssg},
+    ssr: options.ssr !== false && {root, logType: logType(options.ssr?.logType), ...options.ssr},
+  }));
 
   if (options.remoteStylesheets !== false) plugins.push(dotaRemoteStylesheets());
 
   plugins.push(...(options.extensions ?? []));
   return plugins;
-}
-
-/** The SSG deployment target, so SSR deploys to the same platform without repeating it. */
-function ssgDeploymentTarget(ssg: DotaSsgOptions | false | undefined): DotaServerTarget | undefined {
-  if (!ssg) return undefined;
-  const deployment = ssg.deployment ?? (ssg.vercel ? 'vercel' : undefined);
-  if (!deployment) return undefined;
-  return typeof deployment === 'string' ? deployment : deployment.target;
 }
