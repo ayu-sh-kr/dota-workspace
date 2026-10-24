@@ -1,5 +1,6 @@
 import {mkdir, readFile, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
+import {canonicalOutput} from '../../ssg/route-output';
 import type {ResolvedDotaSsgRoute} from '../../ssg/types';
 
 // These markers separate generated rules from authored rules that must survive subsequent builds.
@@ -9,8 +10,8 @@ const end = '# END dota-ssg';
 /**
  * Replaces owned `_redirects` rules with status-200 rewrites, retaining all text outside the block.
  * Prepends the block ahead of authored fallbacks, removes stale rules, and skips unchanged writes.
- * Directory-index outputs get no rule: Netlify and Cloudflare Pages already redirect `/path` to the
- * canonical `/path/`, and a 200 rewrite would serve the page at the slashless URL as well.
+ * Canonical outputs (`path/index.html`, `path.html`) get no rule: Netlify and Cloudflare Pages already
+ * serve them at `/path/` or `/path` and redirect the other form, which a 200 rewrite would bypass.
  * @param outputDirectory Absolute build directory; it and `_redirects` are created when missing.
  * @param routes Validated mappings in emission order; identical source/destination URLs are skipped.
  * @param base Vite public base; only its pathname is used, keeping rewrite destinations local.
@@ -47,8 +48,8 @@ export async function writeRedirects(outputDirectory: string, routes: readonly R
     if (/\s/.test(source + destination) || /[*:]/.test(source)) {
       throw new Error(`Route cannot be represented as a static redirect: ${route.path}`);
     }
-    // Directory indexes keep the host's native trailing-slash redirect; only custom files need a rewrite.
-    if (route.output === 'index.html' || route.output.endsWith('/index.html')) return '';
+    // Canonical outputs keep the host's native slash handling; only custom files need a rewrite.
+    if (route.output === canonicalOutput(route.path, true) || route.output === canonicalOutput(route.path, false)) return '';
     // Status 200 serves the HTML without changing the browser URL; omit mappings that would rewrite to themselves.
     return source === destination ? '' : `${source} ${destination} 200`;
   }).filter(Boolean);
