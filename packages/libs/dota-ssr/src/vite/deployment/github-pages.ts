@@ -1,6 +1,6 @@
 import {mkdir, readFile, writeFile} from 'node:fs/promises';
 import {dirname, resolve} from 'node:path';
-import {resolveSsgRoutes} from '../../ssg/route-output';
+import {canonicalOutput} from '../../ssg/route-output';
 import type {ResolvedDotaSsgRoute} from '../../ssg/types';
 
 /**
@@ -9,12 +9,12 @@ import type {ResolvedDotaSsgRoute} from '../../ssg/types';
  * Existing aliases must match the source content; stale files are not removed and no SPA fallback is added.
  * @param outputDirectory Absolute published build directory; HTML must already use the intended Vite base.
  * @param routes Validated, rendered mappings; an empty list still creates `.nojekyll`.
+ * @param trailingSlash Whether aliases are directory indexes (`/path/`) or `path.html` (`/path`).
  * @throws If alias paths are invalid, existing alias content conflicts, or reading/writing files fails.
  */
-export async function prepareGithubPages(outputDirectory: string, routes: readonly ResolvedDotaSsgRoute[]): Promise<void> {
-  const aliases = new Map(resolveSsgRoutes(routes.map(route => route.path)).map(route => [route.path, route.output]));
+export async function prepareGithubPages(outputDirectory: string, routes: readonly ResolvedDotaSsgRoute[], trailingSlash = true): Promise<void> {
   const documents = await Promise.all(routes.map(async route => {
-    const alias = aliases.get(route.path)!;
+    const alias = canonicalOutput(route.path, trailingSlash);
     if (alias === route.output) return undefined;
     const file = resolve(outputDirectory, alias);
     const html = await readFile(resolve(outputDirectory, route.output), 'utf8');

@@ -29,6 +29,14 @@ describe('resolveSsgRoutes', () => {
     }
   );
 
+  it('writes slashless HTML files when trailing slashes are off, keeping explicit outputs', () => {
+    expect(resolveSsgRoutes(['/', '/docs/', {path: '/guide', output: 'guide/index.html'}], false)).toEqual([
+      {path: '/', output: 'index.html'},
+      {path: '/docs', output: 'docs.html'},
+      {path: '/guide', output: 'guide/index.html'}
+    ]);
+  });
+
   it('rejects route aliases and output collisions after normalization', () => {
     expect(() => resolveSsgRoutes(['/docs', '/docs/'])).toThrow('Duplicate SSG route: /docs');
     expect(() => resolveSsgRoutes([

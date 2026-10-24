@@ -34,6 +34,8 @@ URL /about        → dist/about/index.html
 URL /tasks/42     → dist/tasks/42/index.html
 ```
 
+These are the default `trailingSlash: true` outputs, served at `/about/` with `/about` redirecting there. With `trailingSlash: false`, `/about` is written to `dist/about.html` and served at `/about`. A route written as `/about/` normalizes to `/about`; the setting, not the route string, decides the public URL.
+
 The normalizer validates paths and outputs before writing: duplicate output collisions, escaping the output directory, and query/hash-based paths are not valid output mappings.
 
 ## Export a startup promise

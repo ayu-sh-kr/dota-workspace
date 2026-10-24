@@ -49,6 +49,24 @@ describe('updateVercelConfig', () => {
     }
   });
 
+  it('serves slashless pages through cleanUrls and drops redirects from the trailing-slash setting', async () => {
+    const root = await mkdtemp(resolve(tmpdir(), 'dota-vercel-slashless-'));
+    const file = resolve(root, 'vercel.json');
+    try {
+      await writeFile(file, JSON.stringify({redirects: [
+        {source: '/guide', destination: '/guide/', permanent: true},
+        {source: '/old', destination: '/new', permanent: true}
+      ]}));
+      await updateVercelConfig(root, resolveSsgRoutes(['/guide', {path: '/custom', output: 'pages/custom.html'}], false), {}, false);
+      expect(JSON.parse(await readFile(file, 'utf8'))).toEqual({cleanUrls: true, redirects: [
+        {source: '/old', destination: '/new', permanent: true},
+        {source: '/custom', destination: '/pages/custom.html', permanent: true}
+      ]});
+    } finally {
+      await rm(root, {recursive: true, force: true});
+    }
+  });
+
   it('rejects a configuration whose redirects property is not an array', async () => {
     const directory = await mkdtemp(resolve(tmpdir(), 'dota-ssr-'));
     const configFile = resolve(directory, 'vercel.json');

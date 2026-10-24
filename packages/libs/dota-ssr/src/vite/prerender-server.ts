@@ -97,17 +97,19 @@ export async function createPrerenderServer(
  * virtual module before its values are treated as decorated route contracts.
  * @param server Isolated Vite server that resolves the preloader virtual module.
  * @param routes Explicit routes that override matching decorated paths.
+ * @param trailingSlash Default output shape; see `DotaSsgOptions.trailingSlash`.
  * @returns Validated, normalized routes selected for the current build.
  * @throws Error when the preloader does not expose a route metadata array.
  */
 export async function resolveDecoratedRoutes(
   server: ViteDevServer,
-  routes: readonly DotaSsgRouteInput[] | undefined
+  routes: readonly DotaSsgRouteInput[] | undefined,
+  trailingSlash?: boolean
 ): Promise<ResolvedDotaSsgRoute[]> {
   const loaded = await server.ssrLoadModule(VIRTUAL_DOTA_ROUTE_METADATA, {fixStacktrace: true}) as RouteMetadataModule;
   const decoratedRoutes = loaded.routeMetadata;
   if (!Array.isArray(decoratedRoutes)) {
     throw new Error(`${VIRTUAL_DOTA_ROUTE_METADATA} must export a routeMetadata array for SSG autodetection`);
   }
-  return resolveDecoratedSsgRoutes(decoratedRoutes as DotaDecoratedRoute[], routes);
+  return resolveDecoratedSsgRoutes(decoratedRoutes as DotaDecoratedRoute[], routes, trailingSlash);
 }
