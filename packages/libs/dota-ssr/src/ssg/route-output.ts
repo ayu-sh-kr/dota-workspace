@@ -49,6 +49,15 @@ export function canonicalOutput(path: string, trailingSlash: boolean): string {
 }
 
 /**
+ * Reports whether a route's output is one a static host serves without a rule, in either slash form.
+ * Deployment writers skip these so the host's native redirect keeps a single canonical URL.
+ * @param route Validated route-to-output mapping.
+ */
+export function isCanonicalOutput(route: ResolvedDotaSsgRoute): boolean {
+  return route.output === canonicalOutput(route.path, true) || route.output === canonicalOutput(route.path, false);
+}
+
+/**
  * Combines explicit routes with decorated routes whose render mode is `ssg`.
  * `mode` wins; without it the legacy `ssr: true` still selects the route. `ssr` and
  * `csr` routes are left to request-time rendering or the browser.
