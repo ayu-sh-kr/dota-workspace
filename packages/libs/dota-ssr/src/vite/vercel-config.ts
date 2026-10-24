@@ -1,5 +1,6 @@
 import {readFile, writeFile} from 'node:fs/promises';
 import {dirname, isAbsolute, resolve} from 'node:path';
+import {canonicalOutput} from '../ssg/route-output';
 import type {DotaSsgVercelOptions, ResolvedDotaSsgRoute} from '../ssg/types';
 
 /** Generated canonical redirect appended for one non-root SSG route. */
@@ -33,7 +34,7 @@ export type VercelConfigSource = {
 type VercelRedirectSource = Pick<VercelRedirect, 'source'>;
 
 /**
- * Adds or updates the redirects needed to expose generated directory indexes at their route paths.
+ * Adds or updates the redirects needed to expose generated documents at their canonical route URLs.
  * Existing Vercel settings and unrelated redirects remain unchanged, while prior generated sources
  * are replaced so repeated builds converge without configuration churn.
  * @param root Vite root used to discover the Vercel project configuration.
@@ -63,6 +64,7 @@ export async function updateVercelConfig(
     return !generatedSources.has(redirect.source);
   });
   config.redirects = [...preservedRedirects, ...generatedRedirects];
+  // Vercel serves `path.html` at `/path`, and redirects `/path.html` there, only with clean URLs.
   if (!trailingSlash) config.cleanUrls = true;
 
   const nextText = `${JSON.stringify(config, null, 2)}\n`;
@@ -74,14 +76,16 @@ export async function updateVercelConfig(
 /**
  * Creates canonical route redirects for non-root generated documents.
  * Root output remains Vercel's default document, while directory indexes receive their trailing
- * slash destination and explicitly named HTML outputs retain their file path.
+ * slash destination and explicitly named HTML outputs retain their file path. Without trailing
+ * slashes, `path.html` outputs need no redirect because `cleanUrls` serves them at `/path`.
  * @param routes Validated SSG route-to-output mappings.
  * @param trailingSlash `false` skips `path.html` outputs, which `cleanUrls` serves at the route path.
  * @returns Redirects owned by SSG, in the order supplied by the resolved routes.
  */
 export function createVercelRedirects(routes: readonly ResolvedDotaSsgRoute[], trailingSlash = true): VercelRedirect[] {
   return routes
-    .filter(route => route.path !== '/' && (trailingSlash || route.output !== `${route.path.slice(1)}.html`))
+    .filter(route => route.path !== '/')
+    .filter(route => trailingSlash || route.output !== canonicalOutput(route.path, false))
     .map(route => ({
       source: route.path,
       destination: outputUrl(route.output),
