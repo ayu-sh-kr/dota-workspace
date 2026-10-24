@@ -37,7 +37,7 @@ describe('deployment configuration', () => {
     expect(await readFile(config, 'utf8')).toBe(updated);
   });
 
-  it.each(['netlify', 'cloudflare-pages'] as const)('%s preserves public rules and replaces its generated block', async target => {
+  it.each(['netlify', 'cloudflare-pages'] as const)('%s keeps native trailing-slash redirects, preserves public rules, and replaces its generated block', async target => {
     const file = resolve(output, '_redirects');
     const fallback = '# User rules\n/old /new 301\n/* /index.html 200\n';
     await writeFile(file, fallback);
@@ -45,7 +45,7 @@ describe('deployment configuration', () => {
 
     await prepareDeployment(root, output, routes, {deployment: target}, '/project/');
     const first = await readFile(file, 'utf8');
-    expect(first).toContain('/project/guide /project/guide/index.html 200\n');
+    expect(first).not.toContain('/project/guide ');
     expect(first).toContain('/project/custom /project/pages/custom.html 200\n');
     expect(first.endsWith(fallback)).toBe(true);
     await prepareDeployment(root, output, routes, {deployment: target}, '/project/');
