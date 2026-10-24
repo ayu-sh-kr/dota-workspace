@@ -25,9 +25,10 @@ export async function prepareDeployment(
     : false);
   if (deployment === false) return;
   const resolved = typeof deployment === 'string' ? {target: deployment} : deployment;
+  const trailingSlash = options.trailingSlash ?? true;
   switch (resolved.target) {
     case 'vercel':
-      await updateVercelConfig(root, routes, 'configFile' in resolved ? {configFile: resolved.configFile} : {});
+      await updateVercelConfig(root, routes, 'configFile' in resolved ? {configFile: resolved.configFile} : {}, trailingSlash);
       return;
     case 'netlify':
       await prepareNetlify(outputDirectory, routes, base);
@@ -36,7 +37,7 @@ export async function prepareDeployment(
       await prepareCloudflarePages(outputDirectory, routes, base);
       return;
     case 'github-pages':
-      await prepareGithubPages(outputDirectory, routes);
+      await prepareGithubPages(outputDirectory, routes, trailingSlash);
       return;
     default:
       throw new Error(`Unsupported SSG deployment target: ${String(deployment)}`);
