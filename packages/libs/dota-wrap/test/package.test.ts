@@ -43,6 +43,16 @@ describe('dotaPackage', () => {
     expect(calls.ssr).toEqual([{deployment: false}, {deployment: 'github-pages'}]);
   });
 
+  it('forwards a trailing-slash opt-out to SSG unless SSG sets its own', () => {
+    dotaPackage({target: 'netlify', trailingSlash: false}, {ssg: {}});
+    dotaPackage({target: 'netlify', trailingSlash: false}, {ssg: {trailingSlash: true}});
+
+    expect(calls.ssg).toEqual([
+      {deployment: 'netlify', trailingSlash: false},
+      {deployment: 'netlify', trailingSlash: true},
+    ]);
+  });
+
   it('omits disabled plugins', () => {
     expect(dotaPackage('netlify', {ssg: false, ssr: false})).toEqual([]);
   });
