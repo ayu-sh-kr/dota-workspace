@@ -30,9 +30,7 @@ const logger = createDotaLogger('dota-ssr', 'ssr/node-server.ts');
 /**
  * HTTP server for a built Dota application, covering all three render modes:
  * a built file (assets and prerendered `ssg` pages, including `/path/index.html`) wins,
- * with `/path` redirected (308) to `/path/` for a directory index and `/path/` to `/path` for `path.html`,
- * as static hosts do,
- * then `ssr` routes are rendered per request, then the SPA shell answers so `csr` routes
+ * reached through its canonical URL (see {@link canonicalLocation}), then `ssr` routes are rendered per request, then the SPA shell answers so `csr` routes
  * start in the browser. A client `index.html` identical to the fallback shell is never served
  * as a page, so a server-rendered `/` is not shadowed. A render error is logged and answered with 500, never the shell,
  * so failures stay visible. Paths never resolve outside `clientDirectory`.
@@ -55,12 +53,8 @@ export function createNodeServer(options: NodeServerOptions): Server {
       const pathname = decodeURIComponent(url.pathname);
       const found = request.method === 'GET' || request.method === 'HEAD' ? await findFile(root, pathname) : undefined;
       const file = found === shellIndex ? undefined : found;
-      if (file && !pathname.endsWith('/') && file === resolve(root, `.${pathname}`, 'index.html')) {
-        return void response.writeHead(308, {location: `${url.pathname}/${url.search}`}).end();
-      }
-      if (file && pathname.length > 1 && pathname.endsWith('/') && file === `${resolve(root, `.${pathname}`)}.html`) {
-        return void response.writeHead(308, {location: `${url.pathname.replace(/\/+$/, '')}${url.search}`}).end();
-      }
+      const location = file && canonicalLocation(root, url, file);
+      if (location) return void response.writeHead(308, {location}).end();
       if (file) return sendFile(file, request.method === 'HEAD', response);
       await render(request, response, (error?: unknown) => {
         if (error) {
@@ -88,6 +82,24 @@ async function findFile(root: string, pathname: string): Promise<string | undefi
   for (const candidate of [base, resolve(base, 'index.html'), `${base}.html`]) {
     const info = await stat(candidate).catch(() => undefined);
     if (info?.isFile()) return candidate;
+  }
+  return undefined;
+}
+
+/**
+ * Keeps one URL per page, as static hosts do: a directory index is canonical at `/path/` and
+ * `path.html` at `/path`, so the other form of the request is redirected there.
+ * @param root Client directory the file was found in.
+ * @param url Request URL; its encoded pathname and query are reused in the redirect.
+ * @param file File {@link findFile} chose for the request.
+ * @returns The canonical location, or `undefined` when the request already uses it.
+ */
+function canonicalLocation(root: string, url: URL, file: string): string | undefined {
+  const pathname = decodeURIComponent(url.pathname);
+  const target = resolve(root, `.${pathname}`);
+  if (!pathname.endsWith('/') && file === resolve(target, 'index.html')) return `${url.pathname}/${url.search}`;
+  if (pathname !== '/' && pathname.endsWith('/') && file === `${target}.html`) {
+    return `${url.pathname.replace(/\/+$/, '')}${url.search}`;
   }
   return undefined;
 }
