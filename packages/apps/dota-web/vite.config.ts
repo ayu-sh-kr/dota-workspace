@@ -11,8 +11,6 @@ const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 const blogRoutes = blogPosts.map(post =>
   `/blogs/content/${encodeURIComponent(post.category)}/${encodeURIComponent(post.path)}`
 );
-// Hosting target for SSG and SSR output; `DOTA_DEPLOYMENT=node` builds a local Node server.
-const deployment = (process.env.DOTA_DEPLOYMENT ?? 'vercel') as 'vercel' | 'node';
 // Parameterized pages to prerender. Documentation and blog content is fetched from static
 // Markdown, so prerendering puts it in the first HTML response instead of after hydration.
 const contentRoutes = [...blogRoutes, ...DOCS.map(doc => docUrl(doc.slug))];
@@ -62,7 +60,8 @@ export default defineConfig({
         resolve(projectRoot, '../../ui/dota-ui'),
         resolve(projectRoot, '../../ui/dota-md'),
       ],
-      deployment,
+      // Vercel by default; `DOTA_DEPLOYMENT=node` (the `build:node` script) overrides it.
+      deployment: 'vercel',
       eventMap: {
         outFile: 'src/event-map.d.ts',
       },
@@ -79,7 +78,6 @@ export default defineConfig({
         entry: '/src/main.ts',
         autoDetectRoutes: true,
         routes: prerenderedPages,
-        deployment: deployment === 'node' ? false : deployment,
       },
     }),
   ],
