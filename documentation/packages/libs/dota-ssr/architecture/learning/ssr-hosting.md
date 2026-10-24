@@ -76,11 +76,11 @@ For an existing Node middleware stack, `toNodeListener(handler)` bridges Node re
 
 ![Node host checks a real static file, then SSR, then a CSR fallback shell.](./hosting-flow.svg)
 
-For a normal page GET, `createNodeServer` first looks for an existing static file safely inside the client directory. It can resolve directory `index.html` and clean-URL `.html` candidates. If none exists, it asks the SSR handler. If the handler declines, the host serves the clean CSR fallback shell.
+For a normal page GET, `createNodeServer` first looks for an existing static file safely inside the client directory. It can resolve directory `index.html` and clean-URL `.html` candidates, and redirects (308) to the canonical form like a static host: `/about` to `/about/` for `about/index.html`, `/about/` to `/about` for `about.html`. If none exists, it asks the SSR handler. If the handler declines, the host serves the clean CSR fallback shell.
 
 | Request | Available output | Result |
 | --- | --- | --- |
-| `/tasks/42` | `dist/tasks/42/index.html` exists | Serve the SSG snapshot; do not call `serverLoad`. |
+| `/tasks/42/` | `dist/tasks/42/index.html` exists | Serve the SSG snapshot; do not call `serverLoad`. `/tasks/42` redirects here first. |
 | `/tasks/99` | No static file; `/tasks/:id` is SSR | Render a fresh page for this request. |
 | `/editor` | No static file or SSR match | Send the CSR shell; browser routing creates the page. |
 
