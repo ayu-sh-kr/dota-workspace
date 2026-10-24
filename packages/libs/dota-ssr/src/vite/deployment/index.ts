@@ -10,6 +10,7 @@ import {prepareGithubPages} from './github-pages';
  * @param outputDirectory Absolute build directory for other platforms' published files.
  * @param routes Validated route outputs already written; an empty list still prepares hosting files.
  * @param options Plugin settings; false disables preparation, and omission falls back to `vercel`.
+ *   `trailingSlash` (default `true`) selects which URL form Vercel and GitHub Pages expose.
  * @param base Vite public base, defaulting to `/`; its pathname prefixes Netlify and Cloudflare rules.
  * @throws If the target is unsupported or its handler cannot read, validate, or write deployment files.
  */
@@ -28,7 +29,12 @@ export async function prepareDeployment(
   const trailingSlash = options.trailingSlash ?? true;
   switch (resolved.target) {
     case 'vercel':
-      await updateVercelConfig(root, routes, 'configFile' in resolved ? {configFile: resolved.configFile} : {}, trailingSlash);
+      await updateVercelConfig(
+        root,
+        routes,
+        'configFile' in resolved ? {configFile: resolved.configFile} : {},
+        trailingSlash
+      );
       return;
     case 'netlify':
       await prepareNetlify(outputDirectory, routes, base);
