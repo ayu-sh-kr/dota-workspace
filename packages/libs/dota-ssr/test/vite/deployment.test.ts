@@ -71,6 +71,18 @@ describe('deployment configuration', () => {
     await expect(prepareDeployment(root, output, routes, {deployment: 'github-pages'})).resolves.toBeUndefined();
   });
 
+  it('aliases custom documents to slashless files on GitHub Pages when trailing slashes are off', async () => {
+    await writeFile(resolve(output, 'custom.html'), '<h1>Guide</h1>');
+    const routes = resolveSsgRoutes([{path: '/guide', output: 'custom.html'}], false);
+    await prepareDeployment(root, output, routes, {deployment: 'github-pages', trailingSlash: false});
+    expect(await readFile(resolve(output, 'guide.html'), 'utf8')).toBe('<h1>Guide</h1>');
+  });
+
+  it.each(['netlify', 'cloudflare-pages'] as const)('%s needs no rule for slashless pages', async target => {
+    await prepareDeployment(root, output, resolveSsgRoutes(['/guide'], false), {deployment: target, trailingSlash: false});
+    expect(await readFile(resolve(output, '_redirects'), 'utf8')).toBe('# BEGIN dota-ssg\n# END dota-ssg\n');
+  });
+
   it('does not overwrite a conflicting GitHub Pages route document', async () => {
     await mkdir(resolve(output, 'guide'));
     await writeFile(resolve(output, 'guide/index.html'), 'Existing page');
