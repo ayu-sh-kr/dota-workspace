@@ -40,9 +40,16 @@ describe('createNodeServer', () => {
 
     expect(asset.headers.get('content-type')).toBe('text/javascript; charset=utf-8');
     expect(await asset.text()).toBe('console.log(1)');
-    expect(await (await fetch(`${origin}/docs`)).text()).toBe('prerendered docs');
+    expect(await (await fetch(`${origin}/docs/`)).text()).toBe('prerendered docs');
     expect(await (await fetch(`${origin}/live`)).text()).toBe('rendered');
     expect(await (await fetch(`${origin}/client/route`)).text()).toBe('shell');
+  });
+
+  it('redirects a directory index to its trailing-slash URL, keeping the query', async () => {
+    const response = await fetch(`${origin}/docs?tab=api`, {redirect: 'manual'});
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get('location')).toBe('/docs/?tab=api');
   });
 
   it('renders a server route at "/" instead of serving the unrendered shell', async () => {
