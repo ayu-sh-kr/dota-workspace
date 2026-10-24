@@ -105,10 +105,11 @@ export function dotaVitePlugins(options: DotaVitePluginsOptions = {}): Plugin[] 
     }));
   }
 
-  const logType = (nested?: LogType) => resolveDotaLogType('dota-ssr', nested, options.logType, options.packageLogTypes?.['dota-ssr']);
+  const renderLogType = (nested?: LogType) =>
+    resolveDotaLogType('dota-ssr', nested, options.logType, options.packageLogTypes?.['dota-ssr']);
   plugins.push(...dotaPackage(options.deployment, {
-    ssg: options.ssg && {root, logType: logType(options.ssg.logType), ...options.ssg},
-    ssr: options.ssr !== false && {root, logType: logType(options.ssr?.logType), ...options.ssr},
+    ssg: options.ssg && {root, logType: renderLogType(options.ssg.logType), ...options.ssg},
+    ssr: options.ssr !== false && {root, logType: renderLogType(options.ssr?.logType), ...options.ssr},
   }));
 
   if (options.remoteStylesheets !== false) plugins.push(dotaRemoteStylesheets());
