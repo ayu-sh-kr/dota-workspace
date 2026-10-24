@@ -22,6 +22,7 @@ export const DOCS: readonly DocEntry[] = [
   {slug: 'decorators', title: 'Decorators', section: 'Concepts'},
   {slug: 'life-cycle', title: 'Life Cycle', section: 'Concepts'},
   {slug: 'server-rendering', title: 'Server Rendering', section: 'Server Rendering'},
+  {slug: 'deployment', title: 'Deployment', section: 'Deployment'},
   {slug: 'rest-client', title: 'Rest Client', section: 'Tools'},
   {slug: 'router', title: 'Router', section: 'Tools'},
 ];
