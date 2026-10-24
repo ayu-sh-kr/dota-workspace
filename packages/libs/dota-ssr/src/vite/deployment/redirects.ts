@@ -1,6 +1,6 @@
 import {mkdir, readFile, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {canonicalOutput} from '../../ssg/route-output';
+import {isCanonicalOutput} from '../../ssg/route-output';
 import type {ResolvedDotaSsgRoute} from '../../ssg/types';
 
 // These markers separate generated rules from authored rules that must survive subsequent builds.
@@ -8,7 +8,7 @@ const start = '# BEGIN dota-ssg';
 const end = '# END dota-ssg';
 
 /**
- * Replaces owned `_redirects` rules with status-200 rewrites, retaining all text outside the block.
+ * Replaces owned `_redirects` rules with status-200 rewrites for custom outputs, keeping all text outside the block.
  * Prepends the block ahead of authored fallbacks, removes stale rules, and skips unchanged writes.
  * Canonical outputs (`path/index.html`, `path.html`) get no rule: Netlify and Cloudflare Pages already
  * serve them at `/path/` or `/path` and redirect the other form, which a 200 rewrite would bypass.
@@ -49,7 +49,7 @@ export async function writeRedirects(outputDirectory: string, routes: readonly R
       throw new Error(`Route cannot be represented as a static redirect: ${route.path}`);
     }
     // Canonical outputs keep the host's native slash handling; only custom files need a rewrite.
-    if (route.output === canonicalOutput(route.path, true) || route.output === canonicalOutput(route.path, false)) return '';
+    if (isCanonicalOutput(route)) return '';
     // Status 200 serves the HTML without changing the browser URL; omit mappings that would rewrite to themselves.
     return source === destination ? '' : `${source} ${destination} 200`;
   }).filter(Boolean);
