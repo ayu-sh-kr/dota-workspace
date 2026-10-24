@@ -30,6 +30,7 @@ const logger = createDotaLogger('dota-ssr', 'ssr/node-server.ts');
 /**
  * HTTP server for a built Dota application, covering all three render modes:
  * a built file (assets and prerendered `ssg` pages, including `/path/index.html`) wins,
+ * with `/path` redirected (308) to the canonical `/path/` as static hosts do for directory indexes,
  * then `ssr` routes are rendered per request, then the SPA shell answers so `csr` routes
  * start in the browser. A client `index.html` identical to the fallback shell is never served
  * as a page, so a server-rendered `/` is not shadowed. A render error is logged and answered with 500, never the shell,
@@ -49,9 +50,13 @@ export function createNodeServer(options: NodeServerOptions): Server {
 
   const server = createServer(async (request, response) => {
     try {
-      const pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname);
+      const url = new URL(request.url ?? '/', 'http://localhost');
+      const pathname = decodeURIComponent(url.pathname);
       const found = request.method === 'GET' || request.method === 'HEAD' ? await findFile(root, pathname) : undefined;
       const file = found === shellIndex ? undefined : found;
+      if (file && !pathname.endsWith('/') && file === resolve(root, `.${pathname}`, 'index.html')) {
+        return void response.writeHead(308, {location: `${url.pathname}/${url.search}`}).end();
+      }
       if (file) return sendFile(file, request.method === 'HEAD', response);
       await render(request, response, (error?: unknown) => {
         if (error) {
