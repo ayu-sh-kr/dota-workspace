@@ -10,6 +10,7 @@ import {dotaRemoteStylesheets} from './remote-stylesheets';
 
 export {dotaRemoteStylesheets, extractRemoteImports, remoteStylesheetTags} from './remote-stylesheets';
 export {dotaPackage} from './package';
+export {DOTA_PACKAGE_ENV, readPackageEnv} from './package';
 export type {DotaDeployment, DotaPackageOptions, DotaPackagePlugins, DotaPackageTarget} from './package';
 
 /** Options forwarded to the wrapped Dota preloader plugin. */
@@ -54,6 +55,7 @@ export type DotaVitePluginsOptions = {
   /**
    * Hosting platform for both SSG and SSR output (see {@link dotaPackage}), unless
    * `ssg.deployment` or `ssr.deployment` says otherwise. SSR defaults to `node` when no target is set.
+   * `DOTA_DEPLOYMENT` and the other {@link DOTA_PACKAGE_ENV} variables override all of these.
    */
   deployment?: DotaDeployment;
   /**
