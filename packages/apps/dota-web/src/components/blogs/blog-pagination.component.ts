@@ -1,6 +1,8 @@
 import {BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {applicationEventPublisher} from "@dota/main.ts";
 import {LocalStorageService} from "@dota/service/local-storage.service.ts";
+import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
+import {html, keyed, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 export const BLOG_PAGINATION_CHANGE_EVENT = "blog:pagination:changed";
 export const BLOG_PAGINATION_STORAGE_KEY = "dota-web:blogs:pagination";
@@ -11,7 +13,7 @@ export type BlogPaginationState = {
   pageSize: number;
 };
 
-const DEFAULT_PAGINATION_STATE: BlogPaginationState = {
+export const DEFAULT_PAGINATION_STATE: BlogPaginationState = {
   currentPage: 1,
   pageSize: 6,
 };
@@ -74,8 +76,18 @@ export class BlogPaginationComponent extends BaseElement {
   @Property({name: "total", type: String})
   total: string = "0";
 
+  /** Rendered state; starts at the default so prerendered and hydrated output agree. */
+  private state: BlogPaginationState = DEFAULT_PAGINATION_STATE;
+
   constructor() {
     super();
+  }
+
+  /** Applies the reader's stored page after hydration has adopted the default first page. */
+  @OnEvent("connected", true)
+  restoreState() {
+    this.state = readBlogPaginationState(this.totalItems);
+    this.updateHTML();
   }
 
   @HostListener({event: "click"})
@@ -86,7 +98,7 @@ export class BlogPaginationComponent extends BaseElement {
     }
 
     const button = target.closest<HTMLButtonElement>("[data-pagination-action]");
-    if (!button || button.disabled) {
+    if (!button || button.getAttribute("aria-disabled") === "true") {
       return;
     }
 
@@ -127,15 +139,11 @@ export class BlogPaginationComponent extends BaseElement {
     return Math.max(1, Math.ceil(this.totalItems / this.state.pageSize));
   }
 
-  private get state(): BlogPaginationState {
-    return readBlogPaginationState(this.totalItems);
-  }
-
   private setState(state: BlogPaginationState) {
-    const persistedState = persistBlogPaginationState(state, this.totalItems);
+    this.state = persistBlogPaginationState(state, this.totalItems);
     applicationEventPublisher.publish({
       name: BLOG_PAGINATION_CHANGE_EVENT,
-      data: persistedState,
+      data: this.state,
     });
     this.updateHTML();
   }
@@ -165,40 +173,37 @@ export class BlogPaginationComponent extends BaseElement {
     return items;
   }
 
-  render(): string {
+  render(): TemplateResult {
     const state = this.state;
     const totalPages = this.totalPages;
     const startItem = this.totalItems === 0 ? 0 : (state.currentPage - 1) * state.pageSize + 1;
     const endItem = Math.min(state.currentPage * state.pageSize, this.totalItems);
     const pageItems = this.getPageItems(totalPages, state.currentPage);
 
-    return `
+    return html`
       <nav aria-label="Blog pagination"
-           class="mt-10 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm
-                  dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-        <p class="text-sm text-slate-600 dark:text-slate-300" aria-live="polite">
-          Showing <span class="font-semibold text-slate-950 dark:text-white">${startItem}–${endItem}</span>
-          of <span class="font-semibold text-slate-950 dark:text-white">${this.totalItems}</span> posts
+           class="mt-10 flex flex-col gap-4 border-t border-default pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <p class="type-compact text-muted tabular-nums" aria-live="polite">
+          Showing <span class="font-semibold text-foreground">${startItem}–${endItem}</span>
+          of <span class="font-semibold text-foreground">${this.totalItems}</span> posts
         </p>
 
         <div class="flex flex-wrap items-center gap-2">
           <label for="blog-page-size" class="sr-only">Posts per page</label>
           <select id="blog-page-size"
-                  class="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-700
-                         outline-none transition focus-visible:ring-2 focus-visible:ring-purple-500
-                         dark:border-gray-700 dark:bg-gray-900 dark:text-slate-200"
+                  class="field type-compact min-h-10 py-1"
                   aria-label="Posts per page">
-            ${BLOG_PAGE_SIZE_OPTIONS.map(pageSize => `
-              <option value="${pageSize}" ${state.pageSize === pageSize ? "selected" : ""}>${pageSize} per page</option>
-            `).join("")}
+            ${keyed(BLOG_PAGE_SIZE_OPTIONS, pageSize => pageSize, pageSize => state.pageSize === pageSize
+              ? html`<option value="${pageSize}" selected>${pageSize} per page</option>`
+              : html`<option value="${pageSize}">${pageSize} per page</option>`)}
           </select>
 
           <div class="flex items-center gap-1" aria-label="Pagination controls">
             ${this.renderActionButton("first", "First page", "«", state.currentPage === 1)}
             ${this.renderActionButton("previous", "Previous page", "‹", state.currentPage === 1)}
-            ${pageItems.map(item => item === "ellipsis"
-              ? `<span aria-hidden="true" class="grid size-10 place-items-center text-slate-400 dark:text-slate-500">…</span>`
-              : this.renderPageButton(item, state.currentPage)).join("")}
+            ${keyed(pageItems, (item, index) => item === "ellipsis" ? `ellipsis-${index}` : item, item => item === "ellipsis"
+              ? html`<span aria-hidden="true" class="grid size-10 place-items-center text-muted">…</span>`
+              : this.renderPageButton(item, state.currentPage))}
             ${this.renderActionButton("next", "Next page", "›", state.currentPage === totalPages)}
             ${this.renderActionButton("last", "Last page", "»", state.currentPage === totalPages)}
           </div>
@@ -207,29 +212,29 @@ export class BlogPaginationComponent extends BaseElement {
     `;
   }
 
-  private renderActionButton(action: string, label: string, icon: string, disabled: boolean): string {
-    return `
-      <button type="button" data-pagination-action="${action}" aria-label="${label}" ${disabled ? "disabled" : ""}
-              class="grid size-10 place-items-center rounded-xl border border-transparent text-lg text-slate-600 transition
-                     hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950
-                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500
-                     disabled:pointer-events-none disabled:opacity-35
-                     dark:text-slate-300 dark:hover:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-white">
+  /**
+   * Builds a first/previous/next/last control. Unavailable actions stay focusable but are
+   * marked with `aria-disabled`, which the click handler and styles both respect.
+   */
+  private renderActionButton(action: string, label: string, icon: string, disabled: boolean): TemplateResult {
+    return html`
+      <button type="button" data-pagination-action="${action}" aria-label="${label}" aria-disabled="${disabled}"
+              class="grid size-10 place-items-center rounded-full text-lg text-muted transition-colors
+                     hover:bg-raised hover:text-foreground aria-disabled:pointer-events-none aria-disabled:opacity-35">
         <span aria-hidden="true">${icon}</span>
       </button>
     `;
   }
 
-  private renderPageButton(page: number, currentPage: number): string {
+  private renderPageButton(page: number, currentPage: number): TemplateResult {
     const isCurrent = page === currentPage;
-    return `
-      <button type="button" data-pagination-action="page" data-page="${page}" ${isCurrent ? 'aria-current="page"' : ""}
+    return html`
+      <button type="button" data-pagination-action="page" data-page="${page}" aria-current="${isCurrent ? "page" : "false"}"
               aria-label="Page ${page}"
-              class="grid size-10 place-items-center rounded-xl text-sm font-semibold transition
-                     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500
+              class="type-compact grid size-10 place-items-center rounded-full font-semibold tabular-nums transition-colors
                      ${isCurrent
-                       ? "bg-purple-600 text-white shadow-sm dark:bg-purple-500"
-                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-gray-700 dark:hover:text-white"}">
+                       ? "bg-[var(--action-primary-background)] text-[var(--action-primary-foreground)]"
+                       : "text-muted hover:bg-raised hover:text-foreground"}">
         ${page}
       </button>
     `;

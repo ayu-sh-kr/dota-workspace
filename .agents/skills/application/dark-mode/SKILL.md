@@ -120,6 +120,7 @@ Apply the saved/system theme once the root component is connected using the `@Af
 ```ts
 import { GeneralUtils } from "@dota/utils/GeneralUtils.ts";
 import { AfterInit, BaseElement, Component } from "@ayu-sh-kr/dota-wrap/core";
+import { html, type TemplateResult } from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: 'app-root',
@@ -137,8 +138,8 @@ export class AppComponent extends BaseElement {
     GeneralUtils.setBrowserTheme(browserTheme);
   }
 
-  render(): string {
-    return '';
+  render(): TemplateResult {
+    return html``;
   }
 }
 ```
@@ -160,6 +161,8 @@ import {
   String,
   WindowListener,
 } from "@ayu-sh-kr/dota-wrap/core";
+import { OnEvent } from "@ayu-sh-kr/dota-wrap/event";
+import { html, type TemplateResult } from "@ayu-sh-kr/dota-wrap/rendering";
 import { GeneralUtils } from "@dota/utils/GeneralUtils.ts";
 
 @Component({
@@ -181,19 +184,25 @@ export class DarkModeButtonComponent extends BaseElement {
     GeneralUtils.toggleDarkMode();
   }
 
+  // Prerendered HTML is always light; hydration keeps it, so patch to the reader's theme
+  @OnEvent('connected', true)
+  syncWithTheme() {
+    this.updateHTML();
+  }
+
   // Re-render whenever any component calls toggleDarkMode()
   @WindowListener({ event: 'themeChange' })
   handleThemeChange() {
     this.updateHTML();
   }
 
-  render(): string {
+  render(): TemplateResult {
     const isDarkTheme = GeneralUtils.isDarkMode();
     const icon = isDarkTheme
       ? 'material-symbols:dark-mode'
       : 'material-symbols:sunny-rounded';
 
-    return `
+    return html`
       <button id="dark-button" type="button"
               class="inline-flex size-9 items-center justify-center rounded-full text-primary hover:bg-raised active:scale-95 cursor-pointer"
               aria-label="Switch to ${isDarkTheme ? 'light' : 'dark'} mode">
@@ -216,15 +225,19 @@ export class DarkModeButtonComponent extends BaseElement {
 | `@AfterInit()` | Lifecycle callback after initial render (used in root component) |
 | `@OnEvent(name, connected?)` | Listens to `ApplicationEventService` events; `true` = fires on connect |
 
+Any component whose markup depends on the theme renders the light variant on the server and
+re-renders after connecting, as `syncWithTheme()` does above. Hydration adopts the prerendered DOM
+with its server values, so without that update a dark-mode reader keeps the light icon and label.
+
 ---
 
 ## 5. Using the Toggle Button in a Template
 
-Once registered, embed `<dark-mode-button>` anywhere in a `render()` string:
+Once registered, embed `<dark-mode-button>` anywhere in a `render()` template:
 
 ```ts
-render(): string {
-  return `
+render(): TemplateResult {
+  return html`
     <header>
       <dark-mode-button color="purple"></dark-mode-button>
     </header>

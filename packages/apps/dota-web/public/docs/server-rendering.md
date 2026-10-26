@@ -93,7 +93,7 @@ This is why the browser must be able to reproduce the initial template and state
 
 After building its workspace dependencies, run `pnpm --filter dota-web run build:node` from the workspace root. Then run `pnpm --filter dota-web run preview` to start the generated Node server. It listens on port 3000 by default: [open the local site](http://localhost:3000/) or [open this guide on the local server](http://localhost:3000/docs/server-rendering). Set `PORT` before starting preview if you need another port.
 
-The server serves a matching built file first, asks the SSR handler for a matching request second, and otherwise serves the clean browser shell for CSR routes. It keeps the original shell separately because SSG may replace `dist/index.html` with a prerendered home page.
+The server serves a matching built file first, asks the SSR handler for a matching request second, and otherwise serves the clean browser shell for CSR routes. It keeps the original shell separately because SSG may replace `dist/index.html` with a prerendered home page. A prerendered page has one canonical URL: with the default `trailingSlash: true`, `/articles/featured` redirects to `/articles/featured/`; with `trailingSlash: false`, the page is written to `featured.html` and `/articles/featured/` redirects to `/articles/featured`.
 
 Vercel, Netlify, and Cloudflare Pages receive their own generated function or worker routing. GitHub Pages serves static files only, so it cannot answer request-time SSR routes. Check the generated routing for your host: its static-file precedence and fallback behavior may differ from Node's. SSR handles page HTML; your API, authentication, and cache policy remain application and hosting concerns.
 

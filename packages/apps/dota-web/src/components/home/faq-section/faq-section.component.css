@@ -1,5 +1,22 @@
 .faq-grid { display: grid; gap: var(--layout-space-7); }
 
+/* Questions sit on the page as one ruled list: a hairline between items, no panels. */
+.faq-list { border-block-start: 1px solid var(--border-color); }
+.faq-list .faq-item { border-block-end: 1px solid var(--border-color); }
+.faq-list .faq-question { font-size: var(--type-lede-size); line-height: var(--type-card-leading); }
+
+/* dota-accordion clamps its header to one line; questions here wrap in full. */
+.faq-list .faq-question > div > span {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+.faq-list .faq-question .icon { flex-shrink: 0; color: var(--muted-color); }
+.faq-list .faq-question:hover .icon { color: var(--primary-color); }
+
 @media (min-width: 1024px) {
   .faq-grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+  .faq-intro { position: sticky; inset-block-start: var(--layout-sticky-top); align-self: start; }
 }

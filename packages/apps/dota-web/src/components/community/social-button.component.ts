@@ -1,4 +1,5 @@
 import {BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 import {notificationService} from "@dota/main.ts";
 
@@ -7,12 +8,6 @@ import {notificationService} from "@dota/main.ts";
   shadow: false
 })
 export class SocialButtonComponent extends BaseElement {
-
-  @Property({
-    name: "color",
-    type: String
-  })
-  color!: string;
 
   @Property({
     name: "text",
@@ -43,14 +38,12 @@ export class SocialButtonComponent extends BaseElement {
     }
   }
 
-  render() {
-    // language=html
-    return `
-      <div class="flex justify-center">
-        <dota-button color="${this.color}" variant="link" size="sm">
-          ${this.text}
-        </dota-button>
-      </div>
+  render(): TemplateResult {
+    return html`
+      <button type="button" class="button-link">
+        ${this.text}
+        <span aria-hidden="true">&rarr;</span>
+      </button>
     `
   }
 }

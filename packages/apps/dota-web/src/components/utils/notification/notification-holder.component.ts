@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import '@dota/components/utils/notification/notification.component.ts'
 import {NotificationComponent} from "@dota/components/utils/notification/notification.component.ts";
 
@@ -28,8 +29,8 @@ export class NotificationHolderComponent extends BaseElement {
     holder.appendChild(notification);
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
         <div content="notification" class="${PositionConfig[this.position ?? 'bottom-right']} w-fit flex flex-col gap-y-3">
             
         </div>

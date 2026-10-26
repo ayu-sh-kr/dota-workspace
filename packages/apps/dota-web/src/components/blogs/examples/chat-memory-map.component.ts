@@ -1,4 +1,5 @@
-import {AfterInit, BaseElement, Component, HTML, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {AfterInit, BaseElement, Component, WindowListener} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {
   appendRoundedRect,
   clamp,
@@ -117,6 +118,7 @@ export class ChatMemoryMapComponent extends BaseElement {
   private hoveredNodeId = "";
   private hoveredEdgeKey = "";
   private lockedTargetKey = "";
+  /** Pairs the popover with its panel; hydration keeps the server id, so code finds the panel by data attribute. */
   private readonly popoverId = `chat-memory-map-popover-${Math.random().toString(36).slice(2)}`;
 
   constructor() {
@@ -135,7 +137,7 @@ export class ChatMemoryMapComponent extends BaseElement {
     this.canvas = this.querySelector<HTMLCanvasElement>("#chat-memory-map-canvas");
     this.context = this.canvas?.getContext("2d") ?? null;
     this.anchor = this.querySelector<HTMLElement>("[data-memory-map-anchor]");
-    this.popup = this.querySelector<HTMLElement>(`#${this.popoverId}`);
+    this.popup = this.querySelector<HTMLElement>("[data-memory-map-popup]");
 
     if (!this.canvas || !this.context || !this.anchor || !this.popup) {
       return;
@@ -655,8 +657,8 @@ export class ChatMemoryMapComponent extends BaseElement {
     return `${edge.from}:${edge.to}:${edge.label}`;
   }
 
-  render(): string {
-    return HTML`
+  render(): TemplateResult {
+    return html`
       <section
         class="not-prose relative my-8 overflow-hidden rounded-lg border border-slate-200 bg-[#fbfaf6] shadow-sm dark:border-slate-800 dark:bg-slate-950"
       >
@@ -691,7 +693,7 @@ export class ChatMemoryMapComponent extends BaseElement {
           anchored-selector="#${this.popoverId}">
         </dota-popover>
 
-        <div id="${this.popoverId}" style="display: none; position: absolute; z-index: 40;"></div>
+        <div id="${this.popoverId}" data-memory-map-popup style="display: none; position: absolute; z-index: 40;"></div>
 
         <canvas
           id="chat-memory-map-canvas"

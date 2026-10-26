@@ -330,9 +330,26 @@ dotaSsg({
 | Value | Deployment files |
 | --- | --- |
 | `'vercel'` | Updates redirects in the nearest ancestor `vercel.json`, preserving unrelated settings and redirects. The file must already exist. |
-| `'netlify'` | Writes route rewrites into a managed block in the build output's `_redirects`. |
+| `'netlify'` | Writes rewrites for custom outputs into a managed block in the build output's `_redirects`. |
 | `'cloudflare-pages'` | Writes the same static rewrite format to the build output's `_redirects` for Cloudflare Pages. |
-| `'github-pages'` | Writes `.nojekyll`; copies custom HTML outputs to route-shaped directory indexes because GitHub Pages does not support rewrite rules. |
+| `'github-pages'` | Writes `.nojekyll`; copies custom HTML outputs to route-shaped files because GitHub Pages does not support rewrite rules. |
+
+### Trailing slashes
+
+Each page has one canonical URL, and the other slash form redirects to it.
+`trailingSlash` (default `true`) picks the form by choosing the output file:
+
+| `trailingSlash` | `/docs` is written to | Canonical URL | Vercel | Netlify, Cloudflare Pages, GitHub Pages | Node server |
+| --- | --- | --- | --- | --- | --- |
+| `true` | `docs/index.html` | `/docs/` | permanent `/docs` → `/docs/` redirect | native redirect | 308 `/docs` → `/docs/` |
+| `false` | `docs.html` | `/docs` | `cleanUrls: true` | native clean URL | 308 `/docs/` → `/docs` |
+
+Routes are normalized without a trailing slash, so `'/docs/'` and `'/docs'` name
+the same route; the setting decides the public URL. Explicit `output` files are
+kept as written and get a rewrite or redirect to reach them. Generated Vercel
+redirects for every route path are replaced on each build, so switching the
+setting leaves no stale redirect behind. Changing it changes every public URL;
+choose it before a site is indexed.
 
 Use `deployment: {target: 'vercel', configFile: '../vercel.json'}` to select an
 explicit Vercel file, relative to the Vite root. Other targets also accept the
@@ -346,7 +363,8 @@ both options are omitted, no deployment files are changed.
 Netlify and Cloudflare Pages preserve existing rules outside the `# BEGIN dota-ssg`
 and `# END dota-ssg` block. Generated rules precede those rules so a catch-all SPA
 fallback does not hide prerendered routes. Repeated builds replace the managed
-block, removing stale generated routes. Keep authored rules in `public/_redirects`
+block, removing stale generated routes. Pages at their canonical output need no
+rule, since both hosts already serve them at one URL and redirect the other form. Keep authored rules in `public/_redirects`
 so Vite copies them into each clean build. Generated URLs include Vite's `base`
 pathname. These integrations target static hosting, not Netlify Functions or
 Cloudflare Pages Functions.

@@ -1,5 +1,19 @@
 # @ayu-sh-kr/dota-core
 
+## 1.12.4
+
+### Patch Changes
+
+- Updated dependencies [05c5579]
+  - @ayu-sh-kr/dota-rendering@0.3.1
+
+## 1.12.3
+
+### Patch Changes
+
+- Updated dependencies [f7c8e46]
+  - @ayu-sh-kr/dota-rendering@0.3.0
+
 ## 1.12.2
 
 ### Patch Changes

@@ -2,6 +2,7 @@ import {BaseElement, Component, DocumentListener, Property, String} from "@ayu-s
 import {OnEvent} from "@ayu-sh-kr/dota-wrap/event";
 import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {MDService} from "@dota/configs/markdown.config.ts";
+import {SITE_MARKDOWN_COLOR, SITE_MARKDOWN_THEME} from "@dota/configs/markdown-theme.config.ts";
 import {DOCS, docUrl, type DocEntry} from "@dota/configs/docs.config.ts";
 import {DocLoaderService} from "@dota/service/doc-loader.service.ts";
 
@@ -83,17 +84,17 @@ export class DocsViewComponent extends BaseElement {
   /** Builds the grouped sidebar links and marks the current slug as the active page. */
   private renderNav(): TemplateResult {
     return html`
-      <nav aria-label="Documentation" class="space-y-6 text-sm">
+      <nav aria-label="Documentation" class="type-compact space-y-6">
         ${NAV_SECTIONS.map(({section, docs}) => html`
           <div>
-            <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">${section}</p>
-            <ul class="space-y-0.5 border-l border-gray-200 dark:border-gray-800">
+            <p class="type-eyebrow mb-2 px-3 text-muted">${section}</p>
+            <ul class="space-y-0.5 border-l border-default">
               ${docs.map(doc => html`
                 <li>
                   <a href="${docUrl(doc.slug)}" aria-current="${doc.slug === this.slug ? 'page' : 'false'}"
                      class="${doc.slug === this.slug
-                       ? '-ml-px block border-l-2 border-indigo-500 py-1.5 pl-3 font-medium text-indigo-600 dark:text-indigo-400'
-                       : '-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-gray-600 hover:border-gray-300 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'}">
+                       ? '-ml-px block border-l-2 border-primary py-1.5 pl-3 font-medium text-primary'
+                       : '-ml-px block border-l-2 border-transparent py-1.5 pl-3 text-muted hover:border-strong hover:text-foreground'}">
                     ${doc.title}
                   </a>
                 </li>
@@ -113,7 +114,7 @@ export class DocsViewComponent extends BaseElement {
   private renderSkeleton(): TemplateResult {
     return html`
       <div role="status" aria-label="Loading documentation"
-           class="animate-pulse space-y-4 group-has-[[data-md-content]>*]/article:hidden [&>div]:rounded [&>div]:bg-gray-200 dark:[&>div]:bg-gray-800">
+           class="animate-pulse space-y-4 group-has-[[data-md-content]>*]/article:hidden [&>div]:rounded-control [&>div]:bg-raised">
         <div class="h-9 w-2/3"></div>
         <div class="h-4 w-full"></div>
         <div class="h-4 w-11/12"></div>
@@ -128,9 +129,9 @@ export class DocsViewComponent extends BaseElement {
   /** Renders the fallback shown when `slug` does not identify an entry in `DOCS`. */
   private renderNotFound(): TemplateResult {
     return html`
-      <h1 class="text-3xl font-bold">Page not found</h1>
-      <p class="mt-3 text-gray-600 dark:text-gray-400">This documentation page does not exist.
-        <a class="text-indigo-600 underline dark:text-indigo-400" href="${docUrl(DOCS[0].slug)}">Start with ${DOCS[0].title}</a>.</p>
+      <h1 class="type-section text-foreground">Page not found</h1>
+      <p class="mt-3 text-muted">This documentation page does not exist.
+        <a class="button-link" href="${docUrl(DOCS[0].slug)}">Start with ${DOCS[0].title}</a></p>
     `;
   }
 
@@ -142,15 +143,15 @@ export class DocsViewComponent extends BaseElement {
    */
   private renderPager(doc: DocEntry): TemplateResult {
     const index = DOCS.indexOf(doc);
-    const card = 'flex flex-col gap-1 rounded-xl border border-gray-200 p-4 transition-colors hover:border-indigo-400 dark:border-gray-800 dark:hover:border-indigo-500';
+    const card = 'surface-card surface-card-link flex flex-col gap-1 p-4';
     const link = (target: DocEntry | undefined, label: string, align: string) => target
       ? html`<a href="${docUrl(target.slug)}" class="${card} ${align}">
-               <span class="text-xs text-gray-500 dark:text-gray-400">${label}</span>
-               <span class="font-medium text-gray-900 dark:text-gray-100">${target.title}</span>
+               <span class="type-meta text-muted">${label}</span>
+               <span class="font-medium text-foreground">${target.title}</span>
              </a>`
       : html`<span></span>`;
     return html`
-      <nav aria-label="Previous and next page" class="mt-12 grid gap-4 border-t border-gray-200 pt-8 sm:grid-cols-2 dark:border-gray-800">
+      <nav aria-label="Previous and next page" class="mt-12 grid gap-4 border-t border-default pt-8 sm:grid-cols-2">
         ${link(DOCS[index - 1], 'Previous', '')}
         ${link(DOCS[index + 1], 'Next', 'sm:text-right')}
       </nav>
@@ -166,25 +167,27 @@ export class DocsViewComponent extends BaseElement {
   render(): TemplateResult {
     const doc = this.doc;
     return html`
-      <div class="min-h-screen bg-white font-dm text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-        <header class="sticky top-0 z-40 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/90">
+      <div class="min-h-screen bg-background text-foreground">
+        <header class="sticky top-0 z-40 border-b border-default bg-[var(--glass-color)] backdrop-blur">
           <div class="mx-auto flex h-14 max-w-screen-2xl items-center justify-between gap-3 px-4 lg:px-6">
-            <div class="flex min-w-0 items-center gap-2 text-sm">
-              <a href="/" class="text-lg font-extrabold">Dota</a>
-              <span class="hidden text-gray-300 sm:inline dark:text-gray-600">/</span>
-              <a href="${docUrl(DOCS[0].slug)}" class="hidden text-gray-500 hover:text-gray-900 sm:inline dark:text-gray-400 dark:hover:text-gray-100">Docs</a>
+            <div class="type-compact flex min-w-0 items-center gap-2">
+              <a href="/" class="type-brand inline-flex items-center gap-1 text-lg text-foreground hover:text-primary">
+                <span class="app-header-symbol" aria-hidden="true"></span>Dota
+              </a>
+              <span class="hidden text-muted sm:inline">/</span>
+              <a href="${docUrl(DOCS[0].slug)}" class="hidden font-medium text-muted hover:text-foreground sm:inline">Docs</a>
             </div>
             <div class="flex shrink-0 items-center gap-1.5">
               <docs-theme-picker></docs-theme-picker>
               <docs-accent-picker></docs-accent-picker>
-              <dark-mode-button color="indigo"></dark-mode-button>
+              <dark-mode-button></dark-mode-button>
               <github-button></github-button>
             </div>
           </div>
         </header>
 
         <div class="mx-auto grid max-w-screen-2xl lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[15rem_minmax(0,1fr)_14rem]">
-          <aside class="no-scrollbar sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-gray-200 px-4 py-8 lg:block dark:border-gray-800" tabindex="0" aria-label="Documentation navigation">
+          <aside class="no-scrollbar sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-default px-4 py-8 lg:block" tabindex="0" aria-label="Documentation navigation">
             ${this.renderNav()}
           </aside>
 
@@ -209,14 +212,14 @@ export class DocsViewComponent extends BaseElement {
 
             <article class="group/article mx-auto max-w-3xl">
               ${doc ? html`
-                <p class="mb-2 text-sm font-medium text-indigo-600 dark:text-indigo-400">${doc.section}</p>
+                <p class="type-eyebrow mb-3">${doc.section}</p>
                 ${this.renderSkeleton()}` : this.renderNotFound()}
-              <md-view theme="flat" color="indigo" content-class="w-full antialiased text-[15px] sm:text-base leading-7"></md-view>
+              <md-view theme="${SITE_MARKDOWN_THEME}" color="${SITE_MARKDOWN_COLOR}" content-class="w-full"></md-view>
               ${doc ? this.renderPager(doc) : nothing}
             </article>
           </main>
 
-          <md-toc header-height="72" color="indigo"
+          <md-toc header-height="72" theme="${SITE_MARKDOWN_THEME}" color="${SITE_MARKDOWN_COLOR}"
                   container-class="no-scrollbar sticky top-14 hidden h-[calc(100vh-3.5rem)] overflow-y-auto py-4 xl:flex xl:flex-col"></md-toc>
         </div>
       </div>

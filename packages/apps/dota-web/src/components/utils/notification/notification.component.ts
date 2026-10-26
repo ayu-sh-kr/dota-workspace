@@ -4,11 +4,11 @@ import {
   BindEvent,
   Component,
   HostListener,
-  HTML,
   Number as DNumber,
   Property,
   String, ApplicationEventService
 } from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 
 @Component({
@@ -95,18 +95,18 @@ export class NotificationComponent extends BaseElement {
     this.scheduleRemoval();
   }
 
-  render(): string {
+  render(): TemplateResult {
     const color = `${NotificationConfig.color[this.color] ?? NotificationConfig.color.none}`;
-    return HTML`
+    return html`
            <div class="z-10">
                 <div class="${NotificationConfig.base}">
                     <div class="flex items-center gap-x-2 px-3">
-                        <span class="${color}} text-lg">
+                        <span class="${color} text-lg">
                             <dota-icon name="${this.icon ?? 'material-symbols-light:notifications-active-rounded'}" size="lg" color="${this.color}" variant="ghost"></dota-icon>
                         </span>
                         <div>
-                            <p class="text-xs text-gray-600 dark:text-gray-300 font-semibold">${this.title}</p>
-                            <div class="text-sm text-gray-800 dark:text-gray-200">${this.message}</div>
+                            <p class="type-meta font-semibold text-foreground">${this.title}</p>
+                            <div class="type-compact text-muted">${this.message}</div>
                         </div>
                     </div>
                     <span id="close" class="focus:scale-95 font-semibold cursor-pointer px-3">
@@ -122,7 +122,7 @@ export class NotificationComponent extends BaseElement {
 
 
 const NotificationConfig = {
-  base: 'overflow-hidden relative flex items-center justify-between w-[350px] sm:w-[400px] font-dm py-3 rounded-xl shadow-lg bg-white dark:bg-slate-800',
+  base: 'surface-card overflow-hidden relative flex items-center justify-between w-[350px] sm:w-[400px] py-3',
   duration: 5000,
   color: {
     green: 'bg-green-600',

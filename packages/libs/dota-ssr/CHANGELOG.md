@@ -1,5 +1,46 @@
 # @ayu-sh-kr/dota-ssr
 
+## 0.7.0
+
+### Minor Changes
+
+- 1ad244f: Keep one canonical URL per page on every deployment target, with trailing slashes on by default and a new `trailingSlash: false` opt-out.
+
+  - `trailingSlash` (default `true`) writes `/docs` to `docs/index.html`, served at `/docs/`. `false` writes `docs.html`, served at `/docs`; Vercel gets `cleanUrls: true`, and redirects generated under the other setting are removed. Explicit route outputs are kept either way.
+  - Netlify and Cloudflare Pages `_redirects` no longer rewrite canonical outputs with status 200, which served the page at both URLs; the hosts' native slash handling applies. Custom `.html` outputs keep their rewrite.
+  - The generated Node server redirects (308, query kept) `/docs` to `/docs/` for a directory index and `/docs/` to `/docs` for `docs.html`.
+
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [05c5579]
+  - @ayu-sh-kr/dota-rendering@0.3.1
+  - @ayu-sh-kr/dota-core@1.12.4
+  - @ayu-sh-kr/dota-router@0.3.5
+  - @ayu-sh-kr/dota-runtime@0.0.13
+
+## 0.6.0
+
+### Minor Changes
+
+- f7c8e46: A parameterized route can declare `@Route({path: '/docs/:slug', mode: 'ssg'})`. Static generation prerenders it through the concrete paths in the SSG `routes` option that match it, and the build fails with `Dynamic SSG route needs concrete paths in the SSG routes option` when none do. Previously any parameterized `ssg` route failed the build, so such routes had to omit `mode`.
+- f7c8e46: Prerendered and server-rendered pages keep Dota UI components in place when they hydrate, instead of rebuilding them after first paint.
+
+  - `dota-icon`, `dota-accordion`, `dota-button`, `dota-popover`, `dota-breadcrumb`, `scroll-deck`, `d-avatar`, `avatar-wrapper`, `dota-chip`, `dota-alert`, `orb-background`, and `cloud-chamber` render `html` templates, so hydration adopts their server markup.
+  - `dota-button`, `dota-popover`, `scroll-deck`, `avatar-wrapper`, and `dota-chip` move their authored children into their rendered markup instead of copying them through `innerHTML`. Child elements keep their identity, listeners, and the hydration markers of the template that authored them. The public `content` string field of `dota-button`, `avatar-wrapper`, and `dota-chip` is removed; author the content as children.
+  - `dota-button` applies `disabled` and `aria-label` after each render. Without an `aria-label`, the inner button has none.
+  - `orb-background` applies the current theme's glow after hydration.
+  - Dota Rendering exports `LIGHT_DOM_SLOT_ATTRIBUTE` (`data-dota-slot`), which marks the template element that receives a light-DOM host's authored children. Dota SSR's string adapter places a host's authored children in that element; hosts without one drop them as before.
+
+### Patch Changes
+
+- Updated dependencies [f7c8e46]
+  - @ayu-sh-kr/dota-rendering@0.3.0
+  - @ayu-sh-kr/dota-core@1.12.3
+  - @ayu-sh-kr/dota-router@0.3.4
+  - @ayu-sh-kr/dota-runtime@0.0.12
+
 ## 0.5.0
 
 ### Minor Changes

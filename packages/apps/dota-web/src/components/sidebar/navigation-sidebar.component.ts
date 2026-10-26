@@ -7,6 +7,7 @@ import {
   Watcher,
   WindowListener, BindEvent
 } from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {Link} from "@dota/components/utils/header/header.component.ts";
 
 
@@ -80,14 +81,13 @@ export class NavigationSidebarComponent extends BaseElement {
     this.visible = false;
   }
 
-  render() {
-    // language=html
-    return `
+  render(): TemplateResult {
+    return html`
       <div
         class="fixed ${this.visible ? 'block' : 'hidden'} md:hidden bg-surface text-foreground top-0 left-0 h-screen w-full z-50">
         <div class="relative h-full">
           <header class="p-4 border-b flex items-center justify-between">
-            <div class="font-extrabold text-2xl w-1/6 px-5 text-foreground">
+            <div class="type-brand text-2xl w-1/6 px-5 text-foreground">
               <a href="/">Dota</a>
             </div>
             <button id="close-button" class="">
@@ -95,33 +95,33 @@ export class NavigationSidebarComponent extends BaseElement {
             </button>
           </header>
           <div class="flex mt-12 justify-center h-full">
-            <ul class="flex flex-col w-[300px]">
-              ${this.items.map((item) => {
-                return `
+            <div class="flex flex-col w-[300px]">
+              <ul>
+                ${this.items.map((item) => html`
                   <li class="font-medium hover:text-primary text-foreground text-left w-full">
                     <a href="${item.url}" class="inline-block py-4 border-b w-full">${item.name}</a>
-                     </li>
-                   `;
-              }).join("")}
+                  </li>
+                `)}
+              </ul>
               <div class="bg-raised rounded-control p-3 mt-6 flex items-center justify-between">
-                <p class="text-[13px] text-muted font-medium">Appearance</p>
+                <p class="type-meta text-muted">Appearance</p>
                 <dark-mode-button></dark-mode-button>
               </div>
-              <ul class="mt-4 flex gap-2 items-center justify-center">
+              <div class="mt-4 flex gap-2 items-center justify-center">
                 <a href="#" class="text-muted hover:underline" title="discord">
-                  <dota-icon name="mdi:discord" color="slate" variant="ghost" size="lg"/>
+                  <dota-icon name="mdi:discord" color="slate" variant="ghost" size="lg"></dota-icon>
                 </a>
                 <a href="#" class="text-muted hover:underline" title="twitter">
-                  <dota-icon name="mdi:twitter" color="slate" variant="ghost" size="lg"/>
+                  <dota-icon name="mdi:twitter" color="slate" variant="ghost" size="lg"></dota-icon>
                 </a>
                 <a href="#" class="text-muted hover:underline" title="github">
-                  <dota-icon name="mdi:github" color="slate" variant="ghost" size="lg"/>
-                  <a href="#" class="text-muted hover:underline inline-flex pt-1.5"
-                     title="blog">
-                    <dota-icon name="mdi:blogger" color="slate" variant="ghost" size="lg"/>
-                  </a>
-              </ul>
-            </ul>
+                  <dota-icon name="mdi:github" color="slate" variant="ghost" size="lg"></dota-icon>
+                </a>
+                <a href="#" class="text-muted hover:underline inline-flex pt-1.5" title="blog">
+                  <dota-icon name="mdi:blogger" color="slate" variant="ghost" size="lg"></dota-icon>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

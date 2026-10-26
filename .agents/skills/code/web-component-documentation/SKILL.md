@@ -77,7 +77,7 @@ path exists.
 ## Satisfy the base-class contract
 
 Before documenting or editing a Dota component, inspect its base class. `BaseElement`
-is abstract and declares a protected constructor plus `abstract render(): string`.
+is abstract and declares a protected constructor plus `abstract render(): RenderOutput`.
 Therefore a concrete custom element must declare a constructor that calls `super()` and
 implement `render()`; leave the child abstract only when it intentionally defers that
 rendering contract to a further subclass. Do not describe a component as concrete when

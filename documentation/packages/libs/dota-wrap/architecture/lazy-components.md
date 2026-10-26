@@ -54,6 +54,10 @@ Two build steps keep the start-up requests few, without application configuratio
   preconnected `<link>`s in the HTML head, so they no longer wait for the CSS bundle. Each page
   gets only the imports of its own start-up CSS; CSS loaded only by lazy routes keeps its imports.
   `remoteStylesheets: false` turns this off.
+- The registry has a loader for every component, including the root and the routed pages that the
+  entry already imports. Rolldown would report each of those as an `INEFFECTIVE_DYNAMIC_IMPORT`,
+  so the preloader drops that warning when the registry is a module's only dynamic importer. A
+  module that application code also imports dynamically keeps its warning.
 
 ## Configuration or usage
 

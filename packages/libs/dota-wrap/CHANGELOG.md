@@ -1,5 +1,65 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.7.0
+
+### Minor Changes
+
+- 1ad244f: Add `dotaPackage()` to `@ayu-sh-kr/dota-wrap/vite`, which packages SSG and SSR output for one hosting platform (`node`, `vercel`, `netlify`, `cloudflare-pages`, or `github-pages`) so the target is named once.
+
+  - `dotaVitePlugins({deployment})` now accepts the object form `{target, vercelConfigFile?, serverOutDir?}` as well as a target name.
+  - `deployment: 'node'` no longer needs a separate `ssg.deployment: false`; static builds for a Node server write no hosting files.
+  - `{target, trailingSlash: false}` opts every target out of trailing-slash URLs.
+  - `DOTA_DEPLOYMENT`, `DOTA_TRAILING_SLASH`, `DOTA_VERCEL_CONFIG_FILE`, and `DOTA_SERVER_OUT_DIR` override the matching settings when set, ahead of all plugin options; unsupported values fail the build.
+  - Otherwise, explicit `ssg.deployment` and `ssr.deployment` still take precedence.
+
+### Patch Changes
+
+- Updated dependencies [1ad244f]
+  - @ayu-sh-kr/dota-ssr@0.7.0
+
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [05c5579]
+  - @ayu-sh-kr/dota-rendering@0.3.1
+  - @ayu-sh-kr/dota-core@1.12.4
+  - @ayu-sh-kr/dota-ssr@0.6.1
+  - @ayu-sh-kr/dota-router@0.3.5
+  - @ayu-sh-kr/dota-runtime@0.0.13
+
+## 0.6.0
+
+### Minor Changes
+
+- f7c8e46: A parameterized route can declare `@Route({path: '/docs/:slug', mode: 'ssg'})`. Static generation prerenders it through the concrete paths in the SSG `routes` option that match it, and the build fails with `Dynamic SSG route needs concrete paths in the SSG routes option` when none do. Previously any parameterized `ssg` route failed the build, so such routes had to omit `mode`.
+- f7c8e46: Prerendered and server-rendered pages keep Dota UI components in place when they hydrate, instead of rebuilding them after first paint.
+
+  - `dota-icon`, `dota-accordion`, `dota-button`, `dota-popover`, `dota-breadcrumb`, `scroll-deck`, `d-avatar`, `avatar-wrapper`, `dota-chip`, `dota-alert`, `orb-background`, and `cloud-chamber` render `html` templates, so hydration adopts their server markup.
+  - `dota-button`, `dota-popover`, `scroll-deck`, `avatar-wrapper`, and `dota-chip` move their authored children into their rendered markup instead of copying them through `innerHTML`. Child elements keep their identity, listeners, and the hydration markers of the template that authored them. The public `content` string field of `dota-button`, `avatar-wrapper`, and `dota-chip` is removed; author the content as children.
+  - `dota-button` applies `disabled` and `aria-label` after each render. Without an `aria-label`, the inner button has none.
+  - `orb-background` applies the current theme's glow after hydration.
+  - Dota Rendering exports `LIGHT_DOM_SLOT_ATTRIBUTE` (`data-dota-slot`), which marks the template element that receives a light-DOM host's authored children. Dota SSR's string adapter places a host's authored children in that element; hosts without one drop them as before.
+
+### Patch Changes
+
+- Updated dependencies [f7c8e46]
+- Updated dependencies [f7c8e46]
+  - @ayu-sh-kr/dota-ssr@0.6.0
+  - @ayu-sh-kr/dota-rendering@0.3.0
+  - @ayu-sh-kr/dota-core@1.12.3
+  - @ayu-sh-kr/dota-router@0.3.4
+  - @ayu-sh-kr/dota-runtime@0.0.12
+
+## 0.5.1
+
+### Patch Changes
+
+- 99a943c: Builds that use `lazyComponents` no longer print an `INEFFECTIVE_DYNAMIC_IMPORT` warning for the root component and every routed page.
+
+  - `virtual:dota-component-registry` has a loader for every component, including the ones the entry already imports through `modules` and `virtual:dota-routes`. Those loaders return the already-loaded class, so the warning needed no action.
+  - The preloader drops the warning only when the registry is the module's sole dynamic importer. A module that application code also imports dynamically still reports it.
+
 ## 0.5.0
 
 ### Minor Changes

@@ -8,8 +8,7 @@ if (!customElements.get('scroll-deck-test')) {
 
 const createDeck = (content = '<div data-scroll-slide>One</div><div data-scroll-slide>Two</div>') => {
   const el = document.createElement('scroll-deck-test') as ScrollDeckComponent;
-  (el as unknown as {content: string}).content = content;
-  el.innerHTML = el.render();
+  el.innerHTML = content;
   document.body.append(el);
   el.afterViewInit();
   return el;
@@ -44,20 +43,24 @@ describe('ScrollDeckComponent', () => {
     expect(scroller.querySelector('article')?.textContent).toBe('One');
   });
 
-  it('applies partial visual configuration and a custom accessible label', () => {
+  it('applies partial visual configuration and a custom accessible label without losing slides', async () => {
     const el = createDeck('<div data-scroll-slide>Configured</div>');
+    await Promise.resolve();
+    await Promise.resolve();
     el.config = {
       container: 'custom-container',
       content: 'custom-content',
     };
     el.ariaLabel = 'Featured stories';
 
-    const rendered = el.render();
+    el.updateHTML();
+    const scroller = el.querySelector<HTMLElement>('[data-scroll-deck-scroller]')!;
 
-    expect(rendered).toContain('custom-container');
-    expect(rendered).toContain(ScrollDeckStyle.scroller);
-    expect(rendered).toContain('custom-content');
-    expect(rendered).toContain('aria-label="Featured stories"');
+    expect(el.firstElementChild?.className).toBe('custom-container');
+    expect(scroller.className).toBe(ScrollDeckStyle.scroller);
+    expect(scroller.getAttribute('aria-label')).toBe('Featured stories');
+    expect(scroller.firstElementChild?.className).toBe('custom-content');
+    expect(scroller.querySelector('[data-scroll-slide]')?.textContent).toBe('Configured');
   });
 
   it('moves to adjacent slides from scroller and active-window arrow keys', () => {

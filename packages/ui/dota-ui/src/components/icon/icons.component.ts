@@ -1,4 +1,4 @@
-import {BaseElement, Component, HTML, Object as ObjectType, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, html, Object as ObjectType, Property, String, type TemplateResult} from "@ayu-sh-kr/dota-core";
 import {LifecycleEventConstants} from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 import type {ApplicationEvent} from "@ayu-sh-kr/dota-event";
@@ -161,9 +161,9 @@ class IconsComponent extends BaseElement {
     svg.setAttribute('focusable', 'false');
   }
 
-  render(): string {
+  render(): TemplateResult {
     const style = this.getStyle();
-    return HTML`<span data-icon-root class="${style.container}" aria-hidden="${this.ariaLabel ? 'false' : 'true'}"></span>`;
+    return html`<span data-icon-root class="${style.container}" aria-hidden="${this.ariaLabel ? 'false' : 'true'}"></span>`;
   }
 }
 

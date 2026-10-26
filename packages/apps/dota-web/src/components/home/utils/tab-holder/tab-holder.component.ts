@@ -1,4 +1,4 @@
-import {AfterInit, BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {TAB_REGISTRY} from "../capability.config.ts";
 
@@ -28,52 +28,38 @@ export class TabHolderComponent extends BaseElement {
     super();
   }
 
-  @AfterInit()
-  afterViewInit() {
-    const tabs = TAB_REGISTRY[this.key] ?? [];
-    if (tabs.length === 0) return;
+  /**
+   * Selects the clicked tab, re-renders the pill styles, and notifies the parent section.
+   * @param event Click anywhere in the tab bar; only `.tab-btn` targets change the selection.
+   */
+  @HostListener({event: 'click'})
+  selectTab(event: MouseEvent) {
+    const tabId = (event.target as Element | null)?.closest<HTMLButtonElement>('.tab-btn')?.dataset['tab'];
+    if (!tabId || tabId === this.activeTabId) return;
 
-    this.activeTabId = tabs[0].id;
-
-    this.querySelectorAll<HTMLButtonElement>('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tabId = btn.dataset['tab'];
-        if (!tabId || tabId === this.activeTabId) return;
-
-        this.activeTabId = tabId;
-
-        // Update button active styles
-        this.querySelectorAll<HTMLButtonElement>('.tab-btn').forEach(b => {
-          const active = b.dataset['tab'] === tabId;
-          b.className = active ? 'tab-btn tab-btn-active' : 'tab-btn tab-btn-inactive';
-          b.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-
-        // Notify parent section
-        this.dispatchEvent(new CustomEvent('tab:change', {
-          detail: {tabId, key: this.key},
-          bubbles: true,
-          composed: true,
-        }));
-      });
-    });
+    this.activeTabId = tabId;
+    this.updateHTML();
+    this.dispatchEvent(new CustomEvent('tab:change', {
+      detail: {tabId, key: this.key},
+      bubbles: true,
+      composed: true,
+    }));
   }
 
   render(): TemplateResult {
     const tabs = TAB_REGISTRY[this.key] ?? [];
-
-    const buttons = tabs.map((tab, i) => html`
-      <button class="tab-btn ${i === 0 ? 'tab-btn-active' : 'tab-btn-inactive'}"
-              data-tab="${tab.id}"
-              aria-selected="${i === 0}"
-              role="tab">
-        ${tab.title}
-      </button>
-    `);
+    const activeTabId = this.activeTabId || tabs[0]?.id;
 
     return html`
         <div class="flex flex-wrap gap-2" role="tablist" aria-label="Tabs">
-            ${buttons}
+            ${tabs.map(tab => html`
+              <button class="tab-btn ${tab.id === activeTabId ? 'tab-btn-active' : 'tab-btn-inactive'}"
+                      data-tab="${tab.id}"
+                      aria-selected="${tab.id === activeTabId}"
+                      role="tab">
+                ${tab.title}
+              </button>
+            `)}
         </div>
     `;
   }

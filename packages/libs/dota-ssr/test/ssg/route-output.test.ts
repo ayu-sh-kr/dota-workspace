@@ -29,6 +29,14 @@ describe('resolveSsgRoutes', () => {
     }
   );
 
+  it('writes slashless HTML files when trailing slashes are off, keeping explicit outputs', () => {
+    expect(resolveSsgRoutes(['/', '/docs/', {path: '/guide', output: 'guide/index.html'}], false)).toEqual([
+      {path: '/', output: 'index.html'},
+      {path: '/docs', output: 'docs.html'},
+      {path: '/guide', output: 'guide/index.html'}
+    ]);
+  });
+
   it('rejects route aliases and output collisions after normalization', () => {
     expect(() => resolveSsgRoutes(['/docs', '/docs/'])).toThrow('Duplicate SSG route: /docs');
     expect(() => resolveSsgRoutes([
@@ -63,10 +71,21 @@ describe('resolveDecoratedSsgRoutes', () => {
     expect(routes.map(route => route.path)).toEqual(['/legacy', '/static']);
   });
 
-  it('rejects an opted-in dynamic decorated route before generating output', () => {
-    expect(() => resolveDecoratedSsgRoutes([{path: '/projects/:id', ssr: true}])).toThrow(
-      'Decorated SSG route must be concrete: /projects/:id'
+  it('rejects an opted-in dynamic decorated route without matching explicit routes', () => {
+    expect(() => resolveDecoratedSsgRoutes([{path: '/projects/:id', ssr: true}], ['/projects'])).toThrow(
+      'Dynamic SSG route needs concrete paths in the SSG routes option: /projects/:id'
     );
+  });
+
+  it('prerenders a dynamic ssg route through the explicit paths that match it', () => {
+    expect(resolveDecoratedSsgRoutes([
+      {path: '/docs', mode: 'ssg'},
+      {path: '/docs/:slug', mode: 'ssg'}
+    ], ['/docs/core', '/docs/router/'])).toEqual([
+      {path: '/docs', output: 'docs/index.html'},
+      {path: '/docs/core', output: 'docs/core/index.html'},
+      {path: '/docs/router', output: 'docs/router/index.html'}
+    ]);
   });
 
   it('preserves duplicate detection for decorated route metadata', () => {

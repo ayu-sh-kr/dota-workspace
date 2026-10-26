@@ -10,7 +10,7 @@ import {
   type DotaElementConstructor,
   type SEO
 } from '@ayu-sh-kr/dota-core';
-import {HYDRATION_IDENTITY_ATTRIBUTES, hydrationIdentity, hydrationScope, isTemplateResult} from '@ayu-sh-kr/dota-rendering';
+import {HYDRATION_IDENTITY_ATTRIBUTES, hydrationIdentity, hydrationScope, isTemplateResult, LIGHT_DOM_SLOT_ATTRIBUTE} from '@ayu-sh-kr/dota-rendering';
 import {escapeHtml, serializeOutput, SHADOW_ROOT_MODE_ATTRIBUTE, TEMPLATE_ELEMENT, tokenizeHtml} from '@ayu-sh-kr/dota-rendering/server';
 import {runInBrowserScope} from '@ayu-sh-kr/dota-server-dom/node';
 import {routeMarkerAttributes} from '../route-marker';
@@ -41,6 +41,8 @@ const DEFAULT_MAX_DEPTH = 32;
 const SCOPE_TOKEN = /(\d+)/g;
 /** Renders in flight; the server-render flag stays set until the last one finishes. */
 let activeRenders = 0;
+/** Opening tag of the element a light-DOM template marks for its host's authored children. */
+const LIGHT_DOM_SLOT_TAG = new RegExp(`<[a-z][^\\s/>]*(?:\\s[^>]*?)?\\s${LIGHT_DOM_SLOT_ATTRIBUTE}(?=[\\s=/>])[^>]*>`, 'i');
 
 /**
  * Creates the light-DOM engine that renders Dota components to HTML strings.
@@ -94,10 +96,10 @@ export function createStringAdapter(options: StringAdapterOptions): RenderAdapte
       if (scope !== undefined && isTemplateResult(output)) {
         Object.entries(hydrationIdentity(host.selector, output.strings, scope)).forEach(([name, value]) => instance.setAttribute(name, value));
       }
-      const rendered = await expandHosts(serializeOutput(output, scope), pass, depth + 1);
+      const markup = serializeOutput(output, scope);
       content = Component.__dotaShadow
-        ? `<template shadowrootmode="open">${rendered}</template>${await expandHosts(host.children, pass, depth + 1)}`
-        : rendered;
+        ? `<template shadowrootmode="open">${await expandHosts(markup, pass, depth + 1)}</template>${await expandHosts(host.children, pass, depth + 1)}`
+        : await expandHosts(fillLightDomSlot(markup, host.children), pass, depth + 1);
     }
 
     const attributes = instance.getAttributeNames()
@@ -158,6 +160,22 @@ function reflectProperties(instance: ServerComponent): void {
     if (value === undefined || value === null) return;
     instance.setAttribute(meta.name, meta.type.serialize ? meta.type.serialize(value) : String(value));
   });
+}
+
+/**
+ * Places a light-DOM host's authored children inside the element its template marks with
+ * `data-dota-slot`, matching where the component moves them in the browser. The slot is
+ * filled before nested hosts expand, so only this component's own slot can match.
+ * Without a slot the children are dropped, because the component's output replaces them.
+ * @param markup Serialized output of one component, before nested hosts are expanded.
+ * @param children Markup authored between the host's tags.
+ * @returns The output with the children inserted at the start of the slot element.
+ */
+function fillLightDomSlot(markup: string, children: string): string {
+  const slot = children.trim() ? LIGHT_DOM_SLOT_TAG.exec(markup) : null;
+  if (!slot) return markup;
+  const insertAt = slot.index + slot[0].length;
+  return markup.slice(0, insertAt) + children + markup.slice(insertAt);
 }
 
 /**

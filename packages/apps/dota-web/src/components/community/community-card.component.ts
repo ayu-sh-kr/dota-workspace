@@ -1,5 +1,6 @@
 // community-card.component.ts
 import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult, when} from "@ayu-sh-kr/dota-wrap/rendering";
 
 @Component({
   selector: "community-card",
@@ -17,32 +18,27 @@ export class CommunityCardComponent extends BaseElement {
     super();
   }
 
-  render() {
-    // language=html
-    return `
-      <article class="community-card">
+  render(): TemplateResult {
+    return html`
+      <article class="community-card surface-card flex h-full flex-col gap-5">
         <header class="flex items-center justify-between gap-4">
-          <div class="flex items-center gap-2">
-            <d-avatar img="${this.imageSrc}" img-alt="${this.name}" is-chip="true" color="purple" variant="solid" size="xl"></d-avatar>
+          <div class="flex items-center gap-3">
+            <d-avatar img="${this.imageSrc}" img-alt="${this.name}" is-chip="true" color="slate" variant="solid" size="xl"></d-avatar>
             <div>
-              <h1 class="text-sm">${this.name}</h1>
-              <p class="text-sm text-gray-400">${this.role}</p>
+              <h2 class="font-semibold text-foreground">${this.name}</h2>
+              <p class="type-meta text-muted">${this.role}</p>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            ${this.githubLink ? `<a target="_blank" href="${this.githubLink}" class="text-gray-600 dark:text-gray-300 hover:underline" title="github">
-              <dota-icon name="mdi:github" color="slate" variant="ghost" size="md"/>
-            </a>` : ''}
-            ${this.linkedinLink ? `<a href="${this.linkedinLink}" target="_blank">
-              <dota-icon name="mdi:linkedin" color="slate" variant="ghost" size="md"/>
-            </a>` : ''}
+          <div class="flex items-center gap-1">
+            ${when(this.githubLink, html`<a target="_blank" rel="noopener" href="${this.githubLink}" class="button-icon button-compact" title="GitHub" aria-label="${this.name} on GitHub">
+              <dota-icon name="mdi:github" color="slate" variant="ghost" size="md"></dota-icon>
+            </a>`)}
+            ${when(this.linkedinLink, html`<a target="_blank" rel="noopener" href="${this.linkedinLink}" class="button-icon button-compact" title="LinkedIn" aria-label="${this.name} on LinkedIn">
+              <dota-icon name="mdi:linkedin" color="slate" variant="ghost" size="md"></dota-icon>
+            </a>`)}
           </div>
         </header>
-        <p class="font-medium text-gray-500 mt-4">
-          &quot;
-          ${this.quote}
-          &quot;
-        </p>
+        <blockquote class="type-compact text-muted">&ldquo;${this.quote}&rdquo;</blockquote>
       </article>
     `;
   }

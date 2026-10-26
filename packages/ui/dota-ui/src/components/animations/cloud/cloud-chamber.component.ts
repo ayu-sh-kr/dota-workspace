@@ -1,5 +1,5 @@
 import {startAnimationLoop, type AnimationLoop} from "@dota/components/animations/animation-loop.ts";
-import { BaseElement, Component, Property, String } from "@ayu-sh-kr/dota-core";
+import { BaseElement, Component, html, Property, String, type TemplateResult } from "@ayu-sh-kr/dota-core";
 import { OnEvent } from "@ayu-sh-kr/dota-event";
 import { ORB_COLOR_MAP } from "@dota/components/animations/orb/orb-background.component.ts";
 import type { OrbitColor } from "@dota/components/animations/orb/orb-background.component.ts";
@@ -512,8 +512,8 @@ export class CloudChamberComponent extends BaseElement {
     super.disconnectedCallback();
   }
 
-  render(): string {
-    return `
+  render(): TemplateResult {
+    return html`
       <canvas
         id="cloud-chamber-canvas"
         class="absolute inset-0 block"

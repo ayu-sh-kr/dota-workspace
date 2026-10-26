@@ -1,6 +1,20 @@
 import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
 import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
+const FORM_COMPONENT_CODE = `@Component({ selector: 'app-form' })
+class FormComponent extends BaseElement {
+
+  constructor() { super(); }
+
+  @Emitter({ name: 'form:reset' })
+  onReset!: EventEmitter<void>;
+
+  @BindEvent({ event: 'click', id: '#reset' })
+  handleReset() {
+    this.onReset.emit();
+  }
+}`;
+
 @Component({
   selector: "emitter-section",
   shadow: false
@@ -21,23 +35,9 @@ export class EmitterSectionComponent extends BaseElement {
 
                         <!-- Left: code (stacks below text on mobile) -->
                         <div class="w-full min-w-0 order-2 lg:order-1">
-                            <!-- LOCKED CONTENT: Do not modify text; code extracted from page -->
                             <code-snippet filename="form.component.ts"
                                           language="typescript"
-                                          data-locked="true">
-                                @Component({ selector: 'app-form' })
-                                class FormComponent extends BaseElement {
-                                  
-                                  constructor() { super(); }
-                                  
-                                  @Emitter({ name: 'form:reset' })
-                                  onReset!: EventEmitter&lt;void&gt;;
-
-                                  @BindEvent({ event: 'click', id: '#reset' })
-                                  handleReset() {
-                                    this.onReset.emit();
-                                  }
-                                }
+                                          code="${FORM_COMPONENT_CODE}">
                             </code-snippet>
                         </div>
 

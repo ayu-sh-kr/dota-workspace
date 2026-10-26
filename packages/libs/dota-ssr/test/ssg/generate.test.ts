@@ -161,7 +161,7 @@ describe('dotaSsg build output', () => {
   it('prepares the configured platform after rendering', async () => {
     await build({routes: ['/guide'], deployment: 'netlify'});
 
-    expect(await readFile(join(root, 'dist/_redirects'), 'utf8')).toContain('/guide /guide/index.html 200');
+    expect(await readFile(join(root, 'dist/_redirects'), 'utf8')).toBe('# BEGIN dota-ssg\n# END dota-ssg\n');
     expect(await readFile(join(root, 'dist/guide/index.html'), 'utf8')).toContain('path="/guide"');
   });
 

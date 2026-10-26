@@ -1,4 +1,5 @@
-import {BaseElement, Component, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, html, Property, String, type TemplateResult} from "@ayu-sh-kr/dota-core";
+import {LightDomSlot} from "@dota/components/utils/light-dom-slot.ts";
 import type {ChipColor, ChipPosition} from "@dota/components/chip/chip.config.ts";
 import {ChipStyle} from "@dota/components/chip/chip.config.ts";
 
@@ -39,9 +40,7 @@ class ChipComponent extends BaseElement{
     @Property({name: 'color', type: String})
     color!: ChipColor
 
-    content!: string
-
-    private lightDomCaptured = false;
+    private readonly content = new LightDomSlot();
 
     /** Public so the class can be registered with `customElements.define` and app component lists. */
     constructor() {
@@ -49,20 +48,17 @@ class ChipComponent extends BaseElement{
     }
 
     /**
-     * Captures authored light DOM once, before the first render.
-     * Runs on connect rather than in the constructor, where happy-dom prerendering
-     * has not parsed the children yet.
+     * Renders with the authored content moved beside the chip. The content is detached
+     * just before the first render and returned right after it.
      */
-    @BeforeInit()
-    captureLightDom() {
-        if (!this.lightDomCaptured) {
-            this.lightDomCaptured = true;
-            this.content = this.innerHTML;
-        }
+    connectedCallback() {
+        this.content.capture(this);
+        super.connectedCallback();
+        this.content.restore(this);
     }
 
-    render(): string {
-        return `
+    render(): TemplateResult {
+        return html`
             <div class="${ChipStyle.base.parent}">
                 <span class="
                             ${ChipStyle.base.chip} ${ChipStyle.position[this.position] ?? ChipStyle.position["top-right"]} 
@@ -70,7 +66,7 @@ class ChipComponent extends BaseElement{
                             ${this.text ? 'size-4': 'size-2'}">
                     ${this.text ?? ''}
                 </span>
-                ${this.content}
+                <div data-dota-slot style="display: contents"></div>
             </div>
         `;
     }

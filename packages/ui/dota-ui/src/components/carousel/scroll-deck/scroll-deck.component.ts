@@ -1,4 +1,5 @@
-import {AfterInit, BaseElement, Component, Object as ObjectType, Property, String, BeforeInit} from "@ayu-sh-kr/dota-core";
+import {AfterInit, BaseElement, Component, html, Object as ObjectType, Property, String, type TemplateResult} from "@ayu-sh-kr/dota-core";
+import {LightDomSlot} from "@dota/components/utils/light-dom-slot.ts";
 import {ScrollDeckStyle} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
 import type {ScrollDeckStyleConfig} from "@dota/components/carousel/scroll-deck/scroll-deck.config.ts";
 
@@ -29,7 +30,8 @@ function listen(
  * Events: mouse drag updates `scrollLeft` and settles on a nearby slide; native touch scrolling
  * remains available. Arrow keys on the scroller, or while the deck is active, move one slide.
  * Lifecycle and integration: light DOM preserves consumer-provided elements marked
- * `data-scroll-slide`; listeners are installed after render and removed on disconnection.
+ * `data-scroll-slide` by moving them into the scroller, so server-rendered slides hydrate in
+ * place; listeners are installed after render and removed on disconnection.
  */
 @Component({
   selector: "scroll-deck",
@@ -68,9 +70,7 @@ export class ScrollDeckComponent extends BaseElement {
     }
   };
 
-  private content = "";
-
-  private lightDomCaptured = false;
+  private readonly slides = new LightDomSlot();
 
   /** Public so the class can be registered with `customElements.define` and app component lists. */
   constructor() {
@@ -78,19 +78,16 @@ export class ScrollDeckComponent extends BaseElement {
   }
 
   /**
-   * Captures authored light DOM once, before the first render.
-   * Runs on connect rather than in the constructor, where happy-dom prerendering
-   * has not parsed the children yet.
+   * Renders with the authored slides moved into the scroller, and sizes the host as a block.
+   * The slides are detached just before the first render and returned right after it.
    */
-  @BeforeInit()
-  captureLightDom() {
-    if (!this.lightDomCaptured) {
-      this.lightDomCaptured = true;
-      this.content = this.innerHTML;
-      this.style.display = "block";
-      this.style.width = "100%";
-      this.style.minWidth = "0";
-    }
+  connectedCallback() {
+    this.slides.capture(this);
+    this.style.display = "block";
+    this.style.width = "100%";
+    this.style.minWidth = "0";
+    super.connectedCallback();
+    this.slides.restore(this);
   }
 
   private getScroller(): HTMLElement | null {
@@ -243,13 +240,13 @@ export class ScrollDeckComponent extends BaseElement {
     super.disconnectedCallback?.();
   }
 
-  render(): string {
+  render(): TemplateResult {
     const config = this.config;
     const container = config?.container ?? ScrollDeckStyle.container;
     const scroller = config?.scroller ?? ScrollDeckStyle.scroller;
     const content = config?.content ?? ScrollDeckStyle.content;
 
-    return `
+    return html`
       <section class="${container}">
         <div
           data-scroll-deck-scroller
@@ -259,9 +256,7 @@ export class ScrollDeckComponent extends BaseElement {
           class="${scroller}"
           style="scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-y; scroll-snap-stop: always;"
         >
-          <div class="${content}">
-            ${this.content}
-          </div>
+          <div class="${content}" data-dota-slot></div>
         </div>
       </section>
     `;

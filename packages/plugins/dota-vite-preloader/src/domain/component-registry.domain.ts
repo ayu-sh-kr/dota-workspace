@@ -1,5 +1,6 @@
 import {resolve} from "node:path";
 import {SourceFileIndex} from "@ayu-sh-kr/dota-ast-utils";
+import {VirtualImportID} from "@dota/Constants.ts";
 import type {ComponentScanLogger, DotaComponentCandidate} from "./component-candidate.domain.ts";
 
 /**
@@ -91,4 +92,25 @@ export function prepareComponentRegistryExport(
     `  dependencies: ${JSON.stringify(dependencies)}`,
     "};",
   ].join("\n");
+}
+
+/** Rolldown log code for a dynamic import that cannot split because the module is also imported statically. */
+const INEFFECTIVE_DYNAMIC_IMPORT = "INEFFECTIVE_DYNAMIC_IMPORT";
+
+/** Captures the importer list of an ineffective dynamic import message. */
+const DYNAMIC_IMPORTERS_PATTERN = /is dynamically imported by (.+?) but also statically imported by/;
+
+/**
+ * Reports whether a bundler log is an ineffective dynamic import caused only by the registry.
+ * The registry has a loader for every component, including the root and routed pages that the
+ * entry already imports statically. Those loaders resolve the already-loaded class, so the warning
+ * carries no action for the application. A module that other code also imports dynamically keeps
+ * its warning.
+ * @param log Bundler log passed to the plugin's `onLog` hook.
+ * @returns `true` when the log should be dropped.
+ */
+export function isRegistryOnlyIneffectiveImport(log: {code?: string; message?: string}): boolean {
+  if (log.code !== INEFFECTIVE_DYNAMIC_IMPORT || !log.message) return false;
+  const importers = log.message.match(DYNAMIC_IMPORTERS_PATTERN)?.[1].split(", ");
+  return importers != null && importers.every(importer => importer.endsWith(VirtualImportID.DOTA_COMPONENT_REGISTRY));
 }

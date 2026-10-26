@@ -177,8 +177,36 @@ export class LegacyNoteComponent extends BaseElement {
   }
 }
 
+/** Wraps authored children, which its template places in the `data-dota-slot` element. */
+@Component({selector: 'slot-card', shadow: false})
+export class SlotCardComponent extends BaseElement {
+  @Property({name: 'heading', type: String})
+  heading = '';
+
+  constructor() {
+    super();
+  }
+
+  render() {
+    return html`<section class="card"><h3>${this.heading}</h3><div class="body" data-dota-slot></div></section>`;
+  }
+}
+
+/** Authors light-DOM children, including a nested host, inside a slotted component. */
+@Component({selector: 'slot-page', shadow: false})
+export class SlotPage extends BaseElement {
+  constructor() {
+    super();
+  }
+
+  render() {
+    return html`<slot-card heading="Notes"><task-item label="Nested" position="0"></task-item> and text</slot-card>`;
+  }
+}
+
 /** Every fixture component, as an application would register them. */
 export const FIXTURE_COMPONENTS = [
   TaskItemComponent, ShadowBadgeComponent, TasksPage, StateReaderComponent, EndlessLoopComponent,
-  ClientOnlyPanelComponent, RenderFlagProbeComponent, MarkupProbeComponent, BrowserProbeComponent, LegacyNoteComponent
+  ClientOnlyPanelComponent, RenderFlagProbeComponent, MarkupProbeComponent, BrowserProbeComponent, LegacyNoteComponent,
+  SlotCardComponent, SlotPage
 ];

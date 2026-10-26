@@ -2,21 +2,24 @@ import {glob, readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import type {Plugin} from 'vite';
 import {DiskIconCache, ICON_NAME_PATTERN} from './disk-icon-cache.ts';
+import {LOCAL_COLLECTIONS, LocalIconSets} from './local-icon-sets.ts';
 
-// Collections used in site templates/configuration and the shared UI defaults.
-const COLLECTIONS = ['mdi', 'ic', 'material-symbols', 'material-symbols-light', 'solar', 'healthicons', 'gridicons', 'emojione-monotone', 'lucide'];
 const ASSET_PATH = 'assets/icons/';
 
 /**
- * Publishes locally cached icons as same-origin assets before SSG runs.
- * Dev requests use the same disk cache; production Node/static hosts serve the
- * emitted files without upstream access. TTL refresh happens during each build.
+ * Publishes icons as same-origin assets before SSG runs.
+ * Icons come from the installed `@iconify-json/*` sets, so builds and dev need no network;
+ * only names outside those sets fall back to the disk cache and Iconify. Production hosts serve
+ * the emitted files without upstream access; on Vercel, a name chosen at runtime that was not
+ * emitted is proxied to Iconify by the `/assets/icons/:icon` rewrite in `vercel.json`.
  * @returns App-owned Vite plugin, with disk state outside disposable build output.
  */
 export function iconAssets(): Plugin {
   let root: string;
   let base: string;
   let cache: DiskIconCache;
+  const local = new LocalIconSets();
+  const resolveIcon = async (name: string) => await local.get(name) ?? cache.get(name);
   let isServerBuild = false;
   let isBuild = false;
 
@@ -33,7 +36,7 @@ export function iconAssets(): Plugin {
       // In serve mode the middleware downloads arbitrary names on demand.
       if (!isBuild || isServerBuild) return;
       const names = new Set<string>();
-      const pattern = new RegExp(`(?:${COLLECTIONS.join('|')}):[a-z0-9-]+`, 'g');
+      const pattern = new RegExp(`(?:${LOCAL_COLLECTIONS.join('|')}):[a-z0-9-]+`, 'g');
       for (const directory of [resolve(root, 'src'), resolve(root, 'public'), resolve(root, '../../ui/dota-ui/src')]) {
         for await (const file of glob('**/*.{ts,md,html}', {cwd: directory})) {
           const path = resolve(directory, file);
@@ -42,9 +45,9 @@ export function iconAssets(): Plugin {
           for (const match of content.matchAll(pattern)) names.add(match[0]);
         }
       }
-      // Sequential cold downloads avoid a burst of requests at the public API.
+      // Sequential fallback downloads avoid a burst of requests at the public API.
       for (const name of [...names].sort()) {
-        const svg = await cache.get(name);
+        const svg = await resolveIcon(name);
         if (!svg) {
           this.warn(`Icon ${name} is unavailable and has no disk cache entry.`);
           continue;
@@ -62,7 +65,7 @@ export function iconAssets(): Plugin {
           response.writeHead(400).end();
           return;
         }
-        const svg = await cache.get(name);
+        const svg = await resolveIcon(name);
         response.writeHead(svg ? 200 : 503, {
           'content-type': svg ? 'image/svg+xml' : 'text/plain',
           'cache-control': svg ? 'public, max-age=604800' : 'no-store',

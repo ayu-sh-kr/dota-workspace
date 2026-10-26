@@ -4,7 +4,7 @@ import {ButtonComponent} from '@dota/components/button/button.component.ts';
 if (!customElements.get('dota-button-test')) customElements.define('dota-button-test', ButtonComponent);
 const render = (props: Partial<ButtonComponent> = {}, content = 'Child') => {
   const el = document.createElement('dota-button-test') as ButtonComponent;
-  Object.assign(el, props); el.content = content; el.innerHTML = el.render(); document.body.append(el); return el;
+  Object.assign(el, props); el.innerHTML = content; document.body.append(el); return el;
 };
 afterEach(() => { document.body.innerHTML = ''; });
 
@@ -29,5 +29,19 @@ describe('ButtonComponent', () => {
     const el = render({color: 'invalid' as never, variant: 'invalid' as never, size: 'invalid' as never, rounded: 'invalid' as never, type: 'invalid' as never, config: {base: 'custom-base', label: 'custom-label'}});
     expect(el.querySelector('button')?.type).toBe('button'); expect(el.querySelector('button')?.className).toContain('custom-base');
     expect(el.querySelector('span')?.className).toBe('custom-label');
+  });
+
+  it('keeps the authored label in place when re-rendered as disabled', async () => {
+    const el = render({}, '<strong>Child</strong>');
+    const label = el.querySelector('strong');
+    await Promise.resolve(); await Promise.resolve();
+
+    el.disabled = true;
+    el.updateHTML();
+    el.syncNativeAttributes();
+
+    expect(el.querySelector('button')?.disabled).toBe(true);
+    expect(el.querySelector('[data-dota-slot] strong')).toBe(label);
+    expect(el.querySelector('button')?.hasAttribute('aria-label')).toBe(false);
   });
 });

@@ -1,4 +1,5 @@
-import {BaseElement, BindEvent, Component, html, Number, Property} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, BindEvent, Component, Number, Property} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 
 @Component({
@@ -27,15 +28,14 @@ export class CounterComponent extends BaseElement {
     this.counter--;
   }
 
-  render() {
-    // language=html
+  render(): TemplateResult {
     return html`
       <div class="flex flex-col items-center justify-center p-8">
-        <h1 class="text-2xl font-bold mb-4">Counter Component</h1>
-        <div class="flex items-center space-x-4">
-          <button id="decrement" class="bg-red-500 text-white px-3 py-1 rounded text-sm">-</button>
-          <p id="counter" class="text-xl font-medium w-8 text-center">${this.counter}</p>
-          <button id="increment" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">+</button>
+        <h2 class="type-card mb-4 text-foreground">Counter Component</h2>
+        <div class="flex items-center gap-4">
+          <button id="decrement" type="button" class="button-secondary button-compact" aria-label="Decrement">-</button>
+          <p id="counter" class="type-card w-8 text-center tabular-nums">${this.counter}</p>
+          <button id="increment" type="button" class="button-secondary button-compact" aria-label="Increment">+</button>
         </div>
       </div>
     `

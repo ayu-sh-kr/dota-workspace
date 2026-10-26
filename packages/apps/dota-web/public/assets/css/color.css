@@ -9,7 +9,7 @@
   --contrast-foreground-color: var(--background-color);
   --action-primary-background: var(--contrast-background-color);
   --action-primary-foreground: var(--contrast-foreground-color);
-  --action-primary-hover: var(--code-background-color);
+  --action-primary-hover: var(--color-midnight-black-950);
   --muted-color: var(--color-dota-muted-light);
   --surface-color: var(--color-pure-black-50);
   --surface-raised-color: var(--color-dota-raised-light);
@@ -28,15 +28,20 @@
   --success-color: var(--color-status-success-light);
   --warning-color: var(--color-status-warning-light);
   --danger-color: var(--color-status-danger-light);
-  --code-background-color: var(--color-midnight-black-950);
-  --code-foreground-color: var(--color-paper-50);
-  --code-muted-color: var(--color-inkstone-300);
-  --code-border-color: var(--color-slate-black-800);
-  --code-toolbar-color: var(--color-slate-black-950);
-  --code-accent-color: var(--color-dota-violet-300);
-  --code-success-color: var(--color-status-success-dark);
-  --code-warning-color: var(--color-status-warning-dark);
-  --code-danger-color: var(--color-status-danger-dark);
+  /* Code follows the page theme: a quiet inset panel with syntax hues drawn from the accent family. */
+  --code-background-color: var(--color-dota-code-light);
+  --code-foreground-color: var(--foreground-color);
+  --code-muted-color: var(--muted-color);
+  --code-border-color: var(--border-color);
+  --code-accent-color: var(--primary-color);
+  --code-success-color: var(--color-status-success-light);
+  --code-warning-color: var(--color-status-warning-light);
+  --code-danger-color: var(--color-status-danger-light);
+  --syntax-keyword-color: var(--color-dota-violet-700);
+  --syntax-function-color: var(--color-dota-syntax-blue-light);
+  --syntax-string-color: var(--color-dota-syntax-green-light);
+  --syntax-number-color: var(--color-dota-syntax-orange-light);
+  --syntax-type-color: var(--color-dota-syntax-teal-light);
   --ecosystem-core-color: var(--color-dota-violet-600);
   --ecosystem-core-end: var(--color-dota-violet-800);
   --ecosystem-ui-color: var(--color-google-berry-500);
@@ -83,6 +88,15 @@ html.dark {
   --warning-color: var(--color-status-warning-dark);
   --danger-color: var(--color-status-danger-dark);
   --shadow-color: var(--color-dota-shadow-dark);
+  --code-background-color: var(--color-dota-code-dark);
+  --code-success-color: var(--color-status-success-dark);
+  --code-warning-color: var(--color-status-warning-dark);
+  --code-danger-color: var(--color-status-danger-dark);
+  --syntax-keyword-color: var(--color-dota-violet-300);
+  --syntax-function-color: var(--color-dota-syntax-blue-dark);
+  --syntax-string-color: var(--color-dota-syntax-green-dark);
+  --syntax-number-color: var(--color-dota-syntax-orange-dark);
+  --syntax-type-color: var(--color-dota-syntax-teal-dark);
 }
 
 /* Override the UI package's body background in both modes. */
@@ -125,19 +139,51 @@ html, html body, html.dark body {
     box-shadow: var(--shadow-lift);
   }
 
+  /* A whole-card link: the border takes the accent instead of the card growing or glowing. */
+  .surface-card-link {
+    transition: border-color var(--motion-fast), transform var(--motion-normal);
+  }
+  .surface-card-link:hover { border-color: var(--primary-color-border); transform: translateY(-2px); }
+
+  /* Quiet inset area inside a page, such as a message log. */
+  .surface-inset {
+    border: 1px solid var(--border-color);
+    border-radius: var(--layout-radius-card);
+    background: var(--surface-raised-color);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--layout-space-1);
+    padding: var(--layout-space-1) var(--layout-space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--layout-radius-control);
+    background: var(--surface-color);
+    color: var(--muted-color);
+    font-size: var(--type-label-size);
+    font-weight: 500;
+    line-height: var(--type-control-leading);
+  }
+
+  .field {
+    min-block-size: var(--layout-control-height);
+    padding: var(--layout-space-2) var(--layout-space-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--layout-radius-control);
+    background: var(--surface-color);
+    color: var(--foreground-color);
+    transition: border-color var(--motion-fast);
+  }
+  .field:hover { border-color: var(--border-strong-color); }
+  .field:focus-visible { border-color: var(--primary-color); outline-offset: 1px; }
+
   .code-panel {
     overflow: hidden;
     border: 1px solid var(--code-border-color);
     border-radius: var(--layout-radius-code);
     background: var(--code-background-color);
     color: var(--code-foreground-color);
-    box-shadow: var(--shadow-pop);
-  }
-
-  .code-toolbar {
-    background: var(--code-toolbar-color);
-    border-bottom: 1px solid var(--code-border-color);
-    color: var(--code-muted-color);
   }
 
 }

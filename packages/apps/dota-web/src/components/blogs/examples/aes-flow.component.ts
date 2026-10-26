@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 type FlowStage = {
   title: string;
@@ -150,17 +151,17 @@ export class AesFlowComponent extends BaseElement {
     return mode === "decryption" ? "decryption" : "encryption";
   }
 
-  render(): string {
+  render(): TemplateResult {
     const config = FLOW_CONFIG[this.getMode()];
     const total = config.stages.length;
 
-    return HTML`
+    return html`
       <scroll-deck aria-label="AES flow carousel">
         ${config.stages.map((stage, index) => {
           const accent = STEP_ACCENTS[index % STEP_ACCENTS.length];
           const hasMore = index < total - 1;
 
-          return `
+          return html`
             <article
               data-scroll-slide="true"
               class="relative min-w-full snap-start snap-always"
@@ -225,7 +226,7 @@ export class AesFlowComponent extends BaseElement {
               </div>
             </article>
           `;
-        }).join("")}
+        })}
       </scroll-deck>
     `;
   }

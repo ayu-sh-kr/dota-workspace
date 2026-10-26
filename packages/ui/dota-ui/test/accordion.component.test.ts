@@ -1,12 +1,13 @@
 import {AccordionComponent} from '@dota/components/accordian/accordion.component.ts';
 import {afterEach, describe, expect, it} from 'vitest';
+import {mountTemplate} from './setup/render-template';
 
 const createAccordion = (properties: Partial<AccordionComponent> = {}) => {
   const accordion = document.createElement('dota-accordion-test') as AccordionComponent;
   const {config, ...rest} = properties;
   Object.assign(accordion, rest);
   if (config) accordion.setAttribute('config', JSON.stringify(config));
-  accordion.innerHTML = accordion.render();
+  mountTemplate(accordion);
   document.body.appendChild(accordion);
   return accordion;
 };

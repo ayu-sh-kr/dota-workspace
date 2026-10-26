@@ -1080,4 +1080,14 @@
   --color-dota-shadow-dark: rgb(0 0 0 / 36%);
   --color-dota-scrim: rgb(0 0 0 / 50%);
   --color-dota-highlight: rgb(255 255 255 / 24%);
+  --color-dota-code-light: #f4f4f8;
+  --color-dota-code-dark: #16161c;
+  --color-dota-syntax-blue-light: #2f5bb7;
+  --color-dota-syntax-blue-dark: #8fb3f5;
+  --color-dota-syntax-green-light: #1f7a3d;
+  --color-dota-syntax-green-dark: #86d3a3;
+  --color-dota-syntax-orange-light: #b4541a;
+  --color-dota-syntax-orange-dark: #f2a874;
+  --color-dota-syntax-teal-light: #0e7383;
+  --color-dota-syntax-teal-dark: #6fcbd8;
 }

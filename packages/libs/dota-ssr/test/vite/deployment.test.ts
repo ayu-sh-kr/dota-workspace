@@ -37,7 +37,7 @@ describe('deployment configuration', () => {
     expect(await readFile(config, 'utf8')).toBe(updated);
   });
 
-  it.each(['netlify', 'cloudflare-pages'] as const)('%s preserves public rules and replaces its generated block', async target => {
+  it.each(['netlify', 'cloudflare-pages'] as const)('%s keeps native trailing-slash redirects, preserves public rules, and replaces its generated block', async target => {
     const file = resolve(output, '_redirects');
     const fallback = '# User rules\n/old /new 301\n/* /index.html 200\n';
     await writeFile(file, fallback);
@@ -45,7 +45,7 @@ describe('deployment configuration', () => {
 
     await prepareDeployment(root, output, routes, {deployment: target}, '/project/');
     const first = await readFile(file, 'utf8');
-    expect(first).toContain('/project/guide /project/guide/index.html 200\n');
+    expect(first).not.toContain('/project/guide ');
     expect(first).toContain('/project/custom /project/pages/custom.html 200\n');
     expect(first.endsWith(fallback)).toBe(true);
     await prepareDeployment(root, output, routes, {deployment: target}, '/project/');
@@ -69,6 +69,18 @@ describe('deployment configuration', () => {
     expect(await readFile(resolve(output, 'guide/index.html'), 'utf8')).toBe('<h1>Guide</h1>');
     expect(await readFile(resolve(output, '.nojekyll'), 'utf8')).toBe('');
     await expect(prepareDeployment(root, output, routes, {deployment: 'github-pages'})).resolves.toBeUndefined();
+  });
+
+  it('aliases custom documents to slashless files on GitHub Pages when trailing slashes are off', async () => {
+    await writeFile(resolve(output, 'custom.html'), '<h1>Guide</h1>');
+    const routes = resolveSsgRoutes([{path: '/guide', output: 'custom.html'}], false);
+    await prepareDeployment(root, output, routes, {deployment: 'github-pages', trailingSlash: false});
+    expect(await readFile(resolve(output, 'guide.html'), 'utf8')).toBe('<h1>Guide</h1>');
+  });
+
+  it.each(['netlify', 'cloudflare-pages'] as const)('%s needs no rule for slashless pages', async target => {
+    await prepareDeployment(root, output, resolveSsgRoutes(['/guide'], false), {deployment: target, trailingSlash: false});
+    expect(await readFile(resolve(output, '_redirects'), 'utf8')).toBe('# BEGIN dota-ssg\n# END dota-ssg\n');
   });
 
   it('does not overwrite a conflicting GitHub Pages route document', async () => {

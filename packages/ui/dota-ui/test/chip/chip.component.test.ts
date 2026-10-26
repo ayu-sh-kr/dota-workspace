@@ -5,8 +5,7 @@ if (!customElements.get('dota-chip-test')) customElements.define('dota-chip-test
 const render = (props: Partial<ChipComponent> = {}, content = '<span>Body</span>') => {
   const el = document.createElement('dota-chip-test') as ChipComponent;
   Object.assign(el, props);
-  el.content = content;
-  el.innerHTML = el.render();
+  el.innerHTML = content;
   document.body.append(el);
   return el;
 };

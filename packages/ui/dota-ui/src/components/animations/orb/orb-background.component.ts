@@ -1,5 +1,5 @@
 import {startAnimationLoop, type AnimationLoop} from "@dota/components/animations/animation-loop.ts";
-import {BaseElement, Component, Number, Property, String} from "@ayu-sh-kr/dota-core";
+import {BaseElement, Component, html, Number, Property, String, type TemplateResult} from "@ayu-sh-kr/dota-core";
 import {OnEvent} from "@ayu-sh-kr/dota-event";
 
 // Circular orb geometry — must stay in sync with the CSS orb div.
@@ -563,14 +563,17 @@ export class OrbBackgroundComponent extends BaseElement {
         );
       }
 
-      // Keep glow div gradient in sync when the user toggles dark/light mode.
+      // Match the glow to the current theme (server HTML is rendered in light mode, and
+      // hydration keeps it), then keep it in sync when the user toggles dark/light mode.
       const glowEl = this.querySelector<HTMLElement>('#orb-glow');
       if (glowEl) {
-        this.glowObserver = new MutationObserver(() => {
+        const syncGlow = () => {
           const dark  = isDarkMode();
           const stops = (ORB_COLOR_MAP[this.resolveColor(this.orbitGlowColor)] ?? ORB_COLOR_MAP['purple']).glow;
           glowEl.style.background = makeGlowGradient(dark ? stops.dark : stops.light, dark);
-        });
+        };
+        syncGlow();
+        this.glowObserver = new MutationObserver(syncGlow);
         this.glowObserver.observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
       }
     });
@@ -586,7 +589,7 @@ export class OrbBackgroundComponent extends BaseElement {
     this.glowObserver = null;
   }
 
-  render(): string {
+  render(): TemplateResult {
     const isCenter = this.orbitPosition === 'center';
     const outerCls = isCenter
       ? 'pointer-events-none absolute inset-0 z-0 hidden overflow-hidden lg:block'
@@ -599,10 +602,9 @@ export class OrbBackgroundComponent extends BaseElement {
     const dark       = isDarkMode();
     const glowStops  = (ORB_COLOR_MAP[this.resolveColor(this.orbitGlowColor)] ?? ORB_COLOR_MAP['purple']).glow;
     const glowStyle  = makeGlowGradient(dark ? glowStops.dark : glowStops.light, dark);
-    const glowDiv    = `<div id="orb-glow" class="${glowBase} ${sizeCls} saturate-[130%]" style="background:${glowStyle}"></div>`;
-    return `
+    return html`
       <div class="${outerCls}">
-        ${glowDiv}
+        <div id="orb-glow" class="${glowBase} ${sizeCls} saturate-[130%]" style="background:${glowStyle}"></div>
         <canvas id="orb-particles" class="absolute inset-0 pointer-events-none"></canvas>
       </div>
     `;

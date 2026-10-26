@@ -104,6 +104,29 @@ describe('durable rendering and hydration', () => {
     expect(paragraph?.textContent).toBe('client');
   });
 
+  it('writes client values that differ from the server markup while adopting it', () => {
+    const view = (label: string) => html`<p title="${label}">${label}</p>`;
+    const serverRoot = document.createElement('section');
+    setHydrationEmit(true);
+    render(serverRoot, view('light'));
+
+    const reparsed = document.createElement('div');
+    reparsed.innerHTML = serverRoot.outerHTML;
+    const clientRoot = reparsed.firstElementChild as HTMLElement;
+    const paragraph = clientRoot.querySelector('p');
+    setHydrationEmit(false);
+
+    const instance = hydrate(clientRoot, view('dark'));
+
+    expect(clientRoot.querySelector('p')).toBe(paragraph);
+    expect(paragraph?.getAttribute('title')).toBe('dark');
+    expect(paragraph?.textContent).toBe('dark');
+    expect(update(instance, view('dark'))).toEqual({kind: 'noop', changedParts: 0, replacedNodes: 0});
+    update(instance, view('light'));
+    expect(paragraph?.getAttribute('title')).toBe('light');
+    expect(paragraph?.textContent).toBe('light');
+  });
+
   it('recursively adopts conditional and keyed ranges for later patches', () => {
     const view = (label: string, values: readonly string[]) => html`
       <main>

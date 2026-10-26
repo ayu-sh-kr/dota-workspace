@@ -1,24 +1,13 @@
 import {AfterInit, BaseElement, Component, HostListener, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {type BlogCategory} from "@dota/configs/blogs.config.ts";
 
 import {routerService} from "@dota/main.ts";
 
-const categoryAccent: Record<BlogCategory, string> = {
-  Rant: "text-orange-600 dark:text-orange-300",
-  Tutorial: "text-blue-700 dark:text-blue-300",
-  News: "text-emerald-700 dark:text-emerald-300",
-  Tools: "text-purple-700 dark:text-purple-300",
-  Others: "text-slate-600 dark:text-slate-300",
-};
+/** Categories with their own label; anything else is filed under "Others". */
+const KNOWN_CATEGORIES = new Set<BlogCategory>(["Rant", "Tutorial", "News", "Tools", "Others"]);
 
 let revealObserver: IntersectionObserver | undefined;
-
-const escapeHtml = (value: string): string => value
-  .replaceAll("&", "&amp;")
-  .replaceAll("<", "&lt;")
-  .replaceAll(">", "&gt;")
-  .replaceAll('"', "&quot;")
-  .replaceAll("'", "&#039;");
 
 const estimateReadTime = (header: string, description: string): number => {
   const wordCount = `${header} ${description}`.trim().split(/\s+/).filter(Boolean).length;
@@ -99,16 +88,15 @@ export class BlogPreviewComponent extends BaseElement {
     return `/blogs/content/${encodeURIComponent(this.category)}/${encodeURIComponent(this.path)}`;
   }
 
-  render(): string {
-    const category = this.category in categoryAccent ? this.category : "Others";
-    const accentClass = categoryAccent[category];
+  render(): TemplateResult {
+    const category = KNOWN_CATEGORIES.has(this.category) ? this.category : "Others";
     const readTime = estimateReadTime(this.header, this.description);
 
-    return `
+    return html`
       <style>
         .blog-preview-card {
           transform: translateY(1.25rem);
-          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), border-color var(--motion-fast);
           transition-delay: var(--blog-preview-delay, 0ms);
         }
 
@@ -128,37 +116,21 @@ export class BlogPreviewComponent extends BaseElement {
       <a
         data-blog-card
         href="${this.blogUrl}"
-        aria-label="Read ${escapeHtml(this.header)}"
-        class="blog-preview-card group relative flex h-full min-h-[16rem] w-full flex-col overflow-hidden rounded-[20px]
-               border border-slate-200/90 bg-white p-[30px_28px_26px] text-left text-slate-950
-               shadow-[0_1px_2px_rgba(15,23,42,0.06)] transition-[transform,box-shadow,background-color]
-               duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5
-               hover:bg-slate-50 hover:shadow-[0_18px_40px_-12px_rgba(15,23,42,0.16)]
-               focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-500
-               dark:border-slate-700/80 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700
-               dark:shadow-[0_1px_2px_rgba(0,0,0,0.28)]
-               dark:hover:shadow-[0_18px_40px_-12px_rgba(0,0,0,0.55)] font-dm"
+        aria-label="Read ${this.header}"
+        class="blog-preview-card surface-card surface-card-link group flex h-full min-h-[16rem] w-full flex-col
+               gap-3 p-[var(--layout-pad-card)] text-left text-foreground"
       >
-        <div>
-          <span class="${accentClass} text-[11px] font-medium uppercase tracking-[0.04em]">
-            ${escapeHtml(category)}
-          </span>
-        </div>
+        <span class="type-eyebrow">${category}</span>
 
-        <h2 class="mt-6 text-2xl font-medium leading-[1.18] tracking-[-0.02em] text-slate-950 text-balance dark:text-white">
-          ${escapeHtml(this.header)}
-        </h2>
+        <h2 class="type-card mt-3">${this.header}</h2>
 
-        <p class="mt-2 line-clamp-3 text-[15px] leading-[1.55] text-slate-600 dark:text-slate-300">
-          ${escapeHtml(this.description)}
-        </p>
+        <p class="type-compact line-clamp-3 text-muted">${this.description}</p>
 
-        <div class="mt-auto flex items-center gap-2 pt-8 text-[13px] leading-5 text-slate-500 dark:text-slate-400">
-          <span class="truncate">${escapeHtml(this.writer)}</span>
-          <span aria-hidden="true" class="size-[3px] shrink-0 rounded-full bg-slate-400 dark:bg-slate-500"></span>
+        <div class="type-meta mt-auto flex items-center gap-2 pt-6 text-muted">
+          <span class="truncate">${this.writer}</span>
+          <span aria-hidden="true">·</span>
           <span class="shrink-0">${readTime} min read</span>
-          <span aria-hidden="true" class="${accentClass} ml-auto text-lg leading-none opacity-80 transition-transform duration-[400ms]
-                       ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1">→</span>
+          <span aria-hidden="true" class="ml-auto text-primary transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
         </div>
       </a>
     `;

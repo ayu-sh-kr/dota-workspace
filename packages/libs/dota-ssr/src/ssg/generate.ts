@@ -48,8 +48,8 @@ export async function generateStaticPages(
   ) : undefined;
   try {
     const routes = options.autoDetectRoutes
-      ? await resolveDecoratedRoutes(server!, options.routes)
-      : resolveSsgRoutes(options.routes ?? []);
+      ? await resolveDecoratedRoutes(server!, options.routes, options.trailingSlash)
+      : resolveSsgRoutes(options.routes ?? [], options.trailingSlash);
     const outputs = routes.map(route => resolve(outputDirectory, route.output));
     const directories = new Map<string, Promise<string | undefined>>();
     const routeTimes: {path: string; total: number}[] = [];

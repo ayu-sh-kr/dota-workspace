@@ -44,20 +44,6 @@
     transition: opacity 150ms ease, transform 150ms ease;
 }
 
-.tab-code-body pre,
-.tab-code-body code.hljs {
-    margin: 0 !important;
-    padding: var(--layout-space-4) var(--layout-space-5) !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    font-family: var(--font-code);
-    font-size: var(--type-code-size);
-    line-height: var(--type-code-leading);
-    color: var(--code-foreground-color);
-}
-
 @media (prefers-reduced-motion: reduce) {
     .tab-btn { transition: none; }
     .tab-content-enter { animation: none; opacity: 1; transform: none; }

@@ -1,4 +1,5 @@
 import {BaseElement, Component, Property, String} from "@ayu-sh-kr/dota-wrap/core";
+import {html, nothing, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 import {getSuggestedBlogPosts} from "@dota/configs/blogs.config.ts";
 
 @Component({
@@ -18,32 +19,23 @@ export class BlogSuggestionComponent extends BaseElement {
   })
   limit: string = "3";
 
-  render(): string {
+  render(): TemplateResult | typeof nothing {
     const currentBlog = this.currentBlog?.trim() ?? "";
     const suggestions = getSuggestedBlogPosts(currentBlog, Number(this.limit) || 3);
 
     if (!suggestions.length) {
-      return "";
+      return nothing;
     }
 
-    return `
-      <section class="font-dm mt-14 rounded-3xl border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-950/60 sm:p-6">
-        <div class="mb-5 flex items-end justify-between gap-4">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
-              Continue reading
-            </p>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">
-              Next blogs to open
-            </h2>
-          </div>
-          <p class="max-w-sm text-sm text-slate-600 dark:text-slate-400">
-            A quick path to the next few posts in this series.
-          </p>
+    return html`
+      <section class="mt-16 border-t border-default pt-10">
+        <div class="mb-6 flex flex-col gap-2">
+          <span class="type-eyebrow">Continue reading</span>
+          <h2 class="type-section text-foreground">Next posts</h2>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          ${suggestions.map(post => `
+        <div class="layout-grid-3">
+          ${suggestions.map(post => html`
             <blog-preview
               date="${post.date}"
               writer="${post.writer}"
@@ -52,7 +44,7 @@ export class BlogSuggestionComponent extends BaseElement {
               category="${post.category}"
               path="${post.path}">
             </blog-preview>
-          `).join("")}
+          `)}
         </div>
       </section>
     `;

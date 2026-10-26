@@ -1,4 +1,5 @@
-import {BaseElement, Component, HTML} from "@ayu-sh-kr/dota-wrap/core";
+import {BaseElement, Component} from "@ayu-sh-kr/dota-wrap/core";
+import {html, type TemplateResult} from "@ayu-sh-kr/dota-wrap/rendering";
 
 type FlowStage = {
   title: string;
@@ -79,17 +80,17 @@ const CARD_ACCENT_BY_INDEX = [
   shadow: false,
 })
 export class DesFlowComponent extends BaseElement {
-  render(): string {
+  render(): TemplateResult {
     const total = DES_FLOW_STAGES.length;
 
-    return HTML`
+    return html`
       <scroll-deck aria-label="DES flow carousel">
         ${DES_FLOW_STAGES.map((stage, index) => {
           const accent = ACCENT_BY_INDEX[index % ACCENT_BY_INDEX.length];
           const cardAccent = CARD_ACCENT_BY_INDEX[index % CARD_ACCENT_BY_INDEX.length];
           const hasMore = index < total - 1;
 
-          return `
+          return html`
             <article
               data-scroll-slide="true"
               class="relative min-w-full snap-start snap-always"
@@ -146,7 +147,7 @@ export class DesFlowComponent extends BaseElement {
               </div>
             </article>
           `;
-        }).join("")}
+        })}
       </scroll-deck>
     `;
   }

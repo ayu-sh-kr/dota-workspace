@@ -20,6 +20,7 @@ import {
   buildComponentDependencyGraph,
   prepareComponentRegistryExport,
   prepareSharedChunkGroup,
+  isRegistryOnlyIneffectiveImport,
   type ComponentDependencyGraph
 } from "@dota/domain";
 
@@ -110,6 +111,10 @@ export default function dotaVitePreloader({root = process.cwd(), logType, shared
       // Only the matched modules join the group; libraries they import keep their own chunks.
       const codeSplitting = {includeDependenciesRecursively: false, groups: [prepareSharedChunkGroup(root)]};
       return {build: {rolldownOptions: {output: {codeSplitting}}}};
+    },
+    /** Drops ineffective dynamic import warnings that only the generated registry causes. */
+    onLog(_level, log) {
+      if (isRegistryOnlyIneffectiveImport(log)) return false;
     },
     resolveId(id) {
       if (id === VirtualImportID.DOTA_COMPONENTS) return VirtualImportID.RESOLVED_DOTA_COMPONENTS;

@@ -192,6 +192,69 @@ Keep Vite's separator in the package script (`"build": "tsc && vite build --"`)
 so callers do not have to provide it. Without `--ssg`, the same command produces
 the ordinary client-only build.
 
+## Deployment packaging
+
+Name the hosting platform once with `deployment`, and both SSG and SSR output are
+packaged for it:
+
+```ts
+dotaVitePlugins({
+  deployment: 'netlify',
+  ssg: {autoDetectRoutes: true}
+});
+```
+
+| `deployment` | SSG hosting files | SSR server |
+| --- | --- | --- |
+| `'node'` | none; the Node server serves the pages | `dist-server/server.mjs` |
+| `'vercel'` | redirects in `vercel.json` | Vercel function |
+| `'netlify'` | `_redirects` rules for custom outputs | Netlify function |
+| `'cloudflare-pages'` | `_redirects` rules for custom outputs | `_worker.js/` |
+| `'github-pages'` | `.nojekyll` and route aliases | none; `ssr` routes render in the browser |
+
+The object form carries settings that only some platforms read:
+
+```ts
+dotaVitePlugins({
+  deployment: {
+    target: 'vercel',
+    vercelConfigFile: '../vercel.json', // vercel only
+    serverOutDir: 'dist-server',        // node only
+    trailingSlash: true                 // the default
+  },
+  ssg: {autoDetectRoutes: true}
+});
+```
+
+Page URLs end with a slash by default (`/docs/` serves `docs/index.html`, and
+`/docs` redirects to it). `trailingSlash: false` writes `docs.html` and serves
+it at `/docs` instead. Changing the setting changes every public URL, so pick
+one before a site is indexed. An explicit `ssg.deployment`, `ssg.trailingSlash`,
+or `ssr.deployment` still wins. `dotaPackage()` from
+`@ayu-sh-kr/dota-wrap/vite` applies the same mapping for a custom plugin list.
+
+### Environment variables
+
+Each deployment setting can also be set from the environment. A variable that is
+set wins over the plugin configuration, including the nested `ssg.deployment`,
+`ssg.trailingSlash`, and `ssr.deployment`; unset or empty variables fall back to
+the configuration.
+
+| Variable | Overrides | Values |
+| --- | --- | --- |
+| `DOTA_DEPLOYMENT` | `deployment` / `target` | `node`, `vercel`, `netlify`, `cloudflare-pages`, `github-pages` |
+| `DOTA_TRAILING_SLASH` | `trailingSlash` | `true` or `false` |
+| `DOTA_VERCEL_CONFIG_FILE` | `vercelConfigFile` | path relative to the project root |
+| `DOTA_SERVER_OUT_DIR` | `serverOutDir` | path relative to the project root |
+
+```sh
+DOTA_DEPLOYMENT=node pnpm run build --ssg
+```
+
+Unsupported values fail the build instead of being ignored. The variable names
+are exported as `DOTA_PACKAGE_ENV`, and `readPackageEnv()` returns the settings
+an environment provides.
+
 `dotaSsg()` is available directly from `@ayu-sh-kr/dota-wrap/ssg` when an
 application needs only the SSG plugin. The wrapper points its rendering bridge
 at `@ayu-sh-kr/dota-wrap/rendering`, keeping all application imports within the
