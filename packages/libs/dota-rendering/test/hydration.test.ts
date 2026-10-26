@@ -270,6 +270,7 @@ describe('durable rendering and hydration', () => {
       ['<p class="x" title="extra">Text</p>', '<p class="x">Text</p>'],
       ['<app-icon name="home"></app-icon>', '<app-icon name="away"></app-icon>'],
       ['<p>One</p>', '<p>One</p><p>Two</p>'],
+      ['<svg><font-face><desc>Old</desc></font-face></svg>', '<svg><font-face><desc>New</desc></font-face></svg>'],
     ];
     for (const [server, client] of cases) {
       const root = document.createElement('section');
@@ -281,6 +282,68 @@ describe('durable rendering and hydration', () => {
       expect(root.firstChild).not.toBe(first);
       expect(root.innerHTML).toBe(client);
     }
+  });
+
+  it('keeps server light DOM holding inert template content', () => {
+    const root = document.createElement('section');
+    root.innerHTML = '<template><p>Row</p></template><app-icon name="home" data-dh-c="1"></app-icon>';
+    const template = root.firstElementChild;
+
+    render(root, '<template><p>Row</p></template><app-icon name="home"></app-icon>');
+
+    expect(root.firstElementChild).toBe(template);
+  });
+
+  it('keeps a nested light-DOM component whose slot holds the children the output gives it', () => {
+    const root = document.createElement('section');
+    root.innerHTML = '<dota-button data-dh-c="1"><button><span data-dota-slot="">Save <b>2</b></span></button></dota-button>';
+    const button = root.querySelector('button');
+
+    render(root, '<dota-button>Save <b>2</b></dota-button>');
+
+    expect(root.querySelector('button')).toBe(button);
+  });
+
+  it('keeps a nested shadow host whose light children match the output', () => {
+    const root = document.createElement('section');
+    root.innerHTML = '<app-panel data-dh-c="1">Body</app-panel>';
+    const panel = root.firstElementChild!;
+    panel.attachShadow({mode: 'open'}).innerHTML = '<slot></slot>';
+
+    render(root, '<app-panel>Body</app-panel>');
+
+    expect(root.firstElementChild).toBe(panel);
+  });
+
+  it('replaces nested components whose children differ from the output', () => {
+    const cases = [
+      ['<dota-button><button><span data-dota-slot="">Save 2</span></button></dota-button>', '<dota-button>Save 3</dota-button>'],
+      ['<dota-button><button><span data-dota-slot=""></span></button></dota-button>', '<dota-button>Save</dota-button>'],
+      ['<app-card><app-inner><i data-dota-slot="">Save</i></app-inner></app-card>', '<app-card>Save</app-card>'],
+      ['<app-card><p>Rendered without a slot</p></app-card>', '<app-card>Save</app-card>'],
+    ];
+    for (const [server, client] of cases) {
+      const root = document.createElement('section');
+      root.innerHTML = server;
+      const first = root.firstChild;
+
+      render(root, client);
+
+      expect(root.firstChild).not.toBe(first);
+      expect(root.innerHTML).toBe(client);
+    }
+  });
+
+  it('replaces a nested shadow host whose light children differ from the output', () => {
+    const root = document.createElement('section');
+    root.innerHTML = '<app-panel>Old</app-panel>';
+    const panel = root.firstElementChild!;
+    panel.attachShadow({mode: 'open'}).innerHTML = '<slot></slot>';
+
+    render(root, '<app-panel>New</app-panel>');
+
+    expect(root.firstElementChild).not.toBe(panel);
+    expect(root.innerHTML).toBe('<app-panel>New</app-panel>');
   });
 
   it('mounts repeated templates from one parse without sharing parts', () => {
