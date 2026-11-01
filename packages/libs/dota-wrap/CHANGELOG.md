@@ -1,5 +1,14 @@
 # @ayu-sh-kr/dota-wrap
 
+## 0.7.2
+
+### Patch Changes
+
+- Updated dependencies [a69adb0]
+- Updated dependencies [a69adb0]
+- Updated dependencies [a69adb0]
+  - @ayu-sh-kr/dota-rest@1.3.0
+
 ## 0.7.1
 
 ### Patch Changes
