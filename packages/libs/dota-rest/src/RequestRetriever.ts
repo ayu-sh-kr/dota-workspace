@@ -39,11 +39,10 @@ export class RestRequestRetriever implements RequestRetriever {
   }
 
   /**
-   * Builds the final request, applies client interceptors in registration order, and sends it with
-   * the configured retry policy and `fetch` implementation. Errors while building the request
-   * reject the returned resolver instead of throwing.
-   * Each interceptor observes the previous interceptor's result, and `fetch` only
-   * starts after the complete synchronous or asynchronous pipeline succeeds.
+   * Builds the final request, runs the interceptors in registration order, and sends it with the
+   * configured retry policy and `fetch`. Each interceptor sees the previous one's result, and
+   * nothing is sent until all of them succeed. Errors while building the request reject the
+   * returned resolver instead of throwing.
    * @param builder Request configuration collected by the fluent API.
    * @returns A resolver backed by the intercepted request's response promise.
    */

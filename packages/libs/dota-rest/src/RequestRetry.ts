@@ -1,6 +1,6 @@
 import type {HttpRequestBody} from "@dota/RestUtils.ts";
 import {RestUtils} from "@dota/RestUtils.ts";
-import type {FetchFunction, HttpMethod, RetryOptions} from "@dota/Types.ts";
+import type {FetchFunction, HttpMethod, RetryContext, RetryOptions} from "@dota/Types.ts";
 
 const DEFAULT_METHODS: readonly HttpMethod[] = ['GET', 'PUT', 'HEAD', 'DELETE', 'OPTIONS'];
 const DEFAULT_STATUS_CODES: readonly number[] = [408, 413, 429, 500, 502, 503, 504];
@@ -64,7 +64,7 @@ export class RequestRetry {
         if (!canRetry || !RequestRetry.isNetworkError(error)) {
           throw error;
         }
-        await this.wait(request, {attempt, delay: this.boundedDelay(attempt), error});
+        await this.wait(request, {attempt, delay: this.backoff(attempt), error});
         continue;
       }
 
@@ -72,13 +72,13 @@ export class RequestRetry {
         return response;
       }
 
-      const delay = RequestRetry.retryAfter(response) ?? this.delay(attempt);
-      if (delay > this.maxDelay) {
+      const retryAfter = RequestRetry.retryAfter(response);
+      if (retryAfter !== undefined && retryAfter > this.maxDelay) {
         return response;
       }
 
       await response.body?.cancel().catch(() => undefined);
-      await this.wait(request, {attempt, delay, response});
+      await this.wait(request, {attempt, delay: retryAfter ?? this.backoff(attempt), response});
     }
   }
 
@@ -87,14 +87,11 @@ export class RequestRetry {
     return this.limit > 0 && !isStream && this.methods.includes(request.method.toUpperCase() as HttpMethod);
   }
 
-  private boundedDelay(attempt: number): number {
+  private backoff(attempt: number): number {
     return Math.min(this.delay(attempt), this.maxDelay);
   }
 
-  private async wait(
-    request: HttpRequestBody,
-    context: { attempt: number, delay: number, response?: Response, error?: unknown }
-  ): Promise<void> {
+  private async wait(request: HttpRequestBody, context: RetryContext): Promise<void> {
     await this.options?.beforeRetry?.(context);
     await RequestRetry.sleep(context.delay, request.abortController.signal);
   }

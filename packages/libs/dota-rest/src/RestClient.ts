@@ -69,12 +69,6 @@ export interface ClientBuilder {
    */
   throwHttpErrors(validateStatus?: boolean | StatusValidator): ClientBuilder;
 
-
-  /**
-   * Builds and returns a new instance of the `RestClient` with the specified base URL and headers.
-   *
-   * @returns A new instance of the `RestClient` configured with the specified base URL and headers.
-   */
   /**
    * Sends every request through `fetchFn` instead of the global `fetch`, for example a server-side
    * implementation, a custom agent, or a test double.
@@ -100,6 +94,11 @@ export interface ClientBuilder {
    */
   retry(retry: number | RetryOptions | false): ClientBuilder;
 
+  /**
+   * Builds and returns a new instance of the `RestClient` from the configured settings.
+   *
+   * @returns A new instance of the `RestClient` configured by this builder.
+   */
   build(): RestClient;
 }
 
@@ -199,7 +198,6 @@ function toStatusValidator(option: boolean | StatusValidator): StatusValidator |
   return option ? isSuccessStatus : undefined;
 }
 
-
 export class RestClient {
 
   private config!: RestClientConfig;
@@ -276,27 +274,27 @@ export class RestClient {
     });
   }
 
-  /** Starts a `POST` request. @typeParam T - The type of the response data. */
+  /** Starts a `POST` request; `T` is the response data type. */
   post<T>(): RequestBuilder<T> {
     return this.request<T>('POST');
   }
 
-  /** Starts a `GET` request. @typeParam T - The type of the response data. */
+  /** Starts a `GET` request; `T` is the response data type. */
   get<T>(): RequestBuilder<T> {
     return this.request<T>('GET');
   }
 
-  /** Starts a `PATCH` request. @typeParam T - The type of the response data. */
+  /** Starts a `PATCH` request; `T` is the response data type. */
   patch<T>(): RequestBuilder<T> {
     return this.request<T>('PATCH');
   }
 
-  /** Starts a `PUT` request. @typeParam T - The type of the response data. */
+  /** Starts a `PUT` request; `T` is the response data type. */
   put<T>(): RequestBuilder<T> {
     return this.request<T>('PUT');
   }
 
-  /** Starts a `DELETE` request. @typeParam T - The type of the response data. */
+  /** Starts a `DELETE` request; `T` is the response data type. */
   delete<T>(): RequestBuilder<T> {
     return this.request<T>('DELETE');
   }
@@ -306,7 +304,7 @@ export class RestClient {
     return this.request<void>('HEAD');
   }
 
-  /** Starts an `OPTIONS` request. @typeParam T - The type of the response data. */
+  /** Starts an `OPTIONS` request; `T` is the response data type. */
   options<T>(): RequestBuilder<T> {
     return this.request<T>('OPTIONS');
   }

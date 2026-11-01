@@ -98,8 +98,11 @@ export interface RequestSetup {
   abortController?: AbortController,
   /** Status check inherited from the client; when set, failing responses reject with `HttpError`. */
   validateStatus?: StatusValidator,
+  /** `fetch` implementation inherited from the client; the global `fetch` when omitted. */
   fetch?: FetchFunction,
+  /** `RequestInit` options inherited from the client. */
   fetchOptions?: FetchOptions,
+  /** Retry policy inherited from the client; no retries when omitted. */
   retry?: RetryOptions
 }
 
@@ -150,7 +153,10 @@ export interface RetryOptions {
   statusCodes?: readonly number[];
   /** Delay in milliseconds before the given retry. Default `300 * 2 ** (attempt - 1)`. */
   delay?: (attempt: number) => number;
-  /** Upper bound in milliseconds for any delay, including `Retry-After`. Default `30000`. */
+  /**
+   * Upper bound in milliseconds for a computed delay. A longer `Retry-After` returns the response
+   * instead of waiting. Default `30000`.
+   */
   maxDelay?: number;
   /** Runs before each retry; it may be async and is awaited. */
   beforeRetry?: (context: RetryContext) => void | Promise<void>;

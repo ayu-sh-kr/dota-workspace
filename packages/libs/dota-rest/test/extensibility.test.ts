@@ -204,6 +204,20 @@ describe('retry', () => {
     expect(fetchFn).toHaveBeenCalledTimes(1);
   });
 
+  it('caps a computed delay at maxDelay instead of skipping the retry', async () => {
+    vi.useFakeTimers();
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce(new Response(null, {status: 503}))
+      .mockResolvedValueOnce(new Response(null, {status: 204}));
+    const client = RestClient.builder().fetch(fetchFn).retry({limit: 1, delay: () => 60000, maxDelay: 100}).build();
+
+    const pending = client.get().uri('https://api.test').retrieve().toResponse();
+    await vi.advanceTimersByTimeAsync(100);
+
+    expect((await pending).status).toBe(204);
+    expect(fetchFn).toHaveBeenCalledTimes(2);
+  });
+
   it('stops waiting and rejects when the caller aborts during the delay', async () => {
     const fetchFn = vi.fn().mockResolvedValue(new Response(null, {status: 503}));
     const controller = new AbortController();
