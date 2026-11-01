@@ -5,7 +5,6 @@ import {
   FetchOptions,
   Header,
   HttpMethod,
-  PathParams,
   QueryParams,
   QueryValue,
   RequestSetup,
@@ -120,27 +119,6 @@ export interface RequestBuilder<T> {
   removeHeader(key: string): RequestBuilder<T>;
 
   /**
-   * Sets one value for a `{name}` placeholder in the URI; the value is URL-encoded.
-   *
-   * @param key - The placeholder name without braces.
-   * @param value - The value to substitute.
-   * @returns The builder.
-   */
-  pathParam(key: string, value: string | number | boolean): RequestBuilder<T>;
-
-  /**
-   * Sets values for `{name}` placeholders in the URI, merged with earlier values.
-   *
-   * @example
-   * ```typescript
-   * client.get<User>().uri('/users/{id}').pathParams({id: 42}).retrieve();
-   * ```
-   * @param params - The values to substitute; each is URL-encoded.
-   * @returns The builder.
-   */
-  pathParams(params: PathParams): RequestBuilder<T>;
-
-  /**
    * Sets `RequestInit` options such as `credentials` or `cache`, merged over the client's options.
    *
    * @param options - The options to pass to `fetch`.
@@ -185,7 +163,6 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
   private _params: URLSearchParams;
   private _body: any;
   private readonly _removedHeaders = new Set<string>();
-  private _pathParams: PathParams = {};
   private _fetchOptions: FetchOptions;
   private _retry: RetryOptions | undefined;
   private readonly _fetch: FetchFunction | undefined;
@@ -268,16 +245,6 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
     return this;
   }
 
-  pathParam(key: string, value: string | number | boolean): RequestBuilder<T> {
-    this._pathParams[key] = value;
-    return this;
-  }
-
-  pathParams(params: PathParams): RequestBuilder<T> {
-    this._pathParams = {...this._pathParams, ...params};
-    return this;
-  }
-
   fetchOptions(options: FetchOptions): RequestBuilder<T> {
     this._fetchOptions = {...this._fetchOptions, ...options};
     return this;
@@ -338,10 +305,6 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
 
   getRemovedHeaders(): ReadonlySet<string> {
     return this._removedHeaders;
-  }
-
-  getPathParams(): PathParams {
-    return this._pathParams;
   }
 
   getFetchOptions(): FetchOptions {

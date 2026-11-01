@@ -40,8 +40,8 @@ export class RestRequestRetriever implements RequestRetriever {
 
   /**
    * Builds the final request, applies client interceptors in registration order, and sends it with
-   * the configured retry policy and `fetch` implementation. A missing path parameter rejects the
-   * returned resolver instead of throwing.
+   * the configured retry policy and `fetch` implementation. Errors while building the request
+   * reject the returned resolver instead of throwing.
    * Each interceptor observes the previous interceptor's result, and `fetch` only
    * starts after the complete synchronous or asynchronous pipeline succeeds.
    * @param builder Request configuration collected by the fluent API.
@@ -55,7 +55,7 @@ export class RestRequestRetriever implements RequestRetriever {
     try {
       uri = RestUtils.createURI({
         baseURI: builder.getBaseUri(),
-        uri: RestUtils.fillPathParams(builder.getUri() ?? '', builder.getPathParams()),
+        uri: builder.getUri(),
         params: builder.getParams()
       });
       const requestBody = RestRequestRetriever.createRequestBody(builder, uri);

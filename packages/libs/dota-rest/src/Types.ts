@@ -122,9 +122,6 @@ export type FetchFunction = (input: string, init: RequestInit) => Promise<Respon
 export type FetchOptions = Pick<RequestInit,
   'cache' | 'credentials' | 'integrity' | 'keepalive' | 'mode' | 'redirect' | 'referrer' | 'referrerPolicy'>;
 
-/** Values substituted for `{name}` placeholders in a request URI. */
-export type PathParams = Record<string, string | number | boolean>;
-
 /** Details passed to {@link RetryOptions.beforeRetry} before each retry. */
 export interface RetryContext {
   /** The retry about to run, starting at `1`. */

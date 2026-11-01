@@ -501,29 +501,11 @@ const client = RestClient.builder()
 await client.get<Status>().uri('/public/status').removeHeader('authorization').retrieve().toEntity();
 ```
 
-## Path parameters
-
-Write `{name}` placeholders in the URI and fill them with `pathParam()` or `pathParams()`. Values
-are URL-encoded; a placeholder without a value rejects the request before it is sent.
-
-```typescript
-await client.get<User>().uri('/users/{id}').pathParam('id', 42).retrieve().toEntity();
-// GET https://api.example.com/users/42
-
-await client.get<Blob>()
-  .uri('/users/{id}/files/{name}')
-  .pathParams({id: 42, name: 'report 2026.pdf'})
-  .param('download', true)
-  .retrieve()
-  .toResponse();
-// GET https://api.example.com/users/42/files/report%202026.pdf?download=true
-```
-
 ## HEAD, OPTIONS, and other methods
 
 ```typescript
 // Read headers without downloading the body
-const head = await client.head().uri('/files/{name}').pathParam('name', 'big.zip').retrieve().toVoid();
+const head = await client.head().uri(`/files/${encodeURIComponent(name)}`).retrieve().toVoid();
 console.log(head.headers.get('Content-Length'));
 
 // Ask which methods a resource allows
@@ -531,7 +513,7 @@ const options = await client.options().uri('/users').retrieve().toVoid();
 console.log(options.headers.get('Allow'));
 
 // Any method through one entry point
-await client.request<User>('PATCH').uri('/users/{id}').pathParam('id', 42).body({name: 'Ana'}).retrieve().toEntity();
+await client.request<User>('PATCH').uri(`/users/${id}`).body({name: 'Ana'}).retrieve().toEntity();
 ```
 
 ## Deriving clients with extend()

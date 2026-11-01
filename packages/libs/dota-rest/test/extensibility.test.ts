@@ -67,7 +67,7 @@ describe('headers', () => {
   });
 });
 
-describe('methods and path parameters', () => {
+describe('methods', () => {
   it('supports HEAD, OPTIONS, and a generic request method', async () => {
     const fetchFn = vi.fn().mockImplementation(() => Promise.resolve(new Response(null, {status: 204})));
     const client = RestClient.builder().fetch(fetchFn).build();
@@ -77,28 +77,6 @@ describe('methods and path parameters', () => {
     await client.request('PATCH').uri('https://api.test').retrieve().toVoid();
 
     expect(fetchFn.mock.calls.map(([, init]) => init.method)).toEqual(['HEAD', 'OPTIONS', 'PATCH']);
-  });
-
-  it('fills and encodes path parameters', async () => {
-    const fetchFn = vi.fn().mockResolvedValue(new Response(null, {status: 204}));
-    const client = RestClient.builder().baseUrl('https://api.test').fetch(fetchFn).build();
-
-    await client.get().uri('/users/{id}/files/{name}')
-      .pathParams({id: 7})
-      .pathParam('name', 'a b/c')
-      .param('q', 1)
-      .retrieve()
-      .toVoid();
-
-    expect(fetchFn.mock.calls[0][0]).toBe('https://api.test/users/7/files/a%20b%2Fc?q=1');
-  });
-
-  it('rejects without sending when a path parameter is missing', async () => {
-    const fetchFn = vi.fn();
-    const client = RestClient.builder().fetch(fetchFn).build();
-
-    await expect(client.get().uri('/users/{id}').retrieve().toVoid()).rejects.toThrow('"id"');
-    expect(fetchFn).not.toHaveBeenCalled();
   });
 });
 

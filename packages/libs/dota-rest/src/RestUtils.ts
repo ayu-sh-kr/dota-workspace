@@ -1,4 +1,4 @@
-import type {FetchFunction, FetchOptions, Header, PathParams, QueryParams, QueryValue} from "@dota/Types.ts";
+import type {FetchFunction, FetchOptions, Header, QueryParams, QueryValue} from "@dota/Types.ts";
 
 const ABSOLUTE_URL = /^[a-z][a-z\d+\-.]*:\/\//i;
 
@@ -158,23 +158,6 @@ export class RestUtils {
       || body instanceof ArrayBuffer
       || ArrayBuffer.isView(body)
       || (typeof ReadableStream !== 'undefined' && body instanceof ReadableStream);
-  }
-
-  /**
-   * Replaces each `{name}` placeholder in a URI with its URL-encoded value.
-   *
-   * @param uri - The URI template, for example `/users/{id}`.
-   * @param params - The values to substitute.
-   * @returns The URI with every placeholder replaced.
-   * @throws Error When a placeholder has no value.
-   */
-  static fillPathParams = (uri: string, params: PathParams): string => {
-    return uri.replace(/\{([^{}/]+)\}/g, (_, name: string) => {
-      if (!Object.hasOwn(params, name)) {
-        throw new Error(`Missing value for path parameter "${name}" in "${uri}"`);
-      }
-      return encodeURIComponent(String(params[name]));
-    });
   }
 
   /**
