@@ -93,8 +93,24 @@ export interface RequestSetup {
   /** Interceptors inherited from the client and applied before request execution. */
   requestInterceptors?: readonly RequestInterceptor[],
   /** Optional caller-owned controller; a new controller is created when omitted. */
-  abortController?: AbortController
+  abortController?: AbortController,
+  /** Status check inherited from the client; when set, failing responses reject with `HttpError`. */
+  validateStatus?: StatusValidator
 }
+
+/**
+ * Decides whether a response status counts as success.
+ *
+ * @param status - The HTTP status code.
+ * @returns `true` to resolve normally, `false` to reject with `HttpError`.
+ */
+export type StatusValidator = (status: number) => boolean;
+
+/** A single query parameter value; `null` and `undefined` are skipped. */
+export type QueryValue = string | number | boolean | null | undefined;
+
+/** Query parameters as an object; array values add the key once per item. */
+export type QueryParams = Record<string, QueryValue | readonly QueryValue[]>;
 
 /**
  * The `Response` interface represents the structure of an HTTP response.

@@ -8,7 +8,8 @@ P1 is a significant gap, P2 is polish.
 
 ## 1. Bugs
 
-> **Status:** B1–B11 are fixed on `fix/dota-rest`. B10 keeps the request starting in `retrieve()`,
+> **Status:** B1–B15 and the opt-in part of 2.1 (`throwHttpErrors()`, `HttpError`, error guards)
+> are fixed on `fix/dota-rest`. B10 keeps the request starting in `retrieve()`,
 > so callers that never read the result still send it; the fix suppresses the unhandled rejection
 > and caches `toEntity()` instead of deferring the request.
 

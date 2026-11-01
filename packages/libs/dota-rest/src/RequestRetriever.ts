@@ -72,7 +72,10 @@ export class RestRequestRetriever implements RequestRetriever {
     // The request starts now; this branch only stops unread failures becoming unhandled rejections.
     response.catch(() => undefined);
 
-    return new RestResponseResolver<T>(response, this._handler);
+    return new RestResponseResolver<T>(response, this._handler, {
+      validateStatus: builder.getValidateStatus(),
+      request: {method: requestBody.method, url: uri}
+    });
   }
 
 }

@@ -114,7 +114,7 @@ console.log(data)
 ```
 
 #### Creating `RestClient` with timeout
-By default the client have a timout of 10s but it can be changed during the build of `RestClient` or 
+By default the client has a timeout of 10s but it can be changed during the build of `RestClient` or
 during making the request.
 
 Adding timeout during client buildup.
@@ -337,6 +337,48 @@ const userConverter = (data: any): User => {
 ```
 
 This converter function ensures that the `id` is a number, and `name` and `email` are strings before creating a new `User` instance.
+
+## Query parameters
+
+`param()` appends a value; `params()` merges an object or `URLSearchParams`, replacing only the keys
+it names. Numbers and booleans are stringified, arrays repeat the key, and `null`/`undefined` are skipped.
+
+```typescript
+await client.get<User[]>()
+    .uri('/users')
+    .param('tag', ['admin', 'staff'])
+    .params({page: 2, active: true, search: undefined})
+    .retrieve()
+    .toEntity(); // GET /users?tag=admin&tag=staff&page=2&active=true
+```
+
+## Handling HTTP errors
+
+By default every response resolves, including 4xx and 5xx, so check `status` yourself. Call
+`throwHttpErrors()` to reject failing statuses with an `HttpError` that carries the parsed body.
+
+```typescript
+import {HttpError, isHttpError, isTimeoutError, RestClient} from "@ayu-sh-kr/dota-rest";
+
+const client = RestClient.builder()
+    .baseUrl('http://localhost:8080')
+    .throwHttpErrors()                 // 2xx is success
+    // .throwHttpErrors(s => s < 500)  // or decide per status
+    .build();
+
+try {
+    await client.get<User>().uri('/users/1').retrieve().toEntity();
+} catch (error) {
+    if (isHttpError<{ title: string }>(error)) {
+        console.log(error.status, error.data?.title);
+    } else if (isTimeoutError(error)) {
+        console.log('timed out');
+    }
+}
+```
+
+`isAbortError()` identifies requests cancelled through their `AbortController`, and `isRestError()`
+matches any error created by the client.
 
 ## Conclusion
 

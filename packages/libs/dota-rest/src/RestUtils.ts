@@ -1,4 +1,4 @@
-import type {Header} from "@dota/Types.ts";
+import type {Header, QueryParams, QueryValue} from "@dota/Types.ts";
 
 const ABSOLUTE_URL = /^[a-z][a-z\d+\-.]*:\/\//i;
 
@@ -55,6 +55,53 @@ export class RestUtils {
       return '?';
     }
     return path.endsWith('?') || path.endsWith('&') ? '' : '&';
+  }
+
+  /**
+   * Writes query parameters into `target`, replacing earlier values for the same keys.
+   * Numbers and booleans are stringified, `null` and `undefined` are skipped, and array values
+   * add the key once per item, so `{tag: ['a', 'b']}` becomes `tag=a&tag=b`.
+   *
+   * @param target - The parameters collected so far; mutated in place.
+   * @param source - Parameters to merge, as `URLSearchParams` or a plain object.
+   */
+  static mergeQuery = (target: URLSearchParams, source: URLSearchParams | QueryParams): void => {
+    const entries = source instanceof URLSearchParams
+      ? RestUtils.groupSearchParams(source)
+      : Object.entries(source);
+
+    entries.forEach(([key, value]) => {
+      target.delete(key);
+      RestUtils.appendQuery(target, key, value);
+    });
+  }
+
+  /**
+   * Appends one key's value or values, skipping `null` and `undefined`.
+   *
+   * @param target - The parameters to append to.
+   * @param key - The query parameter name.
+   * @param value - A single value or a list of values.
+   */
+  static appendQuery = (
+    target: URLSearchParams,
+    key: string,
+    value: QueryValue | readonly QueryValue[]
+  ): void => {
+    const values: readonly QueryValue[] = Array.isArray(value) ? value : [value];
+    values
+      .filter(item => item !== null && item !== undefined)
+      .forEach(item => target.append(key, String(item)));
+  }
+
+  /**
+   * Groups repeated keys of `URLSearchParams` so a merge replaces each key once with all its values.
+   *
+   * @param params - Parameters that may repeat a key.
+   * @returns One entry per key with every value for that key.
+   */
+  private static groupSearchParams(params: URLSearchParams): [string, string[]][] {
+    return [...new Set(params.keys())].map(key => [key, params.getAll(key)]);
   }
 
   /**

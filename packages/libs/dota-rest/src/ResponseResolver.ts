@@ -1,4 +1,13 @@
-import {Entity, ResponseConverter, ResponseEntity, ResponseHandler, ResponseVoid, VoidEntity} from "@dota/Types.ts";
+import {
+  Entity,
+  ResponseConverter,
+  ResponseEntity,
+  ResponseHandler,
+  ResponseVoid,
+  StatusValidator,
+  VoidEntity
+} from "@dota/Types.ts";
+import {HttpError} from "@dota/RestError.ts";
 
 const JSON_MEDIA_TYPE = /^[^;]*[/+]json\s*(;|$)/i;
 
@@ -79,7 +88,8 @@ export class RestResponseResolver<T extends any> implements ResponseResolver<T> 
 
   constructor(
     private _response: Promise<Response>,
-    private _handler: ResponseHandler | undefined
+    private _handler: ResponseHandler | undefined,
+    private readonly _options: ResponseResolverOptions = {}
   ) {
   }
 
@@ -113,14 +123,42 @@ export class RestResponseResolver<T extends any> implements ResponseResolver<T> 
   }
 
   /**
-   * Waits for the response and runs the handler, awaiting it so async checks finish first.
+   * Waits for the response, runs the handler, then applies status validation when enabled.
+   * The handler runs first so it still sees failing responses, matching the behaviour without
+   * validation.
    *
-   * @returns The response after the handler has completed.
+   * @returns The response after the handler has completed and the status was accepted.
+   * @throws {HttpError} When a status validator is set and rejects the status.
    */
   private async handledResponse(): Promise<Response> {
     const response = await this._response;
     await this._handler?.(response);
+
+    const {validateStatus, request} = this._options;
+    if (validateStatus && !validateStatus(response.status)) {
+      const data = await RestResponseResolver.readErrorBody(response);
+      throw new HttpError(response, request ?? {method: '', url: response.url}, data);
+    }
     return response;
+  }
+
+  /**
+   * Reads a failing response body for `HttpError.data` without letting a parse failure hide
+   * the HTTP error.
+   *
+   * @param response - The failing response.
+   * @returns Parsed JSON, text, or `undefined` for an empty or unreadable body.
+   */
+  private static async readErrorBody(response: Response): Promise<unknown> {
+    try {
+      const text = await response.text();
+      if (!text) {
+        return undefined;
+      }
+      return RestResponseResolver.isJson(response) ? JSON.parse(text) : text;
+    } catch {
+      return undefined;
+    }
   }
 
   /**
@@ -156,4 +194,12 @@ export class RestResponseResolver<T extends any> implements ResponseResolver<T> 
     return JSON_MEDIA_TYPE.test(response.headers.get('Content-Type') ?? '');
   }
 
+}
+
+/** Optional behaviour passed from the request to its resolver. */
+export interface ResponseResolverOptions {
+  /** When set, statuses it rejects make terminal calls reject with `HttpError`. */
+  validateStatus?: StatusValidator;
+  /** Request details reported on `HttpError`. */
+  request?: { method: string, url: string };
 }
