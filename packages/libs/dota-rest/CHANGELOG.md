@@ -1,5 +1,38 @@
 # @ayu-sh-kr/dota-rest
 
+## 1.3.0
+
+### Minor Changes
+
+- a69adb0: Add opt-in HTTP errors and more flexible query parameters. Existing code keeps working: failing statuses still resolve unless you opt in.
+
+  - `ClientBuilder.throwHttpErrors()` makes `toEntity()`, `toVoid()`, and `toResponse()` reject with an `HttpError` for non-2xx responses. Pass a function to decide per status, or `false` to turn it off. `HttpError` exposes `status`, `statusText`, `method`, `url`, the parsed body as `data`, and the `response`.
+  - New `RestError` base class and the `isRestError()`, `isHttpError()`, `isTimeoutError()`, and `isAbortError()` guards.
+  - `params()` now merges with parameters already set instead of discarding them, replacing only the keys it names, and also accepts a plain object.
+  - `param()` and `params()` accept numbers, booleans, and arrays (one entry per item) and skip `null` and `undefined`.
+  - Repeated `defaultHeaders()` calls now merge instead of replacing earlier headers.
+  - `RestClientConfig` gains a correctly spelled `timeout` field; `timout` is deprecated but still set and still honoured.
+
+### Patch Changes
+
+- a69adb0: Fix request bodies, URL building, headers, and empty responses.
+
+  - Falsy bodies (`0`, `false`, `""`, `null`) are now sent instead of being dropped.
+  - `FormData`, `Blob`, `URLSearchParams`, strings, buffers, and streams are sent unchanged, so file uploads and form posts work. Only other values are JSON-encoded, and `Content-Type: application/json` is added only for those bodies.
+  - Header names are merged case-insensitively and sent lower-cased, so a request `Content-Type` replaces the default instead of being combined with it. `post`, `put`, and `patch` no longer add a JSON `Content-Type` when there is no JSON body.
+  - URLs join the base and path with exactly one slash, an absolute request URI ignores the base URL, a missing `uri()` resolves to the base URL instead of ending in `undefined`, and query parameters merge into an existing query string ahead of any fragment.
+  - `toEntity()` resolves empty responses, such as `204 No Content` with a JSON content type, with `data` set to `undefined` instead of throwing.
+
+- a69adb0: Fix timeouts, response parsing, and response handlers.
+
+  - Timeouts now also cover the response body download, and reject with a `TimeoutError` instead of a generic `AbortError`, so they can be told apart from manual cancellation.
+  - A timeout no longer aborts the caller's `AbortController`; a controller shared between requests is only aborted by the caller. Aborting it still cancels the request.
+  - All JSON media types, such as `application/problem+json` and `application/vnd.api+json`, are parsed as JSON.
+  - `converter()` now also receives text bodies, so non-JSON responses can be converted to the requested type.
+  - `toEntity()` can be called more than once and returns the same entity.
+  - A failed request whose result is never read no longer causes an unhandled promise rejection; reading the result still rejects with the error.
+  - `ResponseHandler` may be async. The handler is awaited before the response resolves, and a rejected handler rejects the request.
+
 ## 1.2.0
 
 ### Minor Changes
