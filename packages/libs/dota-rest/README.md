@@ -104,8 +104,8 @@ To get the `Response` object of the fetch request and taking action as per your 
 
 ```typescript
 const response = await client.get<User>()
-    .url('/users/1')
-    .retreive()
+    .uri('/users/1')
+    .retrieve()
     .toResponse()
 
 console.log(response.status)
@@ -114,12 +114,12 @@ console.log(data)
 ```
 
 #### Creating `RestClient` with timeout
-By default the client have a timout of 10s but it can be changed during the build of `RestClient` or 
+By default the client has a timeout of 10s but it can be changed during the build of `RestClient` or
 during making the request.
 
 Adding timeout during client buildup.
 ```typescript
-import {RestClient} from "@ayu-sh-kr/rest";
+import {RestClient} from "@ayu-sh-kr/dota-rest";
 
 const restClient = RestClient.builder()
     .baseUrl('http://localhost:8080')
@@ -128,14 +128,17 @@ const restClient = RestClient.builder()
     .build();
 ```
 
-Adding timeout during client setup.
+Adding timeout for a single request.
 ```typescript
 const response = await client.get<User>()
-    .url('/users/1')
+    .uri('/users/1')
     .timeout(5000)
-    .retreive()
+    .retrieve()
     .toResponse()
 ```
+
+When the timeout elapses, the request rejects with a `DOMException` named `TimeoutError`; use `isTimeoutError()` to
+tell it apart from a manual cancellation.
 
 #### Request Interceptors
 
@@ -171,7 +174,8 @@ is not called.
 
 Each request builder creates its own `AbortController` by default. Supply a caller-owned controller with
 `abortController()` when the application needs to cancel the request. Interceptors receive that same controller, and
-its signal is passed to `fetch`.
+aborting it cancels the request. A timeout cancels only its own request and never aborts your controller, so one
+controller can be shared between requests.
 
 ```typescript
 const client = RestClient.builder()
@@ -193,11 +197,12 @@ await response;
 
 #### Response Handler
 `RestClient` provide ability to set response handler which can be used to process response before resolving to
-`toEntity`, `toVoid` or `toReponse`. Response handler is function with one parameter `response` object should be 
+`toEntity`, `toVoid` or `toResponse`. Response handler is function with one parameter `response` object should be
 used to check the response for required `status` and prepare the error if the result is not favourable.
 
-Current implementation of response handler return void to keep it simple and provide bare minimum feature to user
-in order to reduce duplicate code error handling where same logic is implemented across the code.
+A handler may be `async`; it is awaited before the response resolves, and if it throws or rejects, the request
+rejects with that error. To reject non-2xx responses without writing a handler, use `throwHttpErrors()` (see
+[Handling HTTP errors](#handling-http-errors)).
 
 ##### Request processing without response handling
 Here is an example of how to perform request without using a response handler:
@@ -254,7 +259,9 @@ console.log(response.data);
 Using a response handler simplifies the error handling logic by centralizing the response processing in a single function, reducing duplicate code and making the request handling more consistent.
 
 #### ResponseConverter
-Use a converter to process the json data and its mapping to the required object. The converter is a function that takes the json object and returns the data in the required format.
+Use a converter to map the response data to the required object. The converter is set on the resolver returned by
+`retrieve()`. It receives the parsed JSON for JSON responses (including `+json` types) and the text for any other
+content type, and returns the data in the required format.
 
 Here is an example of using a converter with the `RestClient` for a GET request, along with a dummy type:
 
@@ -294,8 +301,8 @@ const client = RestClient.builder()
 // Perform a GET request with the converter
 const response = await client.get<User>()
     .uri('/users/1')
-    .converter(userConverter)
     .retrieve()
+    .converter(userConverter)
     .toEntity();
 
 console.log(response.data);
@@ -338,7 +345,49 @@ const userConverter = (data: any): User => {
 
 This converter function ensures that the `id` is a number, and `name` and `email` are strings before creating a new `User` instance.
 
+## Query parameters
+
+`param()` appends a value; `params()` merges an object or `URLSearchParams`, replacing only the keys
+it names. Numbers and booleans are stringified, arrays repeat the key, and `null`/`undefined` are skipped.
+
+```typescript
+await client.get<User[]>()
+    .uri('/users')
+    .param('tag', ['admin', 'staff'])
+    .params({page: 2, active: true, search: undefined})
+    .retrieve()
+    .toEntity(); // GET /users?tag=admin&tag=staff&page=2&active=true
+```
+
+## Handling HTTP errors
+
+By default every response resolves, including 4xx and 5xx, so check `status` yourself. Call
+`throwHttpErrors()` to reject failing statuses with an `HttpError` that carries the parsed body.
+
+```typescript
+import {HttpError, isHttpError, isTimeoutError, RestClient} from "@ayu-sh-kr/dota-rest";
+
+const client = RestClient.builder()
+    .baseUrl('http://localhost:8080')
+    .throwHttpErrors()                 // 2xx is success
+    // .throwHttpErrors(s => s < 500)  // or decide per status
+    .build();
+
+try {
+    await client.get<User>().uri('/users/1').retrieve().toEntity();
+} catch (error) {
+    if (isHttpError<{ title: string }>(error)) {
+        console.log(error.status, error.data?.title);
+    } else if (isTimeoutError(error)) {
+        console.log('timed out');
+    }
+}
+```
+
+`isAbortError()` identifies requests cancelled through their `AbortController`, and `isRestError()`
+matches any error created by the client.
+
 ## Conclusion
 
-This documentation covers the basic usage of the `RestClient` class for making HTTP requests. 
+This documentation covers the basic usage of the `RestClient` class for making HTTP requests.
 For more advanced usage and customization, refer to the class and method documentation in the source code.

@@ -27,12 +27,12 @@ describe("RestUtils", () => {
       "https://api.example.com/users",
       expect.objectContaining({
         method: "GET",
-        signal: abortController.signal
+        signal: expect.any(AbortSignal)
       })
     );
   });
 
-  it("should abort the request controller when the timeout expires", async () => {
+  it("should reject with TimeoutError without aborting the caller controller", async () => {
     vi.useFakeTimers();
     const abortController = new AbortController();
     global.fetch = vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
@@ -49,11 +49,11 @@ describe("RestUtils", () => {
       timeout: 100,
       abortController
     });
-    const rejection = expect(response).rejects.toMatchObject({name: "AbortError"});
+    const rejection = expect(response).rejects.toMatchObject({name: "TimeoutError"});
 
     await vi.advanceTimersByTimeAsync(100);
 
     await rejection;
-    expect(abortController.signal.aborted).toBe(true);
+    expect(abortController.signal.aborted).toBe(false);
   });
 });

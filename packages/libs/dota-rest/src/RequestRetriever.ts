@@ -54,13 +54,14 @@ export class RestRequestRetriever implements RequestRetriever {
     const requestBody: HttpRequestBody = {
       uri: uri,
       method: builder.getMethod(),
-      headers: {...builder.getDefaultHeaders(), ...builder.getHeaders()},
+      headers: RestUtils.mergeHeaders(builder.getDefaultHeaders(), builder.getHeaders()),
       timeout: builder.getTimeout(),
       abortController: builder.getAbortController()
     };
 
-    if (builder.getBody()) {
-      requestBody.body = JSON.stringify(builder.getBody());
+    const body = builder.getBody();
+    if (body !== undefined) {
+      Object.assign(requestBody, RestUtils.serializeBody(body, requestBody.headers ?? {}));
     }
 
     const interceptorProcessor = new RequestInterceptorProcessor(builder.getRequestInterceptors());
@@ -68,7 +69,13 @@ export class RestRequestRetriever implements RequestRetriever {
       .process(requestBody)
       .then(RestUtils.performFetch);
 
-    return new RestResponseResolver<T>(response, this._handler);
+    // The request starts now; this branch only stops unread failures becoming unhandled rejections.
+    response.catch(() => undefined);
+
+    return new RestResponseResolver<T>(response, this._handler, {
+      validateStatus: builder.getValidateStatus(),
+      request: {method: requestBody.method, url: uri}
+    });
   }
 
 }

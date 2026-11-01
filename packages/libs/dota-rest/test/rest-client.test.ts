@@ -144,10 +144,11 @@ describe('RestClient', () => {
       .toResponse();
 
     expect(requestAbortController).toBe(callerAbortController);
-    expect(global.fetch).toHaveBeenCalledWith(
-      'https://api.example.com/users',
-      expect.objectContaining({signal: callerAbortController.signal})
-    );
+    const fetchSignal = vi.mocked(global.fetch).mock.calls[0][1]!.signal!;
+    expect(fetchSignal.aborted).toBe(false);
+
+    callerAbortController.abort();
+    expect(fetchSignal.aborted).toBe(true);
   });
 
   it('should create a RestRequestMaker with method GET, header, baseUrl and timeout', () => {
@@ -175,7 +176,7 @@ describe('RestClient', () => {
     expect(requestBuilder).toHaveProperty("method", 'PATCH');
     expect(requestBuilder).toHaveProperty("_baseUri", 'https://api.example.com');
     expect(requestBuilder).toHaveProperty("_timeout", 5000);
-    expect(requestBuilder).toHaveProperty("_defaultHeaders", {"Content-type": "application/json"});
+    expect(requestBuilder).toHaveProperty("_defaultHeaders", {});
   });
 
   it('should create a RestRequestMaker with method POST, header, baseUrl and timeout', () => {
@@ -189,7 +190,7 @@ describe('RestClient', () => {
     expect(requestBuilder).toHaveProperty("method", 'POST')
     expect(requestBuilder).toHaveProperty("_baseUri", 'https://api.example.com')
     expect(requestBuilder).toHaveProperty("_timeout", 5000);
-    expect(requestBuilder).toHaveProperty("_defaultHeaders", {"Content-type": "application/json"})
+    expect(requestBuilder).toHaveProperty("_defaultHeaders", {})
   });
 
   it('should create a RestRequestMaker with method PUT, header, baseUrl and timeout', () => {
@@ -203,7 +204,7 @@ describe('RestClient', () => {
     expect(requestBuilder).toHaveProperty("method", 'PUT')
     expect(requestBuilder).toHaveProperty("_baseUri", 'https://api.example.com')
     expect(requestBuilder).toHaveProperty("_timeout", 5000);
-    expect(requestBuilder).toHaveProperty("_defaultHeaders", {"Content-type": "application/json"})
+    expect(requestBuilder).toHaveProperty("_defaultHeaders", {})
   });
 
   it('should create a RestRequestMaker with method DELETE, header, baseUrl and timeout', () => {

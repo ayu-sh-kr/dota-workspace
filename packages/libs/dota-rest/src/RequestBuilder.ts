@@ -1,6 +1,7 @@
 import {RestRequestRetriever} from "@dota/RequestRetriever.ts";
 import type {RequestInterceptor} from "@dota/RequestInterceptor.ts";
-import {Header, HttpMethod, RequestSetup, ResponseHandler} from "@dota/Types.ts";
+import {Header, HttpMethod, QueryParams, QueryValue, RequestSetup, ResponseHandler, StatusValidator} from "@dota/Types.ts";
+import {RestUtils} from "@dota/RestUtils.ts";
 import {ResponseResolver} from "@dota/ResponseResolver.ts";
 
 /**
@@ -65,22 +66,32 @@ export interface RequestBuilder<T> {
   /**
    * Sets multiple query parameters for the HTTP request.
    *
-   * @param params - An instance of `URLSearchParams` containing the query parameters.
+   * Parameters merge with those already set: a key given here replaces earlier values for that
+   * key, and other keys are kept. Arrays add the key once per item; `null` and `undefined` are skipped.
+   *
+   * @param params - `URLSearchParams` or a plain object of query parameters.
    * @returns The current instance of `RequestBuilder` for method chaining.
    */
-  params(params: URLSearchParams): RequestBuilder<T>;
+  params(params: URLSearchParams | QueryParams): RequestBuilder<T>;
 
   /**
    * Sets a single query parameter for the HTTP request.
    *
+   * The value is appended, so calling it twice with the same key sends both values.
+   *
    * @param key - The name of the query parameter.
-   * @param value - The value of the query parameter.
+   * @param value - A value or list of values; numbers and booleans are stringified, and `null`
+   * and `undefined` are skipped.
    * @returns The current instance of `RequestBuilder` for method chaining.
    */
-  param(key: string, value: string): RequestBuilder<T>;
+  param(key: string, value: QueryValue | readonly QueryValue[]): RequestBuilder<T>;
 
   /**
    * Sets the body of the HTTP request.
+   *
+   * Strings, `FormData`, `Blob`, `URLSearchParams`, buffers, and streams are sent unchanged.
+   * Any other value, including `0`, `false`, and `null`, is sent as JSON with
+   * `Content-Type: application/json` unless a content type is already set.
    *
    * @param item - The body content to be sent with the request.
    * @returns The current instance of `RequestBuilder` for method chaining.
@@ -118,6 +129,7 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
   private readonly _handler: ResponseHandler | undefined;
   private readonly _requestInterceptors: readonly RequestInterceptor[];
   private _abortController: AbortController;
+  private readonly _validateStatus: StatusValidator | undefined;
 
   constructor(requestSetup: RequestSetup) {
     this._baseUri = requestSetup.baseUri || '';
@@ -129,6 +141,7 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
     this._handler = requestSetup.handler;
     this._requestInterceptors = requestSetup.requestInterceptors || [];
     this._abortController = requestSetup.abortController || new AbortController();
+    this._validateStatus = requestSetup.validateStatus;
   }
 
 
@@ -152,13 +165,13 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
     return this;
   }
 
-  param(key: string, value: string): RequestBuilder<T> {
-    this._params.append(key, value);
+  param(key: string, value: QueryValue | readonly QueryValue[]): RequestBuilder<T> {
+    RestUtils.appendQuery(this._params, key, value);
     return this;
   }
 
-  params(params: URLSearchParams): RequestBuilder<T> {
-    this._params = new URLSearchParams(params.toString());
+  params(params: URLSearchParams | QueryParams): RequestBuilder<T> {
+    RestUtils.mergeQuery(this._params, params);
     return this;
   }
 
@@ -221,6 +234,11 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
   }
 
   /** Returns the client-wide interceptor pipeline for request execution. */
+  /** Status check inherited from the client, or `undefined` when HTTP errors resolve normally. */
+  getValidateStatus(): StatusValidator | undefined {
+    return this._validateStatus;
+  }
+
   getRequestInterceptors(): readonly RequestInterceptor[] {
     return this._requestInterceptors;
   }

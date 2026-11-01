@@ -1,6 +1,6 @@
 import {RequestBuilder, RestRequestBuilder} from "@dota/RequestBuilder.ts";
 import type {RequestInterceptor} from "@dota/RequestInterceptor.ts";
-import {Header, ResponseHandler} from "@dota/Types.ts";
+import {Header, ResponseHandler, StatusValidator} from "@dota/Types.ts";
 
 
 export interface ClientBuilder {
@@ -15,6 +15,9 @@ export interface ClientBuilder {
 
   /**
    * Sets the default headers for the `RestClient`.
+   *
+   * Calling it again merges the new headers into the earlier ones; a repeated name replaces
+   * the earlier value.
    *
    * @param headers - The headers to be used by the `RestClient`.
    * @returns The current instance of the `RestClientBuilder` for method chaining.
@@ -45,6 +48,17 @@ export interface ClientBuilder {
    * @returns The current instance of the `RestClientBuilder` for method chaining.
    */
   timeout(timeout: number): ClientBuilder;
+
+  /**
+   * Makes `toEntity`, `toVoid`, and `toResponse` reject with `HttpError` for failing statuses.
+   * Off by default, so 4xx and 5xx responses resolve normally unless this is called. The
+   * response handler still runs before the status is checked.
+   *
+   * @param validateStatus - `true` (default) treats 2xx as success, `false` turns the check off,
+   * and a function decides per status code.
+   * @returns The current builder for method chaining.
+   */
+  throwHttpErrors(validateStatus?: boolean | StatusValidator): ClientBuilder;
 
 
   /**
@@ -85,7 +99,14 @@ export type RestClientConfig = {
    * By default, the timeout is set to 10000ms (10 seconds).
    * This can be configured for the `RestClient` as a whole or for specific requests.
    */
-  timout: number;
+  /** Request timeout in milliseconds. */
+  timeout?: number;
+
+  /** @deprecated Misspelled alias of `timeout`; read only when `timeout` is not set. */
+  timout?: number;
+
+  /** When set, statuses it rejects make terminal calls reject with `HttpError`. */
+  validateStatus?: StatusValidator;
 
   /**
    * A handler function responsible for handling responses with undesirable status codes.
@@ -117,6 +138,11 @@ export type RestClientConfig = {
  * const response = await client.get<User>().uri('/users/1').retrieve().toEntity();
  * console.log(response.data);
  */
+const DEFAULT_TIMEOUT = 10000;
+
+/** Default status check used by `throwHttpErrors()`: 2xx is success, as with `Response.ok`. */
+const isSuccessStatus: StatusValidator = status => status >= 200 && status < 300;
+
 export class RestClient {
 
   private config!: RestClientConfig;
@@ -129,6 +155,24 @@ export class RestClient {
    * Creates a new instance of the `RestClientBuilder`. This method there to
    * provide backward compatibility with the old code.
    */
+  /** Effective timeout, honouring the deprecated `timout` field for older configurations. */
+  private get timeout(): number {
+    return this.config.timeout ?? this.config.timout ?? DEFAULT_TIMEOUT;
+  }
+
+  /**
+   * Normalises the `throwHttpErrors` argument into a status check.
+   *
+   * @param option - `true` for the default 2xx check, `false` to disable, or a custom check.
+   * @returns The check to apply, or `undefined` when HTTP errors resolve normally.
+   */
+  private static toStatusValidator(option: boolean | StatusValidator): StatusValidator | undefined {
+    if (typeof option === 'function') {
+      return option;
+    }
+    return option ? isSuccessStatus : undefined;
+  }
+
   static create(): ClientBuilder {
     return RestClient.builder();
   }
@@ -145,9 +189,10 @@ export class RestClient {
   static builder(): ClientBuilder {
     class RestClientBuilder implements ClientBuilder {
       _baseurl = '';
-      _headers!: Header;
-      _timout: number = 10000;
-      _handler!: ResponseHandler;
+      _headers: Header = {};
+      _timeout: number = 10000;
+      _handler?: ResponseHandler;
+      _validateStatus?: StatusValidator;
       _requestInterceptors: RequestInterceptor[] = [];
 
       public baseUrl(url: string) {
@@ -156,13 +201,13 @@ export class RestClient {
       }
 
       public defaultHeaders(headers: Header) {
-        this._headers = headers;
+        this._headers = {...this._headers, ...headers};
         return this;
       }
 
 
       public timeout(timeout: number) {
-        this._timout = timeout;
+        this._timeout = timeout;
         return this;
       }
 
@@ -172,6 +217,11 @@ export class RestClient {
       }
 
       /** Adds an interceptor to the ordered pipeline shared by this client. */
+      public throwHttpErrors(validateStatus: boolean | StatusValidator = true) {
+        this._validateStatus = RestClient.toStatusValidator(validateStatus);
+        return this;
+      }
+
       public requestInterceptor(interceptor: RequestInterceptor) {
         this._requestInterceptors.push(interceptor);
         return this;
@@ -181,8 +231,10 @@ export class RestClient {
         return new RestClient({
           baseUrl: this._baseurl,
           headers: this._headers,
-          timout: this._timout,
+          timeout: this._timeout,
+          timout: this._timeout,
           handler: this._handler,
+          validateStatus: this._validateStatus,
           requestInterceptors: [...this._requestInterceptors]
         });
       }
@@ -201,9 +253,10 @@ export class RestClient {
   post<T>(): RequestBuilder<T> {
     return new RestRequestBuilder<T>({
       method: 'POST',
-      headers: {'Content-type': 'application/json', ...this.config.headers},
+      headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
-      timeout: this.config.timout,
+      timeout: this.timeout,
+      validateStatus: this.config.validateStatus,
       handler: this.config.handler,
       requestInterceptors: this.config.requestInterceptors
     })
@@ -221,7 +274,8 @@ export class RestClient {
       method: 'GET',
       headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
-      timeout: this.config.timout,
+      timeout: this.timeout,
+      validateStatus: this.config.validateStatus,
       handler: this.config.handler,
       requestInterceptors: this.config.requestInterceptors
     })
@@ -237,9 +291,10 @@ export class RestClient {
   patch<T>(): RequestBuilder<T> {
     return new RestRequestBuilder<T>({
       method: 'PATCH',
-      headers: {'Content-type': 'application/json', ...this.config.headers},
+      headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
-      timeout: this.config.timout,
+      timeout: this.timeout,
+      validateStatus: this.config.validateStatus,
       handler: this.config.handler,
       requestInterceptors: this.config.requestInterceptors
     })
@@ -255,9 +310,10 @@ export class RestClient {
   put<T>(): RequestBuilder<T> {
     return new RestRequestBuilder<T>({
       method: 'PUT',
-      headers: {'Content-type': 'application/json', ...this.config.headers},
+      headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
-      timeout: this.config.timout,
+      timeout: this.timeout,
+      validateStatus: this.config.validateStatus,
       handler: this.config.handler,
       requestInterceptors: this.config.requestInterceptors
     })
@@ -275,7 +331,8 @@ export class RestClient {
       method: 'DELETE',
       headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
-      timeout: this.config.timout,
+      timeout: this.timeout,
+      validateStatus: this.config.validateStatus,
       handler: this.config.handler,
       requestInterceptors: this.config.requestInterceptors
     })
