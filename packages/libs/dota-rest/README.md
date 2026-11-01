@@ -389,5 +389,5 @@ matches any error created by the client.
 
 ## Conclusion
 
-This documentation covers the basic usage of the `RestClient` class for making HTTP requests. 
+This documentation covers the basic usage of the `RestClient` class for making HTTP requests.
 For more advanced usage and customization, refer to the class and method documentation in the source code.
