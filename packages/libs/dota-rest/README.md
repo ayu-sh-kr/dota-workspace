@@ -389,54 +389,174 @@ matches any error created by the client.
 
 ## Retries
 
-Retries are off by default. Pass a limit, or options, to the client or to a single request:
+Retries are off by default. Pass a limit, or `RetryOptions`, to the client builder or to a single
+request; a request setting replaces the client's.
+
+```typescript
+// Retry up to 2 times with the default policy
+const client = RestClient.builder()
+  .baseUrl('https://api.example.com')
+  .retry(2)
+  .build();
+
+// Disable retries for one request
+await client.get<Report>().uri('/report').retry(false).retrieve().toEntity();
+```
+
+Network errors and the statuses `408`, `413`, `429`, `500`, `502`, `503`, and `504` are retried, only
+for `GET`, `PUT`, `HEAD`, `DELETE`, and `OPTIONS`. The delay starts at 300 ms and doubles on each
+retry. A `Retry-After` header (seconds or an HTTP date) takes precedence, and no delay exceeds
+`maxDelay` (30 s by default); when `Retry-After` asks for longer, the response is returned instead
+of waiting. Timeouts, caller aborts, and `ReadableStream` bodies are never retried. Interceptors run
+once, before the first attempt.
+
+All options:
 
 ```typescript
 const client = RestClient.builder()
   .baseUrl('https://api.example.com')
-  .retry({limit: 2, beforeRetry: ({attempt, response}) => console.warn('retry', attempt, response?.status)})
+  .retry({
+    limit: 3,
+    methods: ['GET', 'POST'],                        // opt POST in when the endpoint is idempotent
+    statusCodes: [429, 503],
+    delay: attempt => 500 * attempt + Math.random() * 100, // linear backoff with jitter
+    maxDelay: 5000,
+    beforeRetry: ({attempt, delay, response, error}) => {
+      console.warn(`retry #${attempt} in ${delay}ms`, response?.status ?? error);
+    }
+  })
   .build();
-
-await client.get().uri('/report').retry(false).retrieve().toEntity(); // no retries for this request
 ```
 
-Network errors and the statuses `408`, `413`, `429`, `500`, `502`, `503`, and `504` are retried, only
-for `GET`, `PUT`, `HEAD`, `DELETE`, and `OPTIONS`. The delay doubles from 300 ms (`delay`), a
-`Retry-After` header takes precedence, and no delay exceeds `maxDelay` (30 s); a longer
-`Retry-After` returns the response instead of waiting. Timeouts, caller aborts, and streamed bodies
-are never retried. Interceptors run once, before the first attempt.
+`beforeRetry` may be async and is awaited, so it can refresh a token before the next attempt.
+Aborting the request's `AbortController` during the wait rejects immediately with an `AbortError`:
 
-## Fetch options, custom fetch, and headers
+```typescript
+const controller = new AbortController();
+const pending = client.get().uri('/slow').abortController(controller).retrieve().toEntity();
+controller.abort(); // stops the current attempt or the wait before the next one
+```
+
+## Custom fetch
+
+Inject a `fetch`-compatible function to use a server-side implementation, a custom agent, or a
+test double instead of the global `fetch`:
+
+```typescript
+import {fetch as undiciFetch, Agent} from 'undici';
+
+const agent = new Agent({keepAliveTimeout: 10_000});
+const client = RestClient.builder()
+  .baseUrl('https://api.example.com')
+  .fetch((url, init) => undiciFetch(url, {...init, dispatcher: agent}) as unknown as Promise<Response>)
+  .build();
+```
+
+In tests, pass a mock instead of replacing `globalThis.fetch`:
+
+```typescript
+const fetchMock = vi.fn().mockResolvedValue(new Response('{"id":1}', {
+  headers: {'Content-Type': 'application/json'}
+}));
+const client = RestClient.builder().fetch(fetchMock).build();
+
+await client.get<{id: number}>().uri('https://api.test/users/1').retrieve().toEntity();
+expect(fetchMock).toHaveBeenCalledWith('https://api.test/users/1', expect.objectContaining({method: 'GET'}));
+```
+
+## Fetch options
+
+`fetchOptions()` passes standard `RequestInit` options (`cache`, `credentials`, `integrity`,
+`keepalive`, `mode`, `redirect`, `referrer`, `referrerPolicy`) to `fetch`. Client options are the
+defaults, and request options are merged over them.
+
+```typescript
+// Send cookies with every request for session-based authentication
+const client = RestClient.builder()
+  .baseUrl('https://api.example.com')
+  .fetchOptions({credentials: 'include', mode: 'cors'})
+  .build();
+
+// Bypass the HTTP cache for one request
+await client.get<Feed>().uri('/feed').fetchOptions({cache: 'no-store'}).retrieve().toEntity();
+
+// Let an analytics beacon outlive the page
+await client.post().uri('/events').body({type: 'leave'}).fetchOptions({keepalive: true}).retrieve().toVoid();
+```
+
+Method, headers, body, and signal are always set by the client.
+
+## Removing headers
+
+`removeHeader()` drops a header for one request, including a client default. Names ignore case,
+and setting the header again afterwards sends the new value.
 
 ```typescript
 const client = RestClient.builder()
-  .fetch(myFetch)                            // any fetch-compatible function; defaults to global fetch
-  .fetchOptions({credentials: 'include'})    // cache, credentials, mode, redirect, keepalive, ...
+  .baseUrl('https://api.example.com')
   .defaultHeaders({Authorization: 'Bearer token'})
   .build();
 
-await client.get().uri('/public').removeHeader('Authorization').fetchOptions({cache: 'no-store'})
-  .retrieve().toVoid();
+// Call a public endpoint without the credentials
+await client.get<Status>().uri('/public/status').removeHeader('authorization').retrieve().toEntity();
 ```
 
-## Path parameters and other methods
+## Path parameters
+
+Write `{name}` placeholders in the URI and fill them with `pathParam()` or `pathParams()`. Values
+are URL-encoded; a placeholder without a value rejects the request before it is sent.
 
 ```typescript
 await client.get<User>().uri('/users/{id}').pathParam('id', 42).retrieve().toEntity();
-await client.head().uri('/files/{name}').pathParams({name: 'a b.txt'}).retrieve().toVoid();
-await client.request('OPTIONS').uri('/users').retrieve().toResponse();
+// GET https://api.example.com/users/42
+
+await client.get<Blob>()
+  .uri('/users/{id}/files/{name}')
+  .pathParams({id: 42, name: 'report 2026.pdf'})
+  .param('download', true)
+  .retrieve()
+  .toResponse();
+// GET https://api.example.com/users/42/files/report%202026.pdf?download=true
 ```
 
-Values are URL-encoded; a placeholder without a value rejects the request before it is sent.
+## HEAD, OPTIONS, and other methods
+
+```typescript
+// Read headers without downloading the body
+const head = await client.head().uri('/files/{name}').pathParam('name', 'big.zip').retrieve().toVoid();
+console.log(head.headers.get('Content-Length'));
+
+// Ask which methods a resource allows
+const options = await client.options().uri('/users').retrieve().toVoid();
+console.log(options.headers.get('Allow'));
+
+// Any method through one entry point
+await client.request<User>('PATCH').uri('/users/{id}').pathParam('id', 42).body({name: 'Ana'}).retrieve().toEntity();
+```
 
 ## Deriving clients with extend()
 
 `extend()` returns a builder seeded with a copy of the client's configuration. Headers and fetch
-options merge, interceptors are appended, and other settings replace the parent's. The parent is
-unchanged.
+options merge, interceptors are appended after the parent's, and other settings (base URL, timeout,
+retry, `fetch`, handler, HTTP errors) replace the parent's. The parent is unchanged.
 
 ```typescript
-const authed = client.extend().defaultHeaders({Authorization: `Bearer ${token}`}).build();
+const api = RestClient.builder()
+  .baseUrl('https://api.example.com')
+  .defaultHeaders({'X-App': 'dota'})
+  .retry(2)
+  .build();
+
+// Authenticated sub-client: same base URL, headers, and retry policy, plus a token
+const authed = api.extend()
+  .defaultHeaders({Authorization: `Bearer ${token}`})
+  .build();
+
+// Admin client on another base URL that throws on HTTP errors
+const admin = authed.extend()
+  .baseUrl('https://admin.example.com')
+  .throwHttpErrors()
+  .build();
 ```
 
 ## Conclusion
