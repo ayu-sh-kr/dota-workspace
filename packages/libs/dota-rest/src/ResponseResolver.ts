@@ -94,16 +94,17 @@ export class RestResponseResolver<T extends any> implements ResponseResolver<T> 
     }
     const entity = ResponseEntity.create<T>(response);
 
+    const text = await response.text();
+    if (!text) {
+      entity.data = undefined as T;
+      return entity;
+    }
     const contentType = response.headers.get('Content-Type');
     if (contentType && contentType.includes('application/json')) {
-      const json = await response.json();
-      if (this._converter) {
-        entity.data = this._converter(json)
-      } else {
-        entity.data = json;
-      }
+      const json = JSON.parse(text);
+      entity.data = this._converter ? this._converter(json) : json;
     } else {
-      entity.data = await response.text() as unknown as T;
+      entity.data = text as unknown as T;
     }
     return entity;
   }

@@ -201,7 +201,7 @@ export class RestClient {
   post<T>(): RequestBuilder<T> {
     return new RestRequestBuilder<T>({
       method: 'POST',
-      headers: {'Content-type': 'application/json', ...this.config.headers},
+      headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
       timeout: this.config.timout,
       handler: this.config.handler,
@@ -237,7 +237,7 @@ export class RestClient {
   patch<T>(): RequestBuilder<T> {
     return new RestRequestBuilder<T>({
       method: 'PATCH',
-      headers: {'Content-type': 'application/json', ...this.config.headers},
+      headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
       timeout: this.config.timout,
       handler: this.config.handler,
@@ -255,7 +255,7 @@ export class RestClient {
   put<T>(): RequestBuilder<T> {
     return new RestRequestBuilder<T>({
       method: 'PUT',
-      headers: {'Content-type': 'application/json', ...this.config.headers},
+      headers: {...this.config.headers},
       baseUri: this.config.baseUrl,
       timeout: this.config.timout,
       handler: this.config.handler,

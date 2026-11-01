@@ -54,13 +54,14 @@ export class RestRequestRetriever implements RequestRetriever {
     const requestBody: HttpRequestBody = {
       uri: uri,
       method: builder.getMethod(),
-      headers: {...builder.getDefaultHeaders(), ...builder.getHeaders()},
+      headers: RestUtils.mergeHeaders(builder.getDefaultHeaders(), builder.getHeaders()),
       timeout: builder.getTimeout(),
       abortController: builder.getAbortController()
     };
 
-    if (builder.getBody()) {
-      requestBody.body = JSON.stringify(builder.getBody());
+    const body = builder.getBody();
+    if (body !== undefined) {
+      Object.assign(requestBody, RestUtils.serializeBody(body, requestBody.headers ?? {}));
     }
 
     const interceptorProcessor = new RequestInterceptorProcessor(builder.getRequestInterceptors());

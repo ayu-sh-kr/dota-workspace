@@ -175,7 +175,7 @@ describe('RestClient', () => {
     expect(requestBuilder).toHaveProperty("method", 'PATCH');
     expect(requestBuilder).toHaveProperty("_baseUri", 'https://api.example.com');
     expect(requestBuilder).toHaveProperty("_timeout", 5000);
-    expect(requestBuilder).toHaveProperty("_defaultHeaders", {"Content-type": "application/json"});
+    expect(requestBuilder).toHaveProperty("_defaultHeaders", {});
   });
 
   it('should create a RestRequestMaker with method POST, header, baseUrl and timeout', () => {
@@ -189,7 +189,7 @@ describe('RestClient', () => {
     expect(requestBuilder).toHaveProperty("method", 'POST')
     expect(requestBuilder).toHaveProperty("_baseUri", 'https://api.example.com')
     expect(requestBuilder).toHaveProperty("_timeout", 5000);
-    expect(requestBuilder).toHaveProperty("_defaultHeaders", {"Content-type": "application/json"})
+    expect(requestBuilder).toHaveProperty("_defaultHeaders", {})
   });
 
   it('should create a RestRequestMaker with method PUT, header, baseUrl and timeout', () => {
@@ -203,7 +203,7 @@ describe('RestClient', () => {
     expect(requestBuilder).toHaveProperty("method", 'PUT')
     expect(requestBuilder).toHaveProperty("_baseUri", 'https://api.example.com')
     expect(requestBuilder).toHaveProperty("_timeout", 5000);
-    expect(requestBuilder).toHaveProperty("_defaultHeaders", {"Content-type": "application/json"})
+    expect(requestBuilder).toHaveProperty("_defaultHeaders", {})
   });
 
   it('should create a RestRequestMaker with method DELETE, header, baseUrl and timeout', () => {
