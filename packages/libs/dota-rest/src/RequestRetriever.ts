@@ -2,6 +2,7 @@ import {RestRequestBuilder} from "@dota/RequestBuilder.ts";
 import {RequestInterceptorProcessor} from "@dota/RequestInterceptor.ts";
 import {HttpRequestBody, RestUtils} from "@dota/RestUtils.ts";
 import {ResponseResolver, RestResponseResolver} from "@dota/ResponseResolver.ts";
+import {RequestRetry} from "@dota/RequestRetry.ts";
 import {ResponseHandler} from "@dota/Types.ts";
 
 /**
@@ -38,44 +39,63 @@ export class RestRequestRetriever implements RequestRetriever {
   }
 
   /**
-   * Builds the final request and applies client interceptors in registration order.
+   * Builds the final request, applies client interceptors in registration order, and sends it with
+   * the configured retry policy and `fetch` implementation. A missing path parameter rejects the
+   * returned resolver instead of throwing.
    * Each interceptor observes the previous interceptor's result, and `fetch` only
    * starts after the complete synchronous or asynchronous pipeline succeeds.
    * @param builder Request configuration collected by the fluent API.
    * @returns A resolver backed by the intercepted request's response promise.
    */
   retrieve<T extends any>(builder: RestRequestBuilder<T>): ResponseResolver<T> {
-    const uri = RestUtils.createURI({
-      baseURI: builder.getBaseUri(),
-      uri: builder.getUri(),
-      params: builder.getParams()
-    });
+    const method = builder.getMethod();
+    let uri = '';
+    let response: Promise<Response>;
 
-    const requestBody: HttpRequestBody = {
-      uri: uri,
-      method: builder.getMethod(),
-      headers: RestUtils.mergeHeaders(builder.getDefaultHeaders(), builder.getHeaders()),
-      timeout: builder.getTimeout(),
-      abortController: builder.getAbortController()
-    };
-
-    const body = builder.getBody();
-    if (body !== undefined) {
-      Object.assign(requestBody, RestUtils.serializeBody(body, requestBody.headers ?? {}));
+    try {
+      uri = RestUtils.createURI({
+        baseURI: builder.getBaseUri(),
+        uri: RestUtils.fillPathParams(builder.getUri() ?? '', builder.getPathParams()),
+        params: builder.getParams()
+      });
+      const requestBody = RestRequestRetriever.createRequestBody(builder, uri);
+      const interceptorProcessor = new RequestInterceptorProcessor(builder.getRequestInterceptors());
+      const retry = new RequestRetry(builder.getRetry(), builder.getFetch());
+      response = interceptorProcessor
+        .process(requestBody)
+        .then(request => retry.send(request));
+    } catch (error) {
+      response = Promise.reject(error);
     }
-
-    const interceptorProcessor = new RequestInterceptorProcessor(builder.getRequestInterceptors());
-    const response = interceptorProcessor
-      .process(requestBody)
-      .then(RestUtils.performFetch);
 
     // The request starts now; this branch only stops unread failures becoming unhandled rejections.
     response.catch(() => undefined);
 
     return new RestResponseResolver<T>(response, this._handler, {
       validateStatus: builder.getValidateStatus(),
-      request: {method: requestBody.method, url: uri}
+      request: {method, url: uri}
     });
+  }
+
+  private static createRequestBody<T>(builder: RestRequestBuilder<T>, uri: string): HttpRequestBody {
+    const headers = RestUtils.omitHeaders(
+      RestUtils.mergeHeaders(builder.getDefaultHeaders(), builder.getHeaders()),
+      builder.getRemovedHeaders()
+    );
+    const requestBody: HttpRequestBody = {
+      uri,
+      method: builder.getMethod(),
+      headers,
+      timeout: builder.getTimeout(),
+      fetchOptions: builder.getFetchOptions(),
+      abortController: builder.getAbortController()
+    };
+
+    const body = builder.getBody();
+    if (body !== undefined) {
+      Object.assign(requestBody, RestUtils.serializeBody(body, headers));
+    }
+    return requestBody;
   }
 
 }

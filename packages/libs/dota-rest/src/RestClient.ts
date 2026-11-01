@@ -1,6 +1,15 @@
 import {RequestBuilder, RestRequestBuilder} from "@dota/RequestBuilder.ts";
 import type {RequestInterceptor} from "@dota/RequestInterceptor.ts";
-import {Header, ResponseHandler, StatusValidator} from "@dota/Types.ts";
+import {toRetryOptions} from "@dota/RequestRetry.ts";
+import {
+  FetchFunction,
+  FetchOptions,
+  Header,
+  HttpMethod,
+  ResponseHandler,
+  RetryOptions,
+  StatusValidator
+} from "@dota/Types.ts";
 
 
 export interface ClientBuilder {
@@ -66,6 +75,31 @@ export interface ClientBuilder {
    *
    * @returns A new instance of the `RestClient` configured with the specified base URL and headers.
    */
+  /**
+   * Sends every request through `fetchFn` instead of the global `fetch`, for example a server-side
+   * implementation, a custom agent, or a test double.
+   *
+   * @param fetchFn - A `fetch`-compatible function.
+   * @returns The builder.
+   */
+  fetch(fetchFn: FetchFunction): ClientBuilder;
+
+  /**
+   * Sets default `RequestInit` options such as `credentials: 'include'`, merged with earlier calls.
+   *
+   * @param options - The options to pass to `fetch`.
+   * @returns The builder.
+   */
+  fetchOptions(options: FetchOptions): ClientBuilder;
+
+  /**
+   * Sets the default retry policy. Retries are off by default.
+   *
+   * @param retry - A retry limit, full options, or `false` to disable retries.
+   * @returns The builder.
+   */
+  retry(retry: number | RetryOptions | false): ClientBuilder;
+
   build(): RestClient;
 }
 
@@ -118,6 +152,15 @@ export type RestClientConfig = {
 
   /** Interceptors applied in registration order before each request is sent. */
   requestInterceptors?: readonly RequestInterceptor[];
+
+  /** The `fetch` implementation; the global `fetch` when unset. */
+  fetch?: FetchFunction;
+
+  /** Default `RequestInit` options such as `credentials` or `cache`. */
+  fetchOptions?: FetchOptions;
+
+  /** Default retry policy; requests are not retried when unset. */
+  retry?: RetryOptions;
 }
 
 
@@ -143,6 +186,20 @@ const DEFAULT_TIMEOUT = 10000;
 /** Default status check used by `throwHttpErrors()`: 2xx is success, as with `Response.ok`. */
 const isSuccessStatus: StatusValidator = status => status >= 200 && status < 300;
 
+/**
+ * Normalises the `throwHttpErrors` argument into a status check.
+ *
+ * @param option - `true` for the default 2xx check, `false` to disable, or a custom check.
+ * @returns The check to apply, or `undefined` when HTTP errors resolve normally.
+ */
+function toStatusValidator(option: boolean | StatusValidator): StatusValidator | undefined {
+  if (typeof option === 'function') {
+    return option;
+  }
+  return option ? isSuccessStatus : undefined;
+}
+
+
 export class RestClient {
 
   private config!: RestClientConfig;
@@ -152,189 +209,190 @@ export class RestClient {
   }
 
   /**
-   * Creates a new instance of the `RestClientBuilder`. This method there to
-   * provide backward compatibility with the old code.
+   * Creates a client from a complete configuration; used by the client builder.
+   *
+   * @internal
    */
+  static fromConfig(config: RestClientConfig): RestClient {
+    return new RestClient(config);
+  }
+
   /** Effective timeout, honouring the deprecated `timout` field for older configurations. */
   private get timeout(): number {
     return this.config.timeout ?? this.config.timout ?? DEFAULT_TIMEOUT;
   }
 
-  /**
-   * Normalises the `throwHttpErrors` argument into a status check.
-   *
-   * @param option - `true` for the default 2xx check, `false` to disable, or a custom check.
-   * @returns The check to apply, or `undefined` when HTTP errors resolve normally.
-   */
-  private static toStatusValidator(option: boolean | StatusValidator): StatusValidator | undefined {
-    if (typeof option === 'function') {
-      return option;
-    }
-    return option ? isSuccessStatus : undefined;
-  }
-
+  /** Creates a client builder; an alias of {@link RestClient.builder} kept for older code. */
   static create(): ClientBuilder {
     return RestClient.builder();
   }
 
   /**
-   * Creates a new instance of the `RestClientBuilder` class, which is used to configure and build a `RestClient` instance.
+   * Creates a builder that configures and builds a `RestClient`.
    *
-   * The `RestClientBuilder` class provides methods to set the base URL and default headers for the `RestClient`.
-   * Once configured, the `build` method of the `RestClientBuilder` can be called to create a new `RestClient` instance
-   * with the specified base URL and headers.
-   *
-   * @returns A new instance of the `RestClientBuilder` class.
+   * @returns A new, empty client builder.
    */
   static builder(): ClientBuilder {
-    class RestClientBuilder implements ClientBuilder {
-      _baseurl = '';
-      _headers: Header = {};
-      _timeout: number = 10000;
-      _handler?: ResponseHandler;
-      _validateStatus?: StatusValidator;
-      _requestInterceptors: RequestInterceptor[] = [];
-
-      public baseUrl(url: string) {
-        this._baseurl = url;
-        return this;
-      }
-
-      public defaultHeaders(headers: Header) {
-        this._headers = {...this._headers, ...headers};
-        return this;
-      }
-
-
-      public timeout(timeout: number) {
-        this._timeout = timeout;
-        return this;
-      }
-
-      public handler(handler: ResponseHandler) {
-        this._handler = handler;
-        return this;
-      }
-
-      /** Adds an interceptor to the ordered pipeline shared by this client. */
-      public throwHttpErrors(validateStatus: boolean | StatusValidator = true) {
-        this._validateStatus = RestClient.toStatusValidator(validateStatus);
-        return this;
-      }
-
-      public requestInterceptor(interceptor: RequestInterceptor) {
-        this._requestInterceptors.push(interceptor);
-        return this;
-      }
-
-      public build() {
-        return new RestClient({
-          baseUrl: this._baseurl,
-          headers: this._headers,
-          timeout: this._timeout,
-          timout: this._timeout,
-          handler: this._handler,
-          validateStatus: this._validateStatus,
-          requestInterceptors: [...this._requestInterceptors]
-        });
-      }
-    }
-
-    return new RestClientBuilder();
+    return new RestClientBuilder({});
   }
 
+  /**
+   * Creates a builder seeded with this client's configuration, for deriving a client that shares
+   * it, such as an authenticated sub-client. Headers, fetch options, and interceptors added to the
+   * builder are merged with or appended to this client's; other settings replace them. This client
+   * is not changed.
+   *
+   * @example
+   * ```typescript
+   * const authed = api.extend()
+   *   .defaultHeaders({Authorization: `Bearer ${token}`})
+   *   .build();
+   * ```
+   * @returns A builder seeded with a copy of this client's configuration.
+   */
+  extend(): ClientBuilder {
+    return new RestClientBuilder({...this.config, timeout: this.timeout});
+  }
 
   /**
-   * Creates a new `RestRequestMaker` instance configured for a POST request.
+   * Starts a request with any supported HTTP method.
    *
    * @typeParam T - The type of the response data.
-   * @returns A new `RestRequestMaker` instance configured for a POST request.
+   * @param method - The HTTP method.
+   * @returns A request builder preconfigured with the client's settings.
    */
+  request<T>(method: HttpMethod): RequestBuilder<T> {
+    return new RestRequestBuilder<T>({
+      method,
+      headers: {...this.config.headers},
+      baseUri: this.config.baseUrl,
+      timeout: this.timeout,
+      validateStatus: this.config.validateStatus,
+      handler: this.config.handler,
+      requestInterceptors: this.config.requestInterceptors,
+      fetch: this.config.fetch,
+      fetchOptions: this.config.fetchOptions,
+      retry: this.config.retry
+    });
+  }
+
+  /** Starts a `POST` request. @typeParam T - The type of the response data. */
   post<T>(): RequestBuilder<T> {
-    return new RestRequestBuilder<T>({
-      method: 'POST',
-      headers: {...this.config.headers},
-      baseUri: this.config.baseUrl,
-      timeout: this.timeout,
-      validateStatus: this.config.validateStatus,
-      handler: this.config.handler,
-      requestInterceptors: this.config.requestInterceptors
-    })
+    return this.request<T>('POST');
   }
 
-
-  /**
-   * Creates a new `RestRequestBuilder` instance configured for a GET request.
-   *
-   * @typeParam T - The type of the response data.
-   * @returns A new `RestRequestBuilder` instance configured for a GET request.
-   */
+  /** Starts a `GET` request. @typeParam T - The type of the response data. */
   get<T>(): RequestBuilder<T> {
-    return new RestRequestBuilder<T>({
-      method: 'GET',
-      headers: {...this.config.headers},
-      baseUri: this.config.baseUrl,
-      timeout: this.timeout,
-      validateStatus: this.config.validateStatus,
-      handler: this.config.handler,
-      requestInterceptors: this.config.requestInterceptors
-    })
+    return this.request<T>('GET');
   }
 
-
-  /**
-   * Creates a new `RestRequestBuilder` instance configured for a PATCH request.
-   *
-   * @typeParam T - The type of the response data.
-   * @returns A new `RestRequestBuilder` instance configured for a PATCH request.
-   */
+  /** Starts a `PATCH` request. @typeParam T - The type of the response data. */
   patch<T>(): RequestBuilder<T> {
-    return new RestRequestBuilder<T>({
-      method: 'PATCH',
-      headers: {...this.config.headers},
-      baseUri: this.config.baseUrl,
-      timeout: this.timeout,
-      validateStatus: this.config.validateStatus,
-      handler: this.config.handler,
-      requestInterceptors: this.config.requestInterceptors
-    })
+    return this.request<T>('PATCH');
   }
 
-
-  /**
-   * Creates a new `RestRequestBuilder` instance configured for a PUT request.
-   *
-   * @typeParam T - The type of the response data.
-   * @returns A new `RestRequestBuilder` instance configured for a PUT request.
-   */
+  /** Starts a `PUT` request. @typeParam T - The type of the response data. */
   put<T>(): RequestBuilder<T> {
-    return new RestRequestBuilder<T>({
-      method: 'PUT',
-      headers: {...this.config.headers},
-      baseUri: this.config.baseUrl,
-      timeout: this.timeout,
-      validateStatus: this.config.validateStatus,
-      handler: this.config.handler,
-      requestInterceptors: this.config.requestInterceptors
-    })
+    return this.request<T>('PUT');
   }
 
-
-  /**
-   * Creates a new `RestRequestBuilder` instance configured for a DELETE request.
-   *
-   * @typeParam T - The type of the response data.
-   * @returns A new `RestRequestBuilder` instance configured for a DELETE request.
-   */
+  /** Starts a `DELETE` request. @typeParam T - The type of the response data. */
   delete<T>(): RequestBuilder<T> {
-    return new RestRequestBuilder<T>({
-      method: 'DELETE',
-      headers: {...this.config.headers},
-      baseUri: this.config.baseUrl,
-      timeout: this.timeout,
-      validateStatus: this.config.validateStatus,
-      handler: this.config.handler,
-      requestInterceptors: this.config.requestInterceptors
-    })
+    return this.request<T>('DELETE');
+  }
+
+  /** Starts a `HEAD` request; the response has headers and no body. */
+  head(): RequestBuilder<void> {
+    return this.request<void>('HEAD');
+  }
+
+  /** Starts an `OPTIONS` request. @typeParam T - The type of the response data. */
+  options<T>(): RequestBuilder<T> {
+    return this.request<T>('OPTIONS');
+  }
+}
+
+/** Builds a {@link RestClient}, optionally starting from an existing client's configuration. */
+class RestClientBuilder implements ClientBuilder {
+  private _baseurl: string;
+  private _headers: Header;
+  private _timeout: number;
+  private _handler?: ResponseHandler;
+  private _validateStatus?: StatusValidator;
+  private readonly _requestInterceptors: RequestInterceptor[];
+  private _fetch?: FetchFunction;
+  private _fetchOptions: FetchOptions;
+  private _retry?: RetryOptions;
+
+  constructor(config: RestClientConfig) {
+    this._baseurl = config.baseUrl ?? '';
+    this._headers = {...config.headers};
+    this._timeout = config.timeout ?? config.timout ?? DEFAULT_TIMEOUT;
+    this._handler = config.handler;
+    this._validateStatus = config.validateStatus;
+    this._requestInterceptors = [...config.requestInterceptors ?? []];
+    this._fetch = config.fetch;
+    this._fetchOptions = {...config.fetchOptions};
+    this._retry = config.retry;
+  }
+
+  public baseUrl(url: string) {
+    this._baseurl = url;
+    return this;
+  }
+
+  public defaultHeaders(headers: Header) {
+    this._headers = {...this._headers, ...headers};
+    return this;
+  }
+
+  public timeout(timeout: number) {
+    this._timeout = timeout;
+    return this;
+  }
+
+  public handler(handler: ResponseHandler) {
+    this._handler = handler;
+    return this;
+  }
+
+  public throwHttpErrors(validateStatus: boolean | StatusValidator = true) {
+    this._validateStatus = toStatusValidator(validateStatus);
+    return this;
+  }
+
+  public requestInterceptor(interceptor: RequestInterceptor) {
+    this._requestInterceptors.push(interceptor);
+    return this;
+  }
+
+  public fetch(fetchFn: FetchFunction) {
+    this._fetch = fetchFn;
+    return this;
+  }
+
+  public fetchOptions(options: FetchOptions) {
+    this._fetchOptions = {...this._fetchOptions, ...options};
+    return this;
+  }
+
+  public retry(retry: number | RetryOptions | false) {
+    this._retry = toRetryOptions(retry);
+    return this;
+  }
+
+  public build() {
+    return RestClient.fromConfig({
+      baseUrl: this._baseurl,
+      headers: {...this._headers},
+      timeout: this._timeout,
+      timout: this._timeout,
+      handler: this._handler,
+      validateStatus: this._validateStatus,
+      requestInterceptors: [...this._requestInterceptors],
+      fetch: this._fetch,
+      fetchOptions: {...this._fetchOptions},
+      retry: this._retry
+    });
   }
 }

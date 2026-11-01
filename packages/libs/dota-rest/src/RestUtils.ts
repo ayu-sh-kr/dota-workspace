@@ -1,4 +1,4 @@
-import type {Header, QueryParams, QueryValue} from "@dota/Types.ts";
+import type {FetchFunction, FetchOptions, Header, PathParams, QueryParams, QueryValue} from "@dota/Types.ts";
 
 const ABSOLUTE_URL = /^[a-z][a-z\d+\-.]*:\/\//i;
 
@@ -161,6 +161,38 @@ export class RestUtils {
   }
 
   /**
+   * Replaces each `{name}` placeholder in a URI with its URL-encoded value.
+   *
+   * @param uri - The URI template, for example `/users/{id}`.
+   * @param params - The values to substitute.
+   * @returns The URI with every placeholder replaced.
+   * @throws Error When a placeholder has no value.
+   */
+  static fillPathParams = (uri: string, params: PathParams): string => {
+    return uri.replace(/\{([^{}/]+)\}/g, (_, name: string) => {
+      if (!Object.hasOwn(params, name)) {
+        throw new Error(`Missing value for path parameter "${name}" in "${uri}"`);
+      }
+      return encodeURIComponent(String(params[name]));
+    });
+  }
+
+  /**
+   * Removes headers by name, ignoring case.
+   *
+   * @param headers - Headers with lower-cased names, as returned by {@link RestUtils.mergeHeaders}.
+   * @param names - Header names to remove.
+   * @returns A copy of `headers` without the named headers.
+   */
+  static omitHeaders = (headers: Header, names: Iterable<string>): Header => {
+    const result = {...headers};
+    for (const name of names) {
+      delete result[name.toLowerCase()];
+    }
+    return result;
+  }
+
+  /**
    * Sends the request with a signal that combines caller cancellation and the request timeout.
    *
    * The timeout aborts only this request's internal signal, so a controller shared between requests
@@ -168,12 +200,16 @@ export class RestUtils {
    * stalled body download is also cut off; a timeout rejects with a `TimeoutError` `DOMException`.
    *
    * @param requestBody - The intercepted request; `timeout` of `0` or `undefined` disables it.
+   * @param fetchFn - The `fetch` implementation; defaults to the global `fetch` at call time.
    * @returns The `fetch` response.
    */
-  static performFetch = async (requestBody: HttpRequestBody): Promise<Response> => {
-    const {uri, method, headers, body, abortController, timeout} = requestBody;
+  static performFetch = async (
+    requestBody: HttpRequestBody,
+    fetchFn: FetchFunction = (input, init) => fetch(input, init)
+  ): Promise<Response> => {
+    const {uri, method, headers, body, abortController, timeout, fetchOptions} = requestBody;
     const signal = RestUtils.createRequestSignal(abortController.signal, timeout);
-    const requestInit: RequestInit = {method, signal};
+    const requestInit: RequestInit = {...fetchOptions, method, signal};
 
     if (headers) {
       requestInit.headers = headers;
@@ -184,7 +220,7 @@ export class RestUtils {
     }
 
     try {
-      return await fetch(uri, requestInit);
+      return await fetchFn(uri, requestInit);
     } catch (error) {
       throw signal.aborted && RestUtils.isTimeout(signal.reason) ? signal.reason : error;
     }
@@ -252,6 +288,8 @@ export interface HttpRequestBody {
   headers?: Header,
   body?: BodyInit,
   timeout?: number,
+  /** `RequestInit` options such as `credentials` or `cache`, spread into the `fetch` call. */
+  fetchOptions?: FetchOptions,
   /** Caller-facing controller; aborting it cancels the request. Timeouts never abort it. */
   abortController: AbortController
 }

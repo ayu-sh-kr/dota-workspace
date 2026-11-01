@@ -387,6 +387,58 @@ try {
 `isAbortError()` identifies requests cancelled through their `AbortController`, and `isRestError()`
 matches any error created by the client.
 
+## Retries
+
+Retries are off by default. Pass a limit, or options, to the client or to a single request:
+
+```typescript
+const client = RestClient.builder()
+  .baseUrl('https://api.example.com')
+  .retry({limit: 2, beforeRetry: ({attempt, response}) => console.warn('retry', attempt, response?.status)})
+  .build();
+
+await client.get().uri('/report').retry(false).retrieve().toEntity(); // no retries for this request
+```
+
+Network errors and the statuses `408`, `413`, `429`, `500`, `502`, `503`, and `504` are retried, only
+for `GET`, `PUT`, `HEAD`, `DELETE`, and `OPTIONS`. The delay doubles from 300 ms (`delay`), a
+`Retry-After` header takes precedence, and no delay exceeds `maxDelay` (30 s); a longer
+`Retry-After` returns the response instead of waiting. Timeouts, caller aborts, and streamed bodies
+are never retried. Interceptors run once, before the first attempt.
+
+## Fetch options, custom fetch, and headers
+
+```typescript
+const client = RestClient.builder()
+  .fetch(myFetch)                            // any fetch-compatible function; defaults to global fetch
+  .fetchOptions({credentials: 'include'})    // cache, credentials, mode, redirect, keepalive, ...
+  .defaultHeaders({Authorization: 'Bearer token'})
+  .build();
+
+await client.get().uri('/public').removeHeader('Authorization').fetchOptions({cache: 'no-store'})
+  .retrieve().toVoid();
+```
+
+## Path parameters and other methods
+
+```typescript
+await client.get<User>().uri('/users/{id}').pathParam('id', 42).retrieve().toEntity();
+await client.head().uri('/files/{name}').pathParams({name: 'a b.txt'}).retrieve().toVoid();
+await client.request('OPTIONS').uri('/users').retrieve().toResponse();
+```
+
+Values are URL-encoded; a placeholder without a value rejects the request before it is sent.
+
+## Deriving clients with extend()
+
+`extend()` returns a builder seeded with a copy of the client's configuration. Headers and fetch
+options merge, interceptors are appended, and other settings replace the parent's. The parent is
+unchanged.
+
+```typescript
+const authed = client.extend().defaultHeaders({Authorization: `Bearer ${token}`}).build();
+```
+
 ## Conclusion
 
 This documentation covers the basic usage of the `RestClient` class for making HTTP requests.
