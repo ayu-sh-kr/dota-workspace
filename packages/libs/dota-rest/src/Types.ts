@@ -41,10 +41,12 @@ export type Header = { [key: string]: string };
  * - **PUT**: Used to update or replace an existing resource on the server.
  * - **PATCH**: Used to partially update an existing resource on the server.
  * - **DELETE**: Used to delete a resource from the server.
+ * - **HEAD**: Same as `GET` but the server returns headers only.
+ * - **OPTIONS**: Asks the server which methods and headers a resource supports.
  *
  * This type ensures that only valid HTTP methods are used in the application.
  */
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
 
 
 
@@ -95,7 +97,69 @@ export interface RequestSetup {
   /** Optional caller-owned controller; a new controller is created when omitted. */
   abortController?: AbortController,
   /** Status check inherited from the client; when set, failing responses reject with `HttpError`. */
-  validateStatus?: StatusValidator
+  validateStatus?: StatusValidator,
+  /** `fetch` implementation inherited from the client; the global `fetch` when omitted. */
+  fetch?: FetchFunction,
+  /** `RequestInit` options inherited from the client. */
+  fetchOptions?: FetchOptions,
+  /** Retry policy inherited from the client; no retries when omitted. */
+  retry?: RetryOptions
+}
+
+/**
+ * A `fetch`-compatible function. Inject one to run requests through a custom agent, a
+ * server-side implementation, or a test double instead of the global `fetch`.
+ *
+ * @param input - The fully resolved request URL.
+ * @param init - The request options built by the client.
+ * @returns The response.
+ */
+export type FetchFunction = (input: string, init: RequestInit) => Promise<Response>;
+
+/**
+ * Standard `RequestInit` options passed through to `fetch` unchanged, for example
+ * `credentials: 'include'` for cookie-based authentication.
+ *
+ * Method, headers, body, and signal are managed by the client and are not part of this type.
+ */
+export type FetchOptions = Pick<RequestInit,
+  'cache' | 'credentials' | 'integrity' | 'keepalive' | 'mode' | 'redirect' | 'referrer' | 'referrerPolicy'>;
+
+/** Details passed to {@link RetryOptions.beforeRetry} before each retry. */
+export interface RetryContext {
+  /** The retry about to run, starting at `1`. */
+  attempt: number;
+  /** The milliseconds the client waits before sending the retry. */
+  delay: number;
+  /** The retryable response, when the previous attempt received one. */
+  response?: Response;
+  /** The network error, when the previous attempt failed without a response. */
+  error?: unknown;
+}
+
+/**
+ * Configures automatic retries. Retries are off unless `limit` is greater than `0`.
+ *
+ * A request is retried after a network error or a response whose status is in `statusCodes`,
+ * only for the listed `methods`, and never after a timeout or caller abort. A `Retry-After`
+ * response header takes precedence over the computed delay.
+ */
+export interface RetryOptions {
+  /** Maximum retries after the first attempt. Default `0`. */
+  limit?: number;
+  /** Methods that may be retried. Default: `GET`, `PUT`, `HEAD`, `DELETE`, `OPTIONS`. */
+  methods?: readonly HttpMethod[];
+  /** Statuses that trigger a retry. Default: `408`, `413`, `429`, `500`, `502`, `503`, `504`. */
+  statusCodes?: readonly number[];
+  /** Delay in milliseconds before the given retry. Default `300 * 2 ** (attempt - 1)`. */
+  delay?: (attempt: number) => number;
+  /**
+   * Upper bound in milliseconds for a computed delay. A longer `Retry-After` returns the response
+   * instead of waiting. Default `30000`.
+   */
+  maxDelay?: number;
+  /** Runs before each retry; it may be async and is awaited. */
+  beforeRetry?: (context: RetryContext) => void | Promise<void>;
 }
 
 /**

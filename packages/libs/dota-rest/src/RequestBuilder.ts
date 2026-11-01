@@ -1,6 +1,18 @@
 import {RestRequestRetriever} from "@dota/RequestRetriever.ts";
 import type {RequestInterceptor} from "@dota/RequestInterceptor.ts";
-import {Header, HttpMethod, QueryParams, QueryValue, RequestSetup, ResponseHandler, StatusValidator} from "@dota/Types.ts";
+import {
+  FetchFunction,
+  FetchOptions,
+  Header,
+  HttpMethod,
+  QueryParams,
+  QueryValue,
+  RequestSetup,
+  ResponseHandler,
+  RetryOptions,
+  StatusValidator
+} from "@dota/Types.ts";
+import {toRetryOptions} from "@dota/RequestRetry.ts";
 import {RestUtils} from "@dota/RestUtils.ts";
 import {ResponseResolver} from "@dota/ResponseResolver.ts";
 
@@ -99,6 +111,30 @@ export interface RequestBuilder<T> {
   body(item: any): RequestBuilder<T>;
 
   /**
+   * Removes a header for this request only, including a client default header. Names ignore case.
+   *
+   * @param key - The header name.
+   * @returns The builder.
+   */
+  removeHeader(key: string): RequestBuilder<T>;
+
+  /**
+   * Sets `RequestInit` options such as `credentials` or `cache`, merged over the client's options.
+   *
+   * @param options - The options to pass to `fetch`.
+   * @returns The builder.
+   */
+  fetchOptions(options: FetchOptions): RequestBuilder<T>;
+
+  /**
+   * Overrides the client's retry policy for this request.
+   *
+   * @param retry - A retry limit, full options, or `false` to disable retries.
+   * @returns The builder.
+   */
+  retry(retry: number | RetryOptions | false): RequestBuilder<T>;
+
+  /**
    * Finalizes the request configuration and retrieves a `ResponseResolver` instance.
    *
    * The `ResponseResolver` is responsible for executing the HTTP request and handling the response.
@@ -126,6 +162,10 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
   private _headers: Header;
   private _params: URLSearchParams;
   private _body: any;
+  private readonly _removedHeaders = new Set<string>();
+  private _fetchOptions: FetchOptions;
+  private _retry: RetryOptions | undefined;
+  private readonly _fetch: FetchFunction | undefined;
   private readonly _handler: ResponseHandler | undefined;
   private readonly _requestInterceptors: readonly RequestInterceptor[];
   private _abortController: AbortController;
@@ -142,6 +182,9 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
     this._requestInterceptors = requestSetup.requestInterceptors || [];
     this._abortController = requestSetup.abortController || new AbortController();
     this._validateStatus = requestSetup.validateStatus;
+    this._fetchOptions = {...requestSetup.fetchOptions};
+    this._retry = requestSetup.retry;
+    this._fetch = requestSetup.fetch;
   }
 
 
@@ -156,11 +199,13 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
   }
 
   header(key: string, value: string): RequestBuilder<T> {
+    this._removedHeaders.delete(key.toLowerCase());
     this._headers[key] = value;
     return this;
   }
 
   headers(header: Header): RequestBuilder<T> {
+    Object.keys(header).forEach(key => this._removedHeaders.delete(key.toLowerCase()));
     this._headers = {...this._headers, ...header};
     return this;
   }
@@ -188,6 +233,25 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
 
   body(item: any): RequestBuilder<T> {
     this._body = item;
+    return this;
+  }
+
+  removeHeader(key: string): RequestBuilder<T> {
+    const name = key.toLowerCase();
+    this._removedHeaders.add(name);
+    Object.keys(this._headers)
+      .filter(header => header.toLowerCase() === name)
+      .forEach(header => delete this._headers[header]);
+    return this;
+  }
+
+  fetchOptions(options: FetchOptions): RequestBuilder<T> {
+    this._fetchOptions = {...this._fetchOptions, ...options};
+    return this;
+  }
+
+  retry(retry: number | RetryOptions | false): RequestBuilder<T> {
+    this._retry = toRetryOptions(retry);
     return this;
   }
 
@@ -237,6 +301,22 @@ export class RestRequestBuilder<T> implements RequestBuilder<T> {
   /** Status check inherited from the client, or `undefined` when HTTP errors resolve normally. */
   getValidateStatus(): StatusValidator | undefined {
     return this._validateStatus;
+  }
+
+  getRemovedHeaders(): ReadonlySet<string> {
+    return this._removedHeaders;
+  }
+
+  getFetchOptions(): FetchOptions {
+    return this._fetchOptions;
+  }
+
+  getRetry(): RetryOptions | undefined {
+    return this._retry;
+  }
+
+  getFetch(): FetchFunction | undefined {
+    return this._fetch;
   }
 
   getRequestInterceptors(): readonly RequestInterceptor[] {
