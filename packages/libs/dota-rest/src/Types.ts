@@ -165,9 +165,12 @@ export interface VoidEntity extends ResponseBase {
  * - Implementing custom error handling logic based on the response status.
  * - Triggering additional actions after receiving an HTTP response.
  *
+ * An async handler is awaited before the response is resolved, so a rejection from it rejects
+ * the terminal call (`toEntity`, `toVoid`, or `toResponse`).
+ *
  * @param response - The raw `Response` object received from the HTTP request.
  */
-export type ResponseHandler = (response: Response) => void;
+export type ResponseHandler = (response: Response) => void | Promise<void>;
 
 
 /**

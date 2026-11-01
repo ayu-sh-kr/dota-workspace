@@ -144,10 +144,11 @@ describe('RestClient', () => {
       .toResponse();
 
     expect(requestAbortController).toBe(callerAbortController);
-    expect(global.fetch).toHaveBeenCalledWith(
-      'https://api.example.com/users',
-      expect.objectContaining({signal: callerAbortController.signal})
-    );
+    const fetchSignal = vi.mocked(global.fetch).mock.calls[0][1]!.signal!;
+    expect(fetchSignal.aborted).toBe(false);
+
+    callerAbortController.abort();
+    expect(fetchSignal.aborted).toBe(true);
   });
 
   it('should create a RestRequestMaker with method GET, header, baseUrl and timeout', () => {

@@ -113,12 +113,20 @@ export class RestUtils {
       || (typeof ReadableStream !== 'undefined' && body instanceof ReadableStream);
   }
 
-  static performFetch = async (requestBody: HttpRequestBody) => {
-    const {uri, method, headers, body, abortController} = requestBody;
-    const requestInit: RequestInit = {
-      method: method,
-      signal: abortController.signal
-    }
+  /**
+   * Sends the request with a signal that combines caller cancellation and the request timeout.
+   *
+   * The timeout aborts only this request's internal signal, so a controller shared between requests
+   * is never aborted by one request's timeout. The timer keeps running after headers arrive, so a
+   * stalled body download is also cut off; a timeout rejects with a `TimeoutError` `DOMException`.
+   *
+   * @param requestBody - The intercepted request; `timeout` of `0` or `undefined` disables it.
+   * @returns The `fetch` response.
+   */
+  static performFetch = async (requestBody: HttpRequestBody): Promise<Response> => {
+    const {uri, method, headers, body, abortController, timeout} = requestBody;
+    const signal = RestUtils.createRequestSignal(abortController.signal, timeout);
+    const requestInit: RequestInit = {method, signal};
 
     if (headers) {
       requestInit.headers = headers;
@@ -128,12 +136,59 @@ export class RestUtils {
       requestInit.body = body;
     }
 
-    const timeOutId = requestBody.timeout ?
-      setTimeout(() => abortController.abort(), requestBody.timeout) :
-      undefined;
+    try {
+      return await fetch(uri, requestInit);
+    } catch (error) {
+      throw signal.aborted && RestUtils.isTimeout(signal.reason) ? signal.reason : error;
+    }
+  }
 
-    return await fetch(uri, requestInit)
-      .finally(() => clearTimeout(timeOutId));
+  /**
+   * Links the caller's signal to a request-scoped controller that also aborts on timeout.
+   * The timer is unreferenced where supported so a pending timeout never keeps Node alive.
+   *
+   * @param callerSignal - Signal of the caller-owned or default controller.
+   * @param timeout - Milliseconds before the request is aborted; falsy disables the timer.
+   * @returns The signal to pass to `fetch`.
+   */
+  private static createRequestSignal(callerSignal: AbortSignal, timeout?: number): AbortSignal {
+    const controller = new AbortController();
+    if (callerSignal.aborted) {
+      controller.abort(callerSignal.reason);
+      return controller.signal;
+    }
+
+    const timer = timeout
+      ? setTimeout(() => controller.abort(RestUtils.timeoutError(timeout)), timeout)
+      : undefined;
+    (timer as { unref?: () => void } | undefined)?.unref?.();
+
+    callerSignal.addEventListener('abort', () => {
+      clearTimeout(timer);
+      controller.abort(callerSignal.reason);
+    }, {once: true});
+
+    return controller.signal;
+  }
+
+  /**
+   * Creates the error used for timeouts, matching the name used by `AbortSignal.timeout`.
+   *
+   * @param timeout - The elapsed timeout in milliseconds, included in the message.
+   * @returns A `DOMException` named `TimeoutError`.
+   */
+  private static timeoutError(timeout: number): DOMException {
+    return new DOMException(`Request timed out after ${timeout}ms`, 'TimeoutError');
+  }
+
+  /**
+   * Tells a timeout apart from a caller cancellation, which rejects with `AbortError`.
+   *
+   * @param reason - The abort reason of the request signal.
+   * @returns `true` when the request was aborted by its timeout.
+   */
+  private static isTimeout(reason: unknown): boolean {
+    return reason instanceof DOMException && reason.name === 'TimeoutError';
   }
 }
 
@@ -150,6 +205,6 @@ export interface HttpRequestBody {
   headers?: Header,
   body?: BodyInit,
   timeout?: number,
-  /** Controller shared by interceptors, timeout handling, and the fetch signal. */
+  /** Caller-facing controller; aborting it cancels the request. Timeouts never abort it. */
   abortController: AbortController
 }

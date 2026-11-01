@@ -8,6 +8,10 @@ P1 is a significant gap, P2 is polish.
 
 ## 1. Bugs
 
+> **Status:** B1–B11 are fixed on `fix/dota-rest`. B10 keeps the request starting in `retrieve()`,
+> so callers that never read the result still send it; the fix suppresses the unhandled rejection
+> and caches `toEntity()` instead of deferring the request.
+
 | # | Pri | Area | Problem | Fix |
 | --- | --- | --- | --- | --- |
 | B1 | P0 | `RequestRetriever.retrieve` | `if (builder.getBody())` is a truthiness check, so the bodies `0`, `false`, and `""` are silently dropped. | Check `!== undefined`. |

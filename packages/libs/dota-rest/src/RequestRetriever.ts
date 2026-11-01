@@ -69,6 +69,9 @@ export class RestRequestRetriever implements RequestRetriever {
       .process(requestBody)
       .then(RestUtils.performFetch);
 
+    // The request starts now; this branch only stops unread failures becoming unhandled rejections.
+    response.catch(() => undefined);
+
     return new RestResponseResolver<T>(response, this._handler);
   }
 
