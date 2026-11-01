@@ -82,6 +82,10 @@ export interface RequestBuilder<T> {
   /**
    * Sets the body of the HTTP request.
    *
+   * Strings, `FormData`, `Blob`, `URLSearchParams`, buffers, and streams are sent unchanged.
+   * Any other value, including `0`, `false`, and `null`, is sent as JSON with
+   * `Content-Type: application/json` unless a content type is already set.
+   *
    * @param item - The body content to be sent with the request.
    * @returns The current instance of `RequestBuilder` for method chaining.
    */

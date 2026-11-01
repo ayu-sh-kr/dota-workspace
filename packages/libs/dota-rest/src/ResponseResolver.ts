@@ -34,7 +34,9 @@ export interface ResponseResolver<T> {
   /**
    * Converts the HTTP response into an `Entity` object containing the response data.
    *
-   * This method processes the response and extracts the data, applying the custom converter if one is set.
+   * JSON responses are parsed and passed through the converter when one is set; other content
+   * types are returned as text. An empty body, such as a `204 No Content`, resolves with `data`
+   * set to `undefined`.
    *
    * @typeParam T - The type of the response data.
    * @returns A `Promise` that resolves to an `Entity` object containing the response data.

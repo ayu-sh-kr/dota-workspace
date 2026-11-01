@@ -5,37 +5,35 @@ const ABSOLUTE_URL = /^[a-z][a-z\d+\-.]*:\/\//i;
 export class RestUtils {
 
   /**
-   * Creates a full URI by combining the base URI, path, and query parameters.
-   *
-   * @param options - The options for creating the URI.
-   * @param options.baseURI - The base URI to prepend to the path.
-   * @param options.uri - The path or endpoint to append to the base URI.
-   * @param options.params - The query parameters to append to the URI.
-   * @returns The full URI with the base URI, path, and query parameters.
-   */
-  /**
    * Builds the request URL from an optional base, a path or absolute URL, and query parameters.
+   * Parameters join any query string already in `uri`, and a `#fragment` stays at the end.
    *
-   * Exactly one slash separates the base and the path, an absolute `uri` ignores the base, and
-   * parameters are appended to any query string already present while a fragment is kept last.
-   *
-   * @param options - The base URI, request URI, and query parameters.
-   * When no `uri` was set, the base URI alone is used.
-   *
+   * @param options.baseURI - Client or request base URL; ignored when `uri` is absolute.
+   * @param options.uri - Path or absolute URL; when omitted, the base URL alone is used.
+   * @param options.params - Query parameters to append; empty parameters leave the URL unchanged.
    * @returns The resolved request URL.
    */
-  static createURI = ({baseURI, uri, params}: { baseURI?: string, uri?: string, params?: URLSearchParams }): string => {
+  static createURI = ({baseURI, uri, params}: CreateURIOptions): string => {
     const url = RestUtils.joinURI(baseURI, uri ?? '');
     if (!params || params.size === 0) {
       return url;
     }
+
     const hashIndex = url.indexOf('#');
+    const path = hashIndex >= 0 ? url.slice(0, hashIndex) : url;
     const hash = hashIndex >= 0 ? url.slice(hashIndex) : '';
-    const withoutHash = hashIndex >= 0 ? url.slice(0, hashIndex) : url;
-    const separator = !withoutHash.includes('?') ? '?' : withoutHash.endsWith('?') || withoutHash.endsWith('&') ? '' : '&';
-    return `${withoutHash}${separator}${params.toString()}${hash}`;
+
+    return `${path}${RestUtils.querySeparator(path)}${params.toString()}${hash}`;
   }
 
+  /**
+   * Joins a base URL and a path with exactly one slash between them.
+   * Absolute URLs are returned unchanged so a request can target another host.
+   *
+   * @param baseURI - Base URL, possibly with trailing slashes.
+   * @param uri - Path, possibly with leading slashes, or an absolute URL.
+   * @returns The joined URL, or whichever part is non-empty.
+   */
   private static joinURI(baseURI: string | undefined, uri: string): string {
     if (!baseURI || ABSOLUTE_URL.test(uri)) {
       return uri;
@@ -47,7 +45,21 @@ export class RestUtils {
   }
 
   /**
+   * Chooses how new query parameters attach to a URL that may already have a query string.
+   *
+   * @param path - URL without its fragment.
+   * @returns `?` for no query, `&` after existing parameters, or nothing after a trailing `?`/`&`.
+   */
+  private static querySeparator(path: string): string {
+    if (!path.includes('?')) {
+      return '?';
+    }
+    return path.endsWith('?') || path.endsWith('&') ? '' : '&';
+  }
+
+  /**
    * Merges default and request headers case-insensitively; request headers win.
+   * Names are lower-cased so `Content-type` and `Content-Type` cannot both reach `fetch`.
    *
    * @param defaults - Client-level default headers.
    * @param overrides - Request-level headers.
@@ -85,6 +97,12 @@ export class RestUtils {
     return {body: JSON.stringify(body), headers: nextHeaders};
   }
 
+  /**
+   * Detects values `fetch` already knows how to send, which must not be JSON-encoded.
+   *
+   * @param body - The value passed to `RequestBuilder.body`.
+   * @returns `true` for strings, form data, blobs, buffers, typed arrays, and streams.
+   */
   private static isNativeBody(body: unknown): body is BodyInit {
     return typeof body === 'string'
       || body instanceof FormData
@@ -117,6 +135,13 @@ export class RestUtils {
     return await fetch(uri, requestInit)
       .finally(() => clearTimeout(timeOutId));
   }
+}
+
+/** Inputs for {@link RestUtils.createURI}. */
+export interface CreateURIOptions {
+  baseURI?: string,
+  uri?: string,
+  params?: URLSearchParams
 }
 
 export interface HttpRequestBody {
