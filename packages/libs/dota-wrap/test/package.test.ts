@@ -71,6 +71,13 @@ describe('dotaPackage', () => {
     ]);
   });
 
+  it('gives SSR the shared trailing-slash setting only when one is set', () => {
+    dotaPackage({target: 'netlify', trailingSlash: true}, {ssg: {}});
+    dotaPackage({target: 'netlify'}, {ssg: {}});
+
+    expect(calls.ssr).toEqual([{deployment: 'netlify', trailingSlash: true}, {deployment: 'netlify'}]);
+  });
+
   it('omits disabled plugins', () => {
     expect(dotaPackage('netlify', {ssg: false, ssr: false})).toEqual([]);
   });
@@ -93,7 +100,7 @@ describe('dotaPackage environment', () => {
     });
 
     expect(calls.ssg).toEqual([{deployment: false, trailingSlash: false}]);
-    expect(calls.ssr).toEqual([{deployment: 'node', serverOutDir: 'env-server'}]);
+    expect(calls.ssr).toEqual([{deployment: 'node', serverOutDir: 'env-server', trailingSlash: false}]);
   });
 
   it('falls back to plugin options when variables are unset or empty', () => {
