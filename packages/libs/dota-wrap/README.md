@@ -218,9 +218,10 @@ The object form carries settings that only some platforms read:
 dotaVitePlugins({
   deployment: {
     target: 'vercel',
-    vercelConfigFile: '../vercel.json', // vercel only
+    vercelConfigFile: '../vercel.json', // vercel only; SSG and SSR both update this file
     serverOutDir: 'dist-server',        // node only
-    trailingSlash: true                 // the default
+    trailingSlash: true,                // the default
+    redirects: true                     // the default; false skips SSG route rules
   },
   ssg: {autoDetectRoutes: true}
 });
@@ -229,7 +230,11 @@ dotaVitePlugins({
 Page URLs end with a slash by default (`/docs/` serves `docs/index.html`, and
 `/docs` redirects to it). `trailingSlash: false` writes `docs.html` and serves
 it at `/docs` instead. Changing the setting changes every public URL, so pick
-one before a site is indexed. An explicit `ssg.deployment`, `ssg.trailingSlash`,
+one before a site is indexed. `redirects: false` stops SSG writing route rules
+(the `_redirects` block, `vercel.json` redirects, GitHub Pages aliases) for
+projects that maintain their own; the SSR server routing is still written.
+A page that is both prerendered and matched by an `ssr` route is served from its
+snapshot on every target. An explicit `ssg.deployment`, `ssg.trailingSlash`,
 or `ssr.deployment` still wins. `dotaPackage()` from
 `@ayu-sh-kr/dota-wrap/vite` applies the same mapping for a custom plugin list.
 
