@@ -1,5 +1,11 @@
 // @vitest-environment node
-import {captureApplication, createApplicationHandler, resolveServerRoutes, type CapturedApplication} from '@dota/ssr/index';
+import {
+  captureApplication,
+  createApplicationHandler,
+  resolveClientRoutes,
+  resolveServerRoutes,
+  type CapturedApplication
+} from '@dota/ssr/index';
 import {getApplicationCaptureHook} from '@dota/index';
 import {FIXTURE_COMPONENTS, StateReaderComponent, TasksPage, TaskItemComponent} from '@test/ssr/string-adapter-fixtures';
 
@@ -37,6 +43,12 @@ describe('resolveServerRoutes', () => {
       {path: '/tasks/:id', page: 'task-item'},
       {path: '/state', page: 'state-reader', seo: {title: 'State', description: ''}}
     ]);
+  });
+});
+
+describe('resolveClientRoutes', () => {
+  it('lists every declared path the server does not render, plus the default and error routes', () => {
+    expect(resolveClientRoutes(APPLICATION)).toEqual(['/static', '/client', '/custom', '/', '/error']);
   });
 });
 
