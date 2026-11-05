@@ -62,6 +62,20 @@ describe('createApplicationHandler', () => {
     expect(html).toBe('<!doctype html><html><head><title>State</title></head><body><app-shell id="app-shell"><state-reader seen="nobody"><p>nobody</p></state-reader></app-shell></body></html>');
   });
 
+  it('knows every declared route in any mode, but not generated parents or unknown paths', async () => {
+    const handler = createApplicationHandler(entryReporting({
+      ...APPLICATION,
+      routes: [...APPLICATION.routes, {path: '/products/:product/playground', component: StateReaderComponent, mode: 'ssr'}]
+    }), {template: SHELL});
+
+    for (const path of ['/', '/error', '/tasks/7/', '/static', '/client', '/custom', '/products/kit/playground']) {
+      await expect(handler.isKnownPath(path)).resolves.toBe(true);
+    }
+    for (const path of ['/missing', '/tasks/7/extra', '/products', '/products/kit']) {
+      await expect(handler.isKnownPath(path)).resolves.toBe(false);
+    }
+  });
+
   it('declines routes that are not server-rendered and captures only once', async () => {
     const load = vi.fn(entryReporting(APPLICATION));
     const handler = createApplicationHandler(load, {template: SHELL});
