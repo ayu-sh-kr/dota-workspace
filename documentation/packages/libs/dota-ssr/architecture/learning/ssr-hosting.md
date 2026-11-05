@@ -94,9 +94,13 @@ The chart covers successful page selection. Malformed paths are rejected, unsupp
 | --- | --- |
 | Node | Server bundle, startup, and preserved fallback shell; filesystem/static-first serving as above. |
 | Vercel | Function integration and SSR rewrites. Root static-index precedence is a platform caveat; review generated configuration. |
-| Netlify | Function plus routing rules for SSR paths. |
-| Cloudflare Pages | Advanced worker with asset fallback and Node-compatibility configuration. |
+| Netlify | Function plus routing rules for SSR paths; prerendered pages under those paths go into `excludedPath`. |
+| Cloudflare Pages | Advanced worker with asset fallback and Node-compatibility configuration. `_routes.json` collapses overlapping wildcards (`/tasks/*` covers `/tasks/*/edit`) and excludes prerendered pages; more than 100 rules fail the build. |
 | GitHub Pages | Static files only; no request-time SSR. The build warns and relies on client rendering where applicable. |
+
+Every target keeps the static-first result from the table above: a page prerendered in the same build is served from its snapshot even when an `ssr` route matches it. Node and Vercel check files first; for Netlify and Cloudflare Pages the SSR build reads the pages SSG wrote and excludes them from the server routes.
+
+A not-found page is still a page: `serverLoad` calls `context.setStatus(404)` and renders its message, and the response carries 404 on every target. An unknown path that matches no `ssr` route never reaches the handler; the host's SPA fallback answers it.
 
 Do not assume every platform uses Node's exact file lookup/rewriting policy. Inspect the output for your target. Secondary Vite builds filter out recursive SSR/SSG and artifact writers so building the server does not trigger another full application build loop.
 
