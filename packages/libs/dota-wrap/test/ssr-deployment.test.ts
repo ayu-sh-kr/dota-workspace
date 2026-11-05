@@ -119,6 +119,15 @@ describe('server deployment', () => {
     expect(await readFile(resolve(fixture, 'wrangler.toml'), 'utf8')).toContain('compatibility_flags = ["nodejs_compat"]');
   });
 
+  it('vercel with SSG: renders both slash forms, since its function cannot see the slash', async () => {
+    await writeFile(resolve(fixture, 'vercel.json'), '{}');
+    await buildFor('vercel', true);
+    // The function's own `./_dota-ssr/index.mjs` import would reuse an earlier test's bundle.
+    const {handler} = await load<{handler: Handler}>('api/_dota-ssr/index.mjs');
+
+    expect((await handler(new Request('https://app.test/tasks/7')))!.status).toBe(200);
+  });
+
   it('cloudflare-pages with SSG: keeps a prerendered page static under a server route', async () => {
     await buildFor('cloudflare-pages', true);
     // The worker's own `./server.js` import would reuse the bundle an earlier test loaded.
