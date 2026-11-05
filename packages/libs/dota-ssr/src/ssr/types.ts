@@ -97,6 +97,18 @@ export interface RequestHandlerOptions {
   readonly template: DocumentTemplate;
   /** Fetch used for component requests; defaults to the global fetch. */
   readonly fetch?: typeof fetch;
+  /**
+   * Whether canonical page URLs end with a slash. When set, the other form of a page URL is
+   * redirected (308) to it, as static hosts do for prerendered pages; when unset (the default)
+   * both forms render.
+   */
+  readonly trailingSlash?: boolean;
+  /**
+   * `Cache-Control` sent with pages that render with status 200, such as
+   * `'public, max-age=0, s-maxage=60, stale-while-revalidate=600'`. Off by default, so every
+   * request renders; set it only for pages that do not vary by visitor.
+   */
+  readonly cacheControl?: string;
 }
 
 /** Answers a page request, or resolves `undefined` so the server can fall through. */
@@ -110,10 +122,21 @@ export interface ApplicationHandlerOptions {
   readonly fetch?: typeof fetch;
   /** See {@link StringAdapterOptions.hydration}; defaults to `true`. */
   readonly hydration?: boolean;
+  /** See {@link RequestHandlerOptions.trailingSlash}. */
+  readonly trailingSlash?: boolean;
+  /** See {@link RequestHandlerOptions.cacheControl}. */
+  readonly cacheControl?: string;
 }
 
 /** Request handler for a whole application, plus access to the captured application. */
 export type ApplicationHandler = RequestHandler & {
   /** Captures the application on first call and returns the same result afterwards. */
   readonly application: () => Promise<CapturedApplication>;
+  /**
+   * Whether a declared route of any render mode (or the default or error route) matches the
+   * path, as Dota Router resolves it. Hosts answer other paths' fallback shell with 404.
+   * A parent segment generated for nested routes, such as `/products` under
+   * `/products/:product`, is not a route of its own.
+   */
+  readonly isKnownPath: (pathname: string) => Promise<boolean>;
 };
