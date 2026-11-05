@@ -11,11 +11,23 @@ import {build} from 'vite';
 const fixture = resolve(import.meta.dirname, 'fixtures/ssr-app');
 const GENERATED = ['dist', 'dist-server', '.netlify', 'api', 'vercel.json', 'wrangler.toml', 'node_modules'];
 
-/** Builds the fixture for one target, the way `vite build` would. */
-async function buildFor(target: string): Promise<void> {
+/**
+ * Builds the fixture for one target, the way `vite build` would; with `ssg`, the way
+ * `vite build --ssg` would, prerendering `/tasks/42` in the same build as the server.
+ */
+async function buildFor(target: string, ssg = false): Promise<void> {
   process.env.DOTA_FIXTURE_TARGET = target;
   process.env.VITE_CONFIG_NATIVE_IGNORE_WARNING = 'true';
-  await build({configFile: resolve(fixture, 'vite.config.ts'), logLevel: 'silent'});
+  if (ssg) {
+    process.env.DOTA_FIXTURE_SSG = 'true';
+    process.argv.push('--ssg');
+  }
+  try {
+    await build({configFile: resolve(fixture, 'vite.config.ts'), logLevel: 'silent'});
+  } finally {
+    delete process.env.DOTA_FIXTURE_SSG;
+    if (ssg) process.argv.splice(process.argv.indexOf('--ssg'), 1);
+  }
 }
 
 /** Imports a generated module fresh, since every build rewrites the same paths. */
@@ -38,12 +50,15 @@ describe('server deployment', () => {
     try {
       const page = await (await fetch(`${origin}/tasks/42`)).text();
       const shell = await (await fetch(`${origin}/about`)).text();
+      const missing = await fetch(`${origin}/tasks/missing`);
 
       expect(page).toContain('<title>Task 42</title>');
       expect(page).not.toContain('Fixture shell');
       expect(page).toMatch(/<app-root id="app-root"><task-page path="\/tasks\/42" data-dh-route="true"[^>]* task-id="42" seen-path="\/tasks\/42"/);
       expect(shell).toContain('<title>Fixture shell</title>');
       expect(shell).toContain('<app-root id="app-root"></app-root>');
+      expect(missing.status).toBe(404);
+      expect(await missing.text()).toContain('<title>Task missing</title>');
       expect(existsSync(resolve(fixture, 'dist-server/server.mjs'))).toBe(true);
     } finally {
       server.close();
@@ -58,11 +73,15 @@ describe('server deployment', () => {
 
     const response = await GET(new Request('https://app.test/api/dota-ssr?__dota_path=/tasks/7'));
 
+    const missing = await GET(new Request('https://app.test/api/dota-ssr?__dota_path=/tasks/missing'));
+
     expect(config.rewrites).toEqual([
       {source: '/tasks/:id', destination: '/api/dota-ssr?__dota_path=/tasks/:id'},
+      {source: '/tasks/:id/edit', destination: '/api/dota-ssr?__dota_path=/tasks/:id/edit'},
       {source: '/(.*)', destination: '/index.html'}
     ]);
     expect(await response!.text()).toContain('seen-path="/tasks/7"');
+    expect(missing!.status).toBe(404);
   });
 
   it('netlify: writes a function that claims only ssr paths', async () => {
@@ -71,7 +90,7 @@ describe('server deployment', () => {
 
     const response = await fn.default(new Request('https://app.test/tasks/8'));
 
-    expect(fn.config).toEqual({path: ['/tasks/:id']});
+    expect(fn.config).toEqual({path: ['/tasks/:id', '/tasks/:id/edit']});
     expect(await response!.text()).toContain('<title>Task 8</title>');
   });
 
@@ -81,11 +100,28 @@ describe('server deployment', () => {
     const env = {ASSETS: {fetch: async (request: Request) => new Response(`asset ${new URL(request.url).pathname}`)}};
 
     const page = await worker.fetch(new Request('https://app.test/tasks/9'), env);
+    const edit = await worker.fetch(new Request('https://app.test/tasks/9/edit'), env);
+    const missing = await worker.fetch(new Request('https://app.test/tasks/missing'), env);
     const other = await worker.fetch(new Request('https://app.test/about'), env);
 
     expect(await page.text()).toContain('<title>Task 9</title>');
+    expect(await edit.text()).toContain('<title>Edit task</title>');
+    expect(missing.status).toBe(404);
     expect(await other.text()).toBe('asset /about');
+    // `/tasks/*` already matches every `/tasks/:id/edit` URL; Cloudflare rejects the pair.
     expect(JSON.parse(await readFile(resolve(fixture, 'dist/_routes.json'), 'utf8'))).toEqual({version: 1, include: ['/tasks/*'], exclude: []});
     expect(await readFile(resolve(fixture, 'wrangler.toml'), 'utf8')).toContain('compatibility_flags = ["nodejs_compat"]');
+  });
+
+  it('cloudflare-pages with SSG: keeps a prerendered page static under a server route', async () => {
+    await buildFor('cloudflare-pages', true);
+
+    expect(await readFile(resolve(fixture, 'dist/tasks/42/index.html'), 'utf8')).toContain('<task-page path="/tasks/42"');
+    expect(JSON.parse(await readFile(resolve(fixture, 'dist/_routes.json'), 'utf8'))).toEqual({
+      version: 1,
+      include: ['/tasks/*'],
+      exclude: ['/tasks/42', '/tasks/42/']
+    });
+    expect(await readFile(resolve(fixture, 'dist/_redirects'), 'utf8')).toBe('# BEGIN dota-ssg\n# END dota-ssg\n');
   });
 }, 120_000);
