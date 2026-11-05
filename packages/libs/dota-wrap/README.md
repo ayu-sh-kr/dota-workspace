@@ -236,7 +236,9 @@ projects that maintain their own; the SSR server routing is still written.
 A page that is both prerendered and matched by an `ssr` route is served from its
 snapshot on every target. A `trailingSlash` set here also gives `ssr` pages one URL
 form (the other redirects); when unset they follow SSG's form in `--ssg` builds.
-Response caching is opt-in through `ssr: {cacheControl}`. An explicit `ssg.deployment`, `ssg.trailingSlash`,
+Response caching is opt-in through `ssr: {cacheControl}`. Paths no route declares
+answer 404 on every target (the shell, via `404.html` on static hosts); a SPA catch-all
+rewrite is no longer needed and is reported if present; `ssr: {notFound: false}` opts out. An explicit `ssg.deployment`, `ssg.trailingSlash`,
 or `ssr.deployment` still wins. `dotaPackage()` from
 `@ayu-sh-kr/dota-wrap/vite` applies the same mapping for a custom plugin list.
 
