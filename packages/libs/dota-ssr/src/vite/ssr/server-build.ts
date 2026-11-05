@@ -15,6 +15,7 @@ const ROUTE_READ_TIMEOUT = 30_000;
  * able to resolve `@ayu-sh-kr/dota-ssr` themselves (pnpm only exposes direct
  * dependencies), and the ESM build is required so the server bundle shares one copy of
  * Dota Core with the application.
+ * @param entry Package entry name.
  */
 export function ownModule(entry: 'server' | 'node'): string {
   return createRequire(import.meta.url).resolve(`@ayu-sh-kr/dota-ssr/${entry}`).replace(/\.cjs$/, '.mjs');
@@ -51,6 +52,9 @@ export function serverEntrySource(entryFile: string, target: DotaServerTarget, o
  * application's own Vite config, so transforms, aliases, and preloader modules match the
  * client build. Workers get a `webworker` build that leaves `node:` imports to the platform.
  * @param config Resolved config of the client build.
+ * @param root Project root the entry resolves against.
+ * @param options Options whose entry, hydration, slash policy, and cache header reach the bundle.
+ * @param target Deployment target; Cloudflare gets a `webworker` build.
  * @param template Built `index.html`, embedded as the document shell.
  * @returns Absolute path of the bundle.
  */
