@@ -234,7 +234,9 @@ one before a site is indexed. `redirects: false` stops SSG writing route rules
 (the `_redirects` block, `vercel.json` redirects, GitHub Pages aliases) for
 projects that maintain their own; the SSR server routing is still written.
 A page that is both prerendered and matched by an `ssr` route is served from its
-snapshot on every target. An explicit `ssg.deployment`, `ssg.trailingSlash`,
+snapshot on every target. A `trailingSlash` set here also gives `ssr` pages one URL
+form (the other redirects); when unset they follow SSG's form in `--ssg` builds.
+Response caching is opt-in through `ssr: {cacheControl}`. An explicit `ssg.deployment`, `ssg.trailingSlash`,
 or `ssr.deployment` still wins. `dotaPackage()` from
 `@ayu-sh-kr/dota-wrap/vite` applies the same mapping for a custom plugin list.
 
