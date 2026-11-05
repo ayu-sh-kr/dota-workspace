@@ -94,12 +94,15 @@ export function dotaPackage(
     const serverOutDir = overrides.serverOutDir ?? plugins.ssr?.serverOutDir ?? configured?.serverOutDir;
     // The same `vercel.json` as SSG, so redirects and SSR rewrites never land in different files.
     const vercelConfigFile = overrides.vercelConfigFile ?? plugins.ssr?.vercelConfigFile ?? configured?.vercelConfigFile;
+    // One URL form for prerendered and server-rendered pages; unset leaves SSR to follow SSG.
+    const trailingSlash = overrides.trailingSlash ?? plugins.ssr?.trailingSlash ?? configured?.trailingSlash;
     result.push(dotaSsr({
       deployment: configured?.target ?? ssgDeploymentTarget(plugins.ssg),
       ...plugins.ssr,
       ...(overrides.target ? {deployment: overrides.target} : {}),
       ...(serverOutDir ? {serverOutDir} : {}),
       ...(vercelConfigFile ? {vercelConfigFile} : {}),
+      ...(trailingSlash === undefined ? {} : {trailingSlash}),
     }));
   }
 
