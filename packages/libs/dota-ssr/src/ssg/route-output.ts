@@ -99,7 +99,7 @@ export function resolveDecoratedSsgRoutes(
  * @param pattern Route path whose `:name` segments match any one non-empty segment.
  * @param path Normalized concrete pathname.
  */
-export function matchesRoutePattern(pattern: string, path: string): boolean {
+function matchesRoutePattern(pattern: string, path: string): boolean {
   const patternSegments = pattern.split('/').filter(Boolean);
   const pathSegments = path.split('/').filter(Boolean);
   return patternSegments.length === pathSegments.length &&
