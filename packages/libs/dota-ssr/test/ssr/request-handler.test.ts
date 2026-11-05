@@ -62,6 +62,37 @@ describe('createRequestHandler', () => {
     expect(baseFetch).toHaveBeenCalledWith(new URL('http://example.test:8080/api/data'), undefined);
   });
 
+  it('answers with the status a page sets, 200 otherwise', async () => {
+    const adapter: RenderAdapter = {
+      name: 'lookup',
+      async render(selector, context) {
+        if (context.params.id === 'missing') context.setStatus(404);
+        return {html: `<${selector}></${selector}>`};
+      }
+    };
+    const handler = createRequestHandler({adapter, routes: [{path: '/users/:id', page: 'user-page'}], template: TEMPLATE});
+
+    const missing = await handler(new Request('http://localhost/users/missing'));
+    const found = await handler(new Request('http://localhost/users/42'));
+
+    expect(missing?.status).toBe(404);
+    expect(await missing?.text()).toContain('<user-page></user-page>');
+    expect(found?.status).toBe(200);
+  });
+
+  it('rejects a status a Response cannot carry', async () => {
+    const adapter: RenderAdapter = {
+      name: 'invalid',
+      async render(_selector, context) {
+        context.setStatus(1000);
+        return {html: ''};
+      }
+    };
+    const handler = createRequestHandler({adapter, routes: [{path: '/', page: 'home-page'}], template: TEMPLATE});
+
+    await expect(handler(new Request('http://localhost/'))).rejects.toThrow('Page status must be an integer from 200 to 599; got 1000 for /');
+  });
+
   it('declines non-page and non-GET requests so the server can fall through', async () => {
     const handler = createRequestHandler({adapter: createEchoAdapter(), routes: [{path: '/', page: 'home-page'}], template: TEMPLATE});
 
