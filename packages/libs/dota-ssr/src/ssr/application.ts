@@ -99,8 +99,8 @@ export function createApplicationHandler(loadEntry: () => Promise<unknown>, opti
   };
   const isKnownPath = async (pathname: string) => {
     const captured = await loadApplication();
-    const declared = [...flattenRoutes(captured.routes), {path: captured.defaultRoute.path}, {path: captured.errorRoute.path}];
-    return matchPath(declared, pathname) !== undefined;
+    const fallbacks = [{path: captured.defaultRoute.path}, {path: captured.errorRoute.path}];
+    return matchPath([...flattenRoutes(captured.routes), ...fallbacks], pathname) !== undefined;
   };
   return Object.assign(handle, {application: loadApplication, isKnownPath});
 }
