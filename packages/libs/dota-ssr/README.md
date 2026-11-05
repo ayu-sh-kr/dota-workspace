@@ -460,7 +460,8 @@ wrote in the same build; a build without `--ssg` excludes nothing.
 On Cloudflare Pages, `*` in `_routes.json` matches across slashes, and the platform rejects
 overlapping rules. Nested routes such as `/tasks/:id` and `/tasks/:id/edit` therefore become
 the single rule `/tasks/*`. Cloudflare accepts at most 100 include and exclude rules
-together; a build that needs more fails with the counts, before any file is written.
+together; a build that needs more still writes the file and warns with the counts, since
+Cloudflare will reject that deployment.
 
 Builds whose sources never declare `mode: 'ssr'` skip the server build. While a page
 renders, `window`, `document`, `location`, `history`, storage, and `matchMedia` are backed
