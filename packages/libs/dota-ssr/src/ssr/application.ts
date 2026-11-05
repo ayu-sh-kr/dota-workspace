@@ -4,6 +4,7 @@ import {runInBrowserScope} from '@ayu-sh-kr/dota-server-dom/node';
 import {setApplicationCaptureHook, type CapturedApplication} from '../application-capture';
 import {prepareDocumentShell} from './document';
 import {createRequestHandler} from './request-handler';
+import {matchPath} from './route-match';
 import {createStringAdapter} from './string-adapter';
 import type {ApplicationHandler, ApplicationHandlerOptions, PageRoute} from './types';
 
@@ -65,8 +66,9 @@ export function resolveServerRoutes(application: CapturedApplication): PageRoute
  * can import the handler; later requests reuse the same application. The document
  * shell gets head and body outlets automatically, the body one inside the root element.
  * @param loadEntry Imports the application entry.
- * @param options Document shell, fetch, and hydration settings.
- * @returns A handler answering `ssr` routes; other requests resolve `undefined`.
+ * @param options Document shell, fetch, hydration, slash policy, and cache header.
+ * @returns A handler answering `ssr` routes, where other requests resolve `undefined`,
+ *   and `isKnownPath` for hosts deciding whether their fallback shell is a 404.
  */
 export function createApplicationHandler(loadEntry: () => Promise<unknown>, options: ApplicationHandlerOptions): ApplicationHandler {
   let application: Promise<CapturedApplication> | undefined;
@@ -85,7 +87,9 @@ export function createApplicationHandler(loadEntry: () => Promise<unknown>, opti
         adapter: createStringAdapter({components, hydration: options.hydration}),
         routes: resolveServerRoutes(captured),
         template: async (url) => prepareDocumentShell(typeof options.template === 'string' ? options.template : await options.template(url), rootSelector),
-        fetch: options.fetch
+        fetch: options.fetch,
+        trailingSlash: options.trailingSlash,
+        cacheControl: options.cacheControl
       });
     }).catch((error: unknown) => {
       handler = undefined;
@@ -93,7 +97,12 @@ export function createApplicationHandler(loadEntry: () => Promise<unknown>, opti
     });
     return (await handler)(request);
   };
-  return Object.assign(handle, {application: loadApplication});
+  const isKnownPath = async (pathname: string) => {
+    const captured = await loadApplication();
+    const declared = [...flattenRoutes(captured.routes), {path: captured.defaultRoute.path}, {path: captured.errorRoute.path}];
+    return matchPath(declared, pathname) !== undefined;
+  };
+  return Object.assign(handle, {application: loadApplication, isKnownPath});
 }
 
 /**
