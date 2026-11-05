@@ -1,5 +1,14 @@
 // @vitest-environment node
-import {staticPathsShadowedBy, wildcardRoutePatterns} from '@dota/vite/deployment/route-rules';
+import {
+  isVercelCatchAll,
+  redirectsCatchAlls,
+  shellRoutePaths,
+  staticPathsShadowedBy,
+  toRedirectsSource,
+  toVercelSource,
+  wildcardRoutePatterns,
+  withSlashForms
+} from '@dota/vite/deployment/route-rules';
 import {resolveSsgRoutes} from '@dota/ssg/route-output';
 
 describe('wildcardRoutePatterns', () => {
@@ -31,5 +40,27 @@ describe('staticPathsShadowedBy', () => {
 
   it('lists nothing without prerendered pages', () => {
     expect(staticPathsShadowedBy(['/tasks/:id'], [], '')).toEqual([]);
+  });
+});
+
+describe('shell routes', () => {
+  it('drops the root and prerendered pages, and adds slash forms', () => {
+    const paths = shellRoutePaths(['/', '/about', '/docs/intro', '/users/:id'], resolveSsgRoutes(['/docs/intro']));
+
+    expect(paths).toEqual(['/about', '/users/:id']);
+    expect(withSlashForms(['/', ...paths, '/docs/[...slug]'])).toEqual(['/', '/about', '/users/:id', '/docs/[...slug]', '/about/', '/users/:id/']);
+  });
+});
+
+describe('host source syntax', () => {
+  it('converts bracket segments for _redirects and Vercel', () => {
+    expect(toRedirectsSource('/users/[id]/files/[...path]')).toBe('/users/:id/files/*');
+    expect(toVercelSource('/users/[id]/files/[...path]')).toBe('/users/:id/files/:path+');
+    expect(toVercelSource('/tasks/:id')).toBe('/tasks/:id');
+  });
+
+  it('finds catch-all fallbacks', () => {
+    expect(['/(.*)', '/:path*', '/:path(.*)', '/api/(.*)', '/:id'].map(isVercelCatchAll)).toEqual([true, true, true, false, false]);
+    expect(redirectsCatchAlls('/old /new 301\n/* /index.html 200\n/app/* /x 200\n/* /gone 404', '')).toEqual(['/* /index.html 200']);
   });
 });
