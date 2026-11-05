@@ -6,6 +6,8 @@ export type StaticDeployment = {
   readonly routes: readonly ResolvedDotaSsgRoute[];
   /** Hosting target SSG prepared files for, or `false` when it wrote none. */
   readonly deployment: DotaSsgDeploymentOptions | false;
+  /** Resolved SSG slash policy, which `ssr` pages follow unless configured otherwise. */
+  readonly trailingSlash: boolean;
 };
 
 /** Global slot, so copies of this module loaded twice by a Vite config still share it. */
