@@ -11,7 +11,8 @@ function createContext(tasks: Task[]): RenderContext {
     url: new URL('http://localhost/tasks'),
     params: {},
     state: new Map(),
-    fetch: (async () => Response.json(tasks)) as unknown as typeof fetch
+    fetch: (async () => Response.json(tasks)) as unknown as typeof fetch,
+    setStatus: () => undefined
   };
 }
 
