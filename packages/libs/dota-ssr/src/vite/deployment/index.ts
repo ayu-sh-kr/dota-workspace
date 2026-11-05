@@ -29,9 +29,9 @@ export async function prepareDeployment(
     ? {target: 'vercel', ...(options.vercel === true ? {} : options.vercel)}
     : false);
   const resolved = typeof deployment === 'string' ? {target: deployment} as DotaSsgDeploymentOptions : deployment;
-  recordStaticDeployment(outputDirectory, {routes, deployment: resolved});
-  if (resolved === false) return;
   const trailingSlash = options.trailingSlash ?? true;
+  recordStaticDeployment(outputDirectory, {routes, deployment: resolved, trailingSlash});
+  if (resolved === false) return;
   // `.nojekyll` is not a route rule, so GitHub Pages still gets it with rules turned off.
   const writesRules = resolved.redirects !== false;
   switch (resolved.target) {
