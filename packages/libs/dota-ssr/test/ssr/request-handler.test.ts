@@ -98,6 +98,15 @@ describe('createRequestHandler', () => {
     expect((await either(new Request('http://localhost/users/42')))?.status).toBe(200);
   });
 
+  it('keeps slash redirects on this site when the path starts with repeated slashes', async () => {
+    const routes = [{path: '/:slug', page: 'slug-page'}];
+    const slash = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE, trailingSlash: true});
+    const bare = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE, trailingSlash: false});
+
+    expect((await slash(new Request('http://localhost//evil.example')))?.headers.get('location')).toBe('/evil.example/');
+    expect((await bare(new Request('http://localhost//evil.example/')))?.headers.get('location')).toBe('/evil.example');
+  });
+
   it('sends the opt-in cache header with 200 pages only', async () => {
     const adapter: RenderAdapter = {
       name: 'lookup',
