@@ -138,7 +138,11 @@ export function readPackageEnv(env: Record<string, string | undefined>): Partial
   };
 }
 
-/** SSG hosting files for a deployment; a Node server serves directory indexes itself, so it needs none. */
+/**
+ * SSG hosting files for a deployment; a Node server serves directory indexes itself, so it needs none.
+ * The short string form is kept unless an option needs the object form, so existing output is unchanged.
+ * @param deployment Shared deployment with environment overrides applied.
+ */
 function ssgDeployment(deployment: DotaPackageOptions): DotaSsgOptions['deployment'] {
   if (deployment.target === 'node') return false;
   const rules = deployment.redirects === false ? {redirects: false} : {};
