@@ -3,15 +3,11 @@ import {matchPath, type PathMatch} from './route-match';
 import type {PageRoute, RenderContext, RequestHandler, RequestHandlerOptions} from './types';
 
 /**
- * Creates the web-standard handler that orchestrates one page render per request.
- * It matches a route, builds a fresh {@link RenderContext}, asks the adapter for
- * HTML, and writes it into the document shell. Non-page requests resolve to
- * `undefined` so static files, APIs, or a dev server can answer them instead.
- * The response carries the status components set through `context.setStatus`, 200 otherwise.
- * With `trailingSlash` set, the other slash form of a page redirects (308) to the canonical
- * one before rendering; `cacheControl` is sent only with 200 pages.
- * Render errors propagate so the hosting server owns error pages and logging.
- * @param options Adapter, routes, document shell, fetch, slash policy, and cache header.
+ * Creates the web-standard handler that renders one page per request into the document shell,
+ * with a fresh {@link RenderContext} and the status pages set (200 by default). Non-page requests
+ * resolve `undefined` so files, APIs, or a dev server answer them; with `trailingSlash`, the other
+ * slash form redirects (308) first. Render errors propagate to the host's error handling.
+ * @param options Adapter, routes, document shell, fetch, slash policy, and 200-only cache header.
  */
 export function createRequestHandler(options: RequestHandlerOptions): RequestHandler {
   const baseFetch = options.fetch ?? globalThis.fetch;
