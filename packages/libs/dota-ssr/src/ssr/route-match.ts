@@ -39,7 +39,12 @@ export function toWildcardPattern(path: string): string {
   return path.split('/').map((segment) => dynamicName(segment) === undefined ? segment : '*').join('/');
 }
 
-/** Captured parameters when every path segment is consumed by the pattern, else `undefined`. */
+/**
+ * Walks pattern and path segments together; a catch-all consumes the rest and must be last.
+ * @param pattern Route path segments.
+ * @param segments Request path segments.
+ * @returns Decoded parameters when every segment is consumed, else `undefined`.
+ */
 function matchSegments(pattern: readonly string[], segments: readonly string[]): Record<string, string> | undefined {
   const params: Record<string, string> = {};
   for (const [index, part] of pattern.entries()) {
@@ -56,7 +61,11 @@ function matchSegments(pattern: readonly string[], segments: readonly string[]):
   return pattern.length === segments.length ? params : undefined;
 }
 
-/** Parameter name of a dynamic segment (`:id`, `[id]`, `[...rest]`), else `undefined`. */
+/**
+ * Names a dynamic segment in any of Dota Router's spellings.
+ * @param segment One route path segment.
+ * @returns The parameter name of `:id`, `[id]`, or `[...rest]`, else `undefined` for a literal.
+ */
 function dynamicName(segment: string): string | undefined {
   if (segment.startsWith(':')) return segment.slice(1);
   if (segment.startsWith('[...') && segment.endsWith(']')) return segment.slice(4, -1);
@@ -64,7 +73,11 @@ function dynamicName(segment: string): string | undefined {
   return undefined;
 }
 
-/** Decodes a segment, keeping it as written when it is not valid percent-encoding. */
+/**
+ * Decodes a segment, keeping it as written when it is not valid percent-encoding, so a malformed
+ * URL matches literally instead of failing the request.
+ * @param segment Raw path segment.
+ */
 function decode(segment: string): string {
   try {
     return decodeURIComponent(segment);
