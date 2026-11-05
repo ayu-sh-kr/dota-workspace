@@ -4,6 +4,7 @@ import {pathToFileURL} from 'node:url';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
 import {createConsola} from 'consola';
+import {prepareDeployment} from '@dota/vite/deployment';
 import {prepareServerDeployment} from '@dota/vite/deployment/server';
 import {resolveSsgRoutes} from '@dota/ssg/route-output';
 import type {ServerDeployment} from '@dota/vite/ssr/types';
@@ -19,6 +20,15 @@ const BUNDLE = `export const handler = Object.assign(
 `;
 
 type Worker = {fetch: (request: Request, env: object, context?: object) => Promise<Response>};
+
+/**
+ * Imports the Cloudflare worker a test just generated. Each build rewrites the same file, so the
+ * tag keeps Node from returning an earlier test's cached module.
+ */
+async function loadWorker(root: string, tag: string): Promise<Worker> {
+  const url = pathToFileURL(resolve(root, 'dist/_worker.js/index.js')).href;
+  return (await import(`${url}?${tag}`)).default as Worker;
+}
 
 describe('prepareServerDeployment with prerendered pages', () => {
   let root: string;
@@ -82,7 +92,7 @@ describe('prepareServerDeployment with prerendered pages', () => {
 
   it('cloudflare-pages: answers unknown paths under ssr patterns with the shell and 404', async () => {
     await prepareServerDeployment('cloudflare-pages', deployment, logger);
-    const worker = (await import(`${pathToFileURL(resolve(root, 'dist/_worker.js/index.js')).href}?plain`)).default as Worker;
+    const worker = await loadWorker(root, 'plain');
     const env = {ASSETS: {fetch: async () => new Response('shell', {headers: {'content-type': 'text/html'}})}};
 
     expect(await (await worker.fetch(new Request('https://app.test/tasks/1'), env)).text()).toBe('page');
@@ -103,7 +113,7 @@ describe('prepareServerDeployment with prerendered pages', () => {
     try {
       await prepareServerDeployment('cloudflare-pages', {...deployment, options: {cacheControl: 'public, s-maxage=60'}}, logger);
       const source = await readFile(resolve(root, 'dist/_worker.js/index.js'), 'utf8');
-      const worker = (await import(`${pathToFileURL(resolve(root, 'dist/_worker.js/index.js')).href}?cached`)).default as Worker;
+      const worker = await loadWorker(root, 'cached');
       const pending: Promise<unknown>[] = [];
       const context = {waitUntil: (work: Promise<unknown>) => pending.push(work)};
       const env = {ASSETS: {fetch: async () => new Response('shell')}};
@@ -123,7 +133,7 @@ describe('prepareServerDeployment with prerendered pages', () => {
 
   it('cloudflare-pages: routes browser routes to the worker, which answers them with the shell', async () => {
     await prepareServerDeployment('cloudflare-pages', {...deployment, clientRoutes: ['/', '/about', '/users/[id]'], staticRoutes: []}, logger);
-    const worker = (await import(`${pathToFileURL(resolve(root, 'dist/_worker.js/index.js')).href}?shell`)).default as Worker;
+    const worker = await loadWorker(root, 'shell');
     const fetched: string[] = [];
     const env = {ASSETS: {fetch: async (request: Request | URL) => {
       const {pathname} = new URL(request instanceof URL ? request : request.url);
@@ -169,6 +179,46 @@ describe('prepareServerDeployment with prerendered pages', () => {
     ].join('\n'));
     expect(await readFile(resolve(root, 'dist/404.html'), 'utf8')).toBe('authored not found');
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('catch-all (/app/* /app/index.html 200)'));
+  });
+
+  it('netlify: keeps the SSG block and authored rules beside its own block across rebuilds', async () => {
+    await writeFile(resolve(root, 'dist/_redirects'), '/* /index.html 200\n');
+    const ssgRoutes = resolveSsgRoutes([{path: '/custom', output: 'pages/custom.html'}]);
+    const build = async () => {
+      await prepareDeployment(root, resolve(root, 'dist'), ssgRoutes, {deployment: 'netlify'});
+      await prepareServerDeployment('netlify', {...deployment, staticRoutes: ssgRoutes}, logger);
+    };
+
+    await build();
+    const first = await readFile(resolve(root, 'dist/_redirects'), 'utf8');
+    await build();
+
+    expect(first).toBe([
+      '# BEGIN dota-ssr',
+      '/about /dota-shell.html 200',
+      '/about/ /dota-shell.html 200',
+      '# END dota-ssr',
+      '# BEGIN dota-ssg',
+      '/custom /pages/custom.html 200',
+      '# END dota-ssg',
+      '/* /index.html 200',
+      ''
+    ].join('\n'));
+    expect(await readFile(resolve(root, 'dist/_redirects'), 'utf8')).toBe(first);
+  });
+
+  it('netlify: rejects a malformed dota-ssr block without changing the file', async () => {
+    await writeFile(resolve(root, 'dist/_redirects'), '# BEGIN dota-ssr\n/old /new 301\n');
+
+    await expect(prepareServerDeployment('netlify', deployment, logger)).rejects.toThrow('Malformed dota-ssr block');
+    expect(await readFile(resolve(root, 'dist/_redirects'), 'utf8')).toBe('# BEGIN dota-ssr\n/old /new 301\n');
+  });
+
+  it('replaces its own earlier 404.html on a rebuild', async () => {
+    await prepareServerDeployment('netlify', {...deployment, shell: '<!doctype html><title>old</title>'}, logger);
+    await prepareServerDeployment('netlify', {...deployment, shell: '<!doctype html><title>new</title>'}, logger);
+
+    expect(await readFile(resolve(root, 'dist/404.html'), 'utf8')).toContain('<title>new</title>');
   });
 
   it('netlify: claims both slash forms when a slash policy is set', async () => {
