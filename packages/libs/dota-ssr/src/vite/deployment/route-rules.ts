@@ -2,6 +2,16 @@ import {matchPath, toWildcardPattern} from '../../ssr/route-match';
 import type {ResolvedDotaSsgRoute} from '../../ssg/types';
 
 /**
+ * Path of the Vite base without its trailing slash, which prefixes every generated host rule
+ * (`/app/` becomes `/app`, `/` becomes empty). The placeholder origin resolves relative bases
+ * without a network request; only the pathname is used, keeping rules local to the site.
+ * @param base Vite `base`, absolute or relative.
+ */
+export function basePrefix(base: string): string {
+  return new URL(base, 'https://base.invalid').pathname.replace(/\/$/, '');
+}
+
+/**
  * Converts router paths into host wildcard patterns, dropping duplicates and every pattern
  * another one already covers. In wildcard syntax `*` matches any characters, slashes included,
  * so the pattern for `/tasks/:id` also matches every `/tasks/:id/edit` request; Cloudflare
