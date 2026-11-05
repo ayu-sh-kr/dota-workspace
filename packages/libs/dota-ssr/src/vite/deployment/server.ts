@@ -5,6 +5,7 @@ import {parseVercelConfig, readVercelConfigSource} from '../vercel-config';
 import type {DotaServerTarget, ServerDeployment} from '../ssr/types';
 import {writeManagedRedirects} from './redirects';
 import {
+  basePrefix,
   isVercelCatchAll,
   redirectsCatchAlls,
   shellRoutePaths,
@@ -38,14 +39,12 @@ const SSR_REDIRECTS_OWNER = 'dota-ssr';
 export const SLASH_AWARE_TARGETS: ReadonlySet<DotaServerTarget> = new Set(['node', 'netlify', 'cloudflare-pages']);
 
 /**
- * Writes the files a platform needs to run the server bundle for `ssr` routes, while
- * static files (assets, `ssg` pages) and the SPA fallback (`csr` routes) stay with the
- * platform's static hosting. A prerendered page an `ssr` pattern also matches stays static
- * on every target: Node and Vercel check files before the server, and Netlify and Cloudflare
- * Pages get it as an exclusion. Unless `notFound` is `false`, paths no route declares answer 404:
- * static hosts serve the shell for declared browser routes and `404.html` for everything else.
+ * Writes the files a platform needs to run the server bundle for `ssr` routes, while static
+ * files and browser-rendered routes stay with the platform's static hosting. Prerendered pages
+ * stay static on every target, and unless `notFound` is `false` undeclared paths answer 404.
  * @param target Deployment target.
- * @param deployment Built bundle, routes, and paths.
+ * @param deployment Built bundle, route lists, shell, and resolved plugin options.
+ * @param logger Build logger for progress and warnings.
  */
 export async function prepareServerDeployment(target: DotaServerTarget, deployment: ServerDeployment, logger: ConsolaInstance): Promise<void> {
   switch (target) {
@@ -69,6 +68,7 @@ export async function prepareServerDeployment(target: DotaServerTarget, deployme
  * Only a directory whose `server.mjs` carries the generated notice is removed.
  * @param root Project root that `serverOutDir` is resolved against.
  * @param serverOutDir Configured Node server directory, `dist-server` by default.
+ * @param logger Build logger for progress and warnings.
  */
 export async function removeStaleNodeServer(root: string, serverOutDir: string | undefined, logger: ConsolaInstance): Promise<void> {
   const directory = resolve(root, serverOutDir ?? 'dist-server');
@@ -82,8 +82,11 @@ export async function removeStaleNodeServer(root: string, serverOutDir: string |
  * `node <serverOutDir>/server.mjs` serves the client directory, `ssr` routes, and the
  * SPA fallback on `PORT` (default 3000), via `createNodeServer`. The fallback is the clean
  * built shell, since SSG may have replaced `index.html` with the prerendered home page.
+ * @param deployment Built bundle, shell, output paths, and `serverOutDir`/`notFound` options.
+ * @param logger Build logger for progress and warnings.
  */
-async function prepareNode({root, outputDirectory, bundleFile, shell, options}: ServerDeployment, logger: ConsolaInstance): Promise<void> {
+async function prepareNode(deployment: ServerDeployment, logger: ConsolaInstance): Promise<void> {
+  const {root, outputDirectory, bundleFile, shell, options} = deployment;
   const directory = resolve(root, options.serverOutDir ?? 'dist-server');
   const knownPathOption = options.notFound === false ? '' : ', isKnownPath: handler.isKnownPath';
   await rm(directory, {recursive: true, force: true});
@@ -104,15 +107,12 @@ createNodeServer({handler, clientDirectory, fallback${knownPathOption}}).listen(
 }
 
 /**
- * Vercel: a function at `api/dota-ssr.mjs` beside `vercel.json` (its bundle in
- * `api/_dota-ssr/`, which Vercel does not expose as a function), and one rewrite per
- * `ssr` route placed ahead of authored rewrites so SPA catch-alls cannot shadow it.
- * The original path travels in a query parameter because a rewrite changes the URL the function sees.
- * Vercel checks the filesystem before rewrites, so prerendered pages need no exclusion; the
- * rewrites go into the same `vercel.json` static generation updated, keeping its redirects.
- * The function receives the route path, not the request's, so a slash policy is enforced with
- * one permanent redirect per route (as SSG does for its pages) and rewrites in the canonical form.
- * With `notFound`, declared browser routes rewrite to the shell and Vercel serves `404.html`.
+ * Vercel: `api/dota-ssr.mjs` beside `vercel.json`, with one rewrite per `ssr` route ahead of
+ * authored rewrites (the path travels in a query parameter); files win over rewrites, so
+ * prerendered pages need no exclusion. The function sees the route path, so a slash policy
+ * becomes one permanent redirect per route; with `notFound`, browser routes rewrite to the shell.
+ * @param deployment Built bundle, route lists, shell, and Vercel/slash/`notFound` options.
+ * @param logger Build logger for progress and warnings.
  */
 async function prepareVercel(deployment: ServerDeployment, logger: ConsolaInstance): Promise<void> {
   const {root, outputDirectory, bundleFile, routes, clientRoutes, staticRoutes, shell, options} = deployment;
@@ -139,7 +139,7 @@ async function prepareVercel(deployment: ServerDeployment, logger: ConsolaInstan
   const shellPaths = notFound ? withSlashForms(shellRoutePaths(clientRoutes, staticRoutes).map(toVercelSource)) : [];
   const shellRewrites = shellPaths.map((path) => ({source: path, destination: `/${SHELL_FILE}`}));
   const authored = rewrites.filter((rewrite) => {
-    const destination = String((rewrite as {destination?: unknown})?.destination ?? '');
+    const destination = entryField(rewrite, 'destination') ?? '';
     return !destination.startsWith(VERCEL_FUNCTION_URL) && destination !== `/${SHELL_FILE}`;
   });
   config.rewrites = [...serverRewrites, ...shellRewrites, ...authored];
@@ -148,9 +148,9 @@ async function prepareVercel(deployment: ServerDeployment, logger: ConsolaInstan
   // means switching or dropping the policy leaves nothing stale, and authored redirects are kept.
   const owned = new Set(withSlashForms(sources));
   const isSlashRedirect = (redirect: unknown) => {
-    const {source: from, destination: to} = (redirect ?? {}) as {source?: unknown; destination?: unknown};
-    return typeof from === 'string' && typeof to === 'string' && owned.has(from)
-      && (to === `${from}/` || from === `${to}/`);
+    const from = entryField(redirect, 'source');
+    const to = entryField(redirect, 'destination');
+    return from !== undefined && to !== undefined && owned.has(from) && (to === `${from}/` || from === `${to}/`);
   };
   const slashRedirects = options.trailingSlash === undefined ? [] : sources
     .filter((path) => path !== '/')
@@ -166,8 +166,7 @@ async function prepareVercel(deployment: ServerDeployment, logger: ConsolaInstan
 
   if (notFound) {
     await writeShellFiles(outputDirectory, shell, logger);
-    const catchAlls = authored.map((rewrite) => String((rewrite as {source?: unknown})?.source))
-      .filter(isVercelCatchAll);
+    const catchAlls = authored.map((rewrite) => entryField(rewrite, 'source') ?? '').filter(isVercelCatchAll);
     warnCatchAlls(catchAlls, source.file, logger);
   }
   const text = `${JSON.stringify(config, null, 2)}\n`;
@@ -193,12 +192,12 @@ export const HEAD = render;
 }
 
 /**
- * Netlify: a Functions API v2 function in `.netlify/v1/functions/dota-ssr/` (the Frameworks
- * API directory Netlify picks up without configuration). Its `config.path` lists only the `ssr`
- * routes, so it takes precedence just for them, including over the shell at `/index.html`.
- * Functions also win over static files, so prerendered pages those routes match are listed in
- * `config.excludedPath`. With `notFound`, declared browser routes rewrite to the shell in a managed
- * `_redirects` block (static files still win) and Netlify serves `404.html` for everything else.
+ * Netlify: a Functions API v2 function in `.netlify/v1/functions/dota-ssr/` whose `config.path`
+ * claims only `ssr` routes. Functions win over files, so prerendered pages those routes match go
+ * into `config.excludedPath`. With `notFound`, browser routes rewrite to the shell in a managed
+ * `_redirects` block (files still win) and Netlify serves `404.html` for everything else.
+ * @param deployment Built bundle, route lists, shell, base, and slash/`notFound` options.
+ * @param logger Build logger for progress and warnings.
  */
 async function prepareNetlify(deployment: ServerDeployment, logger: ConsolaInstance): Promise<void> {
   const {root, outputDirectory, bundleFile, routes, clientRoutes, staticRoutes, shell, base, options} = deployment;
@@ -207,8 +206,7 @@ async function prepareNetlify(deployment: ServerDeployment, logger: ConsolaInsta
   await mkdir(directory, {recursive: true});
   await copyFile(bundleFile, resolve(directory, 'server.mjs'));
   const prefix = basePrefix(base);
-  const forms = options.trailingSlash === undefined ? routes : withSlashForms(routes);
-  const path = [...new Set(forms.map((route) => `${prefix}${route}`))];
+  const path = [...new Set(serverRouteForms(routes, options.trailingSlash).map((route) => `${prefix}${route}`))];
   const excludedPath = staticPathsShadowedBy(routes, staticRoutes, prefix);
   await writeFile(resolve(directory, 'dota-ssr.mjs'), `${GENERATED_NOTICE}
 import {handler} from './server.mjs';
@@ -228,22 +226,19 @@ export const config = ${JSON.stringify(excludedPath.length ? {path, excludedPath
 }
 
 /**
- * Cloudflare Pages: an advanced-mode `_worker.js/` in the output directory that renders
- * `ssr` routes and hands everything else to the static assets, plus `_routes.json` so
- * only `ssr` paths invoke the worker: overlapping wildcards are collapsed, which Cloudflare
- * requires, and prerendered pages they match are excluded so their snapshots are served.
- * The bundle needs the `nodejs_compat` flag (for `AsyncLocalStorage`), so a `wrangler.toml`
- * enabling it is written when none exists.
- * With `notFound`, declared browser routes also invoke the worker, which answers them with the
- * shell, and `404.html` turns Cloudflare's SPA fallback into a 404 for every other path.
- * Rules beyond Cloudflare's limit are still written, with a warning naming the counts.
+ * Cloudflare Pages: an advanced-mode `_worker.js/` plus `_routes.json`, whose collapsed wildcards
+ * send only declared routes to the worker and exclude prerendered pages. With `notFound`, browser
+ * routes reach the worker for the shell and `404.html` answers the rest; rules past the platform
+ * limit are written with a warning. A `wrangler.toml` enabling `nodejs_compat` is added if missing.
+ * @param deployment Built bundle, route lists, shell, base, and slash/`notFound`/cache options.
+ * @param logger Build logger for progress and warnings.
  */
 async function prepareCloudflarePages(deployment: ServerDeployment, logger: ConsolaInstance): Promise<void> {
   const {root, outputDirectory, bundleFile, routes, clientRoutes, staticRoutes, shell, base, options} = deployment;
   const prefix = basePrefix(base);
   const notFound = options.notFound !== false;
   const shellPaths = notFound ? shellRoutePaths(clientRoutes, staticRoutes) : [];
-  const serverForms = options.trailingSlash === undefined ? routes : withSlashForms(routes);
+  const serverForms = serverRouteForms(routes, options.trailingSlash);
   const include = wildcardRoutePatterns([...serverForms, ...withSlashForms(shellPaths)], prefix);
   const exclude = staticPathsShadowedBy([...routes, ...shellPaths], staticRoutes, prefix);
   const ruleCount = include.length + exclude.length;
@@ -331,10 +326,33 @@ const CLOUDFLARE_CACHED_EXPORT = `export default {
 };`;
 
 /**
+ * The `ssr` paths a host must route to the server: with a slash policy, both forms of each route,
+ * so the server can redirect the other one; without, only the declared form, as before.
+ * @param routes Router-style `ssr` paths.
+ * @param trailingSlash Resolved slash policy, or `undefined` when none is set.
+ */
+function serverRouteForms(routes: readonly string[], trailingSlash: boolean | undefined): readonly string[] {
+  return trailingSlash === undefined ? routes : withSlashForms(routes);
+}
+
+/**
+ * Reads a string field of an authored `vercel.json` rewrite or redirect, whose entries are not
+ * validated, so foreign or malformed entries are kept instead of failing the build.
+ * @param entry Rewrite or redirect as parsed from JSON.
+ * @param key Field to read, such as `source` or `destination`.
+ * @returns The value when it is a string, else `undefined`.
+ */
+function entryField(entry: unknown, key: 'source' | 'destination'): string | undefined {
+  const value = (entry as Record<string, unknown> | null)?.[key];
+  return typeof value === 'string' ? value : undefined;
+}
+
+/**
  * Writes the clean shell (captured before SSG replaced `index.html`) as `dota-shell.html`, and as
  * `404.html` unless the output already holds an authored one, which is kept.
  * @param outputDirectory Absolute client output directory.
  * @param shell Built shell from the client build.
+ * @param logger Build logger for progress and warnings.
  */
 async function writeShellFiles(outputDirectory: string, shell: string, logger: ConsolaInstance): Promise<void> {
   await writeFile(resolve(outputDirectory, SHELL_FILE), shell, 'utf8');
@@ -351,17 +369,13 @@ async function writeShellFiles(outputDirectory: string, shell: string, logger: C
  * Warns about authored catch-all rules, which answer unknown paths with 200 before `404.html` can.
  * Declared browser routes are rewritten to the shell already, so these rules can be removed.
  * @param rules Catch-all rules as written.
- * @param file File holding them.
+ * @param file File holding them, named in the warning.
+ * @param logger Build logger for progress and warnings.
  */
 function warnCatchAlls(rules: readonly string[], file: string, logger: ConsolaInstance): void {
   if (rules.length === 0) return;
   logger.warn(`${file} has a catch-all (${rules.join(', ')}) that answers unknown paths with 200; `
     + 'remove it for 404s, since declared routes already rewrite to the application shell');
-}
-
-/** Path of the Vite base without its trailing slash, for platform route patterns. */
-function basePrefix(base: string): string {
-  return new URL(base, 'https://base.invalid').pathname.replace(/\/$/, '');
 }
 
 /** Worker name for `wrangler.toml`: the package name, made DNS-safe, else the directory name. */
