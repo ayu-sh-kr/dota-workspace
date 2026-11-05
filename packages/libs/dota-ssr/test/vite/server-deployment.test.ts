@@ -8,6 +8,7 @@ import {resolveSsgRoutes} from '@dota/ssg/route-output';
 import type {ServerDeployment} from '@dota/vite/ssr/types';
 
 const logger = createConsola({level: -999});
+const warn = vi.spyOn(logger, 'warn');
 
 describe('prepareServerDeployment with prerendered pages', () => {
   let root: string;
@@ -44,12 +45,22 @@ describe('prepareServerDeployment with prerendered pages', () => {
     });
   });
 
-  it('cloudflare-pages: fails before writing when the rules exceed the platform limit', async () => {
+  it('cloudflare-pages: warns but still writes when the rules exceed the platform limit', async () => {
     const pages = Array.from({length: 50}, (_, index) => `/tasks/${index}`);
+    warn.mockClear();
 
-    await expect(prepareServerDeployment('cloudflare-pages', {...deployment, staticRoutes: resolveSsgRoutes(pages)}, logger))
-      .rejects.toThrow('Cloudflare Pages accepts 100 rules in _routes.json, but 1 server route patterns and 100 exclusions');
-    await expect(readFile(resolve(root, 'dist/_routes.json'), 'utf8')).rejects.toThrow('ENOENT');
+    await prepareServerDeployment('cloudflare-pages', {...deployment, staticRoutes: resolveSsgRoutes(pages)}, logger);
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('_routes.json has 101 rules (1 include, 100 exclude), but Cloudflare Pages accepts 100'));
+    expect(JSON.parse(await readFile(resolve(root, 'dist/_routes.json'), 'utf8')).exclude).toHaveLength(100);
+  });
+
+  it('cloudflare-pages: stays quiet within the limit', async () => {
+    warn.mockClear();
+
+    await prepareServerDeployment('cloudflare-pages', deployment, logger);
+
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('netlify: excludes covered prerendered pages from the function paths', async () => {
