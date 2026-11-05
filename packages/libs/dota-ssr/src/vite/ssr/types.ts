@@ -22,8 +22,8 @@ export interface DotaSsrOptions {
   /** Built shell relative to the output directory; defaults to `index.html`. */
   template?: string;
   /**
-   * Deployment target; defaults to the target static generation prepared in the same build,
-   * else `node`. `false` builds nothing for the server.
+   * Deployment target; defaults to `node`. `false` builds nothing for the server. Dota Wrap's
+   * `dotaVitePlugins({deployment})` sets one target for SSG and SSR.
    */
   deployment?: DotaServerTarget | false;
   /** `node` target output, relative to the root; defaults to `dist-server`. */
@@ -40,8 +40,8 @@ export interface DotaSsrOptions {
    * Whether canonical `ssr` page URLs end with a slash; the other form redirects (308) to it.
    * Defaults to the `trailingSlash` of `dotaSsg()` in the same build, so server-rendered and
    * prerendered pages share one URL form; without either, both forms render as before.
-   * Cloudflare Pages and Netlify also route the slash form of literal routes to the server so
-   * it can redirect. Vercel passes the route path to its function, so the policy does not apply there.
+   * Cloudflare Pages and Netlify route both forms to the server so it can redirect. Vercel hands
+   * its function the route path rather than the request's, so the policy is not applied there.
    */
   trailingSlash?: boolean;
   /**
