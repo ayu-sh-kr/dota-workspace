@@ -61,6 +61,19 @@ export function resolveServerRoutes(application: CapturedApplication): PageRoute
 }
 
 /**
+ * Paths the browser renders: every declared route the server does not render (including
+ * custom `render` routes), plus the default and error routes, in declaration order without
+ * duplicates. Static hosts answer these with the application shell and every other path with 404.
+ * @param application Captured application.
+ */
+export function resolveClientRoutes(application: CapturedApplication): string[] {
+  const served = new Set(resolveServerRoutes(application).map((route) => route.path));
+  const declared = flattenRoutes(application.routes).map(({path}) => path);
+  const fallbacks = [application.defaultRoute.path, application.errorRoute.path];
+  return [...new Set([...declared, ...fallbacks])].filter((path) => !served.has(path));
+}
+
+/**
  * Creates the request handler for an application, capturing it on first use.
  * Capture is lazy so platforms that forbid work at module load (Cloudflare Workers)
  * can import the handler; later requests reuse the same application. The document
