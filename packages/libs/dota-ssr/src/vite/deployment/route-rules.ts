@@ -1,4 +1,4 @@
-import {matchesRoutePattern} from '../../ssg/route-output';
+import {matchPath, toWildcardPattern} from '../../ssr/route-match';
 import type {ResolvedDotaSsgRoute} from '../../ssg/types';
 
 /**
@@ -6,13 +6,13 @@ import type {ResolvedDotaSsgRoute} from '../../ssg/types';
  * another one already covers. In wildcard syntax `*` matches any characters, slashes included,
  * so the pattern for `/tasks/:id` also matches every `/tasks/:id/edit` request; Cloudflare
  * Pages rejects a rule list holding both.
- * @param paths Router-style paths such as `/tasks/:id`.
+ * @param paths Router-style paths such as `/tasks/:id` or `/docs/[...slug]`.
  * @param prefix Vite base pathname without its trailing slash, prepended to every pattern.
  * @returns The smallest pattern list matching the same requests, in first-seen order.
  */
 export function wildcardRoutePatterns(paths: readonly string[], prefix: string): string[] {
   let kept: string[] = [];
-  for (const pattern of paths.map((path) => `${prefix}${path.replace(/:[^/]+/g, '*')}`)) {
+  for (const pattern of paths.map((path) => `${prefix}${toWildcardPattern(path)}`)) {
     // An earlier pattern wins a tie, so two patterns covering each other keep exactly one.
     if (kept.some((existing) => coversPattern(existing, pattern))) continue;
     kept = [...kept.filter((existing) => !coversPattern(pattern, existing)), pattern];
@@ -31,7 +31,7 @@ export function wildcardRoutePatterns(paths: readonly string[], prefix: string):
  */
 export function staticPathsShadowedBy(serverPaths: readonly string[], staticRoutes: readonly ResolvedDotaSsgRoute[], prefix: string): string[] {
   return staticRoutes
-    .filter((route) => serverPaths.some((pattern) => matchesRoutePattern(pattern, route.path)))
+    .filter((route) => matchPath(serverPaths.map((path) => ({path})), route.path) !== undefined)
     .flatMap((route) => route.path === '/' ? [`${prefix}/`] : [`${prefix}${route.path}`, `${prefix}${route.path}/`]);
 }
 
