@@ -2,6 +2,7 @@ import {mkdir, readFile, writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {isCanonicalOutput} from '../../ssg/route-output';
 import type {ResolvedDotaSsgRoute} from '../../ssg/types';
+import {basePrefix} from './route-rules';
 
 /** Owner of the block holding static generation's rewrites. */
 const SSG_OWNER = 'dota-ssg';
@@ -17,8 +18,7 @@ const SSG_OWNER = 'dota-ssg';
  * @throws For unmatched markers, whitespace in URLs, wildcard/parameter sources, or file access failures.
  */
 export async function writeRedirects(outputDirectory: string, routes: readonly ResolvedDotaSsgRoute[], base: string): Promise<void> {
-  // The placeholder origin resolves relative bases without a network request; trimming the final slash avoids doubling it.
-  const prefix = new URL(base, 'https://ssg.invalid').pathname.replace(/\/$/, '');
+  const prefix = basePrefix(base);
   const lines = routes.map(route => {
     // Pair the public route URL with the HTML file already written for that route under the same deployment base.
     const source = `${prefix}${route.path}`;
