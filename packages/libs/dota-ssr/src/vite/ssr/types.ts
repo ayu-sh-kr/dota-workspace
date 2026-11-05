@@ -41,9 +41,18 @@ export interface DotaSsrOptions {
    * Defaults to the `trailingSlash` of `dotaSsg()` in the same build, so server-rendered and
    * prerendered pages share one URL form; without either, both forms render as before.
    * Cloudflare Pages and Netlify route both forms to the server so it can redirect. Vercel hands
-   * its function the route path rather than the request's, so the policy is not applied there.
+   * its function the route path rather than the request's, so there a permanent redirect per
+   * route in `vercel.json` enforces the policy instead.
    */
   trailingSlash?: boolean;
+  /**
+   * Whether paths no route declares answer with status 404 (the application shell, so the client
+   * still shows its not-found page); defaults to `true`. The Node server and Cloudflare worker
+   * check each request; Vercel, Netlify, and Cloudflare Pages also get `404.html` and route every
+   * declared browser-rendered path to `dota-shell.html`, replacing the need for a SPA catch-all.
+   * `false` keeps the previous behaviour, where the host's fallback answers every path with 200.
+   */
+  notFound?: boolean;
   /**
    * Opt-in `Cache-Control` for `ssr` pages rendered with status 200 in built servers (never in
    * `vite dev`), such as `'public, max-age=0, s-maxage=60, stale-while-revalidate=600'`. CDNs
@@ -68,10 +77,20 @@ export type ServerDeployment = {
   readonly shell: string;
   /** Router-style paths (`/tasks/:id`) of the `ssr` routes. */
   readonly routes: readonly string[];
+  /** Router-style paths of the routes the browser renders, from `resolveClientRoutes`. */
+  readonly clientRoutes: readonly string[];
   /** Pages static generation wrote in the same build; they stay static where `ssr` patterns cover them. */
   readonly staticRoutes: readonly ResolvedDotaSsgRoute[];
   /** Vite public base. */
   readonly base: string;
   /** Resolved plugin options. */
   readonly options: DotaSsrOptions;
+};
+
+/** Route paths read from a built server bundle. */
+export type BundleRoutes = {
+  /** Paths the server renders. */
+  readonly server: string[];
+  /** Paths the browser renders. */
+  readonly client: string[];
 };
