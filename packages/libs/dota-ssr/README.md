@@ -458,10 +458,42 @@ The SSR plugin's `closeBundle` runs after every other plugin's, so it reads the 
 wrote in the same build; a build without `--ssg` excludes nothing.
 
 On Cloudflare Pages, `*` in `_routes.json` matches across slashes, and the platform rejects
-overlapping rules. Nested routes such as `/tasks/:id` and `/tasks/:id/edit` therefore become
-the single rule `/tasks/*`. Cloudflare accepts at most 100 include and exclude rules
+overlapping rules. Nested routes such as `/products/:product` and
+`/products/:product/playground` therefore become the single rule `/products/*`; duplicates
+are dropped too, and `[slug]` and `[...rest]` segments become `*` like `:param`. Cloudflare accepts at most 100 include and exclude rules
 together; a build that needs more still writes the file and warns with the counts, since
 Cloudflare will reject that deployment.
+
+#### Unknown paths, slash forms, and caching
+
+**Unknown paths get 404.** A path that matches no declared route in any mode, nor the
+default or error route, is answered with the SPA shell and status 404, so the client still
+shows its not-found page. This applies to the Node server and to Cloudflare Pages paths
+under an `ssr` pattern, such as `/products/kit/unknown`. A parent generated for nested routes,
+such as `/products` when only `/products/:product` is declared, counts as unknown. Paths
+outside every `ssr` pattern on Vercel, Netlify, and Cloudflare Pages are answered by the
+host's own SPA fallback, which this build does not change. Custom Node hosts opt in by
+passing `isKnownPath: handler.isKnownPath` to `createNodeServer`.
+
+**One URL per page.** With `trailingSlash` set, the other slash form of an `ssr` page
+redirects (308) to the canonical one, keeping the query, as static hosts do for prerendered
+pages. It defaults to the `trailingSlash` of `dotaSsg()` in the same build, so both kinds of
+page use one form (`/docs/` by default). Without SSG or an explicit setting, both forms render
+as before. Cloudflare Pages and Netlify also route the slash form of each route to the server
+so it can redirect. On Vercel the function receives the route path rather than the request's
+slash form, so use Vercel's own `trailingSlash` setting there.
+
+**Caching is opt-in.** `cacheControl` adds `Cache-Control` to `ssr` pages rendered with status
+200 in the built server, never in `vite dev`, redirects, or error pages:
+
+```ts
+dotaSsr({cacheControl: 'public, max-age=0, s-maxage=60, stale-while-revalidate=600'})
+```
+
+CDNs that honour `s-maxage`, such as Vercel and Netlify, then answer repeat requests without
+calling the function. On Cloudflare Pages the worker checks the Cache API first and stores
+cacheable pages, so a hit returns before rendering; the Cache API works on custom domains,
+not `*.pages.dev`. Set it only for pages that are the same for every visitor.
 
 Builds whose sources never declare `mode: 'ssr'` skip the server build. While a page
 renders, `window`, `document`, `location`, `history`, storage, and `matchMedia` are backed
