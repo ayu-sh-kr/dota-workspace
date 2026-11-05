@@ -9,6 +9,7 @@ export type {
   DotaDecoratedRoute,
   DotaSsgRoute,
   DotaSsgRouteInput,
+  DotaSsgRouteRuleOptions,
   DotaSsgVercelOptions,
   ResolvedDotaSsgRoute
 } from '../ssg/types';
