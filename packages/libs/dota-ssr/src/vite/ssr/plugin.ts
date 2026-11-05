@@ -6,6 +6,7 @@ import type {Plugin, ResolvedConfig, ViteDevServer} from 'vite';
 import {toNodeListener} from '../../ssr/node-listener';
 import type {ApplicationHandler, PageRoute, RequestHandler} from '../../ssr/types';
 import {prepareServerDeployment, removeStaleNodeServer} from '../deployment/server';
+import {takeStaticDeployment} from '../deployment/static-deployment';
 import {buildServerBundle, ownModule, readServerRoutes} from './server-build';
 import type {DotaSsrOptions} from './types';
 
@@ -23,7 +24,9 @@ type ServerModule = {
  * Request-time rendering for `@Route({mode: 'ssr'})` routes, with no server code to write.
  * - `vite dev`: middleware renders `ssr` routes; everything else is served by Vite as before.
  * - `vite build`: after the client build, a server bundle is built from the same config and
- *   the deployment target's files are written (see `prepareServerDeployment`).
+ *   the deployment target's files are written (see `prepareServerDeployment`). This runs after
+ *   every other plugin's `closeBundle`, so pages prerendered by `dotaSsg` in the same build are
+ *   known and stay static, and their deployment target is the default one.
  * Builds whose sources never declare `mode: 'ssr'` skip the server build entirely.
  * @param options Entry, deployment target, and output settings.
  */
@@ -54,15 +57,21 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
       order: 'post',
       sequential: true,
       async handler() {
-        if (config.command !== 'build' || config.build.ssr || options.deployment === false) return;
-        const target = options.deployment ?? 'node';
+        if (config.command !== 'build' || config.build.ssr) return;
         const root = options.root ?? config.root;
+        const outputDirectory = resolve(root, config.build.outDir);
+        // Static generation finished earlier in this build; taking its record also clears it,
+        // so a later build in this process never routes around pages that no longer exist.
+        const staticBuild = takeStaticDeployment(outputDirectory);
+        if (options.deployment === false) return;
+        const staticTarget = staticBuild?.deployment || undefined;
+        const target = options.deployment ?? staticTarget?.target ?? 'node';
+        const vercelConfigFile = options.vercelConfigFile ?? (staticTarget?.target === 'vercel' ? staticTarget.configFile : undefined);
         await removeStaleNodeServer(root, options.serverOutDir, logger);
         if (!declaresServerRoutes) {
           logger.debug('No route declares mode: \'ssr\'; skipping the server build');
           return;
         }
-        const outputDirectory = resolve(root, config.build.outDir);
         const template = builtShell ?? await readFile(resolve(outputDirectory, options.template ?? 'index.html'), 'utf8');
         logger.debug(`Building the server for ${target} from ${root}`);
         const started = performance.now();
@@ -76,7 +85,16 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
         }
         logger.info(`SSR ready for ${routes.length} routes`);
         logger.debug(`Server-rendered routes: ${routes.join(', ')}`);
-        await prepareServerDeployment(target, {root, outputDirectory, bundleFile, shell: template, routes, base: config.base, options}, logger);
+        await prepareServerDeployment(target, {
+          root,
+          outputDirectory,
+          bundleFile,
+          shell: template,
+          routes,
+          staticRoutes: staticBuild?.routes ?? [],
+          base: config.base,
+          options: {...options, ...(vercelConfigFile ? {vercelConfigFile} : {})}
+        }, logger);
       }
     }
   };
