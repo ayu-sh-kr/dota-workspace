@@ -81,11 +81,18 @@ describe('server deployment', () => {
 
     const missing = await GET(new Request('https://app.test/api/dota-ssr?__dota_path=/tasks/missing'));
 
+    // Browser routes rewrite to the clean shell, so unknown paths can fall through to 404.html.
     expect(config.rewrites).toEqual([
       {source: '/tasks/:id', destination: '/api/dota-ssr?__dota_path=/tasks/:id'},
       {source: '/tasks/:id/edit', destination: '/api/dota-ssr?__dota_path=/tasks/:id/edit'},
+      {source: '/about', destination: '/dota-shell.html'},
+      {source: '/error', destination: '/dota-shell.html'},
+      {source: '/about/', destination: '/dota-shell.html'},
+      {source: '/error/', destination: '/dota-shell.html'},
       {source: '/(.*)', destination: '/index.html'}
     ]);
+    expect(await readFile(resolve(fixture, 'dist/404.html'), 'utf8')).toContain('<title>Fixture shell</title>');
+    expect(await readFile(resolve(fixture, 'dist/dota-shell.html'), 'utf8')).toContain('<title>Fixture shell</title>');
     expect(await response!.text()).toContain('seen-path="/tasks/7"');
     expect(missing!.status).toBe(404);
   });
@@ -115,17 +122,28 @@ describe('server deployment', () => {
     expect(missing.status).toBe(404);
     expect(await other.text()).toBe('asset /about');
     // `/tasks/*` already matches every `/tasks/:id/edit` URL; Cloudflare rejects the pair.
-    expect(JSON.parse(await readFile(resolve(fixture, 'dist/_routes.json'), 'utf8'))).toEqual({version: 1, include: ['/tasks/*'], exclude: []});
+    // Browser routes reach the worker too, which answers them with the shell.
+    expect(JSON.parse(await readFile(resolve(fixture, 'dist/_routes.json'), 'utf8'))).toEqual({
+      version: 1,
+      include: ['/tasks/*', '/about', '/error', '/about/', '/error/'],
+      exclude: []
+    });
+    expect(await readFile(resolve(fixture, 'dist/404.html'), 'utf8')).toContain('<title>Fixture shell</title>');
     expect(await readFile(resolve(fixture, 'wrangler.toml'), 'utf8')).toContain('compatibility_flags = ["nodejs_compat"]');
   });
 
-  it('vercel with SSG: renders both slash forms, since its function cannot see the slash', async () => {
+  it('vercel with SSG: redirects ssr routes to one slash form through vercel.json', async () => {
     await writeFile(resolve(fixture, 'vercel.json'), '{}');
     await buildFor('vercel', true);
     // The function's own `./_dota-ssr/index.mjs` import would reuse an earlier test's bundle.
     const {handler} = await load<{handler: Handler}>('api/_dota-ssr/index.mjs');
 
+    const config = JSON.parse(await readFile(resolve(fixture, 'vercel.json'), 'utf8'));
+
     expect((await handler(new Request('https://app.test/tasks/7')))!.status).toBe(200);
+    // Vercel enforces SSG's slash policy for ssr routes: a redirect, then a canonical rewrite.
+    expect(config.redirects).toContainEqual({source: '/tasks/:id', destination: '/tasks/:id/', permanent: true});
+    expect(config.rewrites[0]).toEqual({source: '/tasks/:id/', destination: '/api/dota-ssr?__dota_path=/tasks/:id/'});
   });
 
   it('cloudflare-pages with SSG: keeps a prerendered page static under a server route', async () => {
@@ -137,7 +155,7 @@ describe('server deployment', () => {
     expect(await readFile(resolve(fixture, 'dist/tasks/42/index.html'), 'utf8')).toContain('<task-page path="/tasks/42"');
     expect(JSON.parse(await readFile(resolve(fixture, 'dist/_routes.json'), 'utf8'))).toEqual({
       version: 1,
-      include: ['/tasks/*'],
+      include: ['/tasks/*', '/about', '/error', '/about/', '/error/'],
       exclude: ['/tasks/42', '/tasks/42/']
     });
     expect(await readFile(resolve(fixture, 'dist/_redirects'), 'utf8')).toBe('# BEGIN dota-ssg\n# END dota-ssg\n');
