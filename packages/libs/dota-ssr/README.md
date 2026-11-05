@@ -468,13 +468,27 @@ Cloudflare will reject that deployment.
 #### Unknown paths, slash forms, and caching
 
 **Unknown paths get 404.** A path that matches no declared route in any mode, nor the
-default or error route, is answered with the SPA shell and status 404, so the client still
-shows its not-found page. This applies to the Node server and to Cloudflare Pages paths
-under an `ssr` pattern, such as `/products/kit/unknown`. A parent generated for nested routes,
-such as `/products` when only `/products/:product` is declared, counts as unknown. Paths
-outside every `ssr` pattern on Vercel, Netlify, and Cloudflare Pages are answered by the
-host's own SPA fallback, which this build does not change. Custom Node hosts opt in by
-passing `isKnownPath: handler.isKnownPath` to `createNodeServer`.
+default or error route, is answered with the application shell and status 404, so the client
+still shows its not-found page. A parent generated for nested routes, such as `/products` when
+only `/products/:product` is declared, counts as unknown. The route table comes from the
+application itself, so nothing is listed by hand:
+
+| Target | Declared browser routes | Every other path |
+| --- | --- | --- |
+| `node` | the shell, 200 | the shell, 404 |
+| `vercel` | rewrites to `dota-shell.html` after the `ssr` rewrites | `404.html` (the shell), 404 |
+| `netlify` | a `# BEGIN dota-ssr` block in `_redirects` pointing at `dota-shell.html` | `404.html`, 404 |
+| `cloudflare-pages` | routed to the worker, which serves the shell | `404.html`, 404 |
+
+`dota-shell.html` and `404.html` hold the clean shell captured before SSG replaces
+`index.html`. Prerendered pages and other files still win, an authored `404.html` is kept,
+and an authored catch-all rule (such as `/(.*)` to a SPA page, or `/* /index.html 200`) is
+reported with a warning, because it would still answer unknown paths with 200: remove it, since
+declared routes no longer need it. On Cloudflare Pages browser routes count toward the 100
+`_routes.json` rules and invoke the worker. `notFound: false` restores the previous behaviour on
+every target. Custom Node hosts opt in by passing `isKnownPath: handler.isKnownPath` to
+`createNodeServer`. Vercel reads `vercel.json` before it builds, so commit the file a local
+build regenerates for these rules to reach the deployment.
 
 **One URL per page.** With `trailingSlash` set, the other slash form of an `ssr` page
 redirects (308) to the canonical one, keeping the query, as static hosts do for prerendered
@@ -482,8 +496,10 @@ pages. It defaults to the `trailingSlash` of `dotaSsg()` in the same build, so b
 page use one form (`/docs/` by default). Without SSG or an explicit setting, both forms render
 as before. Cloudflare Pages and Netlify also route the slash form of each route to the server
 so it can redirect. Redirects keep the site's host: repeated leading slashes are collapsed. On
-Vercel the function receives the route path rather than the request's slash form, so the
-policy is not applied there (a redirect would loop); use Vercel's own `trailingSlash` setting.
+Vercel the function receives the route path rather than the request's, so the policy is
+written into `vercel.json` instead: one permanent redirect per `ssr` route to its canonical form
+(as SSG writes for its pages), with the rewrite matching that form. Only `ssr` routes are
+affected, unlike Vercel's site-wide `trailingSlash` setting.
 
 **Caching is opt-in.** `cacheControl` adds `Cache-Control` to `ssr` pages rendered with status
 200 in the built server, never in `vite dev`, redirects, or error pages:
