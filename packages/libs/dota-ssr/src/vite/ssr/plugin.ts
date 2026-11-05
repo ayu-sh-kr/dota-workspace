@@ -67,6 +67,12 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
         const staticTarget = staticBuild?.deployment || undefined;
         const target = options.deployment ?? staticTarget?.target ?? 'node';
         const vercelConfigFile = options.vercelConfigFile ?? (staticTarget?.target === 'vercel' ? staticTarget.configFile : undefined);
+        const trailingSlash = options.trailingSlash ?? staticBuild?.trailingSlash;
+        const resolvedOptions: DotaSsrOptions = {
+          ...options,
+          ...(vercelConfigFile ? {vercelConfigFile} : {}),
+          ...(trailingSlash === undefined ? {} : {trailingSlash})
+        };
         await removeStaleNodeServer(root, options.serverOutDir, logger);
         if (!declaresServerRoutes) {
           logger.debug('No route declares mode: \'ssr\'; skipping the server build');
@@ -75,7 +81,7 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
         const template = builtShell ?? await readFile(resolve(outputDirectory, options.template ?? 'index.html'), 'utf8');
         logger.debug(`Building the server for ${target} from ${root}`);
         const started = performance.now();
-        const bundleFile = await buildServerBundle(config, root, options, target, template);
+        const bundleFile = await buildServerBundle(config, root, resolvedOptions, target, template);
         const built = performance.now();
         const routes = await readServerRoutes(bundleFile);
         logger.debug(`Server bundle ${bundleFile} built in ${(built - started).toFixed(0)}ms; application read in ${(performance.now() - built).toFixed(0)}ms`);
@@ -93,7 +99,7 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
           routes,
           staticRoutes: staticBuild?.routes ?? [],
           base: config.base,
-          options: {...options, ...(vercelConfigFile ? {vercelConfigFile} : {})}
+          options: resolvedOptions
         }, logger);
       }
     }
@@ -126,6 +132,7 @@ function installDevMiddleware(server: ViteDevServer, options: DotaSsrOptions, lo
     const ssr = await server.ssrLoadModule(ownModule('server')) as ServerModule;
     const application = ssr.createApplicationHandler(() => server.ssrLoadModule(entryFile), {
       hydration: options.hydration,
+      trailingSlash: options.trailingSlash,
       template: async (url: URL) => server.transformIndexHtml(`${url.pathname}${url.search}`, await readFile(templateFile, 'utf8'))
     });
     const routes = ssr.resolveServerRoutes(await application.application());
