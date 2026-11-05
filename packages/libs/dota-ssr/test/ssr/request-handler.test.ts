@@ -80,6 +80,41 @@ describe('createRequestHandler', () => {
     expect(found?.status).toBe(200);
   });
 
+  it('redirects the other slash form of a page when a slash policy is set', async () => {
+    const routes = [{path: '/', page: 'home-page'}, {path: '/users/:id', page: 'user-page'}];
+    const slash = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE, trailingSlash: true});
+    const bare = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE, trailingSlash: false});
+    const either = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE});
+
+    const toSlash = await slash(new Request('http://localhost/users/42?tab=a'));
+    const toBare = await bare(new Request('http://localhost/users/42/'));
+
+    expect(toSlash?.status).toBe(308);
+    expect(toSlash?.headers.get('location')).toBe('/users/42/?tab=a');
+    expect(toBare?.headers.get('location')).toBe('/users/42');
+    expect((await slash(new Request('http://localhost/users/42/')))?.status).toBe(200);
+    expect((await bare(new Request('http://localhost/')))?.status).toBe(200);
+    expect((await either(new Request('http://localhost/users/42/')))?.status).toBe(200);
+    expect((await either(new Request('http://localhost/users/42')))?.status).toBe(200);
+  });
+
+  it('sends the opt-in cache header with 200 pages only', async () => {
+    const adapter: RenderAdapter = {
+      name: 'lookup',
+      async render(_selector, context) {
+        if (context.params.id === 'missing') context.setStatus(404);
+        return {html: ''};
+      }
+    };
+    const routes = [{path: '/users/:id', page: 'user-page'}];
+    const cached = createRequestHandler({adapter, routes, template: TEMPLATE, cacheControl: 'public, s-maxage=60'});
+    const uncached = createRequestHandler({adapter, routes, template: TEMPLATE});
+
+    expect((await cached(new Request('http://localhost/users/42')))?.headers.get('cache-control')).toBe('public, s-maxage=60');
+    expect((await cached(new Request('http://localhost/users/missing')))?.headers.has('cache-control')).toBe(false);
+    expect((await uncached(new Request('http://localhost/users/42')))?.headers.has('cache-control')).toBe(false);
+  });
+
   it('rejects a status a Response cannot carry', async () => {
     const adapter: RenderAdapter = {
       name: 'invalid',
