@@ -89,6 +89,8 @@ describe('prepareServerDeployment with prerendered pages', () => {
     const missing = await worker.fetch(new Request('https://app.test/tasks/2/extra'), env);
     expect(missing.status).toBe(404);
     expect(await missing.text()).toBe('shell');
+    const redirect = {ASSETS: {fetch: async () => new Response(null, {status: 308, headers: {location: '/x/', 'content-type': 'text/html'}})}};
+    expect((await worker.fetch(new Request('https://app.test/tasks/2/extra'), redirect)).status).toBe(308);
   });
 
   it('cloudflare-pages: serves cached pages without rendering only when caching is on', async () => {
