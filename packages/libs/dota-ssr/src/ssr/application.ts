@@ -74,14 +74,13 @@ export function resolveClientRoutes(application: CapturedApplication): string[] 
 }
 
 /**
- * Creates the request handler for an application, capturing it on first use.
- * Capture is lazy so platforms that forbid work at module load (Cloudflare Workers)
- * can import the handler; later requests reuse the same application. The document
- * shell gets head and body outlets automatically, the body one inside the root element.
+ * Creates the request handler for an application, capturing it lazily on first use, so
+ * platforms that forbid work at module load (Cloudflare Workers) can import it. The shell
+ * gets head and body outlets automatically, the body one inside the root element.
  * @param loadEntry Imports the application entry.
  * @param options Document shell, fetch, hydration, slash policy, and cache header.
- * @returns A handler answering `ssr` routes, where other requests resolve `undefined`,
- *   and `isKnownPath` for hosts deciding whether their fallback shell is a 404.
+ * @returns A handler answering `ssr` routes (others resolve `undefined`), plus `isKnownPath`
+ *   for hosts deciding whether their fallback shell is a 404.
  */
 export function createApplicationHandler(loadEntry: () => Promise<unknown>, options: ApplicationHandlerOptions): ApplicationHandler {
   let application: Promise<CapturedApplication> | undefined;
