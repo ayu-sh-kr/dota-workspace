@@ -355,6 +355,13 @@ Use `deployment: {target: 'vercel', configFile: '../vercel.json'}` to select an
 explicit Vercel file, relative to the Vite root. Other targets also accept the
 object form, such as `deployment: {target: 'netlify'}`.
 
+Every target accepts `redirects: false` in the object form, such as
+`deployment: {target: 'cloudflare-pages', redirects: false}`. The build then writes
+no route rules: no `_redirects` block, no Vercel `redirects` or `cleanUrls`, and no
+GitHub Pages aliases (`.nojekyll` is still written). Use it when you maintain those
+rules yourself. Pages at their canonical output still work without rules; pages with a
+custom `output` need a rule of yours. Request-time deployment files are unaffected.
+
 Existing `vercel: true`, `vercel: false`, and `vercel: {configFile: '...'}` options
 remain supported with their previous behavior. An explicit `deployment` takes
 precedence, including `deployment: false` to disable all deployment output. When
@@ -393,6 +400,18 @@ export class TaskPage extends DotaPageElement {
 }
 ```
 
+A page that finds nothing for its URL calls `context.setStatus(404)` and renders its own
+not-found content. The response carries that status on every target, in `vite dev`, and on
+the Node server; any status from 200 to 599 is accepted, and the last call wins.
+
+```ts
+async serverLoad(context: RenderContext) {
+  const response = await context.fetch(`/api/tasks/${context.params.id}`);
+  if (response.status === 404) return context.setStatus(404);
+  this.task = await response.json();
+}
+```
+
 ```ts
 // vite.config.ts: one deployment target for SSG and SSR output
 plugins: [...dotaVitePlugins({deployment: 'vercel', ssg: {autoDetectRoutes: true}})]
@@ -417,6 +436,31 @@ markers, which `dotaHydration()` adopts in the browser.
 | `netlify` | a Functions API function in `.netlify/v1/functions/dota-ssr/` claiming only `ssr` paths |
 | `cloudflare-pages` | `_worker.js/` and `_routes.json` in the output directory; a `wrangler.toml` enabling `nodejs_compat` when none exists |
 | `github-pages` | nothing: static only, so `ssr` routes render in the browser (with a warning) |
+
+When `deployment` is omitted, `dotaSsr()` uses the target `dotaSsg()` prepared in the same
+build, else `node`. On `vercel`, `vercelConfigFile` selects the file for the rewrites; it
+defaults to the file SSG updated, so redirects and rewrites always share one `vercel.json`.
+
+#### SSG and SSR in one build
+
+A page can be prerendered and also match an `ssr` route, for example `/tasks/42` listed in
+SSG `routes` under `@Route({path: '/tasks/:id', mode: 'ssr'})`. The prerendered snapshot is
+served on every target, and `serverLoad` does not run for it:
+
+| Target | How the snapshot wins |
+| --- | --- |
+| `node` | The server serves existing files before rendering. |
+| `vercel` | Vercel checks the filesystem before rewrites. |
+| `netlify` | Both slash forms of the page go into the function's `config.excludedPath`. |
+| `cloudflare-pages` | Both slash forms go into `_routes.json` `exclude`. |
+
+The SSR plugin's `closeBundle` runs after every other plugin's, so it reads the pages SSG
+wrote in the same build; a build without `--ssg` excludes nothing.
+
+On Cloudflare Pages, `*` in `_routes.json` matches across slashes, and the platform rejects
+overlapping rules. Nested routes such as `/tasks/:id` and `/tasks/:id/edit` therefore become
+the single rule `/tasks/*`. Cloudflare accepts at most 100 include and exclude rules
+together; a build that needs more fails with the counts, before any file is written.
 
 Builds whose sources never declare `mode: 'ssr'` skip the server build. While a page
 renders, `window`, `document`, `location`, `history`, storage, and `matchMedia` are backed
