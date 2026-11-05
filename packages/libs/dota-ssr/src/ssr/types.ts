@@ -15,6 +15,14 @@ export interface RenderContext {
   readonly fetch: typeof fetch;
   /** Per-request store shared by every component rendered for this page. */
   readonly state: Map<string, unknown>;
+  /**
+   * Sets the HTTP status of the page response; it defaults to 200. A `serverLoad` that finds
+   * no data for the URL calls `setStatus(404)` and renders its not-found content, so crawlers
+   * and caches see a real 404 on every deployment target. The last call wins.
+   * @param status Integer from 200 to 599, the range a `Response` accepts.
+   * @throws RangeError when the status is outside that range.
+   */
+  setStatus(status: number): void;
 }
 
 /**
