@@ -29,9 +29,14 @@ export function wildcardRoutePatterns(paths: readonly string[], prefix: string):
  * @param staticRoutes Pages static generation wrote in the same build.
  * @param prefix Vite base pathname without its trailing slash.
  */
-export function staticPathsShadowedBy(serverPaths: readonly string[], staticRoutes: readonly ResolvedDotaSsgRoute[], prefix: string): string[] {
+export function staticPathsShadowedBy(
+  serverPaths: readonly string[],
+  staticRoutes: readonly ResolvedDotaSsgRoute[],
+  prefix: string
+): string[] {
+  const serverRoutes = serverPaths.map((path) => ({path}));
   return staticRoutes
-    .filter((route) => matchPath(serverPaths.map((path) => ({path})), route.path) !== undefined)
+    .filter((route) => matchPath(serverRoutes, route.path) !== undefined)
     .flatMap((route) => route.path === '/' ? [`${prefix}/`] : [`${prefix}${route.path}`, `${prefix}${route.path}/`]);
 }
 
