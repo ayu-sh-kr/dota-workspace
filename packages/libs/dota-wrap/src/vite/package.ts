@@ -19,6 +19,12 @@ export type DotaPackageOptions = {
   serverOutDir?: string;
   /** Whether page URLs end with a slash; defaults to `true`. See `DotaSsgOptions.trailingSlash`. */
   trailingSlash?: boolean;
+  /**
+   * Whether SSG writes the target's route rules (`vercel.json` redirects, the `_redirects`
+   * block, GitHub Pages aliases); defaults to `true`. See `DotaSsgRouteRuleOptions.redirects`.
+   * Server routing for `ssr` routes is written either way.
+   */
+  redirects?: boolean;
 };
 
 /** Deployment targets accepted from `DOTA_DEPLOYMENT`. */
@@ -86,11 +92,14 @@ export function dotaPackage(
 
   if (plugins.ssr !== false) {
     const serverOutDir = overrides.serverOutDir ?? plugins.ssr?.serverOutDir ?? configured?.serverOutDir;
+    // The same `vercel.json` as SSG, so redirects and SSR rewrites never land in different files.
+    const vercelConfigFile = overrides.vercelConfigFile ?? plugins.ssr?.vercelConfigFile ?? configured?.vercelConfigFile;
     result.push(dotaSsr({
       deployment: configured?.target ?? ssgDeploymentTarget(plugins.ssg),
       ...plugins.ssr,
       ...(overrides.target ? {deployment: overrides.target} : {}),
       ...(serverOutDir ? {serverOutDir} : {}),
+      ...(vercelConfigFile ? {vercelConfigFile} : {}),
     }));
   }
 
@@ -127,10 +136,11 @@ export function readPackageEnv(env: Record<string, string | undefined>): Partial
 /** SSG hosting files for a deployment; a Node server serves directory indexes itself, so it needs none. */
 function ssgDeployment(deployment: DotaPackageOptions): DotaSsgOptions['deployment'] {
   if (deployment.target === 'node') return false;
+  const rules = deployment.redirects === false ? {redirects: false} : {};
   if (deployment.target === 'vercel' && deployment.vercelConfigFile) {
-    return {target: 'vercel', configFile: deployment.vercelConfigFile};
+    return {target: 'vercel', configFile: deployment.vercelConfigFile, ...rules};
   }
-  return deployment.target;
+  return deployment.redirects === false ? {target: deployment.target, ...rules} : deployment.target;
 }
 
 /** The SSG deployment target, so SSR deploys to the same platform without repeating it. */
