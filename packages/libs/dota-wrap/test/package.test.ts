@@ -35,10 +35,22 @@ describe('dotaPackage', () => {
     expect(calls.ssr).toEqual([{deployment: 'node', serverOutDir: 'server'}]);
   });
 
-  it('passes a Vercel configuration path to SSG', () => {
+  it('passes a Vercel configuration path to SSG and SSR so both update one file', () => {
     dotaPackage({target: 'vercel', vercelConfigFile: '../vercel.json'}, {ssg: {}});
 
     expect(calls.ssg).toEqual([{deployment: {target: 'vercel', configFile: '../vercel.json'}}]);
+    expect(calls.ssr).toEqual([{deployment: 'vercel', vercelConfigFile: '../vercel.json'}]);
+  });
+
+  it('forwards a route-rule opt-out to SSG only', () => {
+    dotaPackage({target: 'cloudflare-pages', redirects: false}, {ssg: {}});
+    dotaPackage({target: 'vercel', vercelConfigFile: 'vercel.json', redirects: false}, {ssg: {}});
+
+    expect(calls.ssg).toEqual([
+      {deployment: {target: 'cloudflare-pages', redirects: false}},
+      {deployment: {target: 'vercel', configFile: 'vercel.json', redirects: false}},
+    ]);
+    expect(calls.ssr).toEqual([{deployment: 'cloudflare-pages'}, {deployment: 'vercel', vercelConfigFile: 'vercel.json'}]);
   });
 
   it('lets per-plugin deployments win and SSR follow the SSG target when none is shared', () => {
@@ -57,6 +69,13 @@ describe('dotaPackage', () => {
       {deployment: 'netlify', trailingSlash: false},
       {deployment: 'netlify', trailingSlash: true},
     ]);
+  });
+
+  it('gives SSR the shared trailing-slash setting only when one is set', () => {
+    dotaPackage({target: 'netlify', trailingSlash: true}, {ssg: {}});
+    dotaPackage({target: 'netlify'}, {ssg: {}});
+
+    expect(calls.ssr).toEqual([{deployment: 'netlify', trailingSlash: true}, {deployment: 'netlify'}]);
   });
 
   it('omits disabled plugins', () => {
@@ -81,7 +100,7 @@ describe('dotaPackage environment', () => {
     });
 
     expect(calls.ssg).toEqual([{deployment: false, trailingSlash: false}]);
-    expect(calls.ssr).toEqual([{deployment: 'node', serverOutDir: 'env-server'}]);
+    expect(calls.ssr).toEqual([{deployment: 'node', serverOutDir: 'env-server', trailingSlash: false}]);
   });
 
   it('falls back to plugin options when variables are unset or empty', () => {

@@ -5,7 +5,8 @@ import type {ConsolaInstance} from 'consola';
 import type {Plugin, ResolvedConfig, ViteDevServer} from 'vite';
 import {toNodeListener} from '../../ssr/node-listener';
 import type {ApplicationHandler, PageRoute, RequestHandler} from '../../ssr/types';
-import {prepareServerDeployment, removeStaleNodeServer} from '../deployment/server';
+import {prepareServerDeployment, removeStaleNodeServer, SLASH_AWARE_TARGETS} from '../deployment/server';
+import {takeStaticDeployment} from '../deployment/static-deployment';
 import {buildServerBundle, ownModule, readServerRoutes} from './server-build';
 import type {DotaSsrOptions} from './types';
 
@@ -22,9 +23,9 @@ type ServerModule = {
 /**
  * Request-time rendering for `@Route({mode: 'ssr'})` routes, with no server code to write.
  * - `vite dev`: middleware renders `ssr` routes; everything else is served by Vite as before.
- * - `vite build`: after the client build, a server bundle is built from the same config and
- *   the deployment target's files are written (see `prepareServerDeployment`).
- * Builds whose sources never declare `mode: 'ssr'` skip the server build entirely.
+ * - `vite build`: runs after every other plugin's `closeBundle`, builds the server bundle, and
+ *   writes the target's files, keeping pages `dotaSsg` prerendered static and following its
+ *   slash policy. Builds whose sources never declare `mode: 'ssr'` skip the server build.
  * @param options Entry, deployment target, and output settings.
  */
 export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
@@ -54,21 +55,39 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
       order: 'post',
       sequential: true,
       async handler() {
-        if (config.command !== 'build' || config.build.ssr || options.deployment === false) return;
-        const target = options.deployment ?? 'node';
+        if (config.command !== 'build' || config.build.ssr) return;
         const root = options.root ?? config.root;
+        const outputDirectory = resolve(root, config.build.outDir);
+        // Static generation finished earlier in this build; taking its record also clears it,
+        // so a later build in this process never routes around pages that no longer exist.
+        const staticBuild = takeStaticDeployment(outputDirectory);
+        if (options.deployment === false) return;
+        const target = options.deployment ?? 'node';
+        const staticTarget = staticBuild?.deployment || undefined;
+        const staticVercelFile = staticTarget?.target === 'vercel' ? staticTarget.configFile : undefined;
+        const vercelConfigFile = options.vercelConfigFile ?? staticVercelFile;
+        const trailingSlash = options.trailingSlash ?? staticBuild?.trailingSlash;
+        const resolvedOptions: DotaSsrOptions = {
+          ...options,
+          ...(vercelConfigFile ? {vercelConfigFile} : {}),
+          ...(trailingSlash === undefined ? {} : {trailingSlash})
+        };
+        // A server that cannot see the request's slash form would redirect forever; its
+        // platform enforces the policy instead (see `prepareServerDeployment`).
+        const bundleOptions: DotaSsrOptions = SLASH_AWARE_TARGETS.has(target)
+          ? resolvedOptions
+          : {...resolvedOptions, trailingSlash: undefined};
         await removeStaleNodeServer(root, options.serverOutDir, logger);
         if (!declaresServerRoutes) {
           logger.debug('No route declares mode: \'ssr\'; skipping the server build');
           return;
         }
-        const outputDirectory = resolve(root, config.build.outDir);
         const template = builtShell ?? await readFile(resolve(outputDirectory, options.template ?? 'index.html'), 'utf8');
         logger.debug(`Building the server for ${target} from ${root}`);
         const started = performance.now();
-        const bundleFile = await buildServerBundle(config, root, options, target, template);
+        const bundleFile = await buildServerBundle(config, root, bundleOptions, target, template);
         const built = performance.now();
-        const routes = await readServerRoutes(bundleFile);
+        const {server: routes, client: clientRoutes} = await readServerRoutes(bundleFile);
         logger.debug(`Server bundle ${bundleFile} built in ${(built - started).toFixed(0)}ms; application read in ${(performance.now() - built).toFixed(0)}ms`);
         if (routes.length === 0) {
           logger.info('No SSR routes; no server output written');
@@ -76,7 +95,17 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
         }
         logger.info(`SSR ready for ${routes.length} routes`);
         logger.debug(`Server-rendered routes: ${routes.join(', ')}`);
-        await prepareServerDeployment(target, {root, outputDirectory, bundleFile, shell: template, routes, base: config.base, options}, logger);
+        await prepareServerDeployment(target, {
+          root,
+          outputDirectory,
+          bundleFile,
+          shell: template,
+          routes,
+          clientRoutes,
+          staticRoutes: staticBuild?.routes ?? [],
+          base: config.base,
+          options: resolvedOptions
+        }, logger);
       }
     }
   };
@@ -88,6 +117,9 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
  * after any file change; an application without `ssr` routes then passes every request on.
  * If capture fails, for example because the entry has browser-only module code, server
  * rendering is off until the next change.
+ * @param server Vite dev server whose module graph and watcher are used.
+ * @param options Plugin options; only an explicit `trailingSlash` applies in dev.
+ * @param logger Plugin logger.
  */
 function installDevMiddleware(server: ViteDevServer, options: DotaSsrOptions, logger: ConsolaInstance): void {
   const root = options.root ?? server.config.root;
@@ -108,6 +140,7 @@ function installDevMiddleware(server: ViteDevServer, options: DotaSsrOptions, lo
     const ssr = await server.ssrLoadModule(ownModule('server')) as ServerModule;
     const application = ssr.createApplicationHandler(() => server.ssrLoadModule(entryFile), {
       hydration: options.hydration,
+      trailingSlash: options.trailingSlash,
       template: async (url: URL) => server.transformIndexHtml(`${url.pathname}${url.search}`, await readFile(templateFile, 'utf8'))
     });
     const routes = ssr.resolveServerRoutes(await application.application());

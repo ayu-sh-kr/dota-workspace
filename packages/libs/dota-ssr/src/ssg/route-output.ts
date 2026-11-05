@@ -1,4 +1,5 @@
 import {posix} from 'node:path';
+import {matchPath} from '../ssr/route-match';
 import type {DotaDecoratedRoute, DotaSsgRouteInput, ResolvedDotaSsgRoute} from './types';
 
 /**
@@ -95,13 +96,11 @@ export function resolveDecoratedSsgRoutes(
 }
 
 /**
- * Reports whether a concrete pathname fills a route pattern segment for segment.
- * @param pattern Route path whose `:name` segments match any one non-empty segment.
+ * Reports whether a concrete pathname fills a route pattern, with the same segment syntax the
+ * server and Dota Router use, so SSG, SSR, and hosting rules agree on which paths a route owns.
+ * @param pattern Route path such as `/docs/:slug`.
  * @param path Normalized concrete pathname.
  */
 function matchesRoutePattern(pattern: string, path: string): boolean {
-  const patternSegments = pattern.split('/').filter(Boolean);
-  const pathSegments = path.split('/').filter(Boolean);
-  return patternSegments.length === pathSegments.length &&
-    patternSegments.every((segment, index) => segment.startsWith(':') || segment === pathSegments[index]);
+  return matchPath([{path: pattern}], path) !== undefined;
 }

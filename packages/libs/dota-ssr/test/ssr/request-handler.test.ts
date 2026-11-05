@@ -62,6 +62,81 @@ describe('createRequestHandler', () => {
     expect(baseFetch).toHaveBeenCalledWith(new URL('http://example.test:8080/api/data'), undefined);
   });
 
+  it('answers with the status a page sets, 200 otherwise', async () => {
+    const adapter: RenderAdapter = {
+      name: 'lookup',
+      async render(selector, context) {
+        if (context.params.id === 'missing') context.setStatus(404);
+        return {html: `<${selector}></${selector}>`};
+      }
+    };
+    const handler = createRequestHandler({adapter, routes: [{path: '/users/:id', page: 'user-page'}], template: TEMPLATE});
+
+    const missing = await handler(new Request('http://localhost/users/missing'));
+    const found = await handler(new Request('http://localhost/users/42'));
+
+    expect(missing?.status).toBe(404);
+    expect(await missing?.text()).toContain('<user-page></user-page>');
+    expect(found?.status).toBe(200);
+  });
+
+  it('redirects the other slash form of a page when a slash policy is set', async () => {
+    const routes = [{path: '/', page: 'home-page'}, {path: '/users/:id', page: 'user-page'}];
+    const slash = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE, trailingSlash: true});
+    const bare = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE, trailingSlash: false});
+    const either = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE});
+
+    const toSlash = await slash(new Request('http://localhost/users/42?tab=a'));
+    const toBare = await bare(new Request('http://localhost/users/42/'));
+
+    expect(toSlash?.status).toBe(308);
+    expect(toSlash?.headers.get('location')).toBe('/users/42/?tab=a');
+    expect(toBare?.headers.get('location')).toBe('/users/42');
+    expect((await slash(new Request('http://localhost/users/42/')))?.status).toBe(200);
+    expect((await bare(new Request('http://localhost/')))?.status).toBe(200);
+    expect((await either(new Request('http://localhost/users/42/')))?.status).toBe(200);
+    expect((await either(new Request('http://localhost/users/42')))?.status).toBe(200);
+  });
+
+  it('keeps slash redirects on this site when the path starts with repeated slashes', async () => {
+    const routes = [{path: '/:slug', page: 'slug-page'}];
+    const slash = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE, trailingSlash: true});
+    const bare = createRequestHandler({adapter: createEchoAdapter(), routes, template: TEMPLATE, trailingSlash: false});
+
+    expect((await slash(new Request('http://localhost//evil.example')))?.headers.get('location')).toBe('/evil.example/');
+    expect((await bare(new Request('http://localhost//evil.example/')))?.headers.get('location')).toBe('/evil.example');
+  });
+
+  it('sends the opt-in cache header with 200 pages only', async () => {
+    const adapter: RenderAdapter = {
+      name: 'lookup',
+      async render(_selector, context) {
+        if (context.params.id === 'missing') context.setStatus(404);
+        return {html: ''};
+      }
+    };
+    const routes = [{path: '/users/:id', page: 'user-page'}];
+    const cached = createRequestHandler({adapter, routes, template: TEMPLATE, cacheControl: 'public, s-maxage=60'});
+    const uncached = createRequestHandler({adapter, routes, template: TEMPLATE});
+
+    expect((await cached(new Request('http://localhost/users/42')))?.headers.get('cache-control')).toBe('public, s-maxage=60');
+    expect((await cached(new Request('http://localhost/users/missing')))?.headers.has('cache-control')).toBe(false);
+    expect((await uncached(new Request('http://localhost/users/42')))?.headers.has('cache-control')).toBe(false);
+  });
+
+  it('rejects a status a Response cannot carry', async () => {
+    const adapter: RenderAdapter = {
+      name: 'invalid',
+      async render(_selector, context) {
+        context.setStatus(1000);
+        return {html: ''};
+      }
+    };
+    const handler = createRequestHandler({adapter, routes: [{path: '/', page: 'home-page'}], template: TEMPLATE});
+
+    await expect(handler(new Request('http://localhost/'))).rejects.toThrow('Page status must be an integer from 200 to 599; got 1000 for /');
+  });
+
   it('declines non-page and non-GET requests so the server can fall through', async () => {
     const handler = createRequestHandler({adapter: createEchoAdapter(), routes: [{path: '/', page: 'home-page'}], template: TEMPLATE});
 

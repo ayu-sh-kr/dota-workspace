@@ -75,6 +75,36 @@ describe('createNodeServer', () => {
     }
   });
 
+  it('sends the shell with 404 for paths the application does not declare', async () => {
+    const known = createNodeServer({clientDirectory: directory, handler: async () => undefined, isKnownPath: (path) => path === '/client'});
+    await new Promise<void>((done) => known.listen(0, done));
+    const base = `http://localhost:${(known.address() as AddressInfo).port}`;
+    try {
+      const client = await fetch(`${base}/client`);
+      const missing = await fetch(`${base}/missing`);
+
+      expect(client.status).toBe(200);
+      expect(missing.status).toBe(404);
+      expect(await missing.text()).toBe('shell');
+      expect((await fetch(`${base}/app.js`)).status).toBe(200);
+    } finally {
+      known.close();
+    }
+  });
+
+  it('answers 500 when the known-path check fails', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const failing = createNodeServer({clientDirectory: directory, handler: async () => undefined, isKnownPath: async () => {
+      throw new Error('capture failed');
+    }});
+    await new Promise<void>((done) => failing.listen(0, done));
+    try {
+      expect((await fetch(`http://localhost:${(failing.address() as AddressInfo).port}/anything`)).status).toBe(500);
+    } finally {
+      failing.close();
+    }
+  });
+
   it('never serves files outside the client directory', async () => {
     const response = await fetch(`${origin}/%2e%2e/%2e%2e/etc/passwd`);
 

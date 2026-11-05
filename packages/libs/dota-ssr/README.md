@@ -355,6 +355,13 @@ Use `deployment: {target: 'vercel', configFile: '../vercel.json'}` to select an
 explicit Vercel file, relative to the Vite root. Other targets also accept the
 object form, such as `deployment: {target: 'netlify'}`.
 
+Every target accepts `redirects: false` in the object form, such as
+`deployment: {target: 'cloudflare-pages', redirects: false}`. The build then writes
+no route rules: no `_redirects` block, no Vercel `redirects` or `cleanUrls`, and no
+GitHub Pages aliases (`.nojekyll` is still written). Use it when you maintain those
+rules yourself. Pages at their canonical output still work without rules; pages with a
+custom `output` need a rule of yours. Request-time deployment files are unaffected.
+
 Existing `vercel: true`, `vercel: false`, and `vercel: {configFile: '...'}` options
 remain supported with their previous behavior. An explicit `deployment` takes
 precedence, including `deployment: false` to disable all deployment output. When
@@ -393,6 +400,18 @@ export class TaskPage extends DotaPageElement {
 }
 ```
 
+A page that finds nothing for its URL calls `context.setStatus(404)` and renders its own
+not-found content. The response carries that status on every target, in `vite dev`, and on
+the Node server; any status from 200 to 599 is accepted, and the last call wins.
+
+```ts
+async serverLoad(context: RenderContext) {
+  const response = await context.fetch(`/api/tasks/${context.params.id}`);
+  if (response.status === 404) return context.setStatus(404);
+  this.task = await response.json();
+}
+```
+
 ```ts
 // vite.config.ts: one deployment target for SSG and SSR output
 plugins: [...dotaVitePlugins({deployment: 'vercel', ssg: {autoDetectRoutes: true}})]
@@ -417,6 +436,82 @@ markers, which `dotaHydration()` adopts in the browser.
 | `netlify` | a Functions API function in `.netlify/v1/functions/dota-ssr/` claiming only `ssr` paths |
 | `cloudflare-pages` | `_worker.js/` and `_routes.json` in the output directory; a `wrangler.toml` enabling `nodejs_compat` when none exists |
 | `github-pages` | nothing: static only, so `ssr` routes render in the browser (with a warning) |
+
+When `deployment` is omitted, `dotaSsr()` targets `node`; Dota Wrap's
+`dotaVitePlugins({deployment})` sets one target for both plugins. On `vercel`,
+`vercelConfigFile` selects the file for the rewrites; it defaults to the file SSG updated in
+the same build, so redirects and rewrites always share one `vercel.json`.
+
+#### SSG and SSR in one build
+
+A page can be prerendered and also match an `ssr` route, for example `/tasks/42` listed in
+SSG `routes` under `@Route({path: '/tasks/:id', mode: 'ssr'})`. The prerendered snapshot is
+served on every target, and `serverLoad` does not run for it:
+
+| Target | How the snapshot wins |
+| --- | --- |
+| `node` | The server serves existing files before rendering. |
+| `vercel` | Vercel checks the filesystem before rewrites. |
+| `netlify` | Both slash forms of the page go into the function's `config.excludedPath`. |
+| `cloudflare-pages` | Both slash forms go into `_routes.json` `exclude`. |
+
+The SSR plugin's `closeBundle` runs after every other plugin's, so it reads the pages SSG
+wrote in the same build; a build without `--ssg` excludes nothing.
+
+On Cloudflare Pages, `*` in `_routes.json` matches across slashes, and the platform rejects
+overlapping rules. Nested routes such as `/products/:product` and
+`/products/:product/playground` therefore become the single rule `/products/*`; duplicates
+are dropped too, and `[slug]` and `[...rest]` segments become `*` like `:param`. Cloudflare accepts at most 100 include and exclude rules
+together; a build that needs more still writes the file and warns with the counts, since
+Cloudflare will reject that deployment.
+
+#### Unknown paths, slash forms, and caching
+
+**Unknown paths get 404.** A path that matches no declared route in any mode, nor the
+default or error route, is answered with the application shell and status 404, so the client
+still shows its not-found page. A parent generated for nested routes, such as `/products` when
+only `/products/:product` is declared, counts as unknown. The route table comes from the
+application itself, so nothing is listed by hand:
+
+| Target | Declared browser routes | Every other path |
+| --- | --- | --- |
+| `node` | the shell, 200 | the shell, 404 |
+| `vercel` | rewrites to `dota-shell.html` after the `ssr` rewrites | `404.html` (the shell), 404 |
+| `netlify` | a `# BEGIN dota-ssr` block in `_redirects` pointing at `dota-shell.html` | `404.html`, 404 |
+| `cloudflare-pages` | routed to the worker, which serves the shell | `404.html`, 404 |
+
+`dota-shell.html` and `404.html` hold the clean shell captured before SSG replaces
+`index.html`. Prerendered pages and other files still win, an authored `404.html` is kept,
+and an authored catch-all rule (such as `/(.*)` to a SPA page, or `/* /index.html 200`) is
+reported with a warning, because it would still answer unknown paths with 200: remove it, since
+declared routes no longer need it. On Cloudflare Pages browser routes count toward the 100
+`_routes.json` rules and invoke the worker. `notFound: false` restores the previous behaviour on
+every target. Custom Node hosts opt in by passing `isKnownPath: handler.isKnownPath` to
+`createNodeServer`. Vercel reads `vercel.json` before it builds, so commit the file a local
+build regenerates for these rules to reach the deployment.
+
+**One URL per page.** With `trailingSlash` set, the other slash form of an `ssr` page
+redirects (308) to the canonical one, keeping the query, as static hosts do for prerendered
+pages. It defaults to the `trailingSlash` of `dotaSsg()` in the same build, so both kinds of
+page use one form (`/docs/` by default). Without SSG or an explicit setting, both forms render
+as before. Cloudflare Pages and Netlify also route the slash form of each route to the server
+so it can redirect. Redirects keep the site's host: repeated leading slashes are collapsed. On
+Vercel the function receives the route path rather than the request's, so the policy is
+written into `vercel.json` instead: one permanent redirect per `ssr` route to its canonical form
+(as SSG writes for its pages), with the rewrite matching that form. Only `ssr` routes are
+affected, unlike Vercel's site-wide `trailingSlash` setting.
+
+**Caching is opt-in.** `cacheControl` adds `Cache-Control` to `ssr` pages rendered with status
+200 in the built server, never in `vite dev`, redirects, or error pages:
+
+```ts
+dotaSsr({cacheControl: 'public, max-age=0, s-maxage=60, stale-while-revalidate=600'})
+```
+
+CDNs that honour `s-maxage`, such as Vercel and Netlify, then answer repeat requests without
+calling the function. On Cloudflare Pages the worker checks the Cache API first and stores
+cacheable pages, so a hit returns before rendering; the Cache API works on custom domains,
+not `*.pages.dev`. Set it only for pages that are the same for every visitor.
 
 Builds whose sources never declare `mode: 'ssr'` skip the server build. While a page
 renders, `window`, `document`, `location`, `history`, storage, and `matchMedia` are backed

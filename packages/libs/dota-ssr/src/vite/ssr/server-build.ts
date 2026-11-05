@@ -4,7 +4,7 @@ import {pathToFileURL} from 'node:url';
 import {Worker} from 'node:worker_threads';
 import {build, type Plugin, type ResolvedConfig} from 'vite';
 import {loadApplicationConfig} from '../application-config';
-import type {DotaServerTarget, DotaSsrOptions} from './types';
+import type {BundleRoutes, DotaServerTarget, DotaSsrOptions} from './types';
 
 const SERVER_ENTRY = 'virtual:dota-ssr-server';
 const TEMPLATE_MODULE = 'virtual:dota-ssr-template';
@@ -15,6 +15,7 @@ const ROUTE_READ_TIMEOUT = 30_000;
  * able to resolve `@ayu-sh-kr/dota-ssr` themselves (pnpm only exposes direct
  * dependencies), and the ESM build is required so the server bundle shares one copy of
  * Dota Core with the application.
+ * @param entry Package entry name.
  */
 export function ownModule(entry: 'server' | 'node'): string {
   return createRequire(import.meta.url).resolve(`@ayu-sh-kr/dota-ssr/${entry}`).replace(/\.cjs$/, '.mjs');
@@ -22,16 +23,26 @@ export function ownModule(entry: 'server' | 'node'): string {
 
 /**
  * Source of the server entry: a lazily capturing handler for the application entry, the
- * `ssr` route list for platform configuration, and, for Node, the HTTP host.
+ * `ssr` and browser-rendered route lists for platform configuration, and, for Node, the HTTP host.
  * @param entryFile Absolute application entry.
  * @param target Deployment target; only `node` bundles the HTTP host.
+ * @param options Plugin options whose hydration, slash policy, and cache header reach the handler.
  */
-export function serverEntrySource(entryFile: string, target: DotaServerTarget, hydration: boolean): string {
+export function serverEntrySource(entryFile: string, target: DotaServerTarget, options: DotaSsrOptions): string {
+  // Only set values are written, so the handler's defaults stay the defaults.
+  const handlerOptions = JSON.stringify({
+    hydration: options.hydration ?? true,
+    ...(options.trailingSlash === undefined ? {} : {trailingSlash: options.trailingSlash}),
+    ...(options.cacheControl ? {cacheControl: options.cacheControl} : {})
+  });
+  const loadEntry = `() => import(${JSON.stringify(entryFile)})`;
+  const serverModule = JSON.stringify(ownModule('server'));
   return [
-    `import {createApplicationHandler, resolveServerRoutes} from ${JSON.stringify(ownModule('server'))};`,
+    `import {createApplicationHandler, resolveClientRoutes, resolveServerRoutes} from ${serverModule};`,
     `import template from ${JSON.stringify(TEMPLATE_MODULE)};`,
-    `export const handler = createApplicationHandler(() => import(${JSON.stringify(entryFile)}), {template, hydration: ${hydration}});`,
+    `export const handler = createApplicationHandler(${loadEntry}, {template, ...${handlerOptions}});`,
     'export const serverRoutes = async () => resolveServerRoutes(await handler.application()).map((route) => route.path);',
+    'export const clientRoutes = async () => resolveClientRoutes(await handler.application());',
     ...(target === 'node' ? [`export {createNodeServer} from ${JSON.stringify(ownModule('node'))};`] : [])
   ].join('\n');
 }
@@ -41,6 +52,9 @@ export function serverEntrySource(entryFile: string, target: DotaServerTarget, h
  * application's own Vite config, so transforms, aliases, and preloader modules match the
  * client build. Workers get a `webworker` build that leaves `node:` imports to the platform.
  * @param config Resolved config of the client build.
+ * @param root Project root the entry resolves against.
+ * @param options Options whose entry, hydration, slash policy, and cache header reach the bundle.
+ * @param target Deployment target; Cloudflare gets a `webworker` build.
  * @param template Built `index.html`, embedded as the document shell.
  * @returns Absolute path of the bundle.
  */
@@ -54,7 +68,7 @@ export async function buildServerBundle(config: ResolvedConfig, root: string, op
     // Vite passes the SSR input as a root-relative path, so match on the name's suffix.
     resolveId: (id) => [SERVER_ENTRY, TEMPLATE_MODULE].find((name) => id === name || id.endsWith(`/${name}`)) && `\0${id.slice(id.lastIndexOf('virtual:'))}`,
     load(id) {
-      if (id === `\0${SERVER_ENTRY}`) return serverEntrySource(entryFile, target, options.hydration ?? true);
+      if (id === `\0${SERVER_ENTRY}`) return serverEntrySource(entryFile, target, options);
       if (id === `\0${TEMPLATE_MODULE}`) return `export default ${JSON.stringify(template)};`;
       return null;
     }
@@ -92,27 +106,30 @@ export async function buildServerBundle(config: ResolvedConfig, root: string, op
 }
 
 /**
- * Reads the `ssr` route paths by running the bundle once, in a worker so the
- * application's module-level state and the server globals stay out of the build process.
+ * Reads the `ssr` and browser-rendered route paths by running the bundle once, in a worker so
+ * the application's module-level state and the server globals stay out of the build process.
  * @param bundleFile Server bundle from {@link buildServerBundle}.
  * @throws Error when the application cannot be captured.
  */
-export function readServerRoutes(bundleFile: string): Promise<string[]> {
+export function readServerRoutes(bundleFile: string): Promise<BundleRoutes> {
   const source = `
     const {parentPort} = require('node:worker_threads');
     import(${JSON.stringify(pathToFileURL(bundleFile).href)})
-      .then(async (bundle) => parentPort.postMessage({routes: await bundle.serverRoutes()}))
+      .then(async (bundle) => {
+        const routes = {server: await bundle.serverRoutes(), client: await bundle.clientRoutes()};
+        parentPort.postMessage({routes});
+      })
       .catch((error) => parentPort.postMessage({error: String(error && error.stack || error)}));`;
   return new Promise((resolveRoutes, reject) => {
     const worker = new Worker(source, {eval: true});
     const timer = setTimeout(() => finish(new Error('Timed out reading server routes from the server bundle')), ROUTE_READ_TIMEOUT);
-    const finish = (error?: Error, routes?: string[]) => {
+    const finish = (error?: Error, routes?: BundleRoutes) => {
       clearTimeout(timer);
       void worker.terminate();
       if (error) reject(error);
-      else resolveRoutes(routes ?? []);
+      else resolveRoutes(routes ?? {server: [], client: []});
     };
-    worker.once('message', (message: {routes?: string[]; error?: string}) =>
+    worker.once('message', (message: {routes?: BundleRoutes; error?: string}) =>
       message.error ? finish(new Error(`Unable to load the application for server rendering:\n${message.error}`)) : finish(undefined, message.routes));
     worker.once('error', (error) => finish(error));
   });

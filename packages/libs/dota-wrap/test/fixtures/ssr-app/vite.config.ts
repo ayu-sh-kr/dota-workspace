@@ -18,6 +18,8 @@ export default defineConfig({
     eventMap: false,
     webTypes: false,
     logType: 'warn',
+    // Prerenders a page the `/tasks/:id` server route also matches, when the test asks for SSG.
+    ssg: process.env.DOTA_FIXTURE_SSG ? {routes: ['/tasks/42']} : false,
     deployment: (process.env.DOTA_FIXTURE_TARGET ?? 'node') as DotaVitePluginsOptions['deployment']
   })
 });

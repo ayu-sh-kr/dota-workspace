@@ -16,6 +16,12 @@ export interface NodeServerOptions {
   readonly clientDirectory: string;
   /** Shell served for unmatched paths so `csr` routes boot in the browser; defaults to `index.html`. */
   readonly fallback?: string;
+  /**
+   * Whether the application declares a route for a path, such as `ApplicationHandler.isKnownPath`.
+   * When given, the shell is still sent for other paths, so the client shows its not-found
+   * page, but with status 404. Omitted, every fallback is a 200 as before.
+   */
+  readonly isKnownPath?: (pathname: string) => boolean | Promise<boolean>;
 }
 
 const CONTENT_TYPES: Record<string, string> = {
@@ -34,6 +40,8 @@ const logger = createDotaLogger('dota-ssr', 'ssr/node-server.ts');
  * start in the browser. A client `index.html` identical to the fallback shell is never served
  * as a page, so a server-rendered `/` is not shadowed. A render error is logged and answered with 500, never the shell,
  * so failures stay visible. Paths never resolve outside `clientDirectory`.
+ * With `isKnownPath`, the shell answers paths the application does not declare with 404.
+ * @param options Page handler, client directory, fallback shell, and optional known-path check.
  * @returns An unstarted `http.Server`; call `listen()`.
  */
 export function createNodeServer(options: NodeServerOptions): Server {
@@ -62,7 +70,13 @@ export function createNodeServer(options: NodeServerOptions): Server {
           return void response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
         }
         if (request.method !== 'GET' && request.method !== 'HEAD') return void response.writeHead(405).end();
-        sendFile(fallback, request.method === 'HEAD', response);
+        void Promise.resolve(options.isKnownPath?.(url.pathname) ?? true)
+          .then((known) => sendFile(fallback, request.method === 'HEAD', response, known ? 200 : 404))
+          .catch((error: unknown) => {
+            logger.error(`Route lookup failed for ${request.url ?? '/'}`, error);
+            if (response.headersSent) return;
+            response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
+          });
       });
     } catch {
       if (!response.headersSent) response.writeHead(400).end();
@@ -75,7 +89,12 @@ export function createNodeServer(options: NodeServerOptions): Server {
   return server;
 }
 
-/** The first existing file for a path: itself, `<path>/index.html`, then `<path>.html`. */
+/**
+ * The first existing file for a path: itself, `<path>/index.html`, then `<path>.html`, matching
+ * how static hosts resolve pretty URLs. Paths escaping the root resolve to nothing.
+ * @param root Absolute client directory.
+ * @param pathname Decoded request path.
+ */
 async function findFile(root: string, pathname: string): Promise<string | undefined> {
   const base = resolve(root, `.${pathname}`);
   if (base !== root && !base.startsWith(root + sep)) return undefined;
@@ -104,8 +123,17 @@ function canonicalLocation(root: string, url: URL, file: string): string | undef
   return undefined;
 }
 
-function sendFile(file: string, headOnly: boolean, response: import('node:http').ServerResponse): void {
-  response.writeHead(200, {'content-type': CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream'});
+/**
+ * Streams a file with its content type, sending only headers for `HEAD`; a read error destroys
+ * the connection since the status is already sent.
+ * @param file Absolute file to send.
+ * @param headOnly Whether the request is `HEAD`.
+ * @param response Node response to write.
+ * @param status Status to send; 404 for the shell answering an undeclared path.
+ */
+function sendFile(file: string, headOnly: boolean, response: import('node:http').ServerResponse, status = 200): void {
+  const contentType = CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream';
+  response.writeHead(status, {'content-type': contentType});
   if (headOnly) response.end();
   else createReadStream(file).on('error', () => response.destroy()).pipe(response);
 }

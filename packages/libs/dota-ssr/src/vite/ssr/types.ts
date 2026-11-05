@@ -1,4 +1,5 @@
 import type {LogType} from 'consola';
+import type {ResolvedDotaSsgRoute} from '../../ssg/types';
 
 /**
  * Where request-time rendering is deployed. Each target gets the files its platform
@@ -20,12 +21,46 @@ export interface DotaSsrOptions {
   root?: string;
   /** Built shell relative to the output directory; defaults to `index.html`. */
   template?: string;
-  /** Deployment target; defaults to the SSG `deployment`, else `node`. `false` builds nothing for the server. */
+  /**
+   * Deployment target; defaults to `node`. `false` builds nothing for the server. Dota Wrap's
+   * `dotaVitePlugins({deployment})` sets one target for SSG and SSR.
+   */
   deployment?: DotaServerTarget | false;
   /** `node` target output, relative to the root; defaults to `dist-server`. */
   serverOutDir?: string;
+  /**
+   * `vercel` target: the `vercel.json` receiving the SSR rewrites, relative to the root unless
+   * absolute. Defaults to the file static generation updated, else the nearest ancestor
+   * `vercel.json`, else a new one in the root, so SSG redirects and SSR rewrites share one file.
+   */
+  vercelConfigFile?: string;
   /** Emit hydration markers; defaults to `true`. */
   hydration?: boolean;
+  /**
+   * Whether canonical `ssr` page URLs end with a slash; the other form redirects (308) to it.
+   * Defaults to the `trailingSlash` of `dotaSsg()` in the same build, so server-rendered and
+   * prerendered pages share one URL form; without either, both forms render as before.
+   * Cloudflare Pages and Netlify route both forms to the server so it can redirect. Vercel hands
+   * its function the route path rather than the request's, so there a permanent redirect per
+   * route in `vercel.json` enforces the policy instead.
+   */
+  trailingSlash?: boolean;
+  /**
+   * Whether paths no route declares answer with status 404 (the application shell, so the client
+   * still shows its not-found page); defaults to `true`. The Node server and Cloudflare worker
+   * check each request; Vercel, Netlify, and Cloudflare Pages also get `404.html` and route every
+   * declared browser-rendered path to `dota-shell.html`, replacing the need for a SPA catch-all.
+   * `false` keeps the previous behaviour, where the host's fallback answers every path with 200.
+   */
+  notFound?: boolean;
+  /**
+   * Opt-in `Cache-Control` for `ssr` pages rendered with status 200 in built servers (never in
+   * `vite dev`), such as `'public, max-age=0, s-maxage=60, stale-while-revalidate=600'`. CDNs
+   * honouring `s-maxage` (Vercel, Netlify) then skip the function; on Cloudflare Pages the
+   * worker answers repeat requests from the Cache API (custom domains only) without rendering.
+   * Set it only when pages do not vary by visitor.
+   */
+  cacheControl?: string;
   /** Minimum log level; defaults to `info`. */
   logType?: LogType;
 }
@@ -42,8 +77,20 @@ export type ServerDeployment = {
   readonly shell: string;
   /** Router-style paths (`/tasks/:id`) of the `ssr` routes. */
   readonly routes: readonly string[];
+  /** Router-style paths of the routes the browser renders, from `resolveClientRoutes`. */
+  readonly clientRoutes: readonly string[];
+  /** Pages static generation wrote in the same build; they stay static where `ssr` patterns cover them. */
+  readonly staticRoutes: readonly ResolvedDotaSsgRoute[];
   /** Vite public base. */
   readonly base: string;
   /** Resolved plugin options. */
   readonly options: DotaSsrOptions;
+};
+
+/** Route paths read from a built server bundle. */
+export type BundleRoutes = {
+  /** Paths the server renders. */
+  readonly server: string[];
+  /** Paths the browser renders. */
+  readonly client: string[];
 };

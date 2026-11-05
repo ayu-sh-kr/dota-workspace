@@ -4,6 +4,7 @@ import {runInBrowserScope} from '@ayu-sh-kr/dota-server-dom/node';
 import {setApplicationCaptureHook, type CapturedApplication} from '../application-capture';
 import {prepareDocumentShell} from './document';
 import {createRequestHandler} from './request-handler';
+import {matchPath} from './route-match';
 import {createStringAdapter} from './string-adapter';
 import type {ApplicationHandler, ApplicationHandlerOptions, PageRoute} from './types';
 
@@ -60,13 +61,26 @@ export function resolveServerRoutes(application: CapturedApplication): PageRoute
 }
 
 /**
- * Creates the request handler for an application, capturing it on first use.
- * Capture is lazy so platforms that forbid work at module load (Cloudflare Workers)
- * can import the handler; later requests reuse the same application. The document
- * shell gets head and body outlets automatically, the body one inside the root element.
+ * Paths the browser renders: every declared route the server does not render (including
+ * custom `render` routes), plus the default and error routes, in declaration order without
+ * duplicates. Static hosts answer these with the application shell and every other path with 404.
+ * @param application Captured application.
+ */
+export function resolveClientRoutes(application: CapturedApplication): string[] {
+  const served = new Set(resolveServerRoutes(application).map((route) => route.path));
+  const declared = flattenRoutes(application.routes).map(({path}) => path);
+  const fallbacks = [application.defaultRoute.path, application.errorRoute.path];
+  return [...new Set([...declared, ...fallbacks])].filter((path) => !served.has(path));
+}
+
+/**
+ * Creates the request handler for an application, capturing it lazily on first use, so
+ * platforms that forbid work at module load (Cloudflare Workers) can import it. The shell
+ * gets head and body outlets automatically, the body one inside the root element.
  * @param loadEntry Imports the application entry.
- * @param options Document shell, fetch, and hydration settings.
- * @returns A handler answering `ssr` routes; other requests resolve `undefined`.
+ * @param options Document shell, fetch, hydration, slash policy, and cache header.
+ * @returns A handler answering `ssr` routes (others resolve `undefined`), plus `isKnownPath`
+ *   for hosts deciding whether their fallback shell is a 404.
  */
 export function createApplicationHandler(loadEntry: () => Promise<unknown>, options: ApplicationHandlerOptions): ApplicationHandler {
   let application: Promise<CapturedApplication> | undefined;
@@ -85,7 +99,9 @@ export function createApplicationHandler(loadEntry: () => Promise<unknown>, opti
         adapter: createStringAdapter({components, hydration: options.hydration}),
         routes: resolveServerRoutes(captured),
         template: async (url) => prepareDocumentShell(typeof options.template === 'string' ? options.template : await options.template(url), rootSelector),
-        fetch: options.fetch
+        fetch: options.fetch,
+        trailingSlash: options.trailingSlash,
+        cacheControl: options.cacheControl
       });
     }).catch((error: unknown) => {
       handler = undefined;
@@ -93,7 +109,12 @@ export function createApplicationHandler(loadEntry: () => Promise<unknown>, opti
     });
     return (await handler)(request);
   };
-  return Object.assign(handle, {application: loadApplication});
+  const isKnownPath = async (pathname: string) => {
+    const captured = await loadApplication();
+    const fallbacks = [{path: captured.defaultRoute.path}, {path: captured.errorRoute.path}];
+    return matchPath([...flattenRoutes(captured.routes), ...fallbacks], pathname) !== undefined;
+  };
+  return Object.assign(handle, {application: loadApplication, isKnownPath});
 }
 
 /**

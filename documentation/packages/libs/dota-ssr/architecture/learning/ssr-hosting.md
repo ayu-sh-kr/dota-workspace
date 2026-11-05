@@ -94,9 +94,15 @@ The chart covers successful page selection. Malformed paths are rejected, unsupp
 | --- | --- |
 | Node | Server bundle, startup, and preserved fallback shell; filesystem/static-first serving as above. |
 | Vercel | Function integration and SSR rewrites. Root static-index precedence is a platform caveat; review generated configuration. |
-| Netlify | Function plus routing rules for SSR paths. |
-| Cloudflare Pages | Advanced worker with asset fallback and Node-compatibility configuration. |
+| Netlify | Function plus routing rules for SSR paths; prerendered pages under those paths go into `excludedPath`. |
+| Cloudflare Pages | Advanced worker with asset fallback and Node-compatibility configuration. `_routes.json` collapses overlapping wildcards (`/tasks/*` covers `/tasks/*/edit`) and excludes prerendered pages; more than 100 rules log a warning. |
 | GitHub Pages | Static files only; no request-time SSR. The build warns and relies on client rendering where applicable. |
+
+Every target keeps the static-first result from the table above: a page prerendered in the same build is served from its snapshot even when an `ssr` route matches it. Node and Vercel check files first; for Netlify and Cloudflare Pages the SSR build reads the pages SSG wrote and excludes them from the server routes.
+
+A not-found page is still a page: `serverLoad` calls `context.setStatus(404)` and renders its message, and the response carries 404 on every target. A path that matches no declared route at all gets the CSR shell with status 404 on every target; the client shows its not-found page. Node and the Cloudflare worker check each request, and Vercel, Netlify, and Cloudflare Pages also get `404.html` while declared browser routes are pointed at `dota-shell.html`, both holding the clean shell. `notFound: false` restores the host's 200 fallback.
+
+With a `trailingSlash` policy (SSG's by default when both run), the other slash form of an `ssr` page redirects with 308, so server-rendered and prerendered pages each keep one URL. Response caching is opt-in through the SSR `cacheControl` option.
 
 Do not assume every platform uses Node's exact file lookup/rewriting policy. Inspect the output for your target. Secondary Vite builds filter out recursive SSR/SSG and artifact writers so building the server does not trigger another full application build loop.
 

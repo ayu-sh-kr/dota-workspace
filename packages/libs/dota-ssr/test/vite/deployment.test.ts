@@ -3,6 +3,7 @@ import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
 import {prepareDeployment} from '@dota/vite/deployment';
+import {takeStaticDeployment} from '@dota/vite/deployment/static-deployment';
 import {resolveSsgRoutes} from '@dota/ssg/route-output';
 
 describe('deployment configuration', () => {
@@ -53,6 +54,41 @@ describe('deployment configuration', () => {
 
     await prepareDeployment(root, output, [], {deployment: target});
     expect(await readFile(file, 'utf8')).toBe(`# BEGIN dota-ssg\n# END dota-ssg\n${fallback}`);
+  });
+
+  it.each(['netlify', 'cloudflare-pages'] as const)('%s leaves _redirects untouched when route rules are off', async target => {
+    const file = resolve(output, '_redirects');
+    await writeFile(file, '/* /index.html 200\n');
+
+    await prepareDeployment(root, output, resolveSsgRoutes([{path: '/custom', output: 'pages/custom.html'}]), {deployment: {target, redirects: false}});
+
+    expect(await readFile(file, 'utf8')).toBe('/* /index.html 200\n');
+  });
+
+  it('leaves vercel.json untouched and writes only .nojekyll for GitHub Pages when route rules are off', async () => {
+    const config = resolve(root, 'vercel.json');
+    await writeFile(config, '{}');
+    const routes = resolveSsgRoutes([{path: '/custom', output: 'pages/custom.html'}]);
+    await mkdir(resolve(output, 'pages'));
+    await writeFile(resolve(output, 'pages/custom.html'), '<p>custom</p>');
+
+    await prepareDeployment(root, output, routes, {deployment: {target: 'vercel', redirects: false}});
+    await prepareDeployment(root, output, routes, {deployment: {target: 'github-pages', redirects: false}});
+
+    expect(await readFile(config, 'utf8')).toBe('{}');
+    expect(await readFile(resolve(output, '.nojekyll'), 'utf8')).toBe('');
+    await expect(readFile(resolve(output, 'custom/index.html'), 'utf8')).rejects.toThrow('ENOENT');
+  });
+
+  it('records the written routes and target for the SSR deployment of the same build', async () => {
+    const routes = resolveSsgRoutes(['/guide']);
+
+    await prepareDeployment(root, output, routes, {deployment: {target: 'cloudflare-pages', redirects: false}});
+
+    expect(takeStaticDeployment(output)).toEqual({routes, deployment: {target: 'cloudflare-pages', redirects: false}, trailingSlash: true});
+    expect(takeStaticDeployment(output)).toBeUndefined();
+    await prepareDeployment(root, output, routes, {deployment: false, trailingSlash: false});
+    expect(takeStaticDeployment(output)).toEqual({routes, deployment: false, trailingSlash: false});
   });
 
   it('rejects malformed managed blocks without changing user rules', async () => {

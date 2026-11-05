@@ -1,5 +1,11 @@
 // @vitest-environment node
-import {captureApplication, createApplicationHandler, resolveServerRoutes, type CapturedApplication} from '@dota/ssr/index';
+import {
+  captureApplication,
+  createApplicationHandler,
+  resolveClientRoutes,
+  resolveServerRoutes,
+  type CapturedApplication
+} from '@dota/ssr/index';
 import {getApplicationCaptureHook} from '@dota/index';
 import {FIXTURE_COMPONENTS, StateReaderComponent, TasksPage, TaskItemComponent} from '@test/ssr/string-adapter-fixtures';
 
@@ -40,6 +46,12 @@ describe('resolveServerRoutes', () => {
   });
 });
 
+describe('resolveClientRoutes', () => {
+  it('lists every declared path the server does not render, plus the default and error routes', () => {
+    expect(resolveClientRoutes(APPLICATION)).toEqual(['/static', '/client', '/custom', '/', '/error']);
+  });
+});
+
 describe('captureApplication', () => {
   it('returns what the entry reports and clears the hook afterwards', async () => {
     await expect(captureApplication(entryReporting(APPLICATION))).resolves.toBe(APPLICATION);
@@ -60,6 +72,20 @@ describe('createApplicationHandler', () => {
     const html = await response!.text();
 
     expect(html).toBe('<!doctype html><html><head><title>State</title></head><body><app-shell id="app-shell"><state-reader seen="nobody"><p>nobody</p></state-reader></app-shell></body></html>');
+  });
+
+  it('knows every declared route in any mode, but not generated parents or unknown paths', async () => {
+    const handler = createApplicationHandler(entryReporting({
+      ...APPLICATION,
+      routes: [...APPLICATION.routes, {path: '/products/:product/playground', component: StateReaderComponent, mode: 'ssr'}]
+    }), {template: SHELL});
+
+    for (const path of ['/', '/error', '/tasks/7/', '/static', '/client', '/custom', '/products/kit/playground']) {
+      await expect(handler.isKnownPath(path)).resolves.toBe(true);
+    }
+    for (const path of ['/missing', '/tasks/7/extra', '/products', '/products/kit']) {
+      await expect(handler.isKnownPath(path)).resolves.toBe(false);
+    }
   });
 
   it('declines routes that are not server-rendered and captures only once', async () => {

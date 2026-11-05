@@ -29,13 +29,31 @@ export class TaskPage extends DotaPageElement {
     return {title: `Task ${this.taskId}`, description: 'Server-rendered task'};
   }
 
-  serverLoad(context: {params: Readonly<Record<string, string>>}) {
+  serverLoad(context: {params: Readonly<Record<string, string>>; setStatus(status: number): void}) {
     this.taskId = context.params.id;
     this.seenPath = location.pathname;
+    if (this.taskId === 'missing') context.setStatus(404);
   }
 
   render() {
     return html`<h1>Task ${this.taskId}</h1><p>${this.seenPath}</p>`;
+  }
+}
+
+/** Nested under the task route, so its wildcard overlaps `/tasks/:id` on Cloudflare Pages. */
+@Route({path: '/tasks/:id/edit', mode: 'ssr'})
+@Component({selector: 'task-edit-page', shadow: false})
+export class TaskEditPage extends DotaPageElement {
+  constructor() {
+    super();
+  }
+
+  get seo(): SEO {
+    return {title: 'Edit task', description: ''};
+  }
+
+  render() {
+    return html`<p>Edit</p>`;
   }
 }
 

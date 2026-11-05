@@ -48,13 +48,24 @@ export interface DotaSsgVercelOptions {
  */
 export type DotaSsgDeploymentTarget = 'vercel' | 'netlify' | 'cloudflare-pages' | 'github-pages';
 
+/** Settings every SSG deployment target accepts. */
+export interface DotaSsgRouteRuleOptions {
+  /**
+   * Whether the target's route rules are written: Vercel `redirects` and `cleanUrls`, the
+   * managed `_redirects` block for Netlify and Cloudflare Pages, and GitHub Pages route aliases.
+   * Defaults to `true`. `false` leaves routing to rules you maintain; GitHub Pages still gets
+   * `.nojekyll`, and request-time deployment files are unaffected.
+   */
+  redirects?: boolean;
+}
+
 /**
- * Object form of `deployment`, allowing Vercel's existing configuration path to be overridden.
- * Other targets write into Vite's build directory and need only the target discriminator.
+ * Object form of `deployment`, allowing Vercel's existing configuration path to be overridden
+ * and route rules to be turned off. Other targets write into Vite's build directory.
  */
 export type DotaSsgDeploymentOptions =
-  | ({target: 'vercel'} & DotaSsgVercelOptions)
-  | {target: Exclude<DotaSsgDeploymentTarget, 'vercel'>};
+  | ({target: 'vercel'} & DotaSsgVercelOptions & DotaSsgRouteRuleOptions)
+  | ({target: Exclude<DotaSsgDeploymentTarget, 'vercel'>} & DotaSsgRouteRuleOptions);
 
 /**
  * Configures the build-only Vite plugin that renders Dota routes inside happy-dom.
