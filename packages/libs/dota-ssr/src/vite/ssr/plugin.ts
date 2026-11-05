@@ -68,18 +68,17 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
         const staticTarget = staticBuild?.deployment || undefined;
         const staticVercelFile = staticTarget?.target === 'vercel' ? staticTarget.configFile : undefined;
         const vercelConfigFile = options.vercelConfigFile ?? staticVercelFile;
-        // A server that cannot see the request's slash form would redirect forever.
-        const trailingSlash = SLASH_AWARE_TARGETS.has(target)
-          ? options.trailingSlash ?? staticBuild?.trailingSlash
-          : undefined;
-        if (trailingSlash === undefined && options.trailingSlash !== undefined) {
-          logger.debug(`trailingSlash does not apply to ${target}: its server cannot see the request's slash form`);
-        }
+        const trailingSlash = options.trailingSlash ?? staticBuild?.trailingSlash;
         const resolvedOptions: DotaSsrOptions = {
           ...options,
           ...(vercelConfigFile ? {vercelConfigFile} : {}),
           ...(trailingSlash === undefined ? {} : {trailingSlash})
         };
+        // A server that cannot see the request's slash form would redirect forever; its
+        // platform enforces the policy instead (see `prepareServerDeployment`).
+        const bundleOptions: DotaSsrOptions = SLASH_AWARE_TARGETS.has(target)
+          ? resolvedOptions
+          : {...resolvedOptions, trailingSlash: undefined};
         await removeStaleNodeServer(root, options.serverOutDir, logger);
         if (!declaresServerRoutes) {
           logger.debug('No route declares mode: \'ssr\'; skipping the server build');
@@ -88,9 +87,9 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
         const template = builtShell ?? await readFile(resolve(outputDirectory, options.template ?? 'index.html'), 'utf8');
         logger.debug(`Building the server for ${target} from ${root}`);
         const started = performance.now();
-        const bundleFile = await buildServerBundle(config, root, resolvedOptions, target, template);
+        const bundleFile = await buildServerBundle(config, root, bundleOptions, target, template);
         const built = performance.now();
-        const routes = await readServerRoutes(bundleFile);
+        const {server: routes, client: clientRoutes} = await readServerRoutes(bundleFile);
         logger.debug(`Server bundle ${bundleFile} built in ${(built - started).toFixed(0)}ms; application read in ${(performance.now() - built).toFixed(0)}ms`);
         if (routes.length === 0) {
           logger.info('No SSR routes; no server output written');
@@ -104,6 +103,7 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
           bundleFile,
           shell: template,
           routes,
+          clientRoutes,
           staticRoutes: staticBuild?.routes ?? [],
           base: config.base,
           options: resolvedOptions
