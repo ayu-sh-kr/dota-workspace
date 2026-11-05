@@ -68,9 +68,10 @@ export function matchRoute(routes: readonly PageRoute[], pathname: string): Path
 function canonicalSlashLocation(url: URL, trailingSlash: boolean | undefined): string | undefined {
   if (trailingSlash === undefined || url.pathname === '/') return undefined;
   const hasSlash = url.pathname.endsWith('/');
-  if (trailingSlash && !hasSlash) return `${url.pathname}/${url.search}`;
-  if (!trailingSlash && hasSlash) return `${url.pathname.replace(/\/+$/, '')}${url.search}`;
-  return undefined;
+  if (hasSlash === trailingSlash) return undefined;
+  // One leading slash: `//host/` would make the location protocol-relative, leaving this site.
+  const path = `/${url.pathname.replace(/^\/+|\/+$/g, '')}`;
+  return `${trailingSlash ? `${path}/` : path}${url.search}`;
 }
 
 export {toNodeListener} from './node-listener';
