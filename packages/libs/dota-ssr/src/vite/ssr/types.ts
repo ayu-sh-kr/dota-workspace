@@ -36,6 +36,22 @@ export interface DotaSsrOptions {
   vercelConfigFile?: string;
   /** Emit hydration markers; defaults to `true`. */
   hydration?: boolean;
+  /**
+   * Whether canonical `ssr` page URLs end with a slash; the other form redirects (308) to it.
+   * Defaults to the `trailingSlash` of `dotaSsg()` in the same build, so server-rendered and
+   * prerendered pages share one URL form; without either, both forms render as before.
+   * Cloudflare Pages and Netlify also route the slash form of literal routes to the server so
+   * it can redirect. Vercel passes the route path to its function, so the policy does not apply there.
+   */
+  trailingSlash?: boolean;
+  /**
+   * Opt-in `Cache-Control` for `ssr` pages rendered with status 200 in built servers (never in
+   * `vite dev`), such as `'public, max-age=0, s-maxage=60, stale-while-revalidate=600'`. CDNs
+   * honouring `s-maxage` (Vercel, Netlify) then skip the function; on Cloudflare Pages the
+   * worker answers repeat requests from the Cache API (custom domains only) without rendering.
+   * Set it only when pages do not vary by visitor.
+   */
+  cacheControl?: string;
   /** Minimum log level; defaults to `info`. */
   logType?: LogType;
 }
