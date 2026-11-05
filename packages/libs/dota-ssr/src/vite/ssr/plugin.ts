@@ -23,11 +23,9 @@ type ServerModule = {
 /**
  * Request-time rendering for `@Route({mode: 'ssr'})` routes, with no server code to write.
  * - `vite dev`: middleware renders `ssr` routes; everything else is served by Vite as before.
- * - `vite build`: after the client build, a server bundle is built from the same config and
- *   the deployment target's files are written (see `prepareServerDeployment`). This runs after
- *   every other plugin's `closeBundle`, so pages prerendered by `dotaSsg` in the same build stay
- *   static, and `ssr` pages follow their slash policy and Vercel configuration file.
- * Builds whose sources never declare `mode: 'ssr'` skip the server build entirely.
+ * - `vite build`: runs after every other plugin's `closeBundle`, builds the server bundle, and
+ *   writes the target's files, keeping pages `dotaSsg` prerendered static and following its
+ *   slash policy. Builds whose sources never declare `mode: 'ssr'` skip the server build.
  * @param options Entry, deployment target, and output settings.
  */
 export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
@@ -119,6 +117,9 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
  * after any file change; an application without `ssr` routes then passes every request on.
  * If capture fails, for example because the entry has browser-only module code, server
  * rendering is off until the next change.
+ * @param server Vite dev server whose module graph and watcher are used.
+ * @param options Plugin options; only an explicit `trailingSlash` applies in dev.
+ * @param logger Plugin logger.
  */
 function installDevMiddleware(server: ViteDevServer, options: DotaSsrOptions, logger: ConsolaInstance): void {
   const root = options.root ?? server.config.root;
