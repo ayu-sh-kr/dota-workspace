@@ -25,12 +25,19 @@ export function ownModule(entry: 'server' | 'node'): string {
  * `ssr` route list for platform configuration, and, for Node, the HTTP host.
  * @param entryFile Absolute application entry.
  * @param target Deployment target; only `node` bundles the HTTP host.
+ * @param options Plugin options whose hydration, slash policy, and cache header reach the handler.
  */
-export function serverEntrySource(entryFile: string, target: DotaServerTarget, hydration: boolean): string {
+export function serverEntrySource(entryFile: string, target: DotaServerTarget, options: DotaSsrOptions): string {
+  // Only set values are written, so the handler's defaults stay the defaults.
+  const handlerOptions = JSON.stringify({
+    hydration: options.hydration ?? true,
+    ...(options.trailingSlash === undefined ? {} : {trailingSlash: options.trailingSlash}),
+    ...(options.cacheControl ? {cacheControl: options.cacheControl} : {})
+  });
   return [
     `import {createApplicationHandler, resolveServerRoutes} from ${JSON.stringify(ownModule('server'))};`,
     `import template from ${JSON.stringify(TEMPLATE_MODULE)};`,
-    `export const handler = createApplicationHandler(() => import(${JSON.stringify(entryFile)}), {template, hydration: ${hydration}});`,
+    `export const handler = createApplicationHandler(() => import(${JSON.stringify(entryFile)}), {template, ...${handlerOptions}});`,
     'export const serverRoutes = async () => resolveServerRoutes(await handler.application()).map((route) => route.path);',
     ...(target === 'node' ? [`export {createNodeServer} from ${JSON.stringify(ownModule('node'))};`] : [])
   ].join('\n');
@@ -54,7 +61,7 @@ export async function buildServerBundle(config: ResolvedConfig, root: string, op
     // Vite passes the SSR input as a root-relative path, so match on the name's suffix.
     resolveId: (id) => [SERVER_ENTRY, TEMPLATE_MODULE].find((name) => id === name || id.endsWith(`/${name}`)) && `\0${id.slice(id.lastIndexOf('virtual:'))}`,
     load(id) {
-      if (id === `\0${SERVER_ENTRY}`) return serverEntrySource(entryFile, target, options.hydration ?? true);
+      if (id === `\0${SERVER_ENTRY}`) return serverEntrySource(entryFile, target, options);
       if (id === `\0${TEMPLATE_MODULE}`) return `export default ${JSON.stringify(template)};`;
       return null;
     }
