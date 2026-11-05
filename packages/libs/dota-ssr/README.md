@@ -437,9 +437,10 @@ markers, which `dotaHydration()` adopts in the browser.
 | `cloudflare-pages` | `_worker.js/` and `_routes.json` in the output directory; a `wrangler.toml` enabling `nodejs_compat` when none exists |
 | `github-pages` | nothing: static only, so `ssr` routes render in the browser (with a warning) |
 
-When `deployment` is omitted, `dotaSsr()` uses the target `dotaSsg()` prepared in the same
-build, else `node`. On `vercel`, `vercelConfigFile` selects the file for the rewrites; it
-defaults to the file SSG updated, so redirects and rewrites always share one `vercel.json`.
+When `deployment` is omitted, `dotaSsr()` targets `node`; Dota Wrap's
+`dotaVitePlugins({deployment})` sets one target for both plugins. On `vercel`,
+`vercelConfigFile` selects the file for the rewrites; it defaults to the file SSG updated in
+the same build, so redirects and rewrites always share one `vercel.json`.
 
 #### SSG and SSR in one build
 
@@ -480,8 +481,9 @@ redirects (308) to the canonical one, keeping the query, as static hosts do for 
 pages. It defaults to the `trailingSlash` of `dotaSsg()` in the same build, so both kinds of
 page use one form (`/docs/` by default). Without SSG or an explicit setting, both forms render
 as before. Cloudflare Pages and Netlify also route the slash form of each route to the server
-so it can redirect. On Vercel the function receives the route path rather than the request's
-slash form, so use Vercel's own `trailingSlash` setting there.
+so it can redirect. Redirects keep the site's host: repeated leading slashes are collapsed. On
+Vercel the function receives the route path rather than the request's slash form, so the
+policy is not applied there (a redirect would loop); use Vercel's own `trailingSlash` setting.
 
 **Caching is opt-in.** `cacheControl` adds `Cache-Control` to `ssr` pages rendered with status
 200 in the built server, never in `vite dev`, redirects, or error pages:
