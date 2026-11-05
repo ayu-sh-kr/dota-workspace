@@ -41,6 +41,7 @@ const logger = createDotaLogger('dota-ssr', 'ssr/node-server.ts');
  * as a page, so a server-rendered `/` is not shadowed. A render error is logged and answered with 500, never the shell,
  * so failures stay visible. Paths never resolve outside `clientDirectory`.
  * With `isKnownPath`, the shell answers paths the application does not declare with 404.
+ * @param options Page handler, client directory, fallback shell, and optional known-path check.
  * @returns An unstarted `http.Server`; call `listen()`.
  */
 export function createNodeServer(options: NodeServerOptions): Server {
@@ -88,7 +89,12 @@ export function createNodeServer(options: NodeServerOptions): Server {
   return server;
 }
 
-/** The first existing file for a path: itself, `<path>/index.html`, then `<path>.html`. */
+/**
+ * The first existing file for a path: itself, `<path>/index.html`, then `<path>.html`, matching
+ * how static hosts resolve pretty URLs. Paths escaping the root resolve to nothing.
+ * @param root Absolute client directory.
+ * @param pathname Decoded request path.
+ */
 async function findFile(root: string, pathname: string): Promise<string | undefined> {
   const base = resolve(root, `.${pathname}`);
   if (base !== root && !base.startsWith(root + sep)) return undefined;
@@ -117,6 +123,14 @@ function canonicalLocation(root: string, url: URL, file: string): string | undef
   return undefined;
 }
 
+/**
+ * Streams a file with its content type, sending only headers for `HEAD`; a read error destroys
+ * the connection since the status is already sent.
+ * @param file Absolute file to send.
+ * @param headOnly Whether the request is `HEAD`.
+ * @param response Node response to write.
+ * @param status Status to send; 404 for the shell answering an undeclared path.
+ */
 function sendFile(file: string, headOnly: boolean, response: import('node:http').ServerResponse, status = 200): void {
   const contentType = CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream';
   response.writeHead(status, {'content-type': contentType});
