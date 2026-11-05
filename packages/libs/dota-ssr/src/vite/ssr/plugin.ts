@@ -5,7 +5,7 @@ import type {ConsolaInstance} from 'consola';
 import type {Plugin, ResolvedConfig, ViteDevServer} from 'vite';
 import {toNodeListener} from '../../ssr/node-listener';
 import type {ApplicationHandler, PageRoute, RequestHandler} from '../../ssr/types';
-import {prepareServerDeployment, removeStaleNodeServer} from '../deployment/server';
+import {prepareServerDeployment, removeStaleNodeServer, SLASH_AWARE_TARGETS} from '../deployment/server';
 import {takeStaticDeployment} from '../deployment/static-deployment';
 import {buildServerBundle, ownModule, readServerRoutes} from './server-build';
 import type {DotaSsrOptions} from './types';
@@ -25,8 +25,8 @@ type ServerModule = {
  * - `vite dev`: middleware renders `ssr` routes; everything else is served by Vite as before.
  * - `vite build`: after the client build, a server bundle is built from the same config and
  *   the deployment target's files are written (see `prepareServerDeployment`). This runs after
- *   every other plugin's `closeBundle`, so pages prerendered by `dotaSsg` in the same build are
- *   known and stay static, and their deployment target is the default one.
+ *   every other plugin's `closeBundle`, so pages prerendered by `dotaSsg` in the same build stay
+ *   static, and `ssr` pages follow their slash policy and Vercel configuration file.
  * Builds whose sources never declare `mode: 'ssr'` skip the server build entirely.
  * @param options Entry, deployment target, and output settings.
  */
@@ -64,10 +64,17 @@ export function dotaSsr(options: DotaSsrOptions = {}): Plugin {
         // so a later build in this process never routes around pages that no longer exist.
         const staticBuild = takeStaticDeployment(outputDirectory);
         if (options.deployment === false) return;
+        const target = options.deployment ?? 'node';
         const staticTarget = staticBuild?.deployment || undefined;
-        const target = options.deployment ?? staticTarget?.target ?? 'node';
-        const vercelConfigFile = options.vercelConfigFile ?? (staticTarget?.target === 'vercel' ? staticTarget.configFile : undefined);
-        const trailingSlash = options.trailingSlash ?? staticBuild?.trailingSlash;
+        const staticVercelFile = staticTarget?.target === 'vercel' ? staticTarget.configFile : undefined;
+        const vercelConfigFile = options.vercelConfigFile ?? staticVercelFile;
+        // A server that cannot see the request's slash form would redirect forever.
+        const trailingSlash = SLASH_AWARE_TARGETS.has(target)
+          ? options.trailingSlash ?? staticBuild?.trailingSlash
+          : undefined;
+        if (trailingSlash === undefined && options.trailingSlash !== undefined) {
+          logger.debug(`trailingSlash does not apply to ${target}: its server cannot see the request's slash form`);
+        }
         const resolvedOptions: DotaSsrOptions = {
           ...options,
           ...(vercelConfigFile ? {vercelConfigFile} : {}),
