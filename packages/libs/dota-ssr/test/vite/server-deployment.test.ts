@@ -35,6 +35,7 @@ describe('prepareServerDeployment with prerendered pages', () => {
       bundleFile: resolve(root, 'bundle.mjs'),
       shell: '<!doctype html>',
       routes: ['/tasks/:id', '/tasks/:id/edit'],
+      clientRoutes: ['/', '/about'],
       staticRoutes: resolveSsgRoutes(['/tasks/42', '/about']),
       base: '/',
       options: {}
@@ -59,7 +60,7 @@ describe('prepareServerDeployment with prerendered pages', () => {
     const pages = Array.from({length: 50}, (_, index) => `/tasks/${index}`);
     warn.mockClear();
 
-    await prepareServerDeployment('cloudflare-pages', {...deployment, staticRoutes: resolveSsgRoutes(pages)}, logger);
+    await prepareServerDeployment('cloudflare-pages', {...deployment, clientRoutes: ['/'], staticRoutes: resolveSsgRoutes(pages)}, logger);
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('_routes.json has 101 rules (1 include, 100 exclude), but Cloudflare Pages accepts 100'));
     expect(JSON.parse(await readFile(resolve(root, 'dist/_routes.json'), 'utf8')).exclude).toHaveLength(100);
@@ -120,6 +121,56 @@ describe('prepareServerDeployment with prerendered pages', () => {
     }
   });
 
+  it('cloudflare-pages: routes browser routes to the worker, which answers them with the shell', async () => {
+    await prepareServerDeployment('cloudflare-pages', {...deployment, clientRoutes: ['/', '/about', '/users/[id]'], staticRoutes: []}, logger);
+    const worker = (await import(`${pathToFileURL(resolve(root, 'dist/_worker.js/index.js')).href}?shell`)).default as Worker;
+    const fetched: string[] = [];
+    const env = {ASSETS: {fetch: async (request: Request | URL) => {
+      const {pathname} = new URL(request instanceof URL ? request : request.url);
+      fetched.push(pathname);
+      return pathname === '/dota-shell' ? new Response('shell') : new Response('not found', {status: 404, headers: {'content-type': 'text/html'}});
+    }}};
+
+    const about = await worker.fetch(new Request('https://app.test/about'), env);
+    const unknown = await worker.fetch(new Request('https://app.test/tasks/2/extra'), env);
+
+    expect(JSON.parse(await readFile(resolve(root, 'dist/_routes.json'), 'utf8')).include).toEqual(['/tasks/*', '/about', '/users/*', '/about/']);
+    expect(await about.text()).toBe('shell');
+    expect(unknown.status).toBe(404);
+    expect(fetched).toEqual(['/about', '/dota-shell', '/tasks/2/extra']);
+    expect(await readFile(resolve(root, 'dist/dota-shell.html'), 'utf8')).toBe('<!doctype html>');
+    expect(await readFile(resolve(root, 'dist/404.html'), 'utf8')).toContain('<!doctype html>');
+  });
+
+  it('cloudflare-pages: with notFound off, routes only ssr paths and writes no shell files', async () => {
+    await prepareServerDeployment('cloudflare-pages', {...deployment, staticRoutes: [], options: {notFound: false}}, logger);
+
+    expect(JSON.parse(await readFile(resolve(root, 'dist/_routes.json'), 'utf8')).include).toEqual(['/tasks/*']);
+    expect(await readFile(resolve(root, 'dist/_worker.js/index.js'), 'utf8')).not.toContain('isKnownPath');
+    await expect(readFile(resolve(root, 'dist/404.html'), 'utf8')).rejects.toThrow('ENOENT');
+  });
+
+  it('netlify: rewrites browser routes to the shell, keeps authored rules and 404.html, and flags catch-alls', async () => {
+    await writeFile(resolve(root, 'dist/_redirects'), '/old /new 301\n/app/* /app/index.html 200\n');
+    await writeFile(resolve(root, 'dist/404.html'), 'authored not found');
+    warn.mockClear();
+
+    await prepareServerDeployment('netlify', {...deployment, base: '/app/', clientRoutes: ['/', '/about', '/docs/[...slug]'], staticRoutes: []}, logger);
+
+    expect(await readFile(resolve(root, 'dist/_redirects'), 'utf8')).toBe([
+      '# BEGIN dota-ssr',
+      '/app/about /app/dota-shell.html 200',
+      '/app/docs/* /app/dota-shell.html 200',
+      '/app/about/ /app/dota-shell.html 200',
+      '# END dota-ssr',
+      '/old /new 301',
+      '/app/* /app/index.html 200',
+      ''
+    ].join('\n'));
+    expect(await readFile(resolve(root, 'dist/404.html'), 'utf8')).toBe('authored not found');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('catch-all (/app/* /app/index.html 200)'));
+  });
+
   it('netlify: claims both slash forms when a slash policy is set', async () => {
     await prepareServerDeployment('netlify', {...deployment, staticRoutes: [], options: {trailingSlash: false}}, logger);
 
@@ -134,6 +185,49 @@ describe('prepareServerDeployment with prerendered pages', () => {
     expect(await readFile(resolve(root, '.netlify/v1/functions/dota-ssr/dota-ssr.mjs'), 'utf8')).toContain(
       'export const config = {"path":["/app/tasks/:id","/app/tasks/:id/edit"],"excludedPath":["/app/tasks/42","/app/tasks/42/"]};'
     );
+  });
+
+  it('vercel: redirects ssr routes to the canonical form and rewrites browser routes to the shell', async () => {
+    await writeFile(resolve(root, 'vercel.json'), JSON.stringify({
+      rewrites: [{source: '/(.*)', destination: '/spa.html'}],
+      redirects: [{source: '/tasks/:id', destination: '/moved', permanent: false}]
+    }));
+    warn.mockClear();
+
+    await prepareServerDeployment('vercel', {...deployment, routes: ['/tasks/:id', '/'], clientRoutes: ['/', '/users/[id]'], options: {trailingSlash: true}}, logger);
+
+    expect(JSON.parse(await readFile(resolve(root, 'vercel.json'), 'utf8'))).toEqual({
+      rewrites: [
+        {source: '/tasks/:id/', destination: '/api/dota-ssr?__dota_path=/tasks/:id/'},
+        {source: '/', destination: '/api/dota-ssr?__dota_path=/'},
+        {source: '/users/:id', destination: '/dota-shell.html'},
+        {source: '/users/:id/', destination: '/dota-shell.html'},
+        {source: '/(.*)', destination: '/spa.html'}
+      ],
+      redirects: [
+        {source: '/tasks/:id', destination: '/moved', permanent: false},
+        {source: '/tasks/:id', destination: '/tasks/:id/', permanent: true}
+      ]
+    });
+    expect(await readFile(resolve(root, 'dist/404.html'), 'utf8')).toBe('<!doctype html>\n<!-- Generated by @ayu-sh-kr/dota-ssr: application shell -->');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('catch-all (/(.*))'));
+
+    await prepareServerDeployment('vercel', {...deployment, routes: ['/tasks/:id'], clientRoutes: ['/'], options: {notFound: false}}, logger);
+    expect(JSON.parse(await readFile(resolve(root, 'vercel.json'), 'utf8'))).toEqual({
+      rewrites: [
+        {source: '/tasks/:id', destination: '/api/dota-ssr?__dota_path=/tasks/:id'},
+        {source: '/(.*)', destination: '/spa.html'}
+      ],
+      redirects: [{source: '/tasks/:id', destination: '/moved', permanent: false}]
+    });
+  });
+
+  it('node: passes the known-path check to the server unless notFound is off', async () => {
+    await prepareServerDeployment('node', deployment, logger);
+    expect(await readFile(resolve(root, 'dist-server/server.mjs'), 'utf8')).toContain('isKnownPath: handler.isKnownPath');
+
+    await prepareServerDeployment('node', {...deployment, options: {notFound: false}}, logger);
+    expect(await readFile(resolve(root, 'dist-server/server.mjs'), 'utf8')).not.toContain('isKnownPath');
   });
 
   it('vercel: adds rewrites to the configured file that static generation updated', async () => {
