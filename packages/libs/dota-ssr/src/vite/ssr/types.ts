@@ -1,4 +1,5 @@
 import type {LogType} from 'consola';
+import type {ResolvedDotaSsgRoute} from '../../ssg/types';
 
 /**
  * Where request-time rendering is deployed. Each target gets the files its platform
@@ -20,10 +21,19 @@ export interface DotaSsrOptions {
   root?: string;
   /** Built shell relative to the output directory; defaults to `index.html`. */
   template?: string;
-  /** Deployment target; defaults to the SSG `deployment`, else `node`. `false` builds nothing for the server. */
+  /**
+   * Deployment target; defaults to the target static generation prepared in the same build,
+   * else `node`. `false` builds nothing for the server.
+   */
   deployment?: DotaServerTarget | false;
   /** `node` target output, relative to the root; defaults to `dist-server`. */
   serverOutDir?: string;
+  /**
+   * `vercel` target: the `vercel.json` receiving the SSR rewrites, relative to the root unless
+   * absolute. Defaults to the file static generation updated, else the nearest ancestor
+   * `vercel.json`, else a new one in the root, so SSG redirects and SSR rewrites share one file.
+   */
+  vercelConfigFile?: string;
   /** Emit hydration markers; defaults to `true`. */
   hydration?: boolean;
   /** Minimum log level; defaults to `info`. */
@@ -42,6 +52,8 @@ export type ServerDeployment = {
   readonly shell: string;
   /** Router-style paths (`/tasks/:id`) of the `ssr` routes. */
   readonly routes: readonly string[];
+  /** Pages static generation wrote in the same build; they stay static where `ssr` patterns cover them. */
+  readonly staticRoutes: readonly ResolvedDotaSsgRoute[];
   /** Vite public base. */
   readonly base: string;
   /** Resolved plugin options. */
