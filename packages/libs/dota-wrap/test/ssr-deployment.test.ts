@@ -1,7 +1,6 @@
 // @vitest-environment node
 // End to end: `vite build` of a fixture app through dotaVitePlugins produces a working
 // server for each deployment target, rendering `ssr` routes and leaving the rest static.
-import {existsSync} from 'node:fs';
 import {readFile, rm, writeFile} from 'node:fs/promises';
 import type {AddressInfo} from 'node:net';
 import {resolve} from 'node:path';
@@ -43,14 +42,17 @@ describe('server deployment', () => {
 
   it('node: serves ssr routes, static files, and the SPA shell for csr routes', async () => {
     await buildFor('node');
-    const {createNodeServer, handler} = await load<{createNodeServer: Function; handler: Handler}>('dist-server/index.mjs');
-    const server = createNodeServer({handler, clientDirectory: resolve(fixture, 'dist')});
+    const {createNodeServer, handler} = await load<{createNodeServer: Function; handler: Handler & {isKnownPath: Function}}>('dist-server/index.mjs');
+    // As the generated dist-server/server.mjs starts it.
+    const server = createNodeServer({handler, clientDirectory: resolve(fixture, 'dist'), isKnownPath: handler.isKnownPath});
     await new Promise<void>((done) => server.listen(0, done));
     const origin = `http://localhost:${(server.address() as AddressInfo).port}`;
     try {
       const page = await (await fetch(`${origin}/tasks/42`)).text();
       const shell = await (await fetch(`${origin}/about`)).text();
       const missing = await fetch(`${origin}/tasks/missing`);
+      const unknown = await fetch(`${origin}/nowhere`);
+      const slashForm = await fetch(`${origin}/tasks/42/`);
 
       expect(page).toContain('<title>Task 42</title>');
       expect(page).not.toContain('Fixture shell');
@@ -59,7 +61,11 @@ describe('server deployment', () => {
       expect(shell).toContain('<app-root id="app-root"></app-root>');
       expect(missing.status).toBe(404);
       expect(await missing.text()).toContain('<title>Task missing</title>');
-      expect(existsSync(resolve(fixture, 'dist-server/server.mjs'))).toBe(true);
+      // No slash policy without SSG: both forms render, as before.
+      expect(slashForm.status).toBe(200);
+      expect(unknown.status).toBe(404);
+      expect(await unknown.text()).toContain('<title>Fixture shell</title>');
+      expect(await readFile(resolve(fixture, 'dist-server/server.mjs'), 'utf8')).toContain('isKnownPath: handler.isKnownPath');
     } finally {
       server.close();
     }
@@ -115,6 +121,9 @@ describe('server deployment', () => {
 
   it('cloudflare-pages with SSG: keeps a prerendered page static under a server route', async () => {
     await buildFor('cloudflare-pages', true);
+    // The worker's own `./server.js` import would reuse the bundle an earlier test loaded.
+    const {handler} = await load<{handler: Handler}>('dist/_worker.js/server.js');
+    const bare = (await handler(new Request('https://app.test/tasks/9?tab=a')))!;
 
     expect(await readFile(resolve(fixture, 'dist/tasks/42/index.html'), 'utf8')).toContain('<task-page path="/tasks/42"');
     expect(JSON.parse(await readFile(resolve(fixture, 'dist/_routes.json'), 'utf8'))).toEqual({
@@ -123,5 +132,9 @@ describe('server deployment', () => {
       exclude: ['/tasks/42', '/tasks/42/']
     });
     expect(await readFile(resolve(fixture, 'dist/_redirects'), 'utf8')).toBe('# BEGIN dota-ssg\n# END dota-ssg\n');
+    // SSR follows SSG's default slash policy, so both kinds of page share one URL form.
+    expect(bare.status).toBe(308);
+    expect(bare.headers.get('location')).toBe('/tasks/9/?tab=a');
+    expect((await handler(new Request('https://app.test/tasks/9/')))!.status).toBe(200);
   });
 }, 120_000);
