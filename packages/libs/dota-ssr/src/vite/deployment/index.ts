@@ -37,7 +37,8 @@ export async function prepareDeployment(
   switch (resolved.target) {
     case 'vercel':
       if (writesRules) {
-        await updateVercelConfig(root, routes, 'configFile' in resolved ? {configFile: resolved.configFile} : {}, trailingSlash);
+        const vercelOptions = 'configFile' in resolved ? {configFile: resolved.configFile} : {};
+        await updateVercelConfig(root, routes, vercelOptions, trailingSlash);
       }
       return;
     case 'netlify':
