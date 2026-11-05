@@ -14,6 +14,7 @@ type RouteMatch = {
  * It matches a route, builds a fresh {@link RenderContext}, asks the adapter for
  * HTML, and writes it into the document shell. Non-page requests resolve to
  * `undefined` so static files, APIs, or a dev server can answer them instead.
+ * The response carries the status components set through `context.setStatus`, 200 otherwise.
  * Render errors propagate so the hosting server owns error pages and logging.
  * @param options Adapter, routes, document shell, and the fetch given to components.
  */
@@ -25,17 +26,26 @@ export function createRequestHandler(options: RequestHandlerOptions): RequestHan
     const match = matchRoute(options.routes, url.pathname);
     if (!match) return undefined;
 
+    let status = 200;
     const context: RenderContext = {
       url,
       params: match.params,
       state: new Map(),
-      fetch: (input, init) => baseFetch(typeof input === 'string' ? new URL(input, url) : input, init)
+      fetch: (input, init) => baseFetch(typeof input === 'string' ? new URL(input, url) : input, init),
+      setStatus(next) {
+        // Checked here so the mistake names the page, not a later `new Response` failure.
+        if (!Number.isInteger(next) || next < 200 || next > 599) {
+          throw new RangeError(`Page status must be an integer from 200 to 599; got ${next} for ${url.pathname}`);
+        }
+        status = next;
+      }
     };
     const [result, template] = await Promise.all([
       options.adapter.render(match.route.page, context),
       typeof options.template === 'string' ? options.template : options.template(url)
     ]);
     return new Response(renderDocument(template, {...result, head: result.head ?? match.route.seo}), {
+      status,
       headers: {'content-type': 'text/html; charset=utf-8'}
     });
   };
