@@ -72,7 +72,7 @@ import {createNodeServer, handler} from './index.mjs';
 const clientDirectory = fileURLToPath(new URL(${JSON.stringify(`${clientDirectory}/`)}, import.meta.url));
 const fallback = fileURLToPath(new URL('./shell.html', import.meta.url));
 const port = Number(process.env.PORT ?? 3000);
-createNodeServer({handler, clientDirectory, fallback}).listen(port);
+createNodeServer({handler, clientDirectory, fallback, isKnownPath: handler.isKnownPath}).listen(port);
 `, 'utf8');
   logger.success(`Node server written to ${relative(root, directory)}; start it with \`node ${relative(root, directory)}/server.mjs\``);
 }
@@ -128,13 +128,13 @@ export const HEAD = render;
  * Functions also win over static files, so prerendered pages those routes match are listed in
  * `config.excludedPath`.
  */
-async function prepareNetlify({root, bundleFile, routes, staticRoutes, base}: ServerDeployment, logger: ConsolaInstance): Promise<void> {
+async function prepareNetlify({root, bundleFile, routes, staticRoutes, base, options}: ServerDeployment, logger: ConsolaInstance): Promise<void> {
   const directory = resolve(root, '.netlify', 'v1', 'functions', 'dota-ssr');
   await rm(directory, {recursive: true, force: true});
   await mkdir(directory, {recursive: true});
   await copyFile(bundleFile, resolve(directory, 'server.mjs'));
   const prefix = basePrefix(base);
-  const path = [...new Set(routes.map((route) => `${prefix}${route}`))];
+  const path = [...new Set(withSlashForms(routes, options.trailingSlash).map((route) => `${prefix}${route}`))];
   const excludedPath = staticPathsShadowedBy(routes, staticRoutes, prefix);
   await writeFile(resolve(directory, 'dota-ssr.mjs'), `${GENERATED_NOTICE}
 import {handler} from './server.mjs';
@@ -155,9 +155,9 @@ export const config = ${JSON.stringify(excludedPath.length ? {path, excludedPath
  * enabling it is written when none exists.
  * Rules beyond Cloudflare's limit are still written, with a warning naming the counts.
  */
-async function prepareCloudflarePages({root, outputDirectory, bundleFile, routes, staticRoutes, base}: ServerDeployment, logger: ConsolaInstance): Promise<void> {
+async function prepareCloudflarePages({root, outputDirectory, bundleFile, routes, staticRoutes, base, options}: ServerDeployment, logger: ConsolaInstance): Promise<void> {
   const prefix = basePrefix(base);
-  const include = wildcardRoutePatterns(routes, prefix);
+  const include = wildcardRoutePatterns(withSlashForms(routes, options.trailingSlash), prefix);
   const exclude = staticPathsShadowedBy(routes, staticRoutes, prefix);
   if (include.length + exclude.length > CLOUDFLARE_ROUTE_RULE_LIMIT) {
     logger.warn(`_routes.json has ${include.length + exclude.length} rules (${include.length} include, ${exclude.length} exclude), `
@@ -171,11 +171,9 @@ async function prepareCloudflarePages({root, outputDirectory, bundleFile, routes
   await writeFile(resolve(directory, 'index.js'), `${GENERATED_NOTICE}
 import {handler} from './server.js';
 
-export default {
-  async fetch(request, env) {
-    return (await handler(request)) ?? env.ASSETS.fetch(request);
-  }
-};
+${CLOUDFLARE_RENDER}
+
+${options.cacheControl ? CLOUDFLARE_CACHED_EXPORT : CLOUDFLARE_EXPORT}
 `, 'utf8');
   await writeFile(resolve(outputDirectory, '_routes.json'), `${JSON.stringify({version: 1, include, exclude}, null, 2)}\n`, 'utf8');
 
@@ -195,6 +193,50 @@ export default {
     logger.warn(`${relative(root, wranglerFile)} must enable compatibility_flags = ["nodejs_compat"] for server rendering`);
   }
   logger.success(`Cloudflare Pages worker written to ${relative(root, directory)}`);
+}
+
+/**
+ * Worker request handling: renders `ssr` routes, else serves the asset. A path under an `ssr`
+ * pattern that no route declares gets the asset (the SPA shell) with status 404.
+ */
+const CLOUDFLARE_RENDER = `async function render(request, env) {
+  const response = await handler(request);
+  if (response) return response;
+  const asset = await env.ASSETS.fetch(request);
+  if (!asset.headers.get('content-type')?.includes('text/html') || await handler.isKnownPath(new URL(request.url).pathname)) return asset;
+  return new Response(asset.body, {status: 404, headers: asset.headers});
+}`;
+
+/** Worker entry without caching: every request is rendered. */
+const CLOUDFLARE_EXPORT = `export default {
+  fetch: render
+};`;
+
+/**
+ * Worker entry with the Cache API in front: a cached page is answered without rendering,
+ * and a 200 page carrying `Cache-Control` is stored for later requests.
+ */
+const CLOUDFLARE_CACHED_EXPORT = `export default {
+  async fetch(request, env, context) {
+    const cache = request.method === 'GET' ? caches.default : undefined;
+    const cached = await cache?.match(request);
+    if (cached) return cached;
+    const response = await render(request, env);
+    if (cache && response.status === 200 && response.headers.has('cache-control')) context.waitUntil(cache.put(request, response.clone()));
+    return response;
+  }
+};`;
+
+/**
+ * Adds the slash form of each route when a slash policy is set, so the server receives both
+ * URL forms and can redirect one to the other. On Cloudflare Pages the forms of routes ending
+ * in a dynamic segment collapse back into their wildcard, which already matches both.
+ * @param routes Router-style `ssr` paths.
+ * @param trailingSlash Slash policy, or `undefined` to route only the declared form.
+ */
+function withSlashForms(routes: readonly string[], trailingSlash: boolean | undefined): string[] {
+  if (trailingSlash === undefined) return [...routes];
+  return [...routes, ...routes.filter((route) => route !== '/').map((route) => `${route}/`)];
 }
 
 /** Path of the Vite base without its trailing slash, for platform route patterns. */
