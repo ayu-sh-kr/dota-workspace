@@ -34,10 +34,11 @@ export function serverEntrySource(entryFile: string, target: DotaServerTarget, o
     ...(options.trailingSlash === undefined ? {} : {trailingSlash: options.trailingSlash}),
     ...(options.cacheControl ? {cacheControl: options.cacheControl} : {})
   });
+  const loadEntry = `() => import(${JSON.stringify(entryFile)})`;
   return [
     `import {createApplicationHandler, resolveServerRoutes} from ${JSON.stringify(ownModule('server'))};`,
     `import template from ${JSON.stringify(TEMPLATE_MODULE)};`,
-    `export const handler = createApplicationHandler(() => import(${JSON.stringify(entryFile)}), {template, ...${handlerOptions}});`,
+    `export const handler = createApplicationHandler(${loadEntry}, {template, ...${handlerOptions}});`,
     'export const serverRoutes = async () => resolveServerRoutes(await handler.application()).map((route) => route.path);',
     ...(target === 'node' ? [`export {createNodeServer} from ${JSON.stringify(ownModule('node'))};`] : [])
   ].join('\n');
