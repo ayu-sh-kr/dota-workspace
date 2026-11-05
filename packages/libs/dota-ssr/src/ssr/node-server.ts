@@ -37,9 +37,10 @@ const logger = createDotaLogger('dota-ssr', 'ssr/node-server.ts');
  * HTTP server for a built Dota application, covering all three render modes:
  * a built file (assets and prerendered `ssg` pages, including `/path/index.html`) wins,
  * reached through its canonical URL (see {@link canonicalLocation}), then `ssr` routes are rendered per request, then the SPA shell answers so `csr` routes
- * start in the browser, with 404 for paths `isKnownPath` rejects. A client `index.html` identical to the fallback shell is never served
+ * start in the browser. A client `index.html` identical to the fallback shell is never served
  * as a page, so a server-rendered `/` is not shadowed. A render error is logged and answered with 500, never the shell,
  * so failures stay visible. Paths never resolve outside `clientDirectory`.
+ * With `isKnownPath`, the shell answers paths the application does not declare with 404.
  * @returns An unstarted `http.Server`; call `listen()`.
  */
 export function createNodeServer(options: NodeServerOptions): Server {
@@ -68,11 +69,12 @@ export function createNodeServer(options: NodeServerOptions): Server {
           return void response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
         }
         if (request.method !== 'GET' && request.method !== 'HEAD') return void response.writeHead(405).end();
-        void Promise.resolve(options.isKnownPath?.(pathname) ?? true)
+        void Promise.resolve(options.isKnownPath?.(url.pathname) ?? true)
           .then((known) => sendFile(fallback, request.method === 'HEAD', response, known ? 200 : 404))
           .catch((error: unknown) => {
             logger.error(`Route lookup failed for ${request.url ?? '/'}`, error);
-            if (!response.headersSent) response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
+            if (response.headersSent) return;
+            response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
           });
       });
     } catch {
@@ -116,7 +118,8 @@ function canonicalLocation(root: string, url: URL, file: string): string | undef
 }
 
 function sendFile(file: string, headOnly: boolean, response: import('node:http').ServerResponse, status = 200): void {
-  response.writeHead(status, {'content-type': CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream'});
+  const contentType = CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream';
+  response.writeHead(status, {'content-type': contentType});
   if (headOnly) response.end();
   else createReadStream(file).on('error', () => response.destroy()).pipe(response);
 }
