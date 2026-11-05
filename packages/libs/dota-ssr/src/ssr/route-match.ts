@@ -8,6 +8,12 @@ export type PathMatch<R> = {
   readonly params: Record<string, string>;
 };
 
+/** Anything with a router-style `path`, such as a page route or a route configuration. */
+export type RoutePath = {
+  /** Path such as `/tasks/:id`. */
+  readonly path: string;
+};
+
 /**
  * Matches a pathname against routes in order, using Dota Router's segment syntax: `:name`
  * and `[name]` capture one segment, and a final `[...name]` captures the remaining segments
@@ -16,7 +22,7 @@ export type PathMatch<R> = {
  * @param pathname Request path without query string.
  * @returns The first matching route and its parameters, or `undefined`.
  */
-export function matchPath<R extends {readonly path: string}>(routes: readonly R[], pathname: string): PathMatch<R> | undefined {
+export function matchPath<R extends RoutePath>(routes: readonly R[], pathname: string): PathMatch<R> | undefined {
   const segments = pathname.split('/').filter(Boolean);
   for (const route of routes) {
     const params = matchSegments(route.path.split('/').filter(Boolean), segments);
