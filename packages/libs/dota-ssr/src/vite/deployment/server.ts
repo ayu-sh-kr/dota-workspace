@@ -153,16 +153,16 @@ export const config = ${JSON.stringify(excludedPath.length ? {path, excludedPath
  * requires, and prerendered pages they match are excluded so their snapshots are served.
  * The bundle needs the `nodejs_compat` flag (for `AsyncLocalStorage`), so a `wrangler.toml`
  * enabling it is written when none exists.
- * @throws When the rules exceed Cloudflare's limit, before any file is written.
+ * Rules beyond Cloudflare's limit are still written, with a warning naming the counts.
  */
 async function prepareCloudflarePages({root, outputDirectory, bundleFile, routes, staticRoutes, base}: ServerDeployment, logger: ConsolaInstance): Promise<void> {
   const prefix = basePrefix(base);
   const include = wildcardRoutePatterns(routes, prefix);
   const exclude = staticPathsShadowedBy(routes, staticRoutes, prefix);
   if (include.length + exclude.length > CLOUDFLARE_ROUTE_RULE_LIMIT) {
-    throw new Error(`Cloudflare Pages accepts ${CLOUDFLARE_ROUTE_RULE_LIMIT} rules in _routes.json, but ${include.length} server route patterns `
-      + `and ${exclude.length} exclusions for prerendered pages they match need ${include.length + exclude.length}; `
-      + 'prerender fewer pages under server routes or merge server routes');
+    logger.warn(`_routes.json has ${include.length + exclude.length} rules (${include.length} include, ${exclude.length} exclude), `
+      + `but Cloudflare Pages accepts ${CLOUDFLARE_ROUTE_RULE_LIMIT}; the deployment will be rejected until server routes are merged `
+      + 'or fewer pages under them are prerendered');
   }
   const directory = resolve(outputDirectory, '_worker.js');
   await rm(directory, {recursive: true, force: true});
