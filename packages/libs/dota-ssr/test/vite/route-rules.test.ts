@@ -7,6 +7,12 @@ describe('wildcardRoutePatterns', () => {
     expect(wildcardRoutePatterns(['/tasks/:id/edit', '/tasks/:id', '/tasks/:id/comments/:comment'], '')).toEqual(['/tasks/*']);
   });
 
+  it('collapses a nested dynamic route under its parent route, whichever comes first', () => {
+    expect(wildcardRoutePatterns(['/products/:product', '/products/:product/playground'], '')).toEqual(['/products/*']);
+    expect(wildcardRoutePatterns(['/products/:product/playground', '/products/[product]'], '')).toEqual(['/products/*']);
+    expect(wildcardRoutePatterns(['/docs/[...slug]', '/docs/:slug/edit'], '')).toEqual(['/docs/*']);
+  });
+
   it('keeps patterns that only partly overlap, and drops duplicates', () => {
     expect(wildcardRoutePatterns(['/a/:x/b', '/a/c/:y', '/users/:id', '/users/:name', '/'], '/base')).toEqual(['/base/a/*/b', '/base/a/c/*', '/base/users/*', '/base/']);
   });
