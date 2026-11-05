@@ -85,10 +85,10 @@ describe('deployment configuration', () => {
 
     await prepareDeployment(root, output, routes, {deployment: {target: 'cloudflare-pages', redirects: false}});
 
-    expect(takeStaticDeployment(output)).toEqual({routes, deployment: {target: 'cloudflare-pages', redirects: false}});
+    expect(takeStaticDeployment(output)).toEqual({routes, deployment: {target: 'cloudflare-pages', redirects: false}, trailingSlash: true});
     expect(takeStaticDeployment(output)).toBeUndefined();
-    await prepareDeployment(root, output, routes, {deployment: false});
-    expect(takeStaticDeployment(output)).toEqual({routes, deployment: false});
+    await prepareDeployment(root, output, routes, {deployment: false, trailingSlash: false});
+    expect(takeStaticDeployment(output)).toEqual({routes, deployment: false, trailingSlash: false});
   });
 
   it('rejects malformed managed blocks without changing user rules', async () => {
