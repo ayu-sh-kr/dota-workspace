@@ -35,10 +35,22 @@ describe('dotaPackage', () => {
     expect(calls.ssr).toEqual([{deployment: 'node', serverOutDir: 'server'}]);
   });
 
-  it('passes a Vercel configuration path to SSG', () => {
+  it('passes a Vercel configuration path to SSG and SSR so both update one file', () => {
     dotaPackage({target: 'vercel', vercelConfigFile: '../vercel.json'}, {ssg: {}});
 
     expect(calls.ssg).toEqual([{deployment: {target: 'vercel', configFile: '../vercel.json'}}]);
+    expect(calls.ssr).toEqual([{deployment: 'vercel', vercelConfigFile: '../vercel.json'}]);
+  });
+
+  it('forwards a route-rule opt-out to SSG only', () => {
+    dotaPackage({target: 'cloudflare-pages', redirects: false}, {ssg: {}});
+    dotaPackage({target: 'vercel', vercelConfigFile: 'vercel.json', redirects: false}, {ssg: {}});
+
+    expect(calls.ssg).toEqual([
+      {deployment: {target: 'cloudflare-pages', redirects: false}},
+      {deployment: {target: 'vercel', configFile: 'vercel.json', redirects: false}},
+    ]);
+    expect(calls.ssr).toEqual([{deployment: 'cloudflare-pages'}, {deployment: 'vercel', vercelConfigFile: 'vercel.json'}]);
   });
 
   it('lets per-plugin deployments win and SSR follow the SSG target when none is shared', () => {
