@@ -9,7 +9,8 @@ function createContext(tasks: unknown[] = [{id: 1, title: 'Write <docs>'}, {id: 
     url: new URL(url),
     params: {},
     state: new Map(),
-    fetch: vi.fn(async () => Response.json(tasks)) as unknown as typeof fetch
+    fetch: vi.fn(async () => Response.json(tasks)) as unknown as typeof fetch,
+    setStatus: vi.fn()
   };
 }
 
