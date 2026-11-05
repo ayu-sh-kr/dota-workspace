@@ -16,6 +16,12 @@ export interface NodeServerOptions {
   readonly clientDirectory: string;
   /** Shell served for unmatched paths so `csr` routes boot in the browser; defaults to `index.html`. */
   readonly fallback?: string;
+  /**
+   * Whether the application declares a route for a path, such as `ApplicationHandler.isKnownPath`.
+   * When given, the shell is still sent for other paths, so the client shows its not-found
+   * page, but with status 404. Omitted, every fallback is a 200 as before.
+   */
+  readonly isKnownPath?: (pathname: string) => boolean | Promise<boolean>;
 }
 
 const CONTENT_TYPES: Record<string, string> = {
@@ -31,7 +37,7 @@ const logger = createDotaLogger('dota-ssr', 'ssr/node-server.ts');
  * HTTP server for a built Dota application, covering all three render modes:
  * a built file (assets and prerendered `ssg` pages, including `/path/index.html`) wins,
  * reached through its canonical URL (see {@link canonicalLocation}), then `ssr` routes are rendered per request, then the SPA shell answers so `csr` routes
- * start in the browser. A client `index.html` identical to the fallback shell is never served
+ * start in the browser, with 404 for paths `isKnownPath` rejects. A client `index.html` identical to the fallback shell is never served
  * as a page, so a server-rendered `/` is not shadowed. A render error is logged and answered with 500, never the shell,
  * so failures stay visible. Paths never resolve outside `clientDirectory`.
  * @returns An unstarted `http.Server`; call `listen()`.
@@ -62,7 +68,12 @@ export function createNodeServer(options: NodeServerOptions): Server {
           return void response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
         }
         if (request.method !== 'GET' && request.method !== 'HEAD') return void response.writeHead(405).end();
-        sendFile(fallback, request.method === 'HEAD', response);
+        void Promise.resolve(options.isKnownPath?.(pathname) ?? true)
+          .then((known) => sendFile(fallback, request.method === 'HEAD', response, known ? 200 : 404))
+          .catch((error: unknown) => {
+            logger.error(`Route lookup failed for ${request.url ?? '/'}`, error);
+            if (!response.headersSent) response.writeHead(500, {'content-type': 'text/plain; charset=utf-8'}).end('Internal Server Error');
+          });
       });
     } catch {
       if (!response.headersSent) response.writeHead(400).end();
@@ -104,8 +115,8 @@ function canonicalLocation(root: string, url: URL, file: string): string | undef
   return undefined;
 }
 
-function sendFile(file: string, headOnly: boolean, response: import('node:http').ServerResponse): void {
-  response.writeHead(200, {'content-type': CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream'});
+function sendFile(file: string, headOnly: boolean, response: import('node:http').ServerResponse, status = 200): void {
+  response.writeHead(status, {'content-type': CONTENT_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream'});
   if (headOnly) response.end();
   else createReadStream(file).on('error', () => response.destroy()).pipe(response);
 }
