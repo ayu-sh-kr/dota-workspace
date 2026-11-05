@@ -11,6 +11,7 @@ export type {
   DotaSsgOptions,
   DotaSsgRoute,
   DotaSsgRouteInput,
+  DotaSsgRouteRuleOptions,
   DotaSsgVercelOptions,
   ResolvedDotaSsgRoute,
   DotaServerTarget,
